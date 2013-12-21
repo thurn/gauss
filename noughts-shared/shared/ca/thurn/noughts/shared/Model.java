@@ -7,6 +7,9 @@ import java.util.Map;
 
 import org.eclipse.xtext.xbase.lib.Procedures;
 
+import ca.thurn.noughts.shared.Game.GameDeserializer;
+
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -15,17 +18,35 @@ import com.firebase.client.Transaction;
 import com.firebase.client.Transaction.Handler;
 import com.firebase.client.Transaction.Result;
 
-public class Model {
+public class Model implements ChildEventListener {
   public static final int X_PLAYER = 0;
   public static final int O_PLAYER = 1;
   public static final String LOCAL_MULTIPLAYER_OPPONENT_ID = "LOCAL_MULTIPLAYER_OPPONENT_ID";
+
+  public static interface GameUpdateListener {
+    public void onGameUpdate(Game game);
+  }
+  
+  public static interface GameListListener {
+    public void onGameAdded(Game game);
+    
+    public void onGameChanged(Game game);
+    
+    public void onGameMoved(Game game);
+    
+    public void onGameRemoved(Game game);
+  }
   
   private String userId;
   private final Firebase firebase;
+  private final Map<String, GameUpdateListener> gameUpdateListeners;
+  private GameListListener gameListListener;
   
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
+    this.gameUpdateListeners = new HashMap<String, GameUpdateListener>();
+    firebase.child("games").addChildEventListener(this);
   }
   
   /**
@@ -43,7 +64,7 @@ public class Model {
    * game. 
    */
   public boolean isCurrentPlayer(Game game) {
-    if (game.gameOver) return false;
+    if (game.isGameOver()) return false;
     return game.currentPlayerId() == userId;
   }
 
@@ -55,6 +76,86 @@ public class Model {
     return game.players.contains(userId);
   }
   
+  /**
+   * Adds a listener whose onGameUpdate method will be invoked if a game with
+   * the provided ID is added or changed. Overwrites any previously added
+   * game update listener.
+   *
+   * @param gameId The ID of the game.
+   * @param listener The listener to add.
+   */
+  public void setGameUpdateListener(String gameId, GameUpdateListener listener) {
+    gameUpdateListeners.put(gameId, listener);
+  }
+  
+  /**
+   * Removes the GameUpdateListener associated with this Game ID.
+   *
+   * @param gameId ID of game to remove listener for.
+   */
+  public void removeGameUpdateListener(String gameId) {
+    gameUpdateListeners.remove(gameId);
+  }
+  
+  /**
+   * Adds a GameListListener which will be triggered whenever the game list
+   * changes. Overwrites any previously added game list listener.
+   *
+   * @param listener The listener to add.
+   */
+  public void setGameListListener(final GameListListener listener) {
+    gameListListener = listener;
+  }
+  
+  /**
+   * Unregisters the current game list listener. You should call this if the
+   * Model is no longer going to be used so the listener stops firing.
+   */
+  public void removeGameListListener() {
+    firebase.removeEventListener(this);
+    gameListListener = null;
+  }
+  
+  @Override
+  public void onCancelled(FirebaseError error) {
+  }
+
+  @Override
+  public void onChildAdded(DataSnapshot snapshot, String previous) {
+    Game game = new GameDeserializer().fromDataSnapshot(snapshot);
+    if (gameListListener != null) {
+      gameListListener.onGameAdded(game);
+    }
+    if (gameUpdateListeners.containsKey(game.id)) {
+      gameUpdateListeners.get(game.id).onGameUpdate(game);
+    }
+  }
+
+  @Override
+  public void onChildChanged(DataSnapshot snapshot, String previous) {
+    Game game = new GameDeserializer().fromDataSnapshot(snapshot);
+    if (gameListListener != null) {
+      gameListListener.onGameChanged(game);
+    }
+    if (gameUpdateListeners.containsKey(game.id)) {
+      gameUpdateListeners.get(game.id).onGameUpdate(game);
+    }
+  }
+
+  @Override
+  public void onChildMoved(DataSnapshot snapshot, String previous) {
+    if (gameListListener != null) {
+      gameListListener.onGameMoved(new GameDeserializer().fromDataSnapshot(snapshot));
+    }
+  }
+
+  @Override
+  public void onChildRemoved(DataSnapshot snapshot) {
+    if (gameListListener != null) {
+      gameListListener.onGameRemoved(new GameDeserializer().fromDataSnapshot(snapshot));
+    }
+  }
+
   /**
    * Partially create a new game with no opponent specified yet, returning the
    * game ID.
@@ -68,15 +169,14 @@ public class Model {
   public String newGame(boolean localMultiplayer, Map<String, String> userProfile,
       Map<String, String> opponentProfile) {
     Firebase ref = firebase.child("games").push();
-    Game game = new Game();
-    game.id = ref.getName();
+    Game game = new Game(ref.getName());
     game.players.add(userId);
-    game.localMultiplayer = localMultiplayer;
+    game.setLocalMultiplayer(localMultiplayer);
     if (localMultiplayer) game.players.add(LOCAL_MULTIPLAYER_OPPONENT_ID);
     game.currentPlayerNumber = X_PLAYER;
     game.currentActionNumber = null;
     game.lastModified = System.currentTimeMillis();
-    game.gameOver = false;
+    game.setGameOver(false);
     
     if (userProfile != null) {
       if (userProfile.get("id") != userId) {
@@ -111,14 +211,12 @@ public class Model {
           newGame.lastModified = timestamp;
           Action action = newGame.currentAction();
           action.futureCommands.clear();
-          action.gameId = "bar";
           action.commands.add(command);
         } else {
-          Action action = new Action();
-          action.player = userId;
-          action.playerNumber = game.currentPlayerNumber;
-          action.submitted = false;
+          Action action = new Action(userId);
           action.gameId = game.id;
+          action.playerNumber = game.currentPlayerNumber;
+          action.setSubmitted(false);
           action.commands.add(command);
           newGame.actions.add(action);
           newGame.currentActionNumber = newGame.actions.size() - 1;
@@ -197,12 +295,12 @@ public class Model {
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game newGame) {
-        newGame.currentAction().submitted = true;
+        newGame.currentAction().setSubmitted(true);
         List<String> victors = computeVictors(newGame);
         if (victors == null) {
           newGame.currentPlayerNumber = newPlayerNumber;
           newGame.currentActionNumber = null;
-          if (newGame.localMultiplayer) {
+          if (newGame.isLocalMultiplayer()) {
             // Update model with new player number in local multiplayer games
             setUserId(newGame.currentPlayerId());
           }
@@ -211,7 +309,7 @@ public class Model {
           newGame.currentPlayerNumber = null;
           newGame.currentActionNumber = null;
           newGame.victors.addAll(victors);
-          newGame.gameOver = true;
+          newGame.setGameOver(true);
         }        
     }});
   }
@@ -270,7 +368,8 @@ public class Model {
    * @param game The game to find the victors for
    * @return A list of victors or null if the game is not over.
    */
-  private List<String> computeVictors(Game game) {
+  // Visible for testing only
+  List<String> computeVictors(Game game) {
     // 1) check for win
     
     Action[][] actionTable = makeActionTable(game);
@@ -306,7 +405,7 @@ public class Model {
   
   
   /**
-   * Checks if the square at (column, row) has been already taken.
+   * Returns true if the square at (column, row) is available. 
    */  
   private boolean isLegalCommand(Game game, Command command) {
     int column = command.column;
@@ -314,7 +413,7 @@ public class Model {
     if (column < 0 || row < 0 || column > 2 || row > 2) {
       return false;
     }
-    return makeActionTable(game)[column][row] != null;    
+    return makeActionTable(game)[column][row] == null;    
   }
   
   /** 
@@ -334,11 +433,11 @@ public class Model {
   }
   
   /**
-   * Runs a  
+   * Runs a transaction to mutate the provided game via the provided function.
    */
   private void mutateGame(Game game, final Procedures.Procedure1<Game> function) {
     Firebase ref = firebase.child("games").child(game.id);
-    ref.runTransaction(new Transaction.Handler() {
+    ref.runTransaction(new Handler() {
       
       @Override
       public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
@@ -346,10 +445,10 @@ public class Model {
       
       @Override
       public Result doTransaction(MutableData mutableData) {
-        Game game = Game.fromMutableData(mutableData);
+        Game game = new GameDeserializer().fromMutableData(mutableData);
         function.apply(game);
         mutableData.setValue(game.serialize());
-        return null;
+        return Transaction.success(mutableData);
       }
     });
   }  
@@ -362,16 +461,9 @@ public class Model {
   }
 
   /**
-   * Ensures the current user is a player in the provided game.
-   */
-  private void ensureIsPlayer(Game game) {
-    if (!isPlayer(game)) die("Unauthorized user: " + userId);
-  }
-
-  /**
    * Ensures the current user is the current player in the provided game.
    */
-  private void ensureIsCurrentPlayer(Game game) {
+  void ensureIsCurrentPlayer(Game game) {
     if (!isCurrentPlayer(game)) die("Unauthorized user: " + userId);
   }
 }

@@ -4,22 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Command extends Entity {
+  public static class CommandDeserializer extends EntityDeserializer<Command> {
+    @Override
+    public Command deserialize(Map<String, Object> commandMap) {
+      return new Command(commandMap);
+    }    
+  }
   
-  public Integer column;
+  public final int column;
   
-  public Integer row;
+  public final int row;
   
-  public Command() {
+  public Command(int column, int row) {
+    this.column = column;
+    this.row = row;
   }
   
   public Command(Map<String, Object> commandMap) {
     column = getInteger(commandMap, "column");
     row = getInteger(commandMap, "row");
-  }
-
-  @Override
-  public Entity deserialize(Map<String, Object> commandMap) {
-    return new Command(commandMap);
   }
 
   @Override

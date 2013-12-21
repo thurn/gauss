@@ -5,13 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.firebase.client.MutableData;
+import ca.thurn.noughts.shared.Action.ActionDeserializer;
 
 public class Game extends Entity {
+  public static class GameDeserializer extends EntityDeserializer<Game> {
+    @Override 
+    public Game deserialize(Map<String, Object> map) {
+      return new Game(map);
+    }    
+  }
+  
   /**
    * The game ID
    */
-  public String id;
+  public final String id;
 
   /**
    * An array of the players in the game, which can be though of as a bimap
@@ -64,33 +71,25 @@ public class Game extends Entity {
   /**
    * True if this game has ended.
    */
-  public Boolean gameOver;
+  private Boolean gameOver;
 
   /**
    * True if this game is in local multiplayer mode
    */
-  public Boolean localMultiplayer;
+  private Boolean localMultiplayer;
 
   /**
    * An array of player IDs who have resigned the game.
    */
   public final List<String> resignedPlayers;
   
-  /**
-   * @param data A MutableData object pointing to a Game.
-   * @return A Game instance based on this MutableData.
-   */
-  @SuppressWarnings("unchecked")
-  public static Game fromMutableData(MutableData data) {
-    return new Game((Map<String, Object>)data.getValue());
-  }
-
-  public Game() {
+  public Game(String id) {
     players = new ArrayList<String>();
     profiles = new HashMap<String, Map<String, String>>();
     actions = new ArrayList<Action>();
     victors = new ArrayList<String>();
     resignedPlayers = new ArrayList<String>();
+    this.id = id;
   }
 
   public Game(Map<String, Object> gameMap) {
@@ -98,7 +97,7 @@ public class Game extends Entity {
     players = getList(gameMap, "players");
     profiles = getMap(gameMap, "profiles");
     currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
-    actions = getEntities(gameMap, "actions", new Action());
+    actions = getEntities(gameMap, "actions", new ActionDeserializer());
     currentActionNumber = getInteger(gameMap, "currentActionNumber");
     lastModified = getLong(gameMap, "lastModified");
     requestId = getString(gameMap, "requestId");
@@ -111,11 +110,6 @@ public class Game extends Entity {
   @Override
   public String entityName() {
     return "Game";
-  }
-
-  @Override 
-  public Game deserialize(Map<String, Object> map) {
-    return new Game(map);
   }
   
   @Override 
@@ -137,6 +131,7 @@ public class Game extends Entity {
   }
   
   public String currentPlayerId() {
+    if (currentPlayerNumber == null) return null;
     return players.get(currentPlayerNumber);
   }
   
@@ -154,5 +149,13 @@ public class Game extends Entity {
   
   public boolean isLocalMultiplayer() {
     return localMultiplayer != null && localMultiplayer == true;
+  }
+
+  void setGameOver(Boolean gameOver) {
+    this.gameOver = gameOver;
+  }
+
+  void setLocalMultiplayer(Boolean localMultiplayer) {
+    this.localMultiplayer = localMultiplayer;
   }
 }
