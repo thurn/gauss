@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Game.GameDeserializer;
 import ca.thurn.noughts.shared.Model.GameUpdateListener;
 import ca.thurn.testing.SharedTestCase;
 
-import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 
 public class ModelTest extends SharedTestCase {
   private Model model;
@@ -19,16 +16,11 @@ public class ModelTest extends SharedTestCase {
   private Firebase firebase;
 
   @Override
-  public void sharedSetUp(final Runnable done) {
-    firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
+  public void sharedSetUp(Runnable done) {
+    firebase = new Firebase("https://www.example.com/");
     userId = randomInteger() + "";
     model = new Model(userId, firebase);
-    firebase.removeValue(new Firebase.CompletionListener() {
-      @Override
-      public void onComplete(FirebaseError error, Firebase ref) {
-        done.run();
-      }
-    });
+    done.run();
   }
   
   @Override
@@ -72,6 +64,7 @@ public class ModelTest extends SharedTestCase {
         model.setGameUpdateListener(game.id, new GameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
+            assertNotNull(game.lastModified);
             assertTrue(game.lastModified > 0);
             Action action = game.currentAction();
             assertEquals(0, action.futureCommands.size());
@@ -432,13 +425,12 @@ public class ModelTest extends SharedTestCase {
   }
   
   private void withTestData(final Game game, final Runnable testFn) {
-    firebase.child("games").addChildEventListener(new AbstractChildEventListener() {
+    model.setGameListListener(new AbstractGameListListener() {
       @Override
-      public void onChildAdded(DataSnapshot snapshot, String previous) {
-        firebase.child("games").removeEventListener(this);
-        assertEquals(game, new GameDeserializer().fromDataSnapshot(snapshot));
+      public void onGameAdded(Game newGame) {
+        assertEquals(game, newGame);
         testFn.run();
-      }
+      }      
     });
     firebase.child("games").child(game.id).setValue(game.serialize());
   }

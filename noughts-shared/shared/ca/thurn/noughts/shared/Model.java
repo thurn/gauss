@@ -123,22 +123,25 @@ public class Model implements ChildEventListener {
   @Override
   public void onChildAdded(DataSnapshot snapshot, String previous) {
     Game game = new GameDeserializer().fromDataSnapshot(snapshot);
-    if (gameListListener != null) {
-      gameListListener.onGameAdded(game);
-    }
+    // If we run the update listener before the list listener, you can add
+    // a new update listener from the list listener without re-processing
+    // this event itself.
     if (gameUpdateListeners.containsKey(game.id)) {
       gameUpdateListeners.get(game.id).onGameUpdate(game);
+    }    
+    if (gameListListener != null) {
+      gameListListener.onGameAdded(game);
     }
   }
 
   @Override
   public void onChildChanged(DataSnapshot snapshot, String previous) {
     Game game = new GameDeserializer().fromDataSnapshot(snapshot);
-    if (gameListListener != null) {
-      gameListListener.onGameChanged(game);
-    }
     if (gameUpdateListeners.containsKey(game.id)) {
       gameUpdateListeners.get(game.id).onGameUpdate(game);
+    }    
+    if (gameListListener != null) {
+      gameListListener.onGameChanged(game);
     }
   }
 
@@ -205,11 +208,11 @@ public class Model implements ChildEventListener {
     ensureIsCurrentPlayer(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
     mutateGame(game, new Procedures.Procedure1<Game>() {
-      @Override public void apply(Game newGame) {
+      @Override public void apply(Game game) {
         long timestamp = System.currentTimeMillis();
         if (game.hasCurrentAction()) {
-          newGame.lastModified = timestamp;
-          Action action = newGame.currentAction();
+          game.lastModified = timestamp;
+          Action action = game.currentAction();
           action.futureCommands.clear();
           action.commands.add(command);
         } else {
@@ -218,9 +221,9 @@ public class Model implements ChildEventListener {
           action.playerNumber = game.currentPlayerNumber;
           action.setSubmitted(false);
           action.commands.add(command);
-          newGame.actions.add(action);
-          newGame.currentActionNumber = newGame.actions.size() - 1;
-          newGame.lastModified = timestamp;
+          game.actions.add(action);
+          game.currentActionNumber = game.actions.size() - 1;
+          game.lastModified = timestamp;
         }
       }
     });
