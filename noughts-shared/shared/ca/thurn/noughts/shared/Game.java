@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.firebase.client.MutableData;
+
 public class Game extends Entity {
   /**
    * The game ID
@@ -73,6 +75,15 @@ public class Game extends Entity {
    * An array of player IDs who have resigned the game.
    */
   public final List<String> resignedPlayers;
+  
+  /**
+   * @param data A MutableData object pointing to a Game.
+   * @return A Game instance based on this MutableData.
+   */
+  @SuppressWarnings("unchecked")
+  public static Game fromMutableData(MutableData data) {
+    return new Game((Map<String, Object>)data.getValue());
+  }
 
   public Game() {
     players = new ArrayList<String>();
@@ -145,41 +156,3 @@ public class Game extends Entity {
     return localMultiplayer != null && localMultiplayer == true;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
