@@ -12,16 +12,88 @@
                         <viewControllerLayoutGuide type="top" id="art-tl-zg4"/>
                         <viewControllerLayoutGuide type="bottom" id="DeG-US-Bkl"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS" userLabel="MainView">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Logo" translatesAutoresizingMaskIntoConstraints="NO" id="xg5-Qh-0Ty">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                            <imageView userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="xg5-Qh-0Ty" userLabel="Logo">
+                                <rect key="frame" x="38" y="45" width="245" height="65"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="65" id="ojA-el-mbK"/>
+                                </constraints>
                             </imageView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="khQ-qh-q60" userLabel="MenuContainer">
+                                <rect key="frame" x="23" y="196" width="275" height="175"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1qV-mY-kuB" userLabel="New Game">
+                                        <rect key="frame" x="84" y="13" width="99" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="New Game">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_new_game" translatesAutoresizingMaskIntoConstraints="NO" id="1ff-9f-fZe" userLabel="ic_new_game">
+                                        <rect key="frame" x="32" y="15" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MJh-9N-Fke" userLabel="How to Play">
+                                        <rect key="frame" x="84" y="60" width="107" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="How to Play">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_how_to_play" translatesAutoresizingMaskIntoConstraints="NO" id="19X-yC-Dh7" userLabel="ic_how_to_play">
+                                        <rect key="frame" x="32" y="62" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3f-7h-aDP" userLabel="Settings">
+                                        <rect key="frame" x="84" y="107" width="73" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Settings">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_settings" translatesAutoresizingMaskIntoConstraints="NO" id="AUS-xW-cdv" userLabel="ic_settings">
+                                        <rect key="frame" x="32" y="109" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="centerY" secondItem="s3f-7h-aDP" secondAttribute="centerY" id="0I4-l1-I9e"/>
+                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="top" secondItem="19X-yC-Dh7" secondAttribute="bottom" constant="15" id="1hZ-wo-MRm"/>
+                                    <constraint firstAttribute="width" constant="275" id="30B-Y2-nub"/>
+                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="centerX" secondItem="19X-yC-Dh7" secondAttribute="centerX" id="4Sc-0n-YY1"/>
+                                    <constraint firstItem="s3f-7h-aDP" firstAttribute="leading" secondItem="1qV-mY-kuB" secondAttribute="leading" id="837-fb-Ag5"/>
+                                    <constraint firstItem="MJh-9N-Fke" firstAttribute="centerX" secondItem="khQ-qh-q60" secondAttribute="centerX" id="8BW-cc-Uzu"/>
+                                    <constraint firstItem="19X-yC-Dh7" firstAttribute="top" secondItem="1ff-9f-fZe" secondAttribute="bottom" constant="15" id="99S-CX-X3S"/>
+                                    <constraint firstAttribute="height" constant="175" id="G5F-YL-g8N"/>
+                                    <constraint firstItem="19X-yC-Dh7" firstAttribute="centerY" secondItem="MJh-9N-Fke" secondAttribute="centerY" id="HjT-St-YPC"/>
+                                    <constraint firstItem="19X-yC-Dh7" firstAttribute="leading" secondItem="AUS-xW-cdv" secondAttribute="leading" id="Ipv-Gk-xqb"/>
+                                    <constraint firstItem="1qV-mY-kuB" firstAttribute="leading" secondItem="1ff-9f-fZe" secondAttribute="trailing" constant="20" id="L0a-lL-rI4"/>
+                                    <constraint firstItem="MJh-9N-Fke" firstAttribute="leading" secondItem="s3f-7h-aDP" secondAttribute="leading" id="aRf-Up-0vF"/>
+                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="centerX" secondItem="1ff-9f-fZe" secondAttribute="centerX" id="fMe-RB-OBE"/>
+                                    <constraint firstItem="1ff-9f-fZe" firstAttribute="top" secondItem="khQ-qh-q60" secondAttribute="top" constant="15" id="i1B-6O-O6u"/>
+                                    <constraint firstItem="MJh-9N-Fke" firstAttribute="leading" secondItem="1qV-mY-kuB" secondAttribute="leading" id="n0O-5D-CPf"/>
+                                    <constraint firstItem="s3f-7h-aDP" firstAttribute="leading" secondItem="MJh-9N-Fke" secondAttribute="leading" id="r5P-V4-XRV"/>
+                                    <constraint firstItem="1ff-9f-fZe" firstAttribute="centerY" secondItem="1qV-mY-kuB" secondAttribute="centerY" id="vzo-Ga-BX1"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="khQ-qh-q60" secondAttribute="centerX" id="Qan-tC-Qnt"/>
+                            <constraint firstItem="khQ-qh-q60" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xg5-Qh-0Ty" secondAttribute="bottom" constant="5" id="h2B-2B-HrV"/>
+                            <constraint firstAttribute="centerY" secondItem="khQ-qh-q60" secondAttribute="centerY" priority="900" id="iW1-eB-ycF"/>
+                            <constraint firstAttribute="centerX" secondItem="xg5-Qh-0Ty" secondAttribute="centerX" id="nCF-G3-tW4"/>
+                            <constraint firstItem="xg5-Qh-0Ty" firstAttribute="top" secondItem="art-tl-zg4" secondAttribute="bottom" constant="25" id="uRM-4X-0Ef"/>
+                        </constraints>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
@@ -29,7 +101,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Logo" width="245" height="56"/>
+        <image name="ic_how_to_play" width="32" height="32"/>
+        <image name="ic_new_game" width="32" height="32"/>
+        <image name="ic_settings" width="32" height="32"/>
+        <image name="logo" width="245" height="56"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

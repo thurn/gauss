@@ -25,8 +25,11 @@ function processImageAndroid {
 
 function processImageIOS {
   file=$(basename $1)
-  $inkscape -d 326 -e ./noughts-ios/images/retina/${file/.svg}@2x.png $1 >& /dev/null
-  $inkscape -d 163 -e ./noughts-ios/images/regular/${file/.svg}.png $1 >& /dev/null
+  mkdir -p noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/
+  $inkscape -d 326 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}@2x.png $1 >& /dev/null
+  $inkscape -d 163 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}.png $1 >& /dev/null
+  cp ./assets/Contents.json ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/
+  perl -p -i -e "s/NAME_OF_FILE_HERE/${file/.svg}/g" noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/Contents.json
 }
 
 for f in $(find ./assets/ios -name *.svg -type f) ;
