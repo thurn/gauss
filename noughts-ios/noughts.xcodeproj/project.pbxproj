@@ -22,32 +22,6 @@
 		7C2E642618641F3500D34AD0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640518641F3500D34AD0 /* UIKit.framework */; };
 		7C2E642E18641F3500D34AD0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E642C18641F3500D34AD0 /* InfoPlist.strings */; };
 		7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E642F18641F3500D34AD0 /* noughtsTests.m */; };
-		7C2E644A18641FAB00D34AD0 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643D18641FAB00D34AD0 /* ChildEventListener.java */; };
-		7C2E644B18641FAB00D34AD0 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643D18641FAB00D34AD0 /* ChildEventListener.java */; };
-		7C2E644C18641FAB00D34AD0 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643E18641FAB00D34AD0 /* DataSnapshot.java */; };
-		7C2E644D18641FAB00D34AD0 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643E18641FAB00D34AD0 /* DataSnapshot.java */; };
-		7C2E644E18641FAB00D34AD0 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643F18641FAB00D34AD0 /* Firebase.java */; };
-		7C2E644F18641FAB00D34AD0 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E643F18641FAB00D34AD0 /* Firebase.java */; };
-		7C2E645018641FAB00D34AD0 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644018641FAB00D34AD0 /* FirebaseError.java */; };
-		7C2E645118641FAB00D34AD0 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644018641FAB00D34AD0 /* FirebaseError.java */; };
-		7C2E645218641FAB00D34AD0 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644118641FAB00D34AD0 /* GenericTypeIndicator.java */; };
-		7C2E645318641FAB00D34AD0 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644118641FAB00D34AD0 /* GenericTypeIndicator.java */; };
-		7C2E645418641FAB00D34AD0 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644218641FAB00D34AD0 /* MutableData.java */; };
-		7C2E645518641FAB00D34AD0 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644218641FAB00D34AD0 /* MutableData.java */; };
-		7C2E645618641FAB00D34AD0 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644318641FAB00D34AD0 /* OnDisconnect.java */; };
-		7C2E645718641FAB00D34AD0 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644318641FAB00D34AD0 /* OnDisconnect.java */; };
-		7C2E645818641FAB00D34AD0 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644418641FAB00D34AD0 /* Query.java */; };
-		7C2E645918641FAB00D34AD0 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644418641FAB00D34AD0 /* Query.java */; };
-		7C2E645A18641FAB00D34AD0 /* TestPrintingListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644518641FAB00D34AD0 /* TestPrintingListener.java */; };
-		7C2E645B18641FAB00D34AD0 /* TestPrintingListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644518641FAB00D34AD0 /* TestPrintingListener.java */; };
-		7C2E645C18641FAB00D34AD0 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644618641FAB00D34AD0 /* Transaction.java */; };
-		7C2E645D18641FAB00D34AD0 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644618641FAB00D34AD0 /* Transaction.java */; };
-		7C2E645E18641FAB00D34AD0 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644718641FAB00D34AD0 /* ValueEventListener.java */; };
-		7C2E645F18641FAB00D34AD0 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644718641FAB00D34AD0 /* ValueEventListener.java */; };
-		7C2E646018641FAB00D34AD0 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644818641FAB00D34AD0 /* WrappedChildEventListener.java */; };
-		7C2E646118641FAB00D34AD0 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644818641FAB00D34AD0 /* WrappedChildEventListener.java */; };
-		7C2E646218641FAB00D34AD0 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644918641FAB00D34AD0 /* WrappedValueEventListener.java */; };
-		7C2E646318641FAB00D34AD0 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E644918641FAB00D34AD0 /* WrappedValueEventListener.java */; };
 		7C2E647018641FC700D34AD0 /* CallbackWrappers.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646618641FC700D34AD0 /* CallbackWrappers.m */; };
 		7C2E647118641FC700D34AD0 /* CallbackWrappers.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646618641FC700D34AD0 /* CallbackWrappers.m */; };
 		7C2E647218641FC700D34AD0 /* epl-v10.html in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646C18641FC700D34AD0 /* epl-v10.html */; };
@@ -58,10 +32,6 @@
 		7C2E647718641FC700D34AD0 /* Procedures.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646E18641FC700D34AD0 /* Procedures.java */; };
 		7C2E647818641FC700D34AD0 /* XXL.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */; };
 		7C2E647918641FC700D34AD0 /* XXL.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */; };
-		7C2E64811864202B00D34AD0 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E647F1864202B00D34AD0 /* Model.java */; };
-		7C2E64821864202B00D34AD0 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E647F1864202B00D34AD0 /* Model.java */; };
-		7C2E64831864202B00D34AD0 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64801864202B00D34AD0 /* Shared.gwt.xml */; };
-		7C2E64841864202B00D34AD0 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64801864202B00D34AD0 /* Shared.gwt.xml */; };
 		7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64871864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64881864215B00D34AD0 /* libicucore.dylib */; };
@@ -71,6 +41,46 @@
 		7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */; };
 		7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
+		7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
+		7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
+		7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */; };
+		7C8EF5F71866577F0075D0C1 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */; };
+		7C8EF6E618667E700075D0C1 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6E518667E700075D0C1 /* Entity.java */; };
+		7C8EF6E718667E700075D0C1 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6E518667E700075D0C1 /* Entity.java */; };
+		7C8EF6EC18667EAC0075D0C1 /* Command.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EB18667EAC0075D0C1 /* Command.java */; };
+		7C8EF6ED18667EAC0075D0C1 /* Command.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EB18667EAC0075D0C1 /* Command.java */; };
+		7C8EF6F218668CB40075D0C1 /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */; };
+		7C8EF6F318668CB40075D0C1 /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */; };
+		7C8EF6F418668CB40075D0C1 /* Action.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EF18668CB40075D0C1 /* Action.java */; };
+		7C8EF6F518668CB40075D0C1 /* Action.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EF18668CB40075D0C1 /* Action.java */; };
+		7C8EF6F618668CB40075D0C1 /* Game.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F018668CB40075D0C1 /* Game.java */; };
+		7C8EF6F718668CB40075D0C1 /* Game.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F018668CB40075D0C1 /* Game.java */; };
+		7C8EF6F818668CB40075D0C1 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F118668CB40075D0C1 /* Model.java */; };
+		7C8EF6F918668CB40075D0C1 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F118668CB40075D0C1 /* Model.java */; };
+		7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74E18668E120075D0C1 /* ChildEventListener.java */; };
+		7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74E18668E120075D0C1 /* ChildEventListener.java */; };
+		7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74F18668E120075D0C1 /* DataSnapshot.java */; };
+		7C8EF75D18668E120075D0C1 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74F18668E120075D0C1 /* DataSnapshot.java */; };
+		7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75018668E120075D0C1 /* Firebase.java */; };
+		7C8EF75F18668E120075D0C1 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75018668E120075D0C1 /* Firebase.java */; };
+		7C8EF76018668E120075D0C1 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75118668E120075D0C1 /* FirebaseError.java */; };
+		7C8EF76118668E120075D0C1 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75118668E120075D0C1 /* FirebaseError.java */; };
+		7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */; };
+		7C8EF76318668E120075D0C1 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */; };
+		7C8EF76418668E120075D0C1 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75318668E120075D0C1 /* MutableData.java */; };
+		7C8EF76518668E120075D0C1 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75318668E120075D0C1 /* MutableData.java */; };
+		7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75418668E120075D0C1 /* OnDisconnect.java */; };
+		7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75418668E120075D0C1 /* OnDisconnect.java */; };
+		7C8EF76818668E120075D0C1 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75518668E120075D0C1 /* Query.java */; };
+		7C8EF76918668E120075D0C1 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75518668E120075D0C1 /* Query.java */; };
+		7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75618668E120075D0C1 /* Transaction.java */; };
+		7C8EF76B18668E120075D0C1 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75618668E120075D0C1 /* Transaction.java */; };
+		7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75718668E120075D0C1 /* ValueEventListener.java */; };
+		7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75718668E120075D0C1 /* ValueEventListener.java */; };
+		7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */; };
+		7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */; };
+		7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
+		7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -83,7 +93,7 @@
 				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.m",
 				"${DERIVED_FILES_DIR}/${INPUT_FILE_BASE}.h",
 			);
-			script = "/usr/local/j2objc/j2objc --no-package-directories --prefixes prefixes.properties -use-arc -d ${DERIVED_FILES_DIR} -classpath ${PROJECT_DIR}/firebase-objc:${PROJECT_DIR}/j2objc-utils:${PROJECT_DIR}/shared ${INPUT_FILE_PATH};";
+			script = "/usr/local/j2objc/j2objc --no-package-directories --prefixes ${PROJECT_DIR}/prefixes.properties -use-arc -d ${DERIVED_FILES_DIR} -sourcepath ${PROJECT_DIR}/firebase-objc:${PROJECT_DIR}/j2objc-utils:${PROJECT_DIR}/../noughts-shared/shared ${INPUT_FILE_PATH};";
 		};
 /* End PBXBuildRule section */
 
@@ -118,27 +128,12 @@
 		7C2E642B18641F3500D34AD0 /* noughtsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "noughtsTests-Info.plist"; sourceTree = "<group>"; };
 		7C2E642D18641F3500D34AD0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7C2E642F18641F3500D34AD0 /* noughtsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = noughtsTests.m; sourceTree = "<group>"; };
-		7C2E643D18641FAB00D34AD0 /* ChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ChildEventListener.java; sourceTree = "<group>"; };
-		7C2E643E18641FAB00D34AD0 /* DataSnapshot.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = DataSnapshot.java; sourceTree = "<group>"; };
-		7C2E643F18641FAB00D34AD0 /* Firebase.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Firebase.java; sourceTree = "<group>"; };
-		7C2E644018641FAB00D34AD0 /* FirebaseError.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = FirebaseError.java; sourceTree = "<group>"; };
-		7C2E644118641FAB00D34AD0 /* GenericTypeIndicator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GenericTypeIndicator.java; sourceTree = "<group>"; };
-		7C2E644218641FAB00D34AD0 /* MutableData.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = MutableData.java; sourceTree = "<group>"; };
-		7C2E644318641FAB00D34AD0 /* OnDisconnect.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = OnDisconnect.java; sourceTree = "<group>"; };
-		7C2E644418641FAB00D34AD0 /* Query.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Query.java; sourceTree = "<group>"; };
-		7C2E644518641FAB00D34AD0 /* TestPrintingListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = TestPrintingListener.java; sourceTree = "<group>"; };
-		7C2E644618641FAB00D34AD0 /* Transaction.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Transaction.java; sourceTree = "<group>"; };
-		7C2E644718641FAB00D34AD0 /* ValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ValueEventListener.java; sourceTree = "<group>"; };
-		7C2E644818641FAB00D34AD0 /* WrappedChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedChildEventListener.java; sourceTree = "<group>"; };
-		7C2E644918641FAB00D34AD0 /* WrappedValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedValueEventListener.java; sourceTree = "<group>"; };
 		7C2E646518641FC700D34AD0 /* CallbackWrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallbackWrappers.h; sourceTree = "<group>"; };
 		7C2E646618641FC700D34AD0 /* CallbackWrappers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallbackWrappers.m; sourceTree = "<group>"; };
 		7C2E646C18641FC700D34AD0 /* epl-v10.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "epl-v10.html"; sourceTree = "<group>"; };
 		7C2E646D18641FC700D34AD0 /* Functions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Functions.java; sourceTree = "<group>"; };
 		7C2E646E18641FC700D34AD0 /* Procedures.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Procedures.java; sourceTree = "<group>"; };
 		7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = XXL.gwt.xml; sourceTree = "<group>"; };
-		7C2E647F1864202B00D34AD0 /* Model.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Model.java; sourceTree = "<group>"; };
-		7C2E64801864202B00D34AD0 /* Shared.gwt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Shared.gwt.xml; sourceTree = "<group>"; };
 		7C2E64851864212F00D34AD0 /* Firebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Firebase.framework; sourceTree = "<group>"; };
 		7C2E64881864215B00D34AD0 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		7C2E648A1864216200D34AD0 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -146,6 +141,26 @@
 		7C2E648E1864216F00D34AD0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7C2E64931864223C00D34AD0 /* prefixes.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = prefixes.properties; sourceTree = "<group>"; };
+		7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractChildEventListener.java; sourceTree = "<group>"; };
+		7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Shared.gwt.xml; sourceTree = "<group>"; };
+		7C8EF6E518667E700075D0C1 /* Entity.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Entity.java; sourceTree = "<group>"; };
+		7C8EF6EB18667EAC0075D0C1 /* Command.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Command.java; sourceTree = "<group>"; };
+		7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractGameListListener.java; sourceTree = "<group>"; };
+		7C8EF6EF18668CB40075D0C1 /* Action.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Action.java; sourceTree = "<group>"; };
+		7C8EF6F018668CB40075D0C1 /* Game.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Game.java; sourceTree = "<group>"; };
+		7C8EF6F118668CB40075D0C1 /* Model.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Model.java; sourceTree = "<group>"; };
+		7C8EF74E18668E120075D0C1 /* ChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ChildEventListener.java; sourceTree = "<group>"; };
+		7C8EF74F18668E120075D0C1 /* DataSnapshot.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = DataSnapshot.java; sourceTree = "<group>"; };
+		7C8EF75018668E120075D0C1 /* Firebase.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Firebase.java; sourceTree = "<group>"; };
+		7C8EF75118668E120075D0C1 /* FirebaseError.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = FirebaseError.java; sourceTree = "<group>"; };
+		7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GenericTypeIndicator.java; sourceTree = "<group>"; };
+		7C8EF75318668E120075D0C1 /* MutableData.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = MutableData.java; sourceTree = "<group>"; };
+		7C8EF75418668E120075D0C1 /* OnDisconnect.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = OnDisconnect.java; sourceTree = "<group>"; };
+		7C8EF75518668E120075D0C1 /* Query.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Query.java; sourceTree = "<group>"; };
+		7C8EF75618668E120075D0C1 /* Transaction.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Transaction.java; sourceTree = "<group>"; };
+		7C8EF75718668E120075D0C1 /* ValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ValueEventListener.java; sourceTree = "<group>"; };
+		7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedChildEventListener.java; sourceTree = "<group>"; };
+		7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedValueEventListener.java; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,10 +197,10 @@
 		7C2E63F518641F3500D34AD0 = {
 			isa = PBXGroup;
 			children = (
+				7C8EF74A18668E120075D0C1 /* firebase-objc */,
+				7C8EF5DB1866577F0075D0C1 /* shared */,
 				7C2E64931864223C00D34AD0 /* prefixes.properties */,
-				7C2E647A1864202B00D34AD0 /* shared */,
 				7C2E646418641FC700D34AD0 /* j2objc-utils */,
-				7C2E643918641FAB00D34AD0 /* firebase-objc */,
 				7C2E640718641F3500D34AD0 /* noughts */,
 				7C2E642918641F3500D34AD0 /* noughtsTests */,
 				7C2E640018641F3500D34AD0 /* Frameworks */,
@@ -263,50 +278,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		7C2E643918641FAB00D34AD0 /* firebase-objc */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E643A18641FAB00D34AD0 /* com */,
-			);
-			path = "firebase-objc";
-			sourceTree = "<group>";
-		};
-		7C2E643A18641FAB00D34AD0 /* com */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E643B18641FAB00D34AD0 /* firebase */,
-			);
-			path = com;
-			sourceTree = "<group>";
-		};
-		7C2E643B18641FAB00D34AD0 /* firebase */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E643C18641FAB00D34AD0 /* client */,
-			);
-			path = firebase;
-			sourceTree = "<group>";
-		};
-		7C2E643C18641FAB00D34AD0 /* client */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E643D18641FAB00D34AD0 /* ChildEventListener.java */,
-				7C2E643E18641FAB00D34AD0 /* DataSnapshot.java */,
-				7C2E643F18641FAB00D34AD0 /* Firebase.java */,
-				7C2E644018641FAB00D34AD0 /* FirebaseError.java */,
-				7C2E644118641FAB00D34AD0 /* GenericTypeIndicator.java */,
-				7C2E644218641FAB00D34AD0 /* MutableData.java */,
-				7C2E644318641FAB00D34AD0 /* OnDisconnect.java */,
-				7C2E644418641FAB00D34AD0 /* Query.java */,
-				7C2E644518641FAB00D34AD0 /* TestPrintingListener.java */,
-				7C2E644618641FAB00D34AD0 /* Transaction.java */,
-				7C2E644718641FAB00D34AD0 /* ValueEventListener.java */,
-				7C2E644818641FAB00D34AD0 /* WrappedChildEventListener.java */,
-				7C2E644918641FAB00D34AD0 /* WrappedValueEventListener.java */,
-			);
-			path = client;
-			sourceTree = "<group>";
-		};
 		7C2E646418641FC700D34AD0 /* j2objc-utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -360,46 +331,95 @@
 			path = lib;
 			sourceTree = "<group>";
 		};
-		7C2E647A1864202B00D34AD0 /* shared */ = {
+		7C8EF5DB1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
-				7C2E647B1864202B00D34AD0 /* ca */,
+				7C8EF5DC1866577F0075D0C1 /* ca */,
 			);
 			name = shared;
 			path = "../noughts-shared/shared";
 			sourceTree = "<group>";
 		};
-		7C2E647B1864202B00D34AD0 /* ca */ = {
+		7C8EF5DC1866577F0075D0C1 /* ca */ = {
 			isa = PBXGroup;
 			children = (
-				7C2E647C1864202B00D34AD0 /* thurn */,
+				7C8EF5DD1866577F0075D0C1 /* thurn */,
 			);
 			path = ca;
 			sourceTree = "<group>";
 		};
-		7C2E647C1864202B00D34AD0 /* thurn */ = {
+		7C8EF5DD1866577F0075D0C1 /* thurn */ = {
 			isa = PBXGroup;
 			children = (
-				7C2E647D1864202B00D34AD0 /* noughts */,
+				7C8EF5DE1866577F0075D0C1 /* noughts */,
 			);
 			path = thurn;
 			sourceTree = "<group>";
 		};
-		7C2E647D1864202B00D34AD0 /* noughts */ = {
+		7C8EF5DE1866577F0075D0C1 /* noughts */ = {
 			isa = PBXGroup;
 			children = (
-				7C2E647E1864202B00D34AD0 /* shared */,
-				7C2E64801864202B00D34AD0 /* Shared.gwt.xml */,
+				7C8EF5DF1866577F0075D0C1 /* shared */,
+				7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
 		};
-		7C2E647E1864202B00D34AD0 /* shared */ = {
+		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
-				7C2E647F1864202B00D34AD0 /* Model.java */,
+				7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */,
+				7C8EF6EF18668CB40075D0C1 /* Action.java */,
+				7C8EF6F018668CB40075D0C1 /* Game.java */,
+				7C8EF6F118668CB40075D0C1 /* Model.java */,
+				7C8EF6EB18667EAC0075D0C1 /* Command.java */,
+				7C8EF6E518667E700075D0C1 /* Entity.java */,
+				7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */,
 			);
 			path = shared;
+			sourceTree = "<group>";
+		};
+		7C8EF74A18668E120075D0C1 /* firebase-objc */ = {
+			isa = PBXGroup;
+			children = (
+				7C8EF74B18668E120075D0C1 /* com */,
+			);
+			path = "firebase-objc";
+			sourceTree = "<group>";
+		};
+		7C8EF74B18668E120075D0C1 /* com */ = {
+			isa = PBXGroup;
+			children = (
+				7C8EF74C18668E120075D0C1 /* firebase */,
+			);
+			path = com;
+			sourceTree = "<group>";
+		};
+		7C8EF74C18668E120075D0C1 /* firebase */ = {
+			isa = PBXGroup;
+			children = (
+				7C8EF74D18668E120075D0C1 /* client */,
+			);
+			path = firebase;
+			sourceTree = "<group>";
+		};
+		7C8EF74D18668E120075D0C1 /* client */ = {
+			isa = PBXGroup;
+			children = (
+				7C8EF74E18668E120075D0C1 /* ChildEventListener.java */,
+				7C8EF74F18668E120075D0C1 /* DataSnapshot.java */,
+				7C8EF75018668E120075D0C1 /* Firebase.java */,
+				7C8EF75118668E120075D0C1 /* FirebaseError.java */,
+				7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */,
+				7C8EF75318668E120075D0C1 /* MutableData.java */,
+				7C8EF75418668E120075D0C1 /* OnDisconnect.java */,
+				7C8EF75518668E120075D0C1 /* Query.java */,
+				7C8EF75618668E120075D0C1 /* Transaction.java */,
+				7C8EF75718668E120075D0C1 /* ValueEventListener.java */,
+				7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */,
+				7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */,
+			);
+			path = client;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -479,10 +499,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E64831864202B00D34AD0 /* Shared.gwt.xml in Resources */,
 				7C2E641818641F3500D34AD0 /* Main_iPad.storyboard in Resources */,
 				7C2E647218641FC700D34AD0 /* epl-v10.html in Resources */,
 				7C2E641D18641F3500D34AD0 /* Images.xcassets in Resources */,
+				7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */,
 				7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */,
 				7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */,
 				7C2E647818641FC700D34AD0 /* XXL.gwt.xml in Resources */,
@@ -494,10 +514,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E64841864202B00D34AD0 /* Shared.gwt.xml in Resources */,
 				7C2E647318641FC700D34AD0 /* epl-v10.html in Resources */,
 				7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */,
 				7C2E647918641FC700D34AD0 /* XXL.gwt.xml in Resources */,
+				7C8EF5F71866577F0075D0C1 /* Shared.gwt.xml in Resources */,
 				7C2E642E18641F3500D34AD0 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -509,26 +529,31 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E645418641FAB00D34AD0 /* MutableData.java in Sources */,
 				7C2E647618641FC700D34AD0 /* Procedures.java in Sources */,
+				7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
+				7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */,
 				7C2E641B18641F3500D34AD0 /* ViewController.m in Sources */,
-				7C2E645A18641FAB00D34AD0 /* TestPrintingListener.java in Sources */,
 				7C2E647418641FC700D34AD0 /* Functions.java in Sources */,
+				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
+				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
+				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
+				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
+				7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
+				7C8EF6EC18667EAC0075D0C1 /* Command.java in Sources */,
+				7C8EF6E618667E700075D0C1 /* Entity.java in Sources */,
 				7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */,
-				7C2E644C18641FAB00D34AD0 /* DataSnapshot.java in Sources */,
+				7C8EF76418668E120075D0C1 /* MutableData.java in Sources */,
+				7C8EF6F618668CB40075D0C1 /* Game.java in Sources */,
+				7C8EF76018668E120075D0C1 /* FirebaseError.java in Sources */,
+				7C8EF6F218668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
 				7C2E640E18641F3500D34AD0 /* main.m in Sources */,
-				7C2E646218641FAB00D34AD0 /* WrappedValueEventListener.java in Sources */,
-				7C2E644E18641FAB00D34AD0 /* Firebase.java in Sources */,
-				7C2E645818641FAB00D34AD0 /* Query.java in Sources */,
-				7C2E64811864202B00D34AD0 /* Model.java in Sources */,
-				7C2E645C18641FAB00D34AD0 /* Transaction.java in Sources */,
-				7C2E646018641FAB00D34AD0 /* WrappedChildEventListener.java in Sources */,
-				7C2E645618641FAB00D34AD0 /* OnDisconnect.java in Sources */,
-				7C2E645218641FAB00D34AD0 /* GenericTypeIndicator.java in Sources */,
-				7C2E644A18641FAB00D34AD0 /* ChildEventListener.java in Sources */,
+				7C8EF6F418668CB40075D0C1 /* Action.java in Sources */,
+				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
+				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
+				7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
+				7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
+				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
 				7C2E647018641FC700D34AD0 /* CallbackWrappers.m in Sources */,
-				7C2E645E18641FAB00D34AD0 /* ValueEventListener.java in Sources */,
-				7C2E645018641FAB00D34AD0 /* FirebaseError.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,24 +561,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E645F18641FAB00D34AD0 /* ValueEventListener.java in Sources */,
-				7C2E645B18641FAB00D34AD0 /* TestPrintingListener.java in Sources */,
-				7C2E645718641FAB00D34AD0 /* OnDisconnect.java in Sources */,
-				7C2E646118641FAB00D34AD0 /* WrappedChildEventListener.java in Sources */,
-				7C2E645D18641FAB00D34AD0 /* Transaction.java in Sources */,
-				7C2E645118641FAB00D34AD0 /* FirebaseError.java in Sources */,
-				7C2E646318641FAB00D34AD0 /* WrappedValueEventListener.java in Sources */,
-				7C2E64821864202B00D34AD0 /* Model.java in Sources */,
+				7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C2E647518641FC700D34AD0 /* Functions.java in Sources */,
-				7C2E645318641FAB00D34AD0 /* GenericTypeIndicator.java in Sources */,
-				7C2E644D18641FAB00D34AD0 /* DataSnapshot.java in Sources */,
+				7C8EF6F518668CB40075D0C1 /* Action.java in Sources */,
+				7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */,
+				7C8EF6F318668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
+				7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
+				7C8EF76318668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
 				7C2E647118641FC700D34AD0 /* CallbackWrappers.m in Sources */,
 				7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */,
+				7C8EF6E718667E700075D0C1 /* Entity.java in Sources */,
+				7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
+				7C8EF6ED18667EAC0075D0C1 /* Command.java in Sources */,
+				7C8EF76B18668E120075D0C1 /* Transaction.java in Sources */,
+				7C8EF76918668E120075D0C1 /* Query.java in Sources */,
+				7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */,
+				7C8EF6F918668CB40075D0C1 /* Model.java in Sources */,
+				7C8EF76118668E120075D0C1 /* FirebaseError.java in Sources */,
+				7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */,
+				7C8EF76518668E120075D0C1 /* MutableData.java in Sources */,
+				7C8EF75D18668E120075D0C1 /* DataSnapshot.java in Sources */,
 				7C2E647718641FC700D34AD0 /* Procedures.java in Sources */,
-				7C2E644F18641FAB00D34AD0 /* Firebase.java in Sources */,
-				7C2E645918641FAB00D34AD0 /* Query.java in Sources */,
-				7C2E644B18641FAB00D34AD0 /* ChildEventListener.java in Sources */,
-				7C2E645518641FAB00D34AD0 /* MutableData.java in Sources */,
+				7C8EF75F18668E120075D0C1 /* Firebase.java in Sources */,
+				7C8EF6F718668CB40075D0C1 /* Game.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -710,7 +740,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					".",
+					.,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
@@ -727,7 +757,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					".",
+					.,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
@@ -746,7 +776,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					".",
+					.,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
@@ -770,7 +800,7 @@
 					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
-					".",
+					.,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
