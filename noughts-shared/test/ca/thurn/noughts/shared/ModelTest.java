@@ -435,7 +435,6 @@ public class ModelTest extends SharedTestCase {
     firebase.child("games").child(game.id).setValue(game.serialize());
   }
   
-  @SafeVarargs
   private final <T> List<T> list(T... objects) {
     List<T> result = new ArrayList<T>();
     for (T t : objects) {

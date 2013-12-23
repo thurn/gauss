@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4510" systemVersion="13A603" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3742"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--MainMenuController-->
         <scene sceneID="ufC-wZ-h7g">
             <objects>
-                <viewController id="vXZ-lx-hvc" customClass="ViewController" sceneMemberID="viewController">
+                <viewController id="vXZ-lx-hvc" userLabel="MainMenuController" customClass="ViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="art-tl-zg4"/>
                         <viewControllerLayoutGuide type="bottom" id="DeG-US-Bkl"/>
@@ -17,50 +17,59 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo" translatesAutoresizingMaskIntoConstraints="NO" id="xg5-Qh-0Ty" userLabel="Logo">
-                                <rect key="frame" x="38" y="45" width="245" height="65"/>
+                                <rect key="frame" x="38" y="89" width="245" height="65"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="65" id="ojA-el-mbK"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="khQ-qh-q60" userLabel="MenuContainer">
-                                <rect key="frame" x="23" y="196" width="275" height="175"/>
+                                <rect key="frame" x="60" y="197" width="200" height="175"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1qV-mY-kuB" userLabel="New Game">
-                                        <rect key="frame" x="84" y="13" width="99" height="36"/>
+                                        <rect key="frame" x="47" y="13" width="99" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <state key="normal" title="New Game">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="u3P-bq-oez" kind="push" id="mPV-vq-C5e"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_new_game" translatesAutoresizingMaskIntoConstraints="NO" id="1ff-9f-fZe" userLabel="ic_new_game">
-                                        <rect key="frame" x="32" y="15" width="32" height="32"/>
+                                        <rect key="frame" x="-5" y="15" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MJh-9N-Fke" userLabel="How to Play">
-                                        <rect key="frame" x="84" y="60" width="107" height="36"/>
+                                        <rect key="frame" x="47" y="60" width="107" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <state key="normal" title="How to Play">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="dqR-a2-eyJ" kind="push" id="TcJ-r0-iys"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_how_to_play" translatesAutoresizingMaskIntoConstraints="NO" id="19X-yC-Dh7" userLabel="ic_how_to_play">
-                                        <rect key="frame" x="32" y="62" width="32" height="32"/>
+                                        <rect key="frame" x="-5" y="62" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3f-7h-aDP" userLabel="Settings">
-                                        <rect key="frame" x="84" y="107" width="73" height="36"/>
+                                        <rect key="frame" x="47" y="107" width="73" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <state key="normal" title="Settings">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="InQ-KL-aAV" kind="push" id="uOe-Ry-jHC"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_settings" translatesAutoresizingMaskIntoConstraints="NO" id="AUS-xW-cdv" userLabel="ic_settings">
-                                        <rect key="frame" x="32" y="109" width="32" height="32"/>
+                                        <rect key="frame" x="-5" y="109" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                 </subviews>
@@ -68,7 +77,7 @@
                                 <constraints>
                                     <constraint firstItem="AUS-xW-cdv" firstAttribute="centerY" secondItem="s3f-7h-aDP" secondAttribute="centerY" id="0I4-l1-I9e"/>
                                     <constraint firstItem="AUS-xW-cdv" firstAttribute="top" secondItem="19X-yC-Dh7" secondAttribute="bottom" constant="15" id="1hZ-wo-MRm"/>
-                                    <constraint firstAttribute="width" constant="275" id="30B-Y2-nub"/>
+                                    <constraint firstAttribute="width" constant="200" id="30B-Y2-nub"/>
                                     <constraint firstItem="AUS-xW-cdv" firstAttribute="centerX" secondItem="19X-yC-Dh7" secondAttribute="centerX" id="4Sc-0n-YY1"/>
                                     <constraint firstItem="s3f-7h-aDP" firstAttribute="leading" secondItem="1qV-mY-kuB" secondAttribute="leading" id="837-fb-Ag5"/>
                                     <constraint firstItem="MJh-9N-Fke" firstAttribute="centerX" secondItem="khQ-qh-q60" secondAttribute="centerX" id="8BW-cc-Uzu"/>
@@ -92,18 +101,200 @@
                             <constraint firstItem="khQ-qh-q60" firstAttribute="top" relation="greaterThanOrEqual" secondItem="xg5-Qh-0Ty" secondAttribute="bottom" constant="5" id="h2B-2B-HrV"/>
                             <constraint firstAttribute="centerY" secondItem="khQ-qh-q60" secondAttribute="centerY" priority="900" id="iW1-eB-ycF"/>
                             <constraint firstAttribute="centerX" secondItem="xg5-Qh-0Ty" secondAttribute="centerX" id="nCF-G3-tW4"/>
-                            <constraint firstItem="xg5-Qh-0Ty" firstAttribute="top" secondItem="art-tl-zg4" secondAttribute="bottom" constant="25" id="uRM-4X-0Ef"/>
+                            <constraint firstItem="xg5-Qh-0Ty" firstAttribute="top" secondItem="art-tl-zg4" secondAttribute="bottom" constant="25" id="nvx-fR-ONa"/>
                         </constraints>
                     </view>
+                    <navigationItem key="navigationItem" title="Menu" id="uep-Ef-BRl"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
+        <!--NewGameController-->
+        <scene sceneID="6qI-Ys-c7L">
+            <objects>
+                <viewController id="u3P-bq-oez" userLabel="NewGameController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="zwu-M8-dcy"/>
+                        <viewControllerLayoutGuide type="bottom" id="G0x-Hy-wd4"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="w6s-gF-qZr" userLabel="MainView">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Fwt-ia-1Mr" userLabel="MenuContainer">
+                                <rect key="frame" x="22" y="189" width="275" height="190"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b8d-DB-29a" userLabel="Invite via Facebook">
+                                        <rect key="frame" x="72" y="13" width="170" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Invite via Facebook">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_facebook_invite" translatesAutoresizingMaskIntoConstraints="NO" id="NXM-am-N9o" userLabel="ic_facebook_invite">
+                                        <rect key="frame" x="20" y="15" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="t4g-HI-idM" userLabel="Invite via Email">
+                                        <rect key="frame" x="72" y="60" width="131" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Invite via Email">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_email_invite" translatesAutoresizingMaskIntoConstraints="NO" id="23e-iY-WwF" userLabel="ic_email_invite">
+                                        <rect key="frame" x="20" y="62" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yX5-zM-9Gf" userLabel="Local Multiplayer">
+                                        <rect key="frame" x="72" y="107" width="150" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Local Multiplayer">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <segue destination="kaa-M7-0XV" kind="modal" id="Kxn-hg-tmd"/>
+                                        </connections>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_local_multiplayer" translatesAutoresizingMaskIntoConstraints="NO" id="Drc-qi-Dl6" userLabel="ic_local_multiplayer">
+                                        <rect key="frame" x="20" y="109" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hA7-hx-29u" userLabel="Play vs Computer">
+                                        <rect key="frame" x="72" y="154" width="157" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Play vs Computer">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_vs_computer" translatesAutoresizingMaskIntoConstraints="NO" id="g7j-Ye-Jgy" userLabel="ic_vs_computer">
+                                        <rect key="frame" x="20" y="156" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="190" id="5VZ-q1-HnU"/>
+                                    <constraint firstItem="NXM-am-N9o" firstAttribute="centerY" secondItem="b8d-DB-29a" secondAttribute="centerY" id="658-Re-II5"/>
+                                    <constraint firstItem="Drc-qi-Dl6" firstAttribute="top" secondItem="23e-iY-WwF" secondAttribute="bottom" constant="15" id="8Bo-YO-zYg"/>
+                                    <constraint firstAttribute="width" constant="275" id="CBe-fe-pyd"/>
+                                    <constraint firstItem="Drc-qi-Dl6" firstAttribute="centerX" secondItem="NXM-am-N9o" secondAttribute="centerX" id="HFc-rQ-luw"/>
+                                    <constraint firstItem="t4g-HI-idM" firstAttribute="centerX" secondItem="Fwt-ia-1Mr" secondAttribute="centerX" id="KCn-br-uzu"/>
+                                    <constraint firstItem="t4g-HI-idM" firstAttribute="leading" secondItem="yX5-zM-9Gf" secondAttribute="leading" id="MwQ-QD-7G5"/>
+                                    <constraint firstItem="23e-iY-WwF" firstAttribute="top" secondItem="NXM-am-N9o" secondAttribute="bottom" constant="15" id="PW5-Gm-rgg"/>
+                                    <constraint firstItem="b8d-DB-29a" firstAttribute="leading" secondItem="NXM-am-N9o" secondAttribute="trailing" constant="20" id="R5l-Do-F4C"/>
+                                    <constraint firstItem="23e-iY-WwF" firstAttribute="centerY" secondItem="t4g-HI-idM" secondAttribute="centerY" id="TDD-a1-rN4"/>
+                                    <constraint firstItem="t4g-HI-idM" firstAttribute="leading" secondItem="b8d-DB-29a" secondAttribute="leading" id="XcO-dy-sfB"/>
+                                    <constraint firstItem="23e-iY-WwF" firstAttribute="centerX" secondItem="g7j-Ye-Jgy" secondAttribute="centerX" id="ZCi-f2-ifQ"/>
+                                    <constraint firstItem="Drc-qi-Dl6" firstAttribute="centerX" secondItem="23e-iY-WwF" secondAttribute="centerX" id="eua-hU-aGF"/>
+                                    <constraint firstItem="Drc-qi-Dl6" firstAttribute="centerY" secondItem="yX5-zM-9Gf" secondAttribute="centerY" id="f0M-6D-M7y"/>
+                                    <constraint firstItem="23e-iY-WwF" firstAttribute="centerX" secondItem="Drc-qi-Dl6" secondAttribute="centerX" id="g5M-H0-Cgq"/>
+                                    <constraint firstItem="NXM-am-N9o" firstAttribute="top" secondItem="Fwt-ia-1Mr" secondAttribute="top" constant="15" id="hNm-mp-BLS"/>
+                                    <constraint firstItem="g7j-Ye-Jgy" firstAttribute="top" secondItem="Drc-qi-Dl6" secondAttribute="bottom" constant="15" id="hy5-EY-cPa"/>
+                                    <constraint firstItem="t4g-HI-idM" firstAttribute="leading" secondItem="hA7-hx-29u" secondAttribute="leading" id="qLT-hQ-p2I"/>
+                                    <constraint firstItem="g7j-Ye-Jgy" firstAttribute="centerY" secondItem="hA7-hx-29u" secondAttribute="centerY" id="sSq-Zl-9WD"/>
+                                    <constraint firstItem="23e-iY-WwF" firstAttribute="centerX" secondItem="NXM-am-N9o" secondAttribute="centerX" id="yt0-d4-y3O"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="centerX" secondItem="Fwt-ia-1Mr" secondAttribute="centerX" id="EH8-TG-29r"/>
+                            <constraint firstAttribute="centerY" secondItem="Fwt-ia-1Mr" secondAttribute="centerY" id="qXV-J5-VWo"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="New Game" id="5LB-Kh-pPn"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="g2G-UM-Xwv" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="752" y="109"/>
+        </scene>
+        <!--Game View Controller-->
+        <scene sceneID="A7E-vU-VZB">
+            <objects>
+                <viewController id="kaa-M7-0XV" customClass="GameViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="LHT-lp-GSf"/>
+                        <viewControllerLayoutGuide type="bottom" id="lxJ-sB-OB7"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="0Cz-W7-kNJ">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="wuE-PD-hp1"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="K0D-c7-t3A" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1262" y="109"/>
+        </scene>
+        <!--HowToPlayController-->
+        <scene sceneID="19b-3a-1IZ">
+            <objects>
+                <viewController id="dqR-a2-eyJ" userLabel="HowToPlayController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cGj-TF-D72"/>
+                        <viewControllerLayoutGuide type="bottom" id="dWm-2f-j5K"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="164-fp-Vw8">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="How to Play" id="3XD-Zx-aMX"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9oK-Oa-1Dv" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="752" y="784"/>
+        </scene>
+        <!--SettingsViewController-->
+        <scene sceneID="fUK-Bg-DSW">
+            <objects>
+                <viewController id="InQ-KL-aAV" userLabel="SettingsViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="wWD-Vf-zSX"/>
+                        <viewControllerLayoutGuide type="bottom" id="hmr-8w-osJ"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="aeO-MG-dTx">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    </view>
+                    <navigationItem key="navigationItem" title="Settings" id="Ipj-JU-ZBV"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="KEI-rT-HFG" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="752" y="1490"/>
+        </scene>
+        <!--RootNavigationController-->
+        <scene sceneID="RxD-8g-r7h">
+            <objects>
+                <navigationController definesPresentationContext="YES" id="twN-X8-1YP" userLabel="RootNavigationController" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="TBD-ru-0sB">
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="vXZ-lx-hvc" kind="relationship" relationship="rootViewController" id="Er4-Gv-2HP"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ABR-Tl-ma0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-311" y="109"/>
+        </scene>
     </scenes>
     <resources>
+        <image name="ic_email_invite" width="32" height="32"/>
+        <image name="ic_facebook_invite" width="32" height="32"/>
         <image name="ic_how_to_play" width="32" height="32"/>
+        <image name="ic_local_multiplayer" width="32" height="32"/>
         <image name="ic_new_game" width="32" height="32"/>
         <image name="ic_settings" width="32" height="32"/>
+        <image name="ic_vs_computer" width="32" height="32"/>
         <image name="logo" width="245" height="56"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

@@ -81,6 +81,8 @@
 		7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */; };
 		7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
 		7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
+		7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
+		7C8EF7751866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -161,6 +163,8 @@
 		7C8EF75718668E120075D0C1 /* ValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ValueEventListener.java; sourceTree = "<group>"; };
 		7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedChildEventListener.java; sourceTree = "<group>"; };
 		7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WrappedValueEventListener.java; sourceTree = "<group>"; };
+		7C8EF7721866B96B0075D0C1 /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
+		7C8EF7731866B96B0075D0C1 /* GameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -245,6 +249,8 @@
 				7C2E641A18641F3500D34AD0 /* ViewController.m */,
 				7C2E641C18641F3500D34AD0 /* Images.xcassets */,
 				7C2E640818641F3500D34AD0 /* Supporting Files */,
+				7C8EF7721866B96B0075D0C1 /* GameViewController.h */,
+				7C8EF7731866B96B0075D0C1 /* GameViewController.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -547,6 +553,7 @@
 				7C8EF76018668E120075D0C1 /* FirebaseError.java in Sources */,
 				7C8EF6F218668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
 				7C2E640E18641F3500D34AD0 /* main.m in Sources */,
+				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF6F418668CB40075D0C1 /* Action.java in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
 				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
@@ -577,6 +584,7 @@
 				7C8EF76918668E120075D0C1 /* Query.java in Sources */,
 				7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C8EF6F918668CB40075D0C1 /* Model.java in Sources */,
+				7C8EF7751866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF76118668E120075D0C1 /* FirebaseError.java in Sources */,
 				7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C8EF76518668E120075D0C1 /* MutableData.java in Sources */,
