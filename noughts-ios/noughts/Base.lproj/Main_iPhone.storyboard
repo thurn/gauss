@@ -157,7 +157,7 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
-                                            <segue destination="kaa-M7-0XV" kind="modal" id="Kxn-hg-tmd"/>
+                                            <segue destination="kaa-M7-0XV" kind="modal" id="cud-rd-kyp"/>
                                         </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_local_multiplayer" translatesAutoresizingMaskIntoConstraints="NO" id="Drc-qi-Dl6" userLabel="ic_local_multiplayer">
@@ -217,19 +217,10 @@
         <!--Game View Controller-->
         <scene sceneID="A7E-vU-VZB">
             <objects>
-                <viewController id="kaa-M7-0XV" customClass="GameViewController" sceneMemberID="viewController">
-                    <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="LHT-lp-GSf"/>
-                        <viewControllerLayoutGuide type="bottom" id="lxJ-sB-OB7"/>
-                    </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="0Cz-W7-kNJ">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="wuE-PD-hp1"/>
-                </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="K0D-c7-t3A" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <viewController id="kaa-M7-0XV" customClass="GameViewController" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="fJZ-L4-Sba"/>
+                </viewController>
             </objects>
             <point key="canvasLocation" x="1262" y="109"/>
         </scene>
