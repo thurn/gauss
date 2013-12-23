@@ -65,7 +65,7 @@ public class Model implements ChildEventListener {
    */
   public boolean isCurrentPlayer(Game game) {
     if (game.isGameOver()) return false;
-    return game.currentPlayerId() == userId;
+    return game.currentPlayerId().equals(userId);
   }
 
   /**

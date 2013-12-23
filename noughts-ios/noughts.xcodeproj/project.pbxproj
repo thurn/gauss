@@ -15,9 +15,9 @@
 		7C1F83BD186810FC00D66C78 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83BC186810FC00D66C78 /* CoreImage.framework */; };
 		7C1F83BF1868110400D66C78 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83BE1868110400D66C78 /* libxml2.dylib */; };
 		7C1F83C11868110B00D66C78 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83C01868110B00D66C78 /* QuartzCore.framework */; };
-		7C1F83C51868115E00D66C78 /* background.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83C21868115E00D66C78 /* background.svg */; };
 		7C1F83C61868115E00D66C78 /* o.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83C31868115E00D66C78 /* o.svg */; };
 		7C1F83C71868115E00D66C78 /* x.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83C41868115E00D66C78 /* x.svg */; };
+		7C1F83CB1868167F00D66C78 /* background.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83CA1868167F00D66C78 /* background.svg */; };
 		7C2E640218641F3500D34AD0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640118641F3500D34AD0 /* Foundation.framework */; };
 		7C2E640418641F3500D34AD0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640318641F3500D34AD0 /* CoreGraphics.framework */; };
 		7C2E640618641F3500D34AD0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640518641F3500D34AD0 /* UIKit.framework */; };
@@ -239,9 +239,9 @@
 		7C1F83BC186810FC00D66C78 /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
 		7C1F83BE1868110400D66C78 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		7C1F83C01868110B00D66C78 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		7C1F83C21868115E00D66C78 /* background.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = background.svg; sourceTree = "<group>"; };
 		7C1F83C31868115E00D66C78 /* o.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = o.svg; sourceTree = "<group>"; };
 		7C1F83C41868115E00D66C78 /* x.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = x.svg; sourceTree = "<group>"; };
+		7C1F83CA1868167F00D66C78 /* background.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = background.svg; sourceTree = "<group>"; };
 		7C2E63FE18641F3500D34AD0 /* noughts.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = noughts.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2E640118641F3500D34AD0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		7C2E640318641F3500D34AD0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -527,7 +527,7 @@
 		7C2E640718641F3500D34AD0 /* noughts */ = {
 			isa = PBXGroup;
 			children = (
-				7C1F83C21868115E00D66C78 /* background.svg */,
+				7C1F83CA1868167F00D66C78 /* background.svg */,
 				7C1F83C31868115E00D66C78 /* o.svg */,
 				7C1F83C41868115E00D66C78 /* x.svg */,
 				7C2E641018641F3500D34AD0 /* AppDelegate.h */,
@@ -801,10 +801,10 @@
 				7C2E647218641FC700D34AD0 /* epl-v10.html in Resources */,
 				7C2E641D18641F3500D34AD0 /* Images.xcassets in Resources */,
 				7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */,
+				7C1F83CB1868167F00D66C78 /* background.svg in Resources */,
 				7C1F83C61868115E00D66C78 /* o.svg in Resources */,
 				7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */,
 				7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */,
-				7C1F83C51868115E00D66C78 /* background.svg in Resources */,
 				7C2E647818641FC700D34AD0 /* XXL.gwt.xml in Resources */,
 				7C2E640C18641F3500D34AD0 /* InfoPlist.strings in Resources */,
 			);
