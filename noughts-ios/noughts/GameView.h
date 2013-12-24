@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "game.h"
 
-@protocol GameViewDelegate
+@protocol GameViewDelegate <UIActionSheetDelegate>
 - (void)handleSquareTapAtX: (int)x AtY: (int)y;
 @end
 

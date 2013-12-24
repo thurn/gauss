@@ -73,7 +73,7 @@ public class Model implements ChildEventListener {
    * @return True if the current user is a player in the provided game.
    */
   public boolean isPlayer(Game game) {
-    return game.players.contains(userId);
+    return game.getPlayers().contains(userId);
   }
   
   /**
@@ -126,8 +126,8 @@ public class Model implements ChildEventListener {
     // If we run the update listener before the list listener, you can add
     // a new update listener from the list listener without re-processing
     // this event itself.
-    if (gameUpdateListeners.containsKey(game.id)) {
-      gameUpdateListeners.get(game.id).onGameUpdate(game);
+    if (gameUpdateListeners.containsKey(game.getId())) {
+      gameUpdateListeners.get(game.getId()).onGameUpdate(game);
     }    
     if (gameListListener != null) {
       gameListListener.onGameAdded(game);
@@ -137,8 +137,8 @@ public class Model implements ChildEventListener {
   @Override
   public void onChildChanged(DataSnapshot snapshot, String previous) {
     Game game = new GameDeserializer().fromDataSnapshot(snapshot);
-    if (gameUpdateListeners.containsKey(game.id)) {
-      gameUpdateListeners.get(game.id).onGameUpdate(game);
+    if (gameUpdateListeners.containsKey(game.getId())) {
+      gameUpdateListeners.get(game.getId()).onGameUpdate(game);
     }    
     if (gameListListener != null) {
       gameListListener.onGameChanged(game);
@@ -173,27 +173,27 @@ public class Model implements ChildEventListener {
       Map<String, String> opponentProfile) {
     Firebase ref = firebase.child("games").push();
     Game game = new Game(ref.getName());
-    game.players.add(userId);
+    game.getPlayersMutable().add(userId);
     game.setLocalMultiplayer(localMultiplayer);
-    if (localMultiplayer) game.players.add(LOCAL_MULTIPLAYER_OPPONENT_ID);
-    game.currentPlayerNumber = X_PLAYER;
-    game.currentActionNumber = null;
-    game.lastModified = System.currentTimeMillis();
+    if (localMultiplayer) game.getPlayersMutable().add(LOCAL_MULTIPLAYER_OPPONENT_ID);
+    game.setCurrentPlayerNumber(X_PLAYER);
+    game.setCurrentActionNumber(null);
+    game.setLastModified(System.currentTimeMillis());
     game.setGameOver(false);
     
     if (userProfile != null) {
       if (userProfile.get("id") != userId) {
         die("Expected user ID in profile to match model user ID");
       }
-      game.profiles.put(userId, userProfile);
+      game.getProfilesMutable().put(userId, userProfile);
     }
     if (opponentProfile != null) {
-      game.profiles.put(opponentProfile.get("id"), opponentProfile);
-      game.players.add(opponentProfile.get("id"));
+      game.getProfilesMutable().put(opponentProfile.get("id"), opponentProfile);
+      game.getPlayersMutable().add(opponentProfile.get("id"));
     }
     
     ref.setValue(game.serialize());
-    return game.id;
+    return game.getId();
   }
   
   /**
@@ -211,19 +211,19 @@ public class Model implements ChildEventListener {
       @Override public void apply(Game game) {
         long timestamp = System.currentTimeMillis();
         if (game.hasCurrentAction()) {
-          game.lastModified = timestamp;
+          game.setLastModified(timestamp);
           Action action = game.currentAction();
-          action.futureCommands.clear();
-          action.commands.add(command);
+          action.getFutureCommandsMutable().clear();
+          action.getCommandsMutable().add(command);
         } else {
           Action action = new Action(userId);
-          action.gameId = game.id;
-          action.playerNumber = game.currentPlayerNumber;
+          action.setGameId(game.getId());
+          action.setPlayerNumber(game.getCurrentPlayerNumber());
           action.setSubmitted(false);
-          action.commands.add(command);
-          game.actions.add(action);
-          game.currentActionNumber = game.actions.size() - 1;
-          game.lastModified = timestamp;
+          action.getCommandsMutable().add(command);
+          game.getActionsMutable().add(action);
+          game.setCurrentActionNumber(game.getActions().size() - 1);
+          game.setLastModified(timestamp);
         }
       }
     });
@@ -239,7 +239,7 @@ public class Model implements ChildEventListener {
    */  
   public boolean couldSubmitCommand(Game game, Command command) {
     if (!isCurrentPlayer(game)) return false;
-    if (game.hasCurrentAction() && game.currentAction().commands.size() > 0) return false;
+    if (game.hasCurrentAction() && game.currentAction().getCommands().size() > 0) return false;
     return isLegalCommand(game, command);
   }
   
@@ -252,7 +252,7 @@ public class Model implements ChildEventListener {
    */  
   public boolean canUndo(Game game) {
     if (game == null || !game.hasCurrentAction()) return false;
-    return game.currentAction().commands.size() > 0;    
+    return game.currentAction().getCommands().size() > 0;    
   }
   
   /**
@@ -264,7 +264,7 @@ public class Model implements ChildEventListener {
    */  
   public boolean canRedo(Game game) {
     if (game == null || !game.hasCurrentAction()) return false;
-    return game.currentAction().futureCommands.size() > 0;    
+    return game.currentAction().getFutureCommands().size() > 0;    
   }
   
   /**
@@ -277,8 +277,8 @@ public class Model implements ChildEventListener {
   public boolean canSubmit(Game game) {
     if (game == null || !game.hasCurrentAction()) return false;
     Action action = game.currentAction();
-    if (action.commands.size() == 0) return false;
-    for (Command command : action.commands) {
+    if (action.getCommands().size() == 0) return false;
+    for (Command command : action.getCommands()) {
       if (!isLegalCommand(game, command)) return false;
     }
     return true;
@@ -294,24 +294,24 @@ public class Model implements ChildEventListener {
   public void submitCurrentAction(Game game) {
     ensureIsCurrentPlayer(game);
     if (!canSubmit(game)) die("Illegal action!");
-    boolean isXPlayer = game.currentPlayerNumber == X_PLAYER;
+    boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game newGame) {
         newGame.currentAction().setSubmitted(true);
         List<String> victors = computeVictors(newGame);
         if (victors == null) {
-          newGame.currentPlayerNumber = newPlayerNumber;
-          newGame.currentActionNumber = null;
+          newGame.setCurrentPlayerNumber(newPlayerNumber);
+          newGame.setCurrentActionNumber(null);
           if (newGame.isLocalMultiplayer()) {
             // Update model with new player number in local multiplayer games
             setUserId(newGame.currentPlayerId());
           }
         } else {
           // Game over!
-          newGame.currentPlayerNumber = null;
-          newGame.currentActionNumber = null;
-          newGame.victors.addAll(victors);
+          newGame.setCurrentPlayerNumber(null);
+          newGame.setCurrentActionNumber(null);
+          newGame.getVictorsMutable().addAll(victors);
           newGame.setGameOver(true);
         }        
     }});
@@ -325,12 +325,12 @@ public class Model implements ChildEventListener {
    */  
   public void undoCommand(Game game) {
     ensureIsCurrentPlayer(game);
-    if (game.currentAction().commands.size() == 0) die("No previous command to undo");
+    if (game.currentAction().getCommands().size() == 0) die("No previous command to undo");
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game newGame) {
         Action action = newGame.currentAction();
-        Command command = action.commands.remove(action.commands.size() - 1);
-        action.futureCommands.add(command);
+        Command command = action.getCommandsMutable().remove(action.getCommands().size() - 1);
+        action.getFutureCommandsMutable().add(command);
     }});
   }
   
@@ -342,12 +342,12 @@ public class Model implements ChildEventListener {
    */
   public void redoCommand(Game game) {
     ensureIsCurrentPlayer(game);
-    if (game.currentAction().futureCommands.size() == 0) die("No previous next command to redo");
+    if (game.currentAction().getFutureCommands().size() == 0) die("No previous next command to redo");
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game newGame) {
         Action action = newGame.currentAction();
-        Command command = action.futureCommands.remove(action.futureCommands.size() - 1);
-        action.commands.add(command);
+        Command command = action.getFutureCommandsMutable().remove(action.getFutureCommands().size() - 1);
+        action.getCommandsMutable().add(command);
     }});
   }
   
@@ -356,7 +356,7 @@ public class Model implements ChildEventListener {
    * @return The ID of your opponent in this game, or null if there isn't one.
    */  
   public String getOpponentId(Game game) {
-    for (String player : game.players) {
+    for (String player : game.getPlayers()) {
       if (!player.equals(userId)) return player;
     }
     throw die("No opponent found");
@@ -385,9 +385,9 @@ public class Model implements ChildEventListener {
       Action action2 = actionTable[lines[i][1][0]][lines[i][1][1]];
       Action action3 = actionTable[lines[i][2][0]][lines[i][2][1]];
       if (action1 != null && action2 != null && action3 != null &&
-          action1.player.equals(action2.player) && action2.player.equals(action3.player)) {
+          action1.getPlayer().equals(action2.getPlayer()) && action2.getPlayer().equals(action3.getPlayer())) {
         List<String> result = new ArrayList<String>();
-        result.add(action1.player);
+        result.add(action1.getPlayer());
         return result;
       }
     }
@@ -395,11 +395,11 @@ public class Model implements ChildEventListener {
     // 2) check for draw
     
     int submitted = 0;
-    for (Action action : game.actions) {
+    for (Action action : game.getActions()) {
       if (action.isSubmitted()) submitted++;
     }
     if (submitted == 9) {
-      return game.players;
+      return game.getPlayers();
     }
     
     // 3) game is not over
@@ -411,8 +411,8 @@ public class Model implements ChildEventListener {
    * Returns true if the square at (column, row) is available. 
    */  
   private boolean isLegalCommand(Game game, Command command) {
-    int column = command.column;
-    int row = command.row; 
+    int column = command.getColumn();
+    int row = command.getRow(); 
     if (column < 0 || row < 0 || column > 2 || row > 2) {
       return false;
     }
@@ -425,10 +425,10 @@ public class Model implements ChildEventListener {
    */  
   private Action[][] makeActionTable(Game game) {
     Action[][] result = new Action[3][3];
-    for (Action action : game.actions) {
+    for (Action action : game.getActions()) {
       if (action.isSubmitted()) {
-        for (Command command : action.commands) {
-          result[command.column][command.row] = action;
+        for (Command command : action.getCommands()) {
+          result[command.getColumn()][command.getRow()] = action;
         }
       }
     }
@@ -439,7 +439,7 @@ public class Model implements ChildEventListener {
    * Runs a transaction to mutate the provided game via the provided function.
    */
   private void mutateGame(Game game, final Procedures.Procedure1<Game> function) {
-    Firebase ref = firebase.child("games").child(game.id);
+    Firebase ref = firebase.child("games").child(game.getId());
     ref.runTransaction(new Handler() {
       
       @Override

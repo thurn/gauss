@@ -8,6 +8,11 @@
 
 #import "GameView.h"
 #import "SVGKit.h"
+#import "Model.h"
+#import "Game.h"
+#import "Action.h"
+#import "Command.h"
+#include "java/lang/Integer.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
@@ -42,8 +47,30 @@
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget: self
                                              action: @selector(handleTap:)]];
+    UIView* derekView = [[UIView alloc] initWithFrame: CGRectMake(0, 0, 100, 100)];
+    derekView.backgroundColor = [UIColor yellowColor];
+    UIButton *button = [UIButton buttonWithType: UIButtonTypeSystem];
+    button.center = CGPointMake(5, 20);
+    UIImage *icon = [UIImage imageNamed: @"ic_game_menu.png"];
+    [button setImage: icon forState: UIControlStateNormal];
+    [button sizeToFit];
+    [button addTarget: self
+               action: @selector(menuButtonClicked:)
+     forControlEvents: UIControlEventTouchUpInside];
+    [self addSubview: button];
   }
   return self;
+}
+
+- (void)menuButtonClicked: (UIButton*)button {
+  NSLog(@"menubuttonclicked");
+  UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle: nil
+                                                     delegate: self.delegate
+                                            cancelButtonTitle: @"Cancel"
+                                       destructiveButtonTitle: @"Resign"
+                                            otherButtonTitles: @"Main Menu", @"Game List",
+                                                               @"New Game", nil];
+  [sheet showInView: self];
 }
 
 - (void)drawGame: (NTSGame*)game {
@@ -70,6 +97,17 @@
   NSLog(@"draw rect");
   [self.back drawAtPoint: CGPointZero];
   if (self.currentGame) {
+    for (NTSAction *action in [self.currentGame getActions]) {
+      for (NTSCommand* command in [action getCommands]) {
+        CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
+                                    [command getRow] * SQUARE_SIZE + TOP_OFFSET);
+        if ([[action getPlayerNumber] intValue] == [NTSModel X_PLAYER]) {
+          [self.x drawAtPoint: point];
+        } else {
+          [self.o drawAtPoint: point];
+        }
+      }
+    }
   }
 }
 

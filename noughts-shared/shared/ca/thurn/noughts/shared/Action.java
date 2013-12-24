@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,17 +16,17 @@ public class Action extends Entity {
     }    
   }
 
-  public final String player;
+  private final String player;
   
-  public Integer playerNumber;
+  private Integer playerNumber;
   
-  public String gameId;
+  private String gameId;
   
   private Boolean submitted;
   
-  public final List<Command> commands;
+  private final List<Command> commands;
   
-  public final List<Command> futureCommands;  
+  private final List<Command> futureCommands;  
   
   public Action(String player) {
     commands = new ArrayList<Command>();
@@ -35,8 +36,8 @@ public class Action extends Entity {
   
   public Action(Map<String, Object> actionMap) {
     player = getString(actionMap, "player");
-    playerNumber = getInteger(actionMap, "playerNumber");
-    gameId = getString(actionMap, "gameId");
+    setPlayerNumber(getInteger(actionMap, "playerNumber"));
+    setGameId(getString(actionMap, "gameId"));
     submitted = getBoolean(actionMap, "submitted");
     commands = getEntities(actionMap, "commands", new CommandDeserializer());
     futureCommands = getEntities(actionMap, "futureCommands", new CommandDeserializer());
@@ -50,12 +51,12 @@ public class Action extends Entity {
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    result.put("player", player);
-    result.put("playerNumber", playerNumber);
-    result.put("gameId", gameId);
+    result.put("player", getPlayer());
+    result.put("playerNumber", getPlayerNumber());
+    result.put("gameId", getGameId());
     result.put("submitted", submitted);
-    result.put("commands", serializeEntities(commands));
-    result.put("futureCommands", serializeEntities(futureCommands));
+    result.put("commands", serializeEntities(getCommandsMutable()));
+    result.put("futureCommands", serializeEntities(getFutureCommandsMutable()));
     return result;
   }
   
@@ -65,5 +66,41 @@ public class Action extends Entity {
 
   void setSubmitted(Boolean submitted) {
     this.submitted = submitted;
+  }
+
+  public String getPlayer() {
+    return player;
+  }
+
+  public Integer getPlayerNumber() {
+    return playerNumber;
+  }
+
+  void setPlayerNumber(Integer playerNumber) {
+    this.playerNumber = playerNumber;
+  }
+
+  public String getGameId() {
+    return gameId;
+  }
+
+  void setGameId(String gameId) {
+    this.gameId = gameId;
+  }
+
+  public List<Command> getCommands() {
+    return Collections.unmodifiableList(getCommandsMutable());
+  }
+  
+  List<Command> getCommandsMutable() {
+    return commands;
+  }
+
+  public List<Command> getFutureCommands() {
+    return Collections.unmodifiableList(getFutureCommandsMutable());
+  }
+  
+  List<Command> getFutureCommandsMutable() {
+    return futureCommands;
   }
 }

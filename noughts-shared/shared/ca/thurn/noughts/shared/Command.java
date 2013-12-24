@@ -10,16 +10,16 @@ public class Command extends Entity {
       return new Command(commandMap);
     }    
   }
-  
-  public final int column;
-  
-  public final int row;
-  
+
+  private final int column;
+
+  private final int row;
+
   public Command(int column, int row) {
     this.column = column;
     this.row = row;
   }
-  
+
   public Command(Map<String, Object> commandMap) {
     column = getInteger(commandMap, "column");
     row = getInteger(commandMap, "row");
@@ -28,14 +28,22 @@ public class Command extends Entity {
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    result.put("column", column);
-    result.put("row", row);
+    result.put("column", getColumn());
+    result.put("row", getRow());
     return result;
   }
 
   @Override
   public String entityName() {
     return "Command";
+  }
+
+  public int getColumn() {
+    return column;
+  }
+
+  public int getRow() {
+    return row;
   }
 
 }

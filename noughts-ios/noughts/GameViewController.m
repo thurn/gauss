@@ -48,6 +48,15 @@
 
 }
 
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+  if (buttonIndex == 1) {
+    NSLog(@"pop");
+    [self dismissViewControllerAnimated:YES completion:^{
+      [self.navigationController popToRootViewControllerAnimated:YES];
+    }];
+  }
+}
+
 - (void)handleSquareTapAtX: (int)x AtY: (int)y {
   NTSCommand *command = [[NTSCommand alloc] initWithInt:x withInt:y];
   if ([self.model couldSubmitCommandWithNTSGame: self.currentGame withNTSCommand: command]) {
