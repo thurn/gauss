@@ -13,6 +13,10 @@
 - (IBAction)onIncrement:(id)sender {
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+  [[self navigationController] setNavigationBarHidden: NO animated: animated];
+}
+
 - (void)didReceiveMemoryWarning
 {
   [super didReceiveMemoryWarning];

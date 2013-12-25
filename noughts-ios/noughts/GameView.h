@@ -9,11 +9,26 @@
 #import <UIKit/UIKit.h>
 #import "game.h"
 
-@protocol GameViewDelegate <UIActionSheetDelegate>
+typedef NS_ENUM(NSUInteger, GameMenuSelection) {
+  kUnknownSelection,
+  kNewGameMenu,
+  kMainMenu,
+  kGameList,
+  kResignGame
+};
+
+@protocol GameViewDelegate
 - (void)handleSquareTapAtX: (int)x AtY: (int)y;
+- (void)handleGameMenuSelection: (GameMenuSelection)selection;
+- (BOOL)canSubmit;
+- (BOOL)canUndo;
+- (BOOL)canRedo;
+- (void)handleSubmit;
+- (void)handleUndo;
+- (void)handleRedo;
 @end
 
-@interface GameView : UIView
+@interface GameView : UIView <UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
-- (void)drawGame: (NTSGame*)game;
+- (void)drawGame:(NTSGame *)game;
 @end

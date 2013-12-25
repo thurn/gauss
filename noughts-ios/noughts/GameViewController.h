@@ -11,5 +11,4 @@
 #import "GameView.h"
 
 @interface GameViewController : ViewController <NTSModel_GameUpdateListener, GameViewDelegate>
-- (void)handleSquareTapAtX: (int)x AtY: (int)y;
 @end

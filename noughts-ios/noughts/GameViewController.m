@@ -8,6 +8,7 @@
 
 #import "GameViewController.h"
 #import "GameView.h"
+#import "NewGameViewController.h"
 #import "Model.h"
 #import "Firebase.h"
 #import "Command.h"
@@ -15,7 +16,7 @@
 @interface GameViewController ()
 @property (strong,nonatomic) NTSModel *model;
 @property (strong,nonatomic) NTSGame *currentGame;
-@property (strong,nonatomic) GameView *gameView;
+@property (weak,nonatomic) GameView *gameView;
 @end
 
 @implementation GameViewController
@@ -48,13 +49,40 @@
 
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+  [[self navigationController] setNavigationBarHidden: YES animated: animated];
+}
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
-    NSLog(@"pop");
-    [self dismissViewControllerAnimated:YES completion:^{
-      [self.navigationController popToRootViewControllerAnimated:YES];
-    }];
+
   }
+}
+
+- (void)handleGameMenuSelection:(GameMenuSelection)selection {
+  switch (selection) {
+    case kMainMenu: {
+      [self.navigationController popToRootViewControllerAnimated:YES];
+      break;
+    }
+    case kNewGameMenu: {
+      UIViewController *newGameController = [self findViewController:[NewGameViewController class]];
+      [self.navigationController popToViewController:newGameController animated:YES];
+      break;
+    }
+    default: {
+      // no action
+    }
+  }
+}
+
+- (UIViewController*)findViewController:(Class)theClass{
+  for (UIViewController *viewController in self.navigationController.viewControllers) {
+    if ([viewController isMemberOfClass:theClass]) {
+      return viewController;
+    }
+  }
+  return nil;
 }
 
 - (void)handleSquareTapAtX: (int)x AtY: (int)y {
@@ -69,8 +97,30 @@
   [self.gameView drawGame: game];
 }
 
-- (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
+- (BOOL)canSubmit {
+  return [self.model canSubmitWithNTSGame:self.currentGame];
+}
+
+- (BOOL)canUndo {
+  return [self.model canUndoWithNTSGame:self.currentGame];
+}
+
+- (BOOL)canRedo {
+  return [self.model canRedoWithNTSGame:self.currentGame];
+}
+
+- (void)handleSubmit {
+  NSLog(@"hs");
+  [self.model submitCurrentActionWithNTSGame:self.currentGame];
+}
+
+- (void)handleUndo {
+  NSLog(@"hu");
+  [self.model undoCommandWithNTSGame:self.currentGame];
+}
+
+- (void)handleRedo {
+  [self.model redoCommandWithNTSGame:self.currentGame];
 }
 
 @end
