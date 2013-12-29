@@ -36,12 +36,15 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e4r-SB-bb9" userLabel="Game List">
-                                        <rect key="frame" x="67" y="60" width="90" height="36"/>
+                                        <rect key="frame" x="67" y="60" width="124" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="Game List">
+                                        <state key="normal" title="Saved Games">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="clg-Vl-XHO" kind="push" id="Gd9-Vb-Gfc"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_game_list" translatesAutoresizingMaskIntoConstraints="NO" id="fae-cB-Ojc" userLabel="ic_game_list">
                                         <rect key="frame" x="15" y="62" width="32" height="32"/>
@@ -112,6 +115,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="173" y="109"/>
         </scene>
         <!--NewGameController-->
         <scene sceneID="6qI-Ys-c7L">
@@ -228,6 +232,44 @@
             </objects>
             <point key="canvasLocation" x="1262" y="109"/>
         </scene>
+        <!--SavedGamesController-->
+        <scene sceneID="1yH-FB-mmL">
+            <objects>
+                <tableViewController id="clg-Vl-XHO" userLabel="SavedGamesController" customClass="SavedGamesViewController" sceneMemberID="viewController">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="6CU-xg-Nyy">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="PM0-Aw-T0u">
+                                <rect key="frame" x="0.0" y="86" width="320" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="PM0-Aw-T0u" id="kkJ-xO-ZY8">
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Game vs. Anonymous" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AiT-0q-Y4f">
+                                            <rect key="frame" x="20" y="11" width="169" height="21"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="clg-Vl-XHO" id="zgO-L4-Eqo"/>
+                            <outlet property="delegate" destination="clg-Vl-XHO" id="aqK-Fb-YEh"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Saved Games" id="aCI-ly-2ju"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="1GB-2k-ags" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="750" y="784"/>
+        </scene>
         <!--HowToPlayController-->
         <scene sceneID="19b-3a-1IZ">
             <objects>
@@ -245,7 +287,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9oK-Oa-1Dv" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="752" y="784"/>
+            <point key="canvasLocation" x="752" y="1426"/>
         </scene>
         <!--SettingsViewController-->
         <scene sceneID="fUK-Bg-DSW">
@@ -264,7 +306,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="KEI-rT-HFG" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="752" y="1490"/>
+            <point key="canvasLocation" x="752" y="2132"/>
         </scene>
         <!--RootNavigationController-->
         <scene sceneID="RxD-8g-r7h">
