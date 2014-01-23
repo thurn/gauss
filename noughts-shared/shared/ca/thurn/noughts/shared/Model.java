@@ -31,9 +31,7 @@ public class Model implements ChildEventListener {
     public void onGameAdded(Game game);
     
     public void onGameChanged(Game game);
-    
-    public void onGameMoved(Game game);
-    
+        
     public void onGameRemoved(Game game);
   }
   
@@ -41,12 +39,14 @@ public class Model implements ChildEventListener {
   private final Firebase firebase;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private GameListListener gameListListener;
+  private Map<String, Game> games;
   
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
-    this.gameUpdateListeners = new HashMap<String, GameUpdateListener>();
+    gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     firebase.child("games").addChildEventListener(this);
+    games = new HashMap<String, Game>();
   }
   
   /**
@@ -132,6 +132,7 @@ public class Model implements ChildEventListener {
     if (gameListListener != null) {
       gameListListener.onGameAdded(game);
     }
+    games.put(game.getId(), game);
   }
 
   @Override
@@ -143,20 +144,35 @@ public class Model implements ChildEventListener {
     if (gameListListener != null) {
       gameListListener.onGameChanged(game);
     }
+    games.put(game.getId(), game);
   }
 
   @Override
   public void onChildMoved(DataSnapshot snapshot, String previous) {
-    if (gameListListener != null) {
-      gameListListener.onGameMoved(new GameDeserializer().fromDataSnapshot(snapshot));
-    }
-  }
+  }  
 
   @Override
   public void onChildRemoved(DataSnapshot snapshot) {
+    Game game = new GameDeserializer().fromDataSnapshot(snapshot);
     if (gameListListener != null) {
       gameListListener.onGameRemoved(new GameDeserializer().fromDataSnapshot(snapshot));
     }
+    games.remove(game.getId());
+  }
+  
+  /**
+   * @return The current {@link GameListPartitions} for this model.
+   */
+  public GameListPartitions getGameListPartitions() {
+    return new GameListPartitions(userId, games.values());
+  }
+  
+  /**
+   * @return The total number of games tracked by this model (including ones in
+   * the game-over state)
+   */
+  public int gameCount() {
+    return games.size();
   }
 
   /**
@@ -454,7 +470,7 @@ public class Model implements ChildEventListener {
         return Transaction.success(mutableData);
       }
     });
-  }  
+  }
   
   /**
    * Throws an exception.

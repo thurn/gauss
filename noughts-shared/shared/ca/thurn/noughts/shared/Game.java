@@ -8,7 +8,28 @@ import java.util.Map;
 
 import ca.thurn.noughts.shared.Action.ActionDeserializer;
 
-public class Game extends Entity {
+public class Game extends Entity implements Comparable<Game> {
+  private static final long ONE_SECOND = 1000;
+  private static final long SECONDS = 60;
+  private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
+  private static final long MINUTES = 60;
+  private static final long ONE_HOUR = MINUTES * ONE_MINUTE;
+  private static final long HOURS = 24;
+  private static final long ONE_DAY = HOURS * ONE_HOUR;
+  private static final long DAYS = 7;
+  private static final long ONE_WEEK = DAYS * ONE_DAY;
+  private static final double WEEKS = 4.34812;
+  private static final long ONE_MONTH = (long)WEEKS * ONE_WEEK;
+  private static final long MONTHS = 12;
+  private static final long ONE_YEAR = MONTHS * ONE_MONTH;
+  
+  public static enum VsType {
+    NO_OPPONENT,
+    LOCAL_MULTIPLAYER,
+    ANONYMOUS_OPPONENT,
+    FACEBOOK_OPPONENT
+  }
+  
   public static class GameDeserializer extends EntityDeserializer<Game> {
     @Override 
     public Game deserialize(Map<String, Object> map) {
@@ -234,5 +255,107 @@ public class Game extends Entity {
 
   List<String> getResignedPlayersMutable() {
     return resignedPlayers;
+  }
+
+  @Override
+  public int compareTo(Game other) {
+    if (other == null) {
+      throw new NullPointerException("Null game in compareTo()");
+    } else if (equals(other)) {
+      return 0;
+    } else if (lastModified < other.lastModified) {
+      return -1;
+    } else if (lastModified > other.lastModified) {
+      return 1;
+    } else {
+      // Different games, same lastModified, order by hashCode
+      return other.hashCode() - hashCode();
+    }
+  }
+
+  /**
+   * @param viewerId viewer's ID
+   * @return The ID of your opponent or null if there isn't one. 
+   */
+  public String getOpponentId(String viewerId) {
+    for (String id : players) {
+      if (!id.equals(viewerId)) {
+        return id;
+      }
+    }
+    return null;
+  }
+  
+  public VsType getVsType(String viewerId) {
+    if (isLocalMultiplayer()) {
+      return VsType.LOCAL_MULTIPLAYER;
+    }
+    if (players.size() < 2) {
+      return VsType.NO_OPPONENT;
+    }
+    String opponentId = getOpponentId(viewerId);
+    if (profiles.get(opponentId) != null) {
+      return VsType.FACEBOOK_OPPONENT;
+    } else {
+      return VsType.ANONYMOUS_OPPONENT;
+    }    
+  }
+
+  public String vsString(String viewerId) {
+    switch (getVsType(viewerId)) {
+      case LOCAL_MULTIPLAYER: {
+        return "Local Multiplayer Game";
+      }
+      case NO_OPPONENT: {
+        return "vs. (No Opponent Yet)";
+      }
+      case FACEBOOK_OPPONENT: {
+        String opponentId = getOpponentId(viewerId);
+        return "vs. " + profiles.get(opponentId).get("givenName");
+      }
+      default: { // ANONYMOUS_OPPONENT
+        return "vs. Anonymous";
+      }
+    }
+  }
+  
+  private String timeAgoString(long number, String unit) {
+    if (number <= 1) {
+      String article = unit.equals("hour") ? "an" : "a";
+      return "Updated " + article + " " + unit + " ago";
+    } else {
+      return "Updated " + number + " " + unit + "s ago";
+    }
+  }
+
+  public String lastUpdatedString() {
+    long duration = Math.max(Clock.getInstance().currentTimeMillis() - lastModified, 0);
+    long number;
+    number = duration / ONE_YEAR;
+    if (number > 0) {
+      return timeAgoString(number, "year");
+    }
+    number = duration / ONE_MONTH;
+    if (number > 0) {
+      return timeAgoString(number, "month");
+    }
+    number = duration / ONE_WEEK;
+    if (number > 0) {
+      return timeAgoString(number, "week");
+    }
+    number = duration / ONE_DAY;
+    if (number > 0) {
+      return timeAgoString(number, "day");
+    }
+    number = duration / ONE_HOUR;
+    if (number > 0) {
+      return timeAgoString(number, "hour");
+    }
+    number = duration / ONE_MINUTE;
+    if (number > 0) {
+      return timeAgoString(number, "minute");
+    }
+    number = duration / ONE_SECOND;
+    return timeAgoString(number, "second");
   }
 }

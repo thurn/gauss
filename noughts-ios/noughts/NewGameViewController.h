@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "HasModel.h"
 
-@interface NewGameViewController : UIViewController
+@interface NewGameViewController : UIViewController <HasModel>
 
 @end

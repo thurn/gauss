@@ -9,14 +9,15 @@
 #import "GameViewController.h"
 #import "GameView.h"
 #import "NewGameViewController.h"
+#import "SavedGamesViewController.h"
 #import "Model.h"
 #import "Firebase.h"
 #import "Command.h"
 
 @interface GameViewController ()
-@property (strong,nonatomic) NTSModel *model;
-@property (strong,nonatomic) NTSGame *currentGame;
+@property (weak,nonatomic) NTSModel *model;
 @property (weak,nonatomic) GameView *gameView;
+@property (strong,nonatomic) NTSGame *currentGame;
 @end
 
 @implementation GameViewController
@@ -35,18 +36,20 @@
   self.gameView = view;
 }
 
+- (void)setNTSModel:(NTSModel *)model {
+  self.model = model;
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
-  FCFirebase *firebase = [[FCFirebase alloc]
-                          initWithNSString: @"https://noughts.firebaseio-demo.com"];
-  self.model = [[NTSModel alloc] initWithNSString: @"derek"
-                                   withFCFirebase: firebase];
+}
+
+- (void)createLocalMultiplayerGame {
   NSString *gameId = [self.model newGameWithBoolean: YES
                                     withJavaUtilMap: nil
                                     withJavaUtilMap: nil];
   [self.model setGameUpdateListenerWithNSString: gameId
                 withNTSModel_GameUpdateListener: self];
-
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -68,6 +71,12 @@
     case kNewGameMenu: {
       UIViewController *newGameController = [self findViewController:[NewGameViewController class]];
       [self.navigationController popToViewController:newGameController animated:YES];
+      break;
+    }
+    case kGameList: {
+      UIViewController *savedGamesController = [self findViewController:
+                                                [SavedGamesViewController class]];
+      [self.navigationController popToViewController:savedGamesController animated:YES];
       break;
     }
     default: {
@@ -110,12 +119,10 @@
 }
 
 - (void)handleSubmit {
-  NSLog(@"hs");
   [self.model submitCurrentActionWithNTSGame:self.currentGame];
 }
 
 - (void)handleUndo {
-  NSLog(@"hu");
   [self.model undoCommandWithNTSGame:self.currentGame];
 }
 

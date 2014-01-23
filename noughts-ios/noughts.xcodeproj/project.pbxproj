@@ -27,7 +27,7 @@
 		7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641118641F3500D34AD0 /* AppDelegate.m */; };
 		7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641318641F3500D34AD0 /* Main_iPhone.storyboard */; };
 		7C2E641818641F3500D34AD0 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641618641F3500D34AD0 /* Main_iPad.storyboard */; };
-		7C2E641B18641F3500D34AD0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641A18641F3500D34AD0 /* ViewController.m */; };
+		7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641A18641F3500D34AD0 /* RootViewController.m */; };
 		7C2E641D18641F3500D34AD0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641C18641F3500D34AD0 /* Images.xcassets */; };
 		7C2E642418641F3500D34AD0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E642318641F3500D34AD0 /* XCTest.framework */; };
 		7C2E642518641F3500D34AD0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640118641F3500D34AD0 /* Foundation.framework */; };
@@ -53,6 +53,8 @@
 		7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */; };
 		7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
+		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
+		7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* SavedGamesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* SavedGamesViewController.m */; };
 		7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
 		7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
@@ -258,8 +260,8 @@
 		7C2E641118641F3500D34AD0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7C2E641418641F3500D34AD0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		7C2E641718641F3500D34AD0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		7C2E641918641F3500D34AD0 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
-		7C2E641A18641F3500D34AD0 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		7C2E641918641F3500D34AD0 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
+		7C2E641A18641F3500D34AD0 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		7C2E641C18641F3500D34AD0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		7C2E642218641F3500D34AD0 /* noughtsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = noughtsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2E642318641F3500D34AD0 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -279,6 +281,8 @@
 		7C2E648E1864216F00D34AD0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7C2E64931864223C00D34AD0 /* prefixes.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = prefixes.properties; sourceTree = "<group>"; };
+		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
+		7C69CD3B18790B600040AD75 /* HasModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HasModel.h; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* SavedGamesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SavedGamesViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* SavedGamesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SavedGamesViewController.m; sourceTree = "<group>"; };
 		7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractChildEventListener.java; sourceTree = "<group>"; };
@@ -540,8 +544,8 @@
 				7C2E641118641F3500D34AD0 /* AppDelegate.m */,
 				7C2E641318641F3500D34AD0 /* Main_iPhone.storyboard */,
 				7C2E641618641F3500D34AD0 /* Main_iPad.storyboard */,
-				7C2E641918641F3500D34AD0 /* ViewController.h */,
-				7C2E641A18641F3500D34AD0 /* ViewController.m */,
+				7C2E641918641F3500D34AD0 /* RootViewController.h */,
+				7C2E641A18641F3500D34AD0 /* RootViewController.m */,
 				7C2E641C18641F3500D34AD0 /* Images.xcassets */,
 				7C2E640818641F3500D34AD0 /* Supporting Files */,
 				7C8EF7721866B96B0075D0C1 /* GameViewController.h */,
@@ -552,6 +556,7 @@
 				7C2C3455186A858200AD04F7 /* NewGameViewController.m */,
 				7C72157D186F232500F1188B /* SavedGamesViewController.h */,
 				7C72157E186F232500F1188B /* SavedGamesViewController.m */,
+				7C69CD3B18790B600040AD75 /* HasModel.h */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -675,6 +680,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7C69CD38187908BB0040AD75 /* GameListPartitions.java */,
 				7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */,
 				7C8EF6EF18668CB40075D0C1 /* Action.java */,
 				7C8EF6F018668CB40075D0C1 /* Game.java */,
@@ -842,7 +848,7 @@
 				7C2E647618641FC700D34AD0 /* Procedures.java in Sources */,
 				7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
 				7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */,
-				7C2E641B18641F3500D34AD0 /* ViewController.m in Sources */,
+				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
 				7C2E647418641FC700D34AD0 /* Functions.java in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
@@ -851,6 +857,7 @@
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
 				7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
+				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C8EF6EC18667EAC0075D0C1 /* Command.java in Sources */,
 				7C8EF6E618667E700075D0C1 /* Entity.java in Sources */,
 				7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */,
@@ -887,6 +894,7 @@
 				7C8EF6E718667E700075D0C1 /* Entity.java in Sources */,
 				7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
 				7C8EF6ED18667EAC0075D0C1 /* Command.java in Sources */,
+				7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C8EF76B18668E120075D0C1 /* Transaction.java in Sources */,
 				7C8EF76918668E120075D0C1 /* Query.java in Sources */,
 				7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */,

@@ -13,10 +13,6 @@ public class AbstractGameListListener implements GameListListener {
   }
 
   @Override
-  public void onGameMoved(Game game) {
-  }
-
-  @Override
   public void onGameRemoved(Game game) {
   }
 

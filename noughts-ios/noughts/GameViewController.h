@@ -6,9 +6,12 @@
 //  Copyright (c) 2013 Derek Thurn. All rights reserved.
 //
 
-#import "ViewController.h"
 #import "Model.h"
 #import "GameView.h"
+#import "HasModel.h"
 
-@interface GameViewController : ViewController <NTSModel_GameUpdateListener, GameViewDelegate>
+@interface GameViewController : UIViewController <NTSModel_GameUpdateListener,
+                                                  GameViewDelegate,
+                                                  HasModel>
+- (void)createLocalMultiplayerGame;
 @end

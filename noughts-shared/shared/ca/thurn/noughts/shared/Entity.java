@@ -45,10 +45,10 @@ public abstract class Entity {
    *
    * @return The name of your entity.
    */
-  public abstract String entityName();
+  abstract String entityName();
 
   @SuppressWarnings("unchecked")
-  public <T> List<T> getList(Map<String, Object> map, String key) {
+  <T> List<T> getList(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (List<T>)map.get(key);
     } else {
@@ -57,7 +57,7 @@ public abstract class Entity {
   }
 
   @SuppressWarnings("unchecked")
-  public <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
+  <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (Map<K,V>)map.get(key);
     } else {
@@ -65,11 +65,11 @@ public abstract class Entity {
     }
   }
 
-  public String getString(Map<String, Object> map, String key) {
+  String getString(Map<String, Object> map, String key) {
     return (String)map.get(key);
   }
 
-  public Integer getInteger(Map<String, Object> map, String key) {
+  Integer getInteger(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return new Integer(((Number)map.get(key)).intValue());
     } else {
@@ -77,16 +77,16 @@ public abstract class Entity {
     }
   }
   
-  public Long getLong(Map<String, Object> map, String key) {
+  Long getLong(Map<String, Object> map, String key) {
     return (Long)map.get(key);
   }
   
-  public Boolean getBoolean(Map<String, Object> map, String key) {
+  Boolean getBoolean(Map<String, Object> map, String key) {
     return (Boolean)map.get(key);
   }
   
   @SuppressWarnings("unchecked")
-  public <T extends Entity> List<T> getEntities(Map<String, Object> map, String key,
+  <T extends Entity> List<T> getEntities(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     ArrayList<T> result = new ArrayList<T>();
     if (map.containsKey(key)) {
@@ -97,7 +97,7 @@ public abstract class Entity {
     return (List<T>)result;
   }
   
-  public List<Map<String, Object>> serializeEntities(List<? extends Entity> list) {
+  List<Map<String, Object>> serializeEntities(List<? extends Entity> list) {
     List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
     for (Entity entity : list) {
       result.add(entity.serialize());
