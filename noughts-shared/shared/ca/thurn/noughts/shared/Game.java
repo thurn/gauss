@@ -27,7 +27,7 @@ public class Game extends Entity implements Comparable<Game> {
     NO_OPPONENT,
     LOCAL_MULTIPLAYER,
     ANONYMOUS_OPPONENT,
-    FACEBOOK_OPPONENT
+    OPPONENT_WITH_PROFILE
   }
   
   public static class GameDeserializer extends EntityDeserializer<Game> {
@@ -167,6 +167,21 @@ public class Game extends Entity implements Comparable<Game> {
   public String getPlayerIdFromPlayerNumber(int playerNumber) {
     return players.get(playerNumber);
   }
+  
+  /**
+   * @param playerId A player ID
+   * @return All player numbers (if any) associated with this player ID
+   */
+  public List<Integer> getPlayerNumbersForPlayerId(String playerId) {
+    if (playerId == null) throw new IllegalArgumentException("Null playerId");
+    List<Integer> results = new ArrayList<Integer>();
+    for (int i = 0; i < players.size(); ++i) {
+      if (players.get(i).equals(playerId)) {
+        results.add(i);
+      }
+    }
+    return results;
+  }
 
   public boolean hasCurrentAction() {
     return getCurrentActionNumber() != null;
@@ -285,13 +300,14 @@ public class Game extends Entity implements Comparable<Game> {
   }
 
   /**
-   * @param viewerPlayerNumber viewer's player number
+   * @param viewerId viewer's player ID
    * @return The player number of your opponent or -1 if there isn't one. 
    */
-  public int getOpponentPlayerNumber(int viewerPlayerNumber) {
-    if (players.size() < 2) {
+  public int getOpponentPlayerNumber(String viewerId) {
+    List<Integer> playerNumbers = getPlayerNumbersForPlayerId(viewerId);
+    if (playerNumbers.size() != 1 || players.size() < 2){
       return -1;
-    } else if (viewerPlayerNumber == 0){
+    } else if (playerNumbers.get(0) == 0){
       return 1;
     } else {
       return 0;
@@ -299,49 +315,49 @@ public class Game extends Entity implements Comparable<Game> {
   }
 
   /**
-   * @param viewerPlayerNumber viewer's player number
+   * @param viewerId viewer's player ID
    * @return The profile of your opponent or null if there isn't one.
    */
-  public Map<String, String> getOpponentProfile(int viewerPlayerNumber) {
-    int opponentNumber = getOpponentPlayerNumber(viewerPlayerNumber);
+  public Map<String, String> getOpponentProfile(String viewerId) {
+    int opponentNumber = getOpponentPlayerNumber(viewerId);
     if (opponentNumber == -1) return null;
     String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
     return profiles.get(opponentId);
   }
   
   /**
-   * @param viewerPlayerNumber viewer's player number
+   * @param viewerId viewer's player ID
    * @return A VsType corresponding to the type of opponent this game has.
    */
-  public VsType getVsType(int viewerPlayerNumber) {
+  public VsType getVsType(String viewerId) {
     if (isLocalMultiplayer()) {
       return VsType.LOCAL_MULTIPLAYER;
     }
     if (players.size() < 2) {
       return VsType.NO_OPPONENT;
     }
-    if (getOpponentProfile(viewerPlayerNumber) != null) {
-      return VsType.FACEBOOK_OPPONENT;
+    if (getOpponentProfile(viewerId) != null) {
+      return VsType.OPPONENT_WITH_PROFILE;
     } else {
       return VsType.ANONYMOUS_OPPONENT;
     }    
   }
 
   /**
-   * @param viewerPlayerNumber viewer's player number
+   * @param viewerId viewer's player ID
    * @return A string describing the opponent of this game, such as
    * "vs. Frank".
    */
-  public String vsString(int viewerPlayerNumber) {
-    switch (getVsType(viewerPlayerNumber)) {
+  public String vsString(String viewerId) {
+    switch (getVsType(viewerId)) {
       case LOCAL_MULTIPLAYER: {
         return "Local Multiplayer Game";
       }
       case NO_OPPONENT: {
         return "vs. (No Opponent Yet)";
       }
-      case FACEBOOK_OPPONENT: {
-        return "vs. " + getOpponentProfile(viewerPlayerNumber).get("givenName");
+      case OPPONENT_WITH_PROFILE: {
+        return "vs. " + getOpponentProfile(viewerId).get("givenName");
       }
       default: { // ANONYMOUS_OPPONENT
         return "vs. Anonymous";
@@ -349,25 +365,29 @@ public class Game extends Entity implements Comparable<Game> {
     }
   }
   
-  private String timeAgoString(int viewerPlayerNumber, long number, String unit) {
+  private String timeAgoString(String viewerId, long number, String unit) {
     String statusString;
     if (isGameOver()) {
-      int opponentPlayerNumber = getOpponentPlayerNumber(viewerPlayerNumber);
-      if (victors.size() == 2) {
-        statusString = "Game tied";
-      } else if (victors.contains(viewerPlayerNumber)) {
-        statusString = "You won";
-      } else if (victors.contains(opponentPlayerNumber)){
-        Map<String, String> opponentProfile = getOpponentProfile(viewerPlayerNumber);
-        if (opponentProfile != null && opponentProfile.get("gender").equals("male")) {
-          statusString = "He won";
-        } else if (opponentProfile != null && opponentProfile.get("gender").equals("female")) {
-          statusString = "She won";
-        } else {
-          statusString = "They won";
-        }
+      if (isLocalMultiplayer()) {
+        statusString = "Game ended";
       } else {
-        statusString = "You lost";
+        List<Integer> playerNumbers = getPlayerNumbersForPlayerId(viewerId);
+        if (victors.size() == 2) {
+          statusString = "Game tied";
+        } else if (playerNumbers.size() == 1 && victors.contains(playerNumbers.get(0))) {
+          statusString = "You won";
+        } else if (victors.contains(getOpponentPlayerNumber(viewerId))){
+          Map<String, String> opponentProfile = getOpponentProfile(viewerId);
+          if (opponentProfile != null && opponentProfile.get("gender").equals("male")) {
+            statusString = "He won";
+          } else if (opponentProfile != null && opponentProfile.get("gender").equals("female")) {
+            statusString = "She won";
+          } else {
+            statusString = "They won";
+          }
+        } else {
+          statusString = "You lost";
+        }
       }
     } else {
       statusString = "Updated";
@@ -381,38 +401,38 @@ public class Game extends Entity implements Comparable<Game> {
   }
 
   /**
-   * @param viewerPlayerNumber viewer's player number
+   * @param viewerId viewer's player ID
    * @return A string describing the last state of the game, such as "updated 1
    * second ago" or "You won 4 years ago". 
    */
-  public String lastUpdatedString(int viewerPlayerNumber) {
+  public String lastUpdatedString(String viewerId) {
     long duration = Math.max(Clock.getInstance().currentTimeMillis() - lastModified, 0);
     long number;
     number = duration / ONE_YEAR;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "year");
+      return timeAgoString(viewerId, number, "year");
     }
     number = duration / ONE_MONTH;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "month");
+      return timeAgoString(viewerId, number, "month");
     }
     number = duration / ONE_WEEK;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "week");
+      return timeAgoString(viewerId, number, "week");
     }
     number = duration / ONE_DAY;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "day");
+      return timeAgoString(viewerId, number, "day");
     }
     number = duration / ONE_HOUR;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "hour");
+      return timeAgoString(viewerId, number, "hour");
     }
     number = duration / ONE_MINUTE;
     if (number > 0) {
-      return timeAgoString(viewerPlayerNumber, number, "minute");
+      return timeAgoString(viewerId, number, "minute");
     }
     number = duration / ONE_SECOND;
-    return timeAgoString(viewerPlayerNumber, number, "second");
+    return timeAgoString(viewerId, number, "second");
   }
 }
