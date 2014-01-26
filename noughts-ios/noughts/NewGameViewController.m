@@ -23,10 +23,6 @@
   return self;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-  [[self navigationController] setNavigationBarHidden: NO animated: animated];
-}
-
 - (void)setNTSModel:(NTSModel *)model {
   self.model = model;
 }

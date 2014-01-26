@@ -55,6 +55,14 @@ public abstract class Entity {
       return new ArrayList<T>();
     }
   }
+  
+  <T> List<Integer> getIntegerList(List<T> list) {
+    List<Integer> result = new ArrayList<Integer>();
+    for (T t : list) {
+      result.add(((Number)t).intValue());
+    }
+    return result;
+  }
 
   @SuppressWarnings("unchecked")
   <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {

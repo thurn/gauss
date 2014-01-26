@@ -3,7 +3,7 @@
 #import "Firebase.h"
 #import "HasModel.h"
 
-@interface RootViewController ()
+@interface RootViewController () <NTSModel_GameListListener>
 @property (weak, nonatomic) IBOutlet UIButton *savedGamesButton;
 @property(strong,nonatomic) NTSModel *model;
 @end
@@ -16,16 +16,31 @@
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio-demo.com"];
   self.model = [[NTSModel alloc] initWithNSString:@"userid" withFCFirebase:firebase];
+  [self.model setGameListListenerWithNTSModel_GameListListener:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-  [[self navigationController] setNavigationBarHidden: NO animated: animated];
+  [self toggleSaveButtonEnabled];
+}
+
+- (void)toggleSaveButtonEnabled {
   if ([self.model gameCount] == 0) {
     [self.savedGamesButton setEnabled:NO];
   } else {
     [self.savedGamesButton setEnabled:YES];
   }
-  NSLog(@"Num Games %d", [self.model gameCount]);
+}
+
+- (void)onGameAddedWithNTSGame:(NTSGame *)game {
+  [self toggleSaveButtonEnabled];
+}
+
+- (void)onGameChangedWithNTSGame:(NTSGame *)game {
+  [self toggleSaveButtonEnabled];
+}
+
+- (void)onGameRemovedWithNTSGame:(NTSGame *)game {
+  [self toggleSaveButtonEnabled];
 }
 
 - (void)didReceiveMemoryWarning

@@ -8,7 +8,9 @@
 
 #import "SavedGamesViewController.h"
 #import "Model.h"
+#import "Game.h"
 #import "GameListPartitions.h"
+#import "GameViewController.h"
 #import "java/util/List.h"
 
 @interface SavedGamesViewController ()
@@ -31,8 +33,7 @@
     return self;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
   // Uncomment the following line to preserve selection between presentations.
   // self.clearsSelectionOnViewWillAppear = NO;
@@ -58,29 +59,60 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  int numRows = 0;
+  return [[self listForSectionNumber:section] size];
+}
+
+- (id<JavaUtilList>)listForSectionNumber:(NSInteger) section {
   switch (section) {
     case YOUR_GAMES_SECTION:
-      numRows = [[self.gameListPartitions yourTurn] size];
-      break;
+      return [self.gameListPartitions yourTurn];
     case THEIR_GAMES_SECTION:
-      numRows = [[self.gameListPartitions theirTurn] size];
-      break;
+      return [self.gameListPartitions theirTurn];
     case GAME_OVER_SECTION:
-      numRows = [[self.gameListPartitions gameOver] size];
-      break;
+      return [self.gameListPartitions gameOver];
   }
-  NSLog(@"num rows in section %d is %d", section, numRows);
-  return numRows;
+  return nil;
+}
+
+- (NTSGame *)gameForIndexPath:(NSIndexPath *)indexPath {
+  id<JavaUtilList> games = [self listForSectionNumber:indexPath.section];
+  return [games getWithInt:indexPath.row];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   static NSString *CellIdentifier = @"Cell";
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-  cell.textLabel.text = [[NSString alloc] initWithFormat:@"cell section #%d row #%d",
-                         indexPath.section, indexPath.row];
+  NTSGame *game = [self gameForIndexPath:indexPath];
+  cell.textLabel.text = [game vsStringWithNSString:[self.model getUserId]];
+  cell.detailTextLabel.text = [game lastUpdatedStringWithNSString:[self.model getUserId]];
+  cell.imageView.image = [UIImage imageNamed:@"ic_local_multiplayer"];
   return cell;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+  if ([self tableView:tableView numberOfRowsInSection:section] == 0) {
+    // Suppress title for empty sections
+    return nil;
+  }
+  switch (section) {
+    case YOUR_GAMES_SECTION:
+      return @"Games - Your Turn";
+    case THEIR_GAMES_SECTION:
+      return @"Games - Their Turn";
+    case GAME_OVER_SECTION:
+      return @"Games - Game Over";
+  }
+  return nil;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+  GameViewController *controller =
+      [self.storyboard instantiateViewControllerWithIdentifier:@"GameViewController"];
+  NTSGame *game = [self gameForIndexPath:indexPath];
+  [controller setNTSModel:self.model];
+  controller.currentGameId = [game getId];
+  [self.navigationController pushViewController:controller animated:YES];
 }
 
 /*

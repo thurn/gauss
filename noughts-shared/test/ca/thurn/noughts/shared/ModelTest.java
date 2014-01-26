@@ -52,7 +52,7 @@ public class ModelTest extends SharedTestCase {
     final Game game = newGame();
     game.getPlayersMutable().add(userId);
     game.setCurrentPlayerNumber(0);
-    Action action = new Action(userId);
+    Action action = new Action(0);
     action.setGameId(game.getId());
     game.getActionsMutable().add(action);
     game.setCurrentActionNumber(0);
@@ -64,6 +64,7 @@ public class ModelTest extends SharedTestCase {
         model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
+            assertNotNull(game);
             assertNotNull(game.getLastModified());
             assertTrue(game.getLastModified() > 0);
             Action action = game.currentAction();
@@ -103,7 +104,7 @@ public class ModelTest extends SharedTestCase {
             assertEquals(0, (int)game.getCurrentActionNumber());
             assertTrue(game.getLastModified() > 0);
             Action action = game.currentAction();
-            assertEquals(userId, action.getPlayer());
+            assertEquals(new Integer(0), action.getPlayerNumber());
             assertFalse(action.isSubmitted());
             assertEquals(game.getId(), action.getGameId());
             assertEquals(1, action.getCommandsMutable().size());
@@ -177,53 +178,53 @@ public class ModelTest extends SharedTestCase {
   public void testComputeVictors() {
     Game game = newGame();
     game.getActionsMutable().addAll(list(
-      action("x", 0, 0),
-      action("o", 0, 1),
-      action("x", 0, 2)      
+      action(0, 0, 0),
+      action(1, 0, 1),
+      action(0, 0, 2)      
     ));
     assertNull(model.computeVictors(game));
     
     game = newGame();
     game.getActionsMutable().addAll(list(
-      action("x", 0, 0),
-      action("x", 0, 1),
-      action("x", 0, 2)
+      action(0, 0, 0),
+      action(0, 0, 1),
+      action(0, 0, 2)
     ));
-    assertDeepEquals(list("x"), model.computeVictors(game));
+    assertDeepEquals(list(0), model.computeVictors(game));
     
     game = newGame();
     game.getActionsMutable().addAll(list(
-      action("x", 0, 0),
-      action("x", 1, 1),
-      action("x", 2, 2)
+      action(0, 0, 0),
+      action(0, 1, 1),
+      action(0, 2, 2)
     ));
-    assertDeepEquals(list("x"), model.computeVictors(game));
+    assertDeepEquals(list(0), model.computeVictors(game));
     
     game = newGame();
     game.getActionsMutable().addAll(list(
-      action("x", 0, 2),
-      action("o", 1, 1),
-      action("x", 1, 2),
-      action("o", 0, 1),
-      action("x", 2, 2)
+      action(0, 0, 2),
+      action(1, 1, 1),
+      action(0, 1, 2),
+      action(1, 0, 1),
+      action(0, 2, 2)
     ));
-    assertDeepEquals(list("x"), model.computeVictors(game));
+    assertDeepEquals(list(0), model.computeVictors(game));
     
     game = newGame();
     game.getPlayersMutable().add("x");
     game.getPlayersMutable().add("o");
     game.getActionsMutable().addAll(list(
-      action("o", 0, 0),
-      action("x", 0, 1),
-      action("o", 0, 2),
-      action("o", 1, 0),
-      action("x", 1, 1),
-      action("o", 1, 2),
-      action("x", 2, 0),
-      action("o", 2, 1),
-      action("x", 2, 2)
+      action(1, 0, 0),
+      action(0, 0, 1),
+      action(1, 0, 2),
+      action(1, 1, 0),
+      action(0, 1, 1),
+      action(1, 1, 2),
+      action(0, 2, 0),
+      action(1, 2, 1),
+      action(0, 2, 2)
     ));
-    assertDeepEquals(list("x", "o"), model.computeVictors(game));
+    assertDeepEquals(list(0, 1), model.computeVictors(game));
   }
   
   public void testSubmitCurrentAction() {
@@ -250,14 +251,14 @@ public class ModelTest extends SharedTestCase {
     beginAsyncTestBlock();
     final Game game = newGameWithCurrentCommand();
     game.setLocalMultiplayer(true);
-    game.getPlayersMutable().add(Model.LOCAL_MULTIPLAYER_OPPONENT_ID);
+    game.getPlayersMutable().add(userId);
     withTestData(game, new Runnable() {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
-            assertEquals(Model.LOCAL_MULTIPLAYER_OPPONENT_ID, game.currentPlayerId());
+            assertEquals(userId, game.currentPlayerId());
             finished();
           }
         });
@@ -273,12 +274,12 @@ public class ModelTest extends SharedTestCase {
     game.getPlayersMutable().add(userId);
     game.getPlayersMutable().add("o");
     game.getActionsMutable().addAll(list(
-      action(userId, 0, 2),
-      action("o", 1, 1),
-      action(userId, 1, 2),
-      action("o", 0, 1)
+      action(0, 0, 2),
+      action(1, 1, 1),
+      action(0, 1, 2),
+      action(1, 0, 1)
     ));
-    Action action = new Action(userId);
+    Action action = new Action(0);
     action.getCommandsMutable().add(new Command(2, 2));
     action.setGameId(game.getId());
     game.getActionsMutable().add(action);
@@ -292,7 +293,8 @@ public class ModelTest extends SharedTestCase {
           public void onGameUpdate(Game game) {
             assertNull(game.getCurrentPlayerNumber());
             assertNull(game.getCurrentActionNumber());
-            assertDeepEquals(list(userId), game.getVictorsMutable());
+            assertEquals(new Integer(0), game.getVictors().get(0));
+            assertEquals(1, game.getVictors().size());
             assertTrue(game.isGameOver());
             finished();
           }
@@ -365,12 +367,6 @@ public class ModelTest extends SharedTestCase {
       "players", list("fooId", userId)));
     assertFalse(model.isCurrentPlayer(g4));
   }
-  
-  public void testIsPlayer() {
-    assertFalse(model.isPlayer(newGame(map("players", list()))));
-    assertFalse(model.isPlayer(newGame(map("players", list("foo")))));
-    assertTrue(model.isPlayer(newGame(map("players", list("foo", userId)))));
-  }
 
   public void testEnsureIsCurrentPlayer() {
     assertDies(new Runnable() {
@@ -384,9 +380,10 @@ public class ModelTest extends SharedTestCase {
     });
   }
 
-  private Action action(String player, int column, int row) {
+  @SuppressWarnings("unchecked")
+  private Action action(int player, int column, int row) {
     return new Action(map(
-        "player", player,
+        "playerNumber", player,
         "submitted", true,
         "commands", list(map(
           "column", column,
@@ -404,6 +401,7 @@ public class ModelTest extends SharedTestCase {
     return new Game(map);
   }
   
+  @SuppressWarnings("unchecked")
   private Game newGameWithCurrentCommand() {
     return newGame(map(
         "currentPlayerNumber", 0,

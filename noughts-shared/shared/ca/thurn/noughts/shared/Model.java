@@ -21,7 +21,6 @@ import com.firebase.client.Transaction.Result;
 public class Model implements ChildEventListener {
   public static final int X_PLAYER = 0;
   public static final int O_PLAYER = 1;
-  public static final String LOCAL_MULTIPLAYER_OPPONENT_ID = "LOCAL_MULTIPLAYER_OPPONENT_ID";
 
   public static interface GameUpdateListener {
     public void onGameUpdate(Game game);
@@ -50,14 +49,12 @@ public class Model implements ChildEventListener {
   }
   
   /**
-   * Updates the current user for this model.
-   *
-   * @param userId The new user's ID.
+   * @return The current user ID
    */
-  public void setUserId(String userId) {
-    this.userId = userId; 
+  public String getUserId() {
+    return this.userId;
   }
-  
+
   /**
    * @param game A game.
    * @return True if the current user is the current player in the provided
@@ -67,25 +64,22 @@ public class Model implements ChildEventListener {
     if (game.isGameOver()) return false;
     return game.currentPlayerId().equals(userId);
   }
-
-  /**
-   * @param game A game.
-   * @return True if the current user is a player in the provided game.
-   */
-  public boolean isPlayer(Game game) {
-    return game.getPlayers().contains(userId);
-  }
   
   /**
    * Adds a listener whose onGameUpdate method will be invoked if a game with
    * the provided ID is added or changed. Overwrites any previously added
-   * game update listener.
+   * game update listener. The provided listener will also be triggered
+   * immediately with the current state of the indicated game if it is locally
+   * available.
    *
    * @param gameId The ID of the game.
    * @param listener The listener to add.
    */
   public void setGameUpdateListener(String gameId, GameUpdateListener listener) {
     gameUpdateListeners.put(gameId, listener);
+    if (games.containsKey(gameId)) {
+      listener.onGameUpdate(games.get(gameId));
+    }
   }
   
   /**
@@ -191,10 +185,10 @@ public class Model implements ChildEventListener {
     Game game = new Game(ref.getName());
     game.getPlayersMutable().add(userId);
     game.setLocalMultiplayer(localMultiplayer);
-    if (localMultiplayer) game.getPlayersMutable().add(LOCAL_MULTIPLAYER_OPPONENT_ID);
+    if (localMultiplayer) game.getPlayersMutable().add(userId);
     game.setCurrentPlayerNumber(X_PLAYER);
     game.setCurrentActionNumber(null);
-    game.setLastModified(System.currentTimeMillis());
+    game.setLastModified(Clock.getInstance().currentTimeMillis());
     game.setGameOver(false);
     
     if (userProfile != null) {
@@ -225,16 +219,15 @@ public class Model implements ChildEventListener {
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game game) {
-        long timestamp = System.currentTimeMillis();
+        long timestamp = Clock.getInstance().currentTimeMillis();
         if (game.hasCurrentAction()) {
           game.setLastModified(timestamp);
           Action action = game.currentAction();
           action.getFutureCommandsMutable().clear();
           action.getCommandsMutable().add(command);
         } else {
-          Action action = new Action(userId);
+          Action action = new Action(game.getCurrentPlayerNumber());
           action.setGameId(game.getId());
-          action.setPlayerNumber(game.getCurrentPlayerNumber());
           action.setSubmitted(false);
           action.getCommandsMutable().add(command);
           game.getActionsMutable().add(action);
@@ -256,7 +249,8 @@ public class Model implements ChildEventListener {
   public boolean couldSubmitCommand(Game game, Command command) {
     if (!isCurrentPlayer(game)) return false;
     if (game.hasCurrentAction() && game.currentAction().getCommands().size() > 0) return false;
-    return isLegalCommand(game, command);
+    boolean res = isLegalCommand(game, command);
+    return res;
   }
   
   /**
@@ -315,13 +309,12 @@ public class Model implements ChildEventListener {
     mutateGame(game, new Procedures.Procedure1<Game>() {
       @Override public void apply(Game newGame) {
         newGame.currentAction().setSubmitted(true);
-        List<String> victors = computeVictors(newGame);
+        List<Integer> victors = computeVictors(newGame);
         if (victors == null) {
           newGame.setCurrentPlayerNumber(newPlayerNumber);
           newGame.setCurrentActionNumber(null);
           if (newGame.isLocalMultiplayer()) {
             // Update model with new player number in local multiplayer games
-            setUserId(newGame.currentPlayerId());
           }
         } else {
           // Game over!
@@ -368,27 +361,16 @@ public class Model implements ChildEventListener {
   }
   
   /**
-   * @param game The game, assumed to be 2-player game.
-   * @return The ID of your opponent in this game, or null if there isn't one.
-   */  
-  public String getOpponentId(Game game) {
-    for (String player : game.getPlayers()) {
-      if (!player.equals(userId)) return player;
-    }
-    throw die("No opponent found");
-  }
-  
-  
-  /**
    * Builds the "victors" array for the game. If the game is over, a list will be
    * returned containing the victorious or drawing players (which may be empty to
    * indicate that "nobody wins"). Otherwise, null is returned.
    * 
    * @param game The game to find the victors for
-   * @return A list of victors or null if the game is not over.
+   * @return A list of player numbers of victors or null if the game is not
+   *     over.
    */
   // Visible for testing only
-  List<String> computeVictors(Game game) {
+  List<Integer> computeVictors(Game game) {
     // 1) check for win
     
     Action[][] actionTable = makeActionTable(game);
@@ -401,9 +383,10 @@ public class Model implements ChildEventListener {
       Action action2 = actionTable[lines[i][1][0]][lines[i][1][1]];
       Action action3 = actionTable[lines[i][2][0]][lines[i][2][1]];
       if (action1 != null && action2 != null && action3 != null &&
-          action1.getPlayer().equals(action2.getPlayer()) && action2.getPlayer().equals(action3.getPlayer())) {
-        List<String> result = new ArrayList<String>();
-        result.add(action1.getPlayer());
+          action1.getPlayerNumber().equals(action2.getPlayerNumber()) &&
+          action2.getPlayerNumber().equals(action3.getPlayerNumber())) {
+        List<Integer> result = new ArrayList<Integer>();
+        result.add(action1.getPlayerNumber());
         return result;
       }
     }
@@ -415,7 +398,10 @@ public class Model implements ChildEventListener {
       if (action.isSubmitted()) submitted++;
     }
     if (submitted == 9) {
-      return game.getPlayers();
+      List<Integer> both = new ArrayList<Integer>();
+      both.add(0);
+      both.add(1);
+      return both;
     }
     
     // 3) game is not over

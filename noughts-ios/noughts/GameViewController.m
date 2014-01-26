@@ -42,40 +42,59 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  [self.model setGameUpdateListenerWithNSString: self.currentGameId
+                withNTSModel_GameUpdateListener: self];
 }
 
 - (void)createLocalMultiplayerGame {
   NSString *gameId = [self.model newGameWithBoolean: YES
                                     withJavaUtilMap: nil
                                     withJavaUtilMap: nil];
-  [self.model setGameUpdateListenerWithNSString: gameId
-                withNTSModel_GameUpdateListener: self];
+  self.currentGameId = gameId;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-  if (buttonIndex == 1) {
-
-  }
-}
-
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
     case kMainMenu: {
+      [[self navigationController] setNavigationBarHidden:NO animated:YES];
       [self.navigationController popToRootViewControllerAnimated:YES];
       break;
     }
     case kNewGameMenu: {
-      UIViewController *newGameController = [self findViewController:[NewGameViewController class]];
+      [[self navigationController] setNavigationBarHidden:NO animated:YES];
+      NewGameViewController *newGameController =
+          (NewGameViewController*)[self findViewController:[NewGameViewController class]];
+      if (newGameController == nil) {
+        // Add new game controller to back stack
+        newGameController =
+            [self.storyboard instantiateViewControllerWithIdentifier:@"NewGameViewController"];
+        [newGameController setNTSModel:self.model];
+        UIViewController *rootController =
+            [self.navigationController.viewControllers objectAtIndex:0];
+        [self.navigationController setViewControllers:@[rootController, newGameController, self]
+                                             animated:NO];
+      }
       [self.navigationController popToViewController:newGameController animated:YES];
       break;
     }
     case kGameList: {
-      UIViewController *savedGamesController = [self findViewController:
-                                                [SavedGamesViewController class]];
+      [[self navigationController] setNavigationBarHidden:NO animated:YES];
+      SavedGamesViewController *savedGamesController =
+          (SavedGamesViewController*)[self findViewController:[SavedGamesViewController class]];
+      if (savedGamesController == nil) {
+        // Add saved games controller to back stack
+        savedGamesController =
+            [self.storyboard instantiateViewControllerWithIdentifier:@"SavedGamesViewController"];
+        [savedGamesController setNTSModel:self.model];
+        UIViewController *rootController =
+            [self.navigationController.viewControllers objectAtIndex:0];
+        [self.navigationController setViewControllers:@[rootController, savedGamesController, self]
+                                             animated:NO];
+      }
       [self.navigationController popToViewController:savedGamesController animated:YES];
       break;
     }

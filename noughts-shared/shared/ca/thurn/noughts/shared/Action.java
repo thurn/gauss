@@ -15,10 +15,8 @@ public class Action extends Entity {
       return new Action(actionMap);
     }    
   }
-
-  private final String player;
   
-  private Integer playerNumber;
+  private final Integer playerNumber;
   
   private String gameId;
   
@@ -28,15 +26,14 @@ public class Action extends Entity {
   
   private final List<Command> futureCommands;  
   
-  public Action(String player) {
+  public Action(int playerNumber) {
     commands = new ArrayList<Command>();
     futureCommands = new ArrayList<Command>();
-    this.player = player;
+    this.playerNumber = playerNumber;
   }
   
   public Action(Map<String, Object> actionMap) {
-    player = getString(actionMap, "player");
-    setPlayerNumber(getInteger(actionMap, "playerNumber"));
+    this.playerNumber = getInteger(actionMap, "playerNumber"); 
     setGameId(getString(actionMap, "gameId"));
     submitted = getBoolean(actionMap, "submitted");
     commands = getEntities(actionMap, "commands", new CommandDeserializer());
@@ -51,7 +48,6 @@ public class Action extends Entity {
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    result.put("player", getPlayer());
     result.put("playerNumber", getPlayerNumber());
     result.put("gameId", getGameId());
     result.put("submitted", submitted);
@@ -68,16 +64,8 @@ public class Action extends Entity {
     this.submitted = submitted;
   }
 
-  public String getPlayer() {
-    return player;
-  }
-
   public Integer getPlayerNumber() {
     return playerNumber;
-  }
-
-  void setPlayerNumber(Integer playerNumber) {
-    this.playerNumber = playerNumber;
   }
 
   public String getGameId() {

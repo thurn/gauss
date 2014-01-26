@@ -83,12 +83,12 @@ public class Game extends Entity implements Comparable<Game> {
   private String requestId;
 
   /**
-   * List of IDs of the players who won this game. In the case of a draw, it
-   * should contain all of the drawing players. In the case of a "nobody
-   * wins" situation, an empty list should be present. This field cannot be
-   * present on a game which is still in progress.
+   * List of player numbers of the players who won this game. In the case of a
+   * draw, it should contain all of the drawing players. In the case of a
+   * "nobody wins" situation, an empty list should be present. This field
+   * cannot be present on a game which is still in progress.
    */
-  private final List<String> victors;
+  private final List<Integer> victors;
 
   /**
    * True if this game has ended.
@@ -109,7 +109,7 @@ public class Game extends Entity implements Comparable<Game> {
     players = new ArrayList<String>();
     profiles = new HashMap<String, Map<String, String>>();
     actions = new ArrayList<Action>();
-    victors = new ArrayList<String>();
+    victors = new ArrayList<Integer>();
     resignedPlayers = new ArrayList<String>();
     this.id = id;
   }
@@ -123,7 +123,7 @@ public class Game extends Entity implements Comparable<Game> {
     setCurrentActionNumber(getInteger(gameMap, "currentActionNumber"));
     setLastModified(getLong(gameMap, "lastModified"));
     setRequestId(getString(gameMap, "requestId"));
-    victors = getList(gameMap, "victors");
+    victors = getIntegerList(getList(gameMap, "victors"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
     resignedPlayers = getList(gameMap, "resignedPlayers");
@@ -151,12 +151,23 @@ public class Game extends Entity implements Comparable<Game> {
     result.put("resignedPlayers", getResignedPlayersMutable());
     return result;
   }
-  
+
+  /**
+   * @return The ID of the current player
+   */
   public String currentPlayerId() {
     if (getCurrentPlayerNumber() == null) return null;
-    return getPlayersMutable().get(getCurrentPlayerNumber());
+    return getPlayerIdFromPlayerNumber(currentPlayerNumber);
   }
   
+  /**
+   * @param playerNumber A player's player number
+   * @return That player's player ID
+   */
+  public String getPlayerIdFromPlayerNumber(int playerNumber) {
+    return players.get(playerNumber);
+  }
+
   public boolean hasCurrentAction() {
     return getCurrentActionNumber() != null;
   }
@@ -241,11 +252,11 @@ public class Game extends Entity implements Comparable<Game> {
     this.requestId = requestId;
   }
   
-  public List<String> getVictors() {
+  public List<Integer> getVictors() {
     return Collections.unmodifiableList(getVictorsMutable());
   }
 
-  List<String> getVictorsMutable() {
+  List<Integer> getVictorsMutable() {
     return victors;
   }
   
@@ -264,9 +275,9 @@ public class Game extends Entity implements Comparable<Game> {
     } else if (equals(other)) {
       return 0;
     } else if (lastModified < other.lastModified) {
-      return -1;
-    } else if (lastModified > other.lastModified) {
       return 1;
+    } else if (lastModified > other.lastModified) {
+      return -1;
     } else {
       // Different games, same lastModified, order by hashCode
       return other.hashCode() - hashCode();
@@ -274,35 +285,55 @@ public class Game extends Entity implements Comparable<Game> {
   }
 
   /**
-   * @param viewerId viewer's ID
-   * @return The ID of your opponent or null if there isn't one. 
+   * @param viewerPlayerNumber viewer's player number
+   * @return The player number of your opponent or -1 if there isn't one. 
    */
-  public String getOpponentId(String viewerId) {
-    for (String id : players) {
-      if (!id.equals(viewerId)) {
-        return id;
-      }
+  public int getOpponentPlayerNumber(int viewerPlayerNumber) {
+    if (players.size() < 2) {
+      return -1;
+    } else if (viewerPlayerNumber == 0){
+      return 1;
+    } else {
+      return 0;
     }
-    return null;
+  }
+
+  /**
+   * @param viewerPlayerNumber viewer's player number
+   * @return The profile of your opponent or null if there isn't one.
+   */
+  public Map<String, String> getOpponentProfile(int viewerPlayerNumber) {
+    int opponentNumber = getOpponentPlayerNumber(viewerPlayerNumber);
+    if (opponentNumber == -1) return null;
+    String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
+    return profiles.get(opponentId);
   }
   
-  public VsType getVsType(String viewerId) {
+  /**
+   * @param viewerPlayerNumber viewer's player number
+   * @return A VsType corresponding to the type of opponent this game has.
+   */
+  public VsType getVsType(int viewerPlayerNumber) {
     if (isLocalMultiplayer()) {
       return VsType.LOCAL_MULTIPLAYER;
     }
     if (players.size() < 2) {
       return VsType.NO_OPPONENT;
     }
-    String opponentId = getOpponentId(viewerId);
-    if (profiles.get(opponentId) != null) {
+    if (getOpponentProfile(viewerPlayerNumber) != null) {
       return VsType.FACEBOOK_OPPONENT;
     } else {
       return VsType.ANONYMOUS_OPPONENT;
     }    
   }
 
-  public String vsString(String viewerId) {
-    switch (getVsType(viewerId)) {
+  /**
+   * @param viewerPlayerNumber viewer's player number
+   * @return A string describing the opponent of this game, such as
+   * "vs. Frank".
+   */
+  public String vsString(int viewerPlayerNumber) {
+    switch (getVsType(viewerPlayerNumber)) {
       case LOCAL_MULTIPLAYER: {
         return "Local Multiplayer Game";
       }
@@ -310,8 +341,7 @@ public class Game extends Entity implements Comparable<Game> {
         return "vs. (No Opponent Yet)";
       }
       case FACEBOOK_OPPONENT: {
-        String opponentId = getOpponentId(viewerId);
-        return "vs. " + profiles.get(opponentId).get("givenName");
+        return "vs. " + getOpponentProfile(viewerPlayerNumber).get("givenName");
       }
       default: { // ANONYMOUS_OPPONENT
         return "vs. Anonymous";
@@ -319,43 +349,70 @@ public class Game extends Entity implements Comparable<Game> {
     }
   }
   
-  private String timeAgoString(long number, String unit) {
+  private String timeAgoString(int viewerPlayerNumber, long number, String unit) {
+    String statusString;
+    if (isGameOver()) {
+      int opponentPlayerNumber = getOpponentPlayerNumber(viewerPlayerNumber);
+      if (victors.size() == 2) {
+        statusString = "Game tied";
+      } else if (victors.contains(viewerPlayerNumber)) {
+        statusString = "You won";
+      } else if (victors.contains(opponentPlayerNumber)){
+        Map<String, String> opponentProfile = getOpponentProfile(viewerPlayerNumber);
+        if (opponentProfile != null && opponentProfile.get("gender").equals("male")) {
+          statusString = "He won";
+        } else if (opponentProfile != null && opponentProfile.get("gender").equals("female")) {
+          statusString = "She won";
+        } else {
+          statusString = "They won";
+        }
+      } else {
+        statusString = "You lost";
+      }
+    } else {
+      statusString = "Updated";
+    }
     if (number <= 1) {
       String article = unit.equals("hour") ? "an" : "a";
-      return "Updated " + article + " " + unit + " ago";
+      return statusString + " " + article + " " + unit + " ago";
     } else {
-      return "Updated " + number + " " + unit + "s ago";
+      return statusString + " " + number + " " + unit + "s ago";
     }
   }
 
-  public String lastUpdatedString() {
+  /**
+   * @param viewerPlayerNumber viewer's player number
+   * @return A string describing the last state of the game, such as "updated 1
+   * second ago" or "You won 4 years ago". 
+   */
+  public String lastUpdatedString(int viewerPlayerNumber) {
     long duration = Math.max(Clock.getInstance().currentTimeMillis() - lastModified, 0);
     long number;
     number = duration / ONE_YEAR;
     if (number > 0) {
-      return timeAgoString(number, "year");
+      return timeAgoString(viewerPlayerNumber, number, "year");
     }
     number = duration / ONE_MONTH;
     if (number > 0) {
-      return timeAgoString(number, "month");
+      return timeAgoString(viewerPlayerNumber, number, "month");
     }
     number = duration / ONE_WEEK;
     if (number > 0) {
-      return timeAgoString(number, "week");
+      return timeAgoString(viewerPlayerNumber, number, "week");
     }
     number = duration / ONE_DAY;
     if (number > 0) {
-      return timeAgoString(number, "day");
+      return timeAgoString(viewerPlayerNumber, number, "day");
     }
     number = duration / ONE_HOUR;
     if (number > 0) {
-      return timeAgoString(number, "hour");
+      return timeAgoString(viewerPlayerNumber, number, "hour");
     }
     number = duration / ONE_MINUTE;
     if (number > 0) {
-      return timeAgoString(number, "minute");
+      return timeAgoString(viewerPlayerNumber, number, "minute");
     }
     number = duration / ONE_SECOND;
-    return timeAgoString(number, "second");
+    return timeAgoString(viewerPlayerNumber, number, "second");
   }
 }

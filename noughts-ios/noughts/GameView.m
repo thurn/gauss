@@ -33,7 +33,6 @@
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
-  NSLog(@"init with frame");
   if (self) {
     // Initialization code
     self.backgroundColor = [UIColor whiteColor];
@@ -208,7 +207,6 @@
 }
 
 - (void)drawRect:(CGRect)rect {
-  NSLog(@"draw rect");
   [self.back drawAtPoint:CGPointZero];
   if (self.currentGame) {
     for (NTSAction *action in [self.currentGame getActions]) {
