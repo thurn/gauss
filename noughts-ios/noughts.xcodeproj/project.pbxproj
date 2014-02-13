@@ -34,16 +34,6 @@
 		7C2E642618641F3500D34AD0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640518641F3500D34AD0 /* UIKit.framework */; };
 		7C2E642E18641F3500D34AD0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E642C18641F3500D34AD0 /* InfoPlist.strings */; };
 		7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E642F18641F3500D34AD0 /* noughtsTests.m */; };
-		7C2E647018641FC700D34AD0 /* CallbackWrappers.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646618641FC700D34AD0 /* CallbackWrappers.m */; };
-		7C2E647118641FC700D34AD0 /* CallbackWrappers.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646618641FC700D34AD0 /* CallbackWrappers.m */; };
-		7C2E647218641FC700D34AD0 /* epl-v10.html in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646C18641FC700D34AD0 /* epl-v10.html */; };
-		7C2E647318641FC700D34AD0 /* epl-v10.html in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646C18641FC700D34AD0 /* epl-v10.html */; };
-		7C2E647418641FC700D34AD0 /* Functions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646D18641FC700D34AD0 /* Functions.java */; };
-		7C2E647518641FC700D34AD0 /* Functions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646D18641FC700D34AD0 /* Functions.java */; };
-		7C2E647618641FC700D34AD0 /* Procedures.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646E18641FC700D34AD0 /* Procedures.java */; };
-		7C2E647718641FC700D34AD0 /* Procedures.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E646E18641FC700D34AD0 /* Procedures.java */; };
-		7C2E647818641FC700D34AD0 /* XXL.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */; };
-		7C2E647918641FC700D34AD0 /* XXL.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */; };
 		7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64871864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64881864215B00D34AD0 /* libicucore.dylib */; };
@@ -269,12 +259,6 @@
 		7C2E642B18641F3500D34AD0 /* noughtsTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "noughtsTests-Info.plist"; sourceTree = "<group>"; };
 		7C2E642D18641F3500D34AD0 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		7C2E642F18641F3500D34AD0 /* noughtsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = noughtsTests.m; sourceTree = "<group>"; };
-		7C2E646518641FC700D34AD0 /* CallbackWrappers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CallbackWrappers.h; sourceTree = "<group>"; };
-		7C2E646618641FC700D34AD0 /* CallbackWrappers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CallbackWrappers.m; sourceTree = "<group>"; };
-		7C2E646C18641FC700D34AD0 /* epl-v10.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = "epl-v10.html"; sourceTree = "<group>"; };
-		7C2E646D18641FC700D34AD0 /* Functions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Functions.java; sourceTree = "<group>"; };
-		7C2E646E18641FC700D34AD0 /* Procedures.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Procedures.java; sourceTree = "<group>"; };
-		7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = XXL.gwt.xml; sourceTree = "<group>"; };
 		7C2E64851864212F00D34AD0 /* Firebase.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Firebase.framework; sourceTree = "<group>"; };
 		7C2E64881864215B00D34AD0 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		7C2E648A1864216200D34AD0 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
@@ -498,7 +482,6 @@
 				7C8EF74A18668E120075D0C1 /* firebase-objc */,
 				7C8EF5DB1866577F0075D0C1 /* shared */,
 				7C2E64931864223C00D34AD0 /* prefixes.properties */,
-				7C2E646418641FC700D34AD0 /* j2objc-utils */,
 				7C2E640718641F3500D34AD0 /* noughts */,
 				7C2E642918641F3500D34AD0 /* noughtsTests */,
 				7C2E640018641F3500D34AD0 /* Frameworks */,
@@ -590,59 +573,6 @@
 				7C2E642C18641F3500D34AD0 /* InfoPlist.strings */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		7C2E646418641FC700D34AD0 /* j2objc-utils */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646518641FC700D34AD0 /* CallbackWrappers.h */,
-				7C2E646618641FC700D34AD0 /* CallbackWrappers.m */,
-				7C2E646718641FC700D34AD0 /* org */,
-			);
-			path = "j2objc-utils";
-			sourceTree = "<group>";
-		};
-		7C2E646718641FC700D34AD0 /* org */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646818641FC700D34AD0 /* eclipse */,
-			);
-			path = org;
-			sourceTree = "<group>";
-		};
-		7C2E646818641FC700D34AD0 /* eclipse */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646918641FC700D34AD0 /* xtext */,
-			);
-			path = eclipse;
-			sourceTree = "<group>";
-		};
-		7C2E646918641FC700D34AD0 /* xtext */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646A18641FC700D34AD0 /* xbase */,
-			);
-			path = xtext;
-			sourceTree = "<group>";
-		};
-		7C2E646A18641FC700D34AD0 /* xbase */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646B18641FC700D34AD0 /* lib */,
-				7C2E646F18641FC700D34AD0 /* XXL.gwt.xml */,
-			);
-			path = xbase;
-			sourceTree = "<group>";
-		};
-		7C2E646B18641FC700D34AD0 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				7C2E646C18641FC700D34AD0 /* epl-v10.html */,
-				7C2E646D18641FC700D34AD0 /* Functions.java */,
-				7C2E646E18641FC700D34AD0 /* Procedures.java */,
-			);
-			path = lib;
 			sourceTree = "<group>";
 		};
 		7C8EF5DB1866577F0075D0C1 /* shared */ = {
@@ -817,14 +747,12 @@
 			files = (
 				7C1F83C71868115E00D66C78 /* x.svg in Resources */,
 				7C2E641818641F3500D34AD0 /* Main_iPad.storyboard in Resources */,
-				7C2E647218641FC700D34AD0 /* epl-v10.html in Resources */,
 				7C2E641D18641F3500D34AD0 /* Images.xcassets in Resources */,
 				7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */,
 				7C1F83CB1868167F00D66C78 /* background.svg in Resources */,
 				7C1F83C61868115E00D66C78 /* o.svg in Resources */,
 				7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */,
 				7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */,
-				7C2E647818641FC700D34AD0 /* XXL.gwt.xml in Resources */,
 				7C2E640C18641F3500D34AD0 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -833,9 +761,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E647318641FC700D34AD0 /* epl-v10.html in Resources */,
 				7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */,
-				7C2E647918641FC700D34AD0 /* XXL.gwt.xml in Resources */,
 				7C8EF5F71866577F0075D0C1 /* Shared.gwt.xml in Resources */,
 				7C2E642E18641F3500D34AD0 /* InfoPlist.strings in Resources */,
 			);
@@ -848,11 +774,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C2E647618641FC700D34AD0 /* Procedures.java in Sources */,
 				7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
 				7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */,
 				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
-				7C2E647418641FC700D34AD0 /* Functions.java in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
@@ -878,7 +802,6 @@
 				7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
 				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
-				7C2E647018641FC700D34AD0 /* CallbackWrappers.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -887,13 +810,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
-				7C2E647518641FC700D34AD0 /* Functions.java in Sources */,
 				7C8EF6F518668CB40075D0C1 /* Action.java in Sources */,
 				7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7C8EF6F318668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
 				7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
 				7C8EF76318668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
-				7C2E647118641FC700D34AD0 /* CallbackWrappers.m in Sources */,
 				7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */,
 				7C8EF6E718667E700075D0C1 /* Entity.java in Sources */,
 				7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
@@ -909,7 +830,6 @@
 				7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C8EF76518668E120075D0C1 /* MutableData.java in Sources */,
 				7C8EF75D18668E120075D0C1 /* DataSnapshot.java in Sources */,
-				7C2E647718641FC700D34AD0 /* Procedures.java in Sources */,
 				7C8EF75F18668E120075D0C1 /* Firebase.java in Sources */,
 				7C8EF6F718668CB40075D0C1 /* Game.java in Sources */,
 			);

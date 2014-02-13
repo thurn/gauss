@@ -16,6 +16,22 @@ import com.firebase.client.Transaction;
 import com.firebase.client.Transaction.Handler;
 import com.firebase.client.Transaction.Result;
 
+/**
+ * The data model for noughts. Data is denormalized into two distinct
+ * locations:
+ * 
+ * /users/<userid>/games/<gameid>/
+ * - This path contains all of the metadata needed to render a user's game
+ *   list, such as whose turn it is, when the game was last modified, etc.
+ * - It does not contain enough information to actually render the state of the
+ *   game, such as previous actions in the game.
+ *   
+ * /games/<gameid>/
+ * - This path contains all of the above, plus information on the actual state
+ *   of the game, such as a history of actions.
+ * - When you load a game for rendering, you need to subscribe here to get the
+ *   actual state of the game.
+ */
 public class Model implements ChildEventListener {
   public static final int X_PLAYER = 0;
   public static final int O_PLAYER = 1;
@@ -336,7 +352,7 @@ public class Model implements ChildEventListener {
    */  
   public void undoCommand(Game game) {
     ensureIsCurrentPlayer(game);
-    if (game.currentAction().getCommands().size() == 0) die("No previous command to undo");
+    if (!canUndo(game)) die("Can't undo.");
     mutateGame(game, new GameMutation() {
       @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
@@ -353,7 +369,7 @@ public class Model implements ChildEventListener {
    */
   public void redoCommand(Game game) {
     ensureIsCurrentPlayer(game);
-    if (game.currentAction().getFutureCommands().size() == 0) die("No previous next command to redo");
+    if (!canRedo(game)) die("Can't redo.");
     mutateGame(game, new GameMutation() {
       @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
