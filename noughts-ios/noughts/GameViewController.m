@@ -14,7 +14,7 @@
 #import "Firebase.h"
 #import "Command.h"
 
-@interface GameViewController ()
+@interface GameViewController () <UIAlertViewDelegate>
 @property (weak,nonatomic) NTSModel *model;
 @property (weak,nonatomic) GameView *gameView;
 @property (strong,nonatomic) NTSGame *currentGame;
@@ -59,6 +59,16 @@
 
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
+    case kResignGame: {
+      UIAlertView *alert = [[UIAlertView alloc]
+                            initWithTitle:@"Confirm"
+                                  message:@"Are you sure you want to leave the game?"
+                                 delegate:self
+                        cancelButtonTitle:@"Cancel"
+                        otherButtonTitles: @"Resign", nil];
+      [alert show];
+      break;
+    }
     case kMainMenu: {
       [[self navigationController] setNavigationBarHidden:NO animated:YES];
       [self.navigationController popToRootViewControllerAnimated:YES];
@@ -101,6 +111,12 @@
     default: {
       // no action
     }
+  }
+}
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+  if (buttonIndex == 1) {
+    [self.model resignGameWithNTSGame:self.currentGame];
   }
 }
 

@@ -349,6 +349,108 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
   
+  public void testResignNotPlayer() {
+    assertDies(new Runnable() {
+      @Override
+      public void run() {
+        model.resignGame(newGame(map(
+            "players", list("foo"),
+            "currentPlayerNumber", 0
+        )));
+      }
+    });
+  }
+  
+  public void testResignGameOver() {
+    assertDies(new Runnable() {
+      @Override
+      public void run() {
+        model.resignGame(newGame(map(
+            "players", list(userId, "foo"),
+            "currentPlayerNumber", 0,
+            "gameOver", true
+        )));
+      }
+    });    
+  }
+  
+  public void testResignGame() {
+    beginAsyncTestBlock();
+    final Game game = newGame(map(
+        "currentPlayerNumber", 0,
+        "players", list(userId, "foobar"),
+        "currentActionNumber", 0,
+        "lastModified", 123L
+        ));
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertTrue(game.getResignedPlayers().contains(userId));
+            assertTrue(game.isGameOver());
+            assertNull(game.getCurrentActionNumber());
+            assertNull(game.getCurrentPlayerNumber());
+            assertTrue(game.getVictors().contains(1));
+            assertTrue(game.getLastModified() > 150L);
+            finished();
+          }
+        });
+        model.resignGame(game);
+      }
+    });
+    endAsyncTestBlock();    
+  }
+  
+  public void testArchiveNotPlayer() {
+    assertDies(new Runnable() {
+      @Override
+      public void run() {
+        model.archiveGame(newGame(map(
+            "players", list("foo"),
+            "currentPlayerNumber", 0
+        )));
+      }
+    });
+  }
+  
+  public void testArchiveGameNotOver() {
+    assertDies(new Runnable() {
+      @Override
+      public void run() {
+        model.archiveGame(newGame(map(
+            "players", list(userId, "foo"),
+            "currentPlayerNumber", 0,
+            "gameOver", false
+        )));
+      }
+    });    
+  }
+  
+  public void testArchiveGame() {
+    beginAsyncTestBlock();
+    final Game game = newGame(map(
+        "currentPlayerNumber", 0,
+        "players", list(userId, "foobar"),
+        "gameOver", true
+        ));
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertFalse(game.getPlayers().contains(userId));
+            finished();
+          }
+        });
+        model.archiveGame(game);
+      }
+    });
+    endAsyncTestBlock();    
+  }
+  
   public void testIsCurrentPlayer() {
     Map<String, Object> map = map("gameOver", true);
     Game g1 = newGame(map);
@@ -373,13 +475,25 @@ public class ModelTest extends SharedTestCase {
       @Override
       public void run() {
         model.ensureIsCurrentPlayer(newGame(map(
-          "players", list("foo"),
+          "players", list("foo", userId),
           "currentPlayerNumber", 0
         )));
       }
     });
   }
 
+  public void testEnsureIsPlayer() {
+    assertDies(new Runnable() {
+      @Override
+      public void run() {
+        model.ensureIsPlayer(newGame(map(
+          "players", list("foo"),
+          "currentPlayerNumber", 0
+        )));
+      }
+    });
+  }
+  
   @SuppressWarnings("unchecked")
   private Action action(int player, int column, int row) {
     return new Action(map(

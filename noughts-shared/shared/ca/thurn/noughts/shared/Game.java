@@ -276,7 +276,7 @@ public class Game extends Entity implements Comparable<Game> {
   }
   
   public List<String> getResignedPlayers() {
-    return Collections.unmodifiableList(getResignedPlayers());
+    return Collections.unmodifiableList(getResignedPlayersMutable());
   }
 
   List<String> getResignedPlayersMutable() {

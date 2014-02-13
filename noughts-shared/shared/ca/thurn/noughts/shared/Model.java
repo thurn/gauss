@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.xtext.xbase.lib.Procedures;
-
 import ca.thurn.noughts.shared.Game.GameDeserializer;
 
 import com.firebase.client.ChildEventListener;
@@ -32,6 +30,10 @@ public class Model implements ChildEventListener {
     public void onGameChanged(Game game);
         
     public void onGameRemoved(Game game);
+  }
+  
+  private static interface GameMutation {
+    public void mutate(Game game);
   }
   
   private String userId;
@@ -217,8 +219,8 @@ public class Model implements ChildEventListener {
   public void addCommand(final Game game, final Command command) {
     ensureIsCurrentPlayer(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
-    mutateGame(game, new Procedures.Procedure1<Game>() {
-      @Override public void apply(Game game) {
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game game) {
         long timestamp = Clock.getInstance().currentTimeMillis();
         if (game.hasCurrentAction()) {
           game.setLastModified(timestamp);
@@ -306,8 +308,8 @@ public class Model implements ChildEventListener {
     if (!canSubmit(game)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
-    mutateGame(game, new Procedures.Procedure1<Game>() {
-      @Override public void apply(Game newGame) {
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game newGame) {
         newGame.currentAction().setSubmitted(true);
         List<Integer> victors = computeVictors(newGame);
         if (victors == null) {
@@ -335,8 +337,8 @@ public class Model implements ChildEventListener {
   public void undoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (game.currentAction().getCommands().size() == 0) die("No previous command to undo");
-    mutateGame(game, new Procedures.Procedure1<Game>() {
-      @Override public void apply(Game newGame) {
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
         Command command = action.getCommandsMutable().remove(action.getCommands().size() - 1);
         action.getFutureCommandsMutable().add(command);
@@ -347,17 +349,47 @@ public class Model implements ChildEventListener {
    * Re-does the player's previously undone command. Throws an exception if there's no
    * previous command to redo.
    * 
-   * @param game The game to undo the previous command of.
+   * @param game The game to redo the previous command of.
    */
   public void redoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (game.currentAction().getFutureCommands().size() == 0) die("No previous next command to redo");
-    mutateGame(game, new Procedures.Procedure1<Game>() {
-      @Override public void apply(Game newGame) {
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
         Command command = action.getFutureCommandsMutable().remove(action.getFutureCommands().size() - 1);
         action.getCommandsMutable().add(command);
     }});
+  }
+  
+  /**
+   * Leave a game. In a 2-player game, this means your opponent wins.
+   * 
+   * @param game Game to resign from.
+   */
+  public void resignGame(Game game) {
+    ensureIsPlayer(game);
+    if (game.isGameOver()) die("Can't resign from a game which is already over");
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game game) {
+        game.getResignedPlayersMutable().add(userId);
+        game.setGameOver(true);
+        game.setCurrentActionNumber(null);
+        game.setCurrentPlayerNumber(null);
+        game.getVictorsMutable().add(game.getOpponentPlayerNumber(userId));
+        game.setLastModified(Clock.getInstance().currentTimeMillis());
+      }
+    });
+  }
+  
+  public void archiveGame(Game game) {
+    ensureIsPlayer(game);
+    if (!game.isGameOver()) die("Can't archive a game which is in progress");
+    mutateGame(game, new GameMutation() {
+      @Override public void mutate(Game game) {
+        game.getPlayersMutable().remove(userId);
+      }
+    });
   }
   
   /**
@@ -440,7 +472,7 @@ public class Model implements ChildEventListener {
   /**
    * Runs a transaction to mutate the provided game via the provided function.
    */
-  private void mutateGame(Game game, final Procedures.Procedure1<Game> function) {
+  private void mutateGame(Game game, final GameMutation function) {
     Firebase ref = firebase.child("games").child(game.getId());
     ref.runTransaction(new Handler() {
       
@@ -451,7 +483,7 @@ public class Model implements ChildEventListener {
       @Override
       public Result doTransaction(MutableData mutableData) {
         Game game = new GameDeserializer().fromMutableData(mutableData);
-        function.apply(game);
+        function.mutate(game);
         mutableData.setValue(game.serialize());
         return Transaction.success(mutableData);
       }
@@ -470,5 +502,9 @@ public class Model implements ChildEventListener {
    */
   void ensureIsCurrentPlayer(Game game) {
     if (!isCurrentPlayer(game)) die("Unauthorized user: " + userId);
+  }
+  
+  void ensureIsPlayer(Game game) {
+    if (!game.getPlayers().contains(userId)) die("Unauthorized user: " + userId);
   }
 }

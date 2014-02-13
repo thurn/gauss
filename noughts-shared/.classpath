@@ -8,7 +8,6 @@
 	<classpathentry kind="lib" path="lib/firebase-client-jvm-LATEST.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-core-1.3.jar"/>
 	<classpathentry kind="lib" path="lib/hamcrest-library-1.3.jar"/>
-	<classpathentry kind="lib" path="lib/j2objc-utils-0.1.jar"/>
 	<classpathentry kind="lib" path="lib/objenesis-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/shared-test-case-0.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
