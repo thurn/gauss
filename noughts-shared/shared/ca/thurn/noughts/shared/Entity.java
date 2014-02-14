@@ -22,12 +22,14 @@ public abstract class Entity {
     
     @SuppressWarnings("unchecked")
     public T fromDataSnapshot(DataSnapshot snapshot) {
-      return (T)deserialize((Map<String, Object>)snapshot.getValue());
+      Map<String, Object> map = (Map<String, Object>)snapshot.getValue();
+      return (T)deserialize(map);
     }
     
     @SuppressWarnings("unchecked")
     public T fromMutableData(MutableData data) {
-      return (T)deserialize((Map<String, Object>)data.getValue());
+      Map<String, Object> map = (Map<String, Object>)data.getValue();
+      return (T)deserialize(map);
     }
   }
   

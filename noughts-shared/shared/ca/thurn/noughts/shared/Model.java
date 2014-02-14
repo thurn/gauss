@@ -2,6 +2,7 @@ package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import com.firebase.client.MutableData;
 import com.firebase.client.Transaction;
 import com.firebase.client.Transaction.Handler;
 import com.firebase.client.Transaction.Result;
+import com.firebase.client.ValueEventListener;
 
 /**
  * The data model for noughts. Data is denormalized into two distinct
@@ -36,10 +38,16 @@ public class Model implements ChildEventListener {
   public static final int X_PLAYER = 0;
   public static final int O_PLAYER = 1;
 
+  /**
+   * Interface to implement to listen for game updates.
+   */
   public static interface GameUpdateListener {
     public void onGameUpdate(Game game);
   }
   
+  /**
+   * Interface to implement to listen for game list updates.
+   */
   public static interface GameListListener {
     public void onGameAdded(Game game);
     
@@ -48,22 +56,66 @@ public class Model implements ChildEventListener {
     public void onGameRemoved(Game game);
   }
   
+  /**
+   * Function to mutate a game.
+   */
   private static interface GameMutation {
+    /**
+     * @param game Game to mutate.
+     */
     public void mutate(Game game);
   }
   
-  private String userId;
+  /**
+   * Handler implementation for mutating games.
+   */
+  private static class GameMutationHandler implements Handler {
+    private final GameMutation function;
+    private final boolean useMinimalForm;
+    
+    /**
+     * @param function Mutation function to use.
+     * @param useMinimalForm If true, write only the game's minimal form as
+     *     returned by {@link Game#minimalGame()}.
+     */
+    public GameMutationHandler(GameMutation function, boolean useMinimalForm) {
+      this.function = function;
+      this.useMinimalForm = useMinimalForm;
+    }
+    
+    @Override
+    public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
+    }
+
+    @Override
+    public Result doTransaction(MutableData mutableData) {
+      if (mutableData.getValue() == null) {
+        // Local updates sometimes cause transactions to be run with null
+        // for the current value. It is safe to ignore these.
+        return Transaction.success(mutableData);
+      }
+      Game game = new GameDeserializer().fromMutableData(mutableData);
+      function.mutate(game);
+      if (useMinimalForm) {
+        mutableData.setValue(game.minimalGame().serialize());
+      } else {
+        mutableData.setValue(game.serialize());
+      }
+      return Transaction.success(mutableData);
+    }   
+  }
+  
+  private final String userId;
   private final Firebase firebase;
-  private final Map<String, GameUpdateListener> gameUpdateListeners;
+  private final Map<String, ValueEventListener> gameUpdateListeners;
   private GameListListener gameListListener;
-  private Map<String, Game> games;
+  private Map<String, Game> userGameList;
   
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
-    gameUpdateListeners = new HashMap<String, GameUpdateListener>();
-    firebase.child("games").addChildEventListener(this);
-    games = new HashMap<String, Game>();
+    gameUpdateListeners = new HashMap<String, ValueEventListener>();
+    userGameList = new HashMap<String, Game>();
   }
   
   /**
@@ -84,21 +136,38 @@ public class Model implements ChildEventListener {
   }
   
   /**
-   * Adds a listener whose onGameUpdate method will be invoked if a game with
-   * the provided ID is added or changed. Overwrites any previously added
-   * game update listener. The provided listener will also be triggered
-   * immediately with the current state of the indicated game if it is locally
-   * available.
+   * Adds a listener whose onGameUpdate method will be invoked when the game
+   * with the provided ID is changed. Overwrites any previously added
+   * game update listener.
    *
    * @param gameId The ID of the game.
    * @param listener The listener to add.
    */
-  public void setGameUpdateListener(String gameId, GameUpdateListener listener) {
-    gameUpdateListeners.put(gameId, listener);
-    if (games.containsKey(gameId)) {
-      listener.onGameUpdate(games.get(gameId));
+  public void setGameUpdateListener(String gameId, final GameUpdateListener listener) {
+    if (gameUpdateListeners.containsKey(gameId)) {
+      gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
     }
+    ValueEventListener valueListener = new ValueEventListener() {
+      @Override
+      public void onCancelled(FirebaseError error) {
+      }
+
+      @Override
+      public void onDataChange(DataSnapshot snapshot) {
+        if (snapshot.getValue() != null) {
+          // We ignore null values in listener functions. They can happen when
+          // you add a new game and then immediately attach a new listener. The
+          // listener should still be triggered once the new game is in the
+          // system.
+          Game game = new GameDeserializer().fromDataSnapshot(snapshot);
+          listener.onGameUpdate(game);
+        }
+      }
+    };
+    gameReference(gameId).addValueEventListener(valueListener);
+    gameUpdateListeners.put(gameId, valueListener);
   }
+
   
   /**
    * Removes the GameUpdateListener associated with this Game ID.
@@ -106,6 +175,9 @@ public class Model implements ChildEventListener {
    * @param gameId ID of game to remove listener for.
    */
   public void removeGameUpdateListener(String gameId) {
+    if (gameUpdateListeners.containsKey(gameId)) {
+      gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
+    }
     gameUpdateListeners.remove(gameId);
   }
   
@@ -116,6 +188,9 @@ public class Model implements ChildEventListener {
    * @param listener The listener to add.
    */
   public void setGameListListener(final GameListListener listener) {
+    if (gameListListener == null) {
+      firebase.child("users").child(userId).child("games").addChildEventListener(this);
+    }
     gameListListener = listener;
   }
   
@@ -135,28 +210,19 @@ public class Model implements ChildEventListener {
   @Override
   public void onChildAdded(DataSnapshot snapshot, String previous) {
     Game game = new GameDeserializer().fromDataSnapshot(snapshot);
-    // If we run the update listener before the list listener, you can add
-    // a new update listener from the list listener without re-processing
-    // this event itself.
-    if (gameUpdateListeners.containsKey(game.getId())) {
-      gameUpdateListeners.get(game.getId()).onGameUpdate(game);
-    }    
     if (gameListListener != null) {
       gameListListener.onGameAdded(game);
     }
-    games.put(game.getId(), game);
+    userGameList.put(game.getId(), game);
   }
 
   @Override
   public void onChildChanged(DataSnapshot snapshot, String previous) {
-    Game game = new GameDeserializer().fromDataSnapshot(snapshot);
-    if (gameUpdateListeners.containsKey(game.getId())) {
-      gameUpdateListeners.get(game.getId()).onGameUpdate(game);
-    }    
+    Game game = new GameDeserializer().fromDataSnapshot(snapshot); 
     if (gameListListener != null) {
       gameListListener.onGameChanged(game);
     }
-    games.put(game.getId(), game);
+    userGameList.put(game.getId(), game);
   }
 
   @Override
@@ -169,14 +235,14 @@ public class Model implements ChildEventListener {
     if (gameListListener != null) {
       gameListListener.onGameRemoved(new GameDeserializer().fromDataSnapshot(snapshot));
     }
-    games.remove(game.getId());
+    userGameList.remove(game.getId());
   }
   
   /**
    * @return The current {@link GameListPartitions} for this model.
    */
   public GameListPartitions getGameListPartitions() {
-    return new GameListPartitions(userId, games.values());
+    return new GameListPartitions(userId, userGameList.values());
   }
   
   /**
@@ -184,7 +250,7 @@ public class Model implements ChildEventListener {
    * the game-over state)
    */
   public int gameCount() {
-    return games.size();
+    return userGameList.size();
   }
 
   /**
@@ -221,6 +287,8 @@ public class Model implements ChildEventListener {
     }
     
     ref.setValue(game.serialize());
+    Firebase userRef = userRefForGame(game, userId);
+    userRef.setValue(game.serialize());
     return game.getId();
   }
   
@@ -235,11 +303,11 @@ public class Model implements ChildEventListener {
   public void addCommand(final Game game, final Command command) {
     ensureIsCurrentPlayer(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
-    mutateGame(game, new GameMutation() {
+    final long timestamp = Clock.getInstance().currentTimeMillis();
+    mutateCanonicalGame(game, new GameMutation() {
       @Override public void mutate(Game game) {
-        long timestamp = Clock.getInstance().currentTimeMillis();
+        game.setLastModified(timestamp);
         if (game.hasCurrentAction()) {
-          game.setLastModified(timestamp);
           Action action = game.currentAction();
           action.getFutureCommandsMutable().clear();
           action.getCommandsMutable().add(command);
@@ -250,12 +318,16 @@ public class Model implements ChildEventListener {
           action.getCommandsMutable().add(command);
           game.getActionsMutable().add(action);
           game.setCurrentActionNumber(game.getActions().size() - 1);
-          game.setLastModified(timestamp);
         }
       }
     });
+    mutateGameLists(game, new GameMutation() {
+      @Override public void mutate(Game game) {
+        game.setLastModified(timestamp);        
+      }
+    });
   }
-  
+
   /**
    * Checks if a command could legally be played in a game.
    * 
@@ -323,25 +395,28 @@ public class Model implements ChildEventListener {
     ensureIsCurrentPlayer(game);
     if (!canSubmit(game)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
+    final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
-    mutateGame(game, new GameMutation() {
-      @Override public void mutate(Game newGame) {
-        newGame.currentAction().setSubmitted(true);
-        List<Integer> victors = computeVictors(newGame);
+    GameMutation mutation = new GameMutation() {
+      @Override public void mutate(Game game) {
+        if (!game.isMinimal()) {
+          game.currentAction().setSubmitted(true);
+        }
+        List<Integer> victors = computeVictors(game);
+        game.setLastModified(timestamp);
         if (victors == null) {
-          newGame.setCurrentPlayerNumber(newPlayerNumber);
-          newGame.setCurrentActionNumber(null);
-          if (newGame.isLocalMultiplayer()) {
-            // Update model with new player number in local multiplayer games
-          }
+          game.setCurrentPlayerNumber(newPlayerNumber);
+          game.setCurrentActionNumber(null);
         } else {
           // Game over!
-          newGame.setCurrentPlayerNumber(null);
-          newGame.setCurrentActionNumber(null);
-          newGame.getVictorsMutable().addAll(victors);
-          newGame.setGameOver(true);
+          game.setCurrentPlayerNumber(null);
+          game.setCurrentActionNumber(null);
+          game.getVictorsMutable().addAll(victors);
+          game.setGameOver(true);
         }        
-    }});
+    }};
+    mutateCanonicalGame(game, mutation);
+    mutateGameLists(game, mutation);
   }
   
   /**
@@ -353,7 +428,7 @@ public class Model implements ChildEventListener {
   public void undoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (!canUndo(game)) die("Can't undo.");
-    mutateGame(game, new GameMutation() {
+    mutateCanonicalGame(game, new GameMutation() {
       @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
         Command command = action.getCommandsMutable().remove(action.getCommands().size() - 1);
@@ -370,7 +445,7 @@ public class Model implements ChildEventListener {
   public void redoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (!canRedo(game)) die("Can't redo.");
-    mutateGame(game, new GameMutation() {
+    mutateCanonicalGame(game, new GameMutation() {
       @Override public void mutate(Game newGame) {
         Action action = newGame.currentAction();
         Command command = action.getFutureCommandsMutable().remove(action.getFutureCommands().size() - 1);
@@ -386,26 +461,28 @@ public class Model implements ChildEventListener {
   public void resignGame(Game game) {
     ensureIsPlayer(game);
     if (game.isGameOver()) die("Can't resign from a game which is already over");
-    mutateGame(game, new GameMutation() {
+    final long timestamp = Clock.getInstance().currentTimeMillis();
+    GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game game) {
         game.getResignedPlayersMutable().add(userId);
         game.setGameOver(true);
         game.setCurrentActionNumber(null);
         game.setCurrentPlayerNumber(null);
-        game.getVictorsMutable().add(game.getOpponentPlayerNumber(userId));
-        game.setLastModified(Clock.getInstance().currentTimeMillis());
+        int opponentPlayerNumber = game.getOpponentPlayerNumber(userId);
+        if (opponentPlayerNumber != -1) {
+          game.getVictorsMutable().add(opponentPlayerNumber);
+        }
+        game.setLastModified(timestamp);
       }
-    });
+    };
+    mutateCanonicalGame(game, mutation);
+    mutateGameLists(game, mutation);
   }
   
   public void archiveGame(Game game) {
     ensureIsPlayer(game);
     if (!game.isGameOver()) die("Can't archive a game which is in progress");
-    mutateGame(game, new GameMutation() {
-      @Override public void mutate(Game game) {
-        game.getPlayersMutable().remove(userId);
-      }
-    });
+    userRefForGame(game, userId).removeValue();
   }
   
   /**
@@ -486,24 +563,45 @@ public class Model implements ChildEventListener {
   }
   
   /**
-   * Runs a transaction to mutate the provided game via the provided function.
+   * Runs a transaction to mutate the provided game via the provided function
+   * under /games/<gameid>. 
+   * 
+   * @param game Game to mutate.
+   * @param function Mutation function to employ
    */
-  private void mutateGame(Game game, final GameMutation function) {
-    Firebase ref = firebase.child("games").child(game.getId());
-    ref.runTransaction(new Handler() {
-      
-      @Override
-      public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
-      }
-      
-      @Override
-      public Result doTransaction(MutableData mutableData) {
-        Game game = new GameDeserializer().fromMutableData(mutableData);
-        function.mutate(game);
-        mutableData.setValue(game.serialize());
-        return Transaction.success(mutableData);
-      }
-    });
+  private void mutateCanonicalGame(Game game, final GameMutation function) {
+    Firebase gameRef = firebase.child("games").child(game.getId());
+    gameRef.runTransaction(new GameMutationHandler(function, false /* useMinimalForm */));
+  }
+
+  /**
+   * Runs a transaction to mutate the provided game in the game list for each
+   * player in the game, under /users/<userid>/games/<gameid>/.
+   *
+   * @param game Game to mutate.
+   * @param function Mutation function to employ.
+   */
+  private void mutateGameLists(Game game, final GameMutation function) {
+    for (String player : new HashSet<String>(game.getPlayers())) {
+      Firebase userRef = userRefForGame(game, player);
+      userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
+    }    
+  }
+  
+  /**
+   * @param game A game.
+   * @return The Firebase reference for this game in the current user's game list.
+   */
+  private Firebase userRefForGame(Game game, String userId) {
+    return firebase.child("users").child(userId).child("games").child(game.getId());
+  }
+  
+  /**
+   * @param gameId A game ID
+   * @return A Firebase reference for this game in the master game list.
+   */
+  private Firebase gameReference(String gameId) {
+    return firebase.child("games").child(gameId);
   }
   
   /**

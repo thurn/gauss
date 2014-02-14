@@ -124,4 +124,11 @@ public class GameTest extends SharedTestCase {
     testGame.getProfilesMutable().put("two", profile);
     assertEquals("vs. GivenName", testGame.vsString("one"));
   }
+  
+  public void testMinimalGame() {
+    Game testGame = new Game("id");
+    testGame.getActionsMutable().add(new Action(0));
+    assertEquals("id", testGame.minimalGame().getId());
+    assertEquals(0, testGame.minimalGame().getActions().size());
+  }
 }

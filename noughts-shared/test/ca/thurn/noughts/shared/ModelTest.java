@@ -9,6 +9,8 @@ import ca.thurn.noughts.shared.Model.GameUpdateListener;
 import ca.thurn.testing.SharedTestCase;
 
 import com.firebase.client.Firebase;
+import com.firebase.client.Firebase.CompletionListener;
+import com.firebase.client.FirebaseError;
 
 public class ModelTest extends SharedTestCase {
   private Model model;
@@ -16,11 +18,16 @@ public class ModelTest extends SharedTestCase {
   private Firebase firebase;
 
   @Override
-  public void sharedSetUp(Runnable done) {
-    firebase = new Firebase("https://www.example.com/");
-    userId = randomInteger() + "";
-    model = new Model(userId, firebase);
-    done.run();
+  public void sharedSetUp(final Runnable done) {
+    firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
+    firebase.removeValue(new CompletionListener() {
+      @Override public void onComplete(FirebaseError error, Firebase firebase) {
+        userId = randomInteger() + "";
+        model = new Model(userId, firebase);
+        done.run();        
+      }
+    });
+
   }
   
   @Override
@@ -44,6 +51,24 @@ public class ModelTest extends SharedTestCase {
     });
     String id = model.newGame(true, null, null);
     assertTrue(!id.equals(""));
+    endAsyncTestBlock();
+  }
+  
+  public void testNewGameGameUpdate() {
+    beginAsyncTestBlock();
+    String id = model.newGame(true, null, null);
+    model.setGameUpdateListener(id, new GameUpdateListener() {
+      @Override
+      public void onGameUpdate(Game game) {
+        assertTrue(game.getPlayersMutable().contains(userId));
+        assertEquals(Model.X_PLAYER, (int)game.getCurrentPlayerNumber());
+        assertTrue(game.getLastModified() > 0);
+        assertTrue(game.isLocalMultiplayer());
+        assertFalse(game.isGameOver());
+        assertEquals(0, game.getActionsMutable().size());
+        finished();
+      }
+    });
     endAsyncTestBlock();
   }
   
@@ -111,6 +136,30 @@ public class ModelTest extends SharedTestCase {
             assertEquals(command, action.getCommandsMutable().get(0));
             finished();
           }
+        });
+        model.addCommand(game, command);
+      }
+    });
+    endAsyncTestBlock();
+  }
+  
+  public void testAddCommandUpdatesLastModified() {
+    beginAsyncTestBlock();
+    final Game game = newGame(map(
+        "players", list(userId),
+        "currentPlayerNumber", 0,
+        "lastModified", 123L));
+    final Command command = new Command(1, 1);
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameListListener(new AbstractGameListListener() {
+          @Override
+          public void onGameChanged(Game game) {
+            assertTrue(game.isMinimal());
+            assertTrue(game.getLastModified() > 150L);
+            finished();
+          }          
         });
         model.addCommand(game, command);
       }
@@ -239,6 +288,27 @@ public class ModelTest extends SharedTestCase {
             assertEquals(1, (int)game.getCurrentPlayerNumber());
             assertNull(game.getCurrentActionNumber());
             finished();
+          }
+        });
+        model.submitCurrentAction(game);
+      }
+    });
+    endAsyncTestBlock();
+  }
+  
+  public void testSubmitCurrentActionGameList() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithCurrentCommand();
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameListListener(new AbstractGameListListener() {
+          @Override
+          public void onGameChanged(Game game) {
+            assertEquals(1, (int)game.getCurrentPlayerNumber());
+            assertTrue(game.getLastModified() > 150L);
+            assertNull(game.getCurrentActionNumber());
+            finished();            
           }
         });
         model.submitCurrentAction(game);
@@ -428,7 +498,7 @@ public class ModelTest extends SharedTestCase {
     });    
   }
   
-  public void testArchiveGame() {
+  public void testArchiveListGame() {
     beginAsyncTestBlock();
     final Game game = newGame(map(
         "currentPlayerNumber", 0,
@@ -438,10 +508,10 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameListListener(new AbstractGameListListener() {
           @Override
-          public void onGameUpdate(Game game) {
-            assertFalse(game.getPlayers().contains(userId));
+          public void onGameRemoved(Game newGame) {
+            assertEquals(game.minimalGame(), newGame);
             finished();
           }
         });
@@ -526,6 +596,7 @@ public class ModelTest extends SharedTestCase {
             "row", 1
           ))
         )),
+        "lastModified", 123L,
         "currentActionNumber", 0
         ));
   }
@@ -540,11 +611,13 @@ public class ModelTest extends SharedTestCase {
     model.setGameListListener(new AbstractGameListListener() {
       @Override
       public void onGameAdded(Game newGame) {
-        assertEquals(game, newGame);
+        assertEquals(game.minimalGame(), newGame);
         testFn.run();
-      }      
+      }
     });
     firebase.child("games").child(game.getId()).setValue(game.serialize());
+    firebase.child("users").child(userId).child("games").child(game.getId())
+        .setValue(game.minimalGame().serialize());
   }
   
   private final <T> List<T> list(T... objects) {

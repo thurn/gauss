@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7C1F83B418680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C1F83B518680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C1F83B818680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
 		7C1F83B918680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
@@ -43,6 +42,9 @@
 		7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */; };
 		7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
+		7C69776518ADA6D50073BA7D /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C69776418ADA6D50073BA7D /* Toast+UIView.m */; };
+		7C69776618ADA6D50073BA7D /* Toast+UIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C69776418ADA6D50073BA7D /* Toast+UIView.m */; };
+		7C69776718ADA90D0073BA7D /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* SavedGamesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* SavedGamesViewController.m */; };
@@ -266,6 +268,8 @@
 		7C2E648E1864216F00D34AD0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7C2E64931864223C00D34AD0 /* prefixes.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = prefixes.properties; sourceTree = "<group>"; };
+		7C69776318ADA6D50073BA7D /* Toast+UIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Toast+UIView.h"; sourceTree = "<group>"; };
+		7C69776418ADA6D50073BA7D /* Toast+UIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "Toast+UIView.m"; sourceTree = "<group>"; };
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
 		7C69CD3B18790B600040AD75 /* HasModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HasModel.h; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* SavedGamesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SavedGamesViewController.h; sourceTree = "<group>"; };
@@ -300,6 +304,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C69776718ADA90D0073BA7D /* libSVGKit-iOS.1.2.0pre.a in Frameworks */,
 				7C2E640618641F3500D34AD0 /* UIKit.framework in Frameworks */,
 				7C2E640418641F3500D34AD0 /* CoreGraphics.framework in Frameworks */,
 				7C1F83C11868110B00D66C78 /* QuartzCore.framework in Frameworks */,
@@ -311,7 +316,6 @@
 				7C2E648D1864216900D34AD0 /* CFNetwork.framework in Frameworks */,
 				7C2E648B1864216200D34AD0 /* libc++.dylib in Frameworks */,
 				7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */,
-				7C1F83B418680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */,
 				7C2E640218641F3500D34AD0 /* Foundation.framework in Frameworks */,
 				7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */,
 			);
@@ -542,6 +546,8 @@
 				7C72157D186F232500F1188B /* SavedGamesViewController.h */,
 				7C72157E186F232500F1188B /* SavedGamesViewController.m */,
 				7C69CD3B18790B600040AD75 /* HasModel.h */,
+				7C69776318ADA6D50073BA7D /* Toast+UIView.h */,
+				7C69776418ADA6D50073BA7D /* Toast+UIView.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -780,6 +786,7 @@
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
+				7C69776518ADA6D50073BA7D /* Toast+UIView.m in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
@@ -809,6 +816,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C69776618ADA6D50073BA7D /* Toast+UIView.m in Sources */,
 				7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C8EF6F518668CB40075D0C1 /* Action.java in Sources */,
 				7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */,

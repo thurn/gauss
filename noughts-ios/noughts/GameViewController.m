@@ -13,6 +13,7 @@
 #import "Model.h"
 #import "Firebase.h"
 #import "Command.h"
+#import "Toast+UIView.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
 @property (weak,nonatomic) NTSModel *model;
@@ -117,6 +118,11 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
     [self.model resignGameWithNTSGame:self.currentGame];
+    [[self navigationController] setNavigationBarHidden:NO animated:YES];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    UIViewController *rootController =
+        [self.navigationController.viewControllers objectAtIndex:0];
+    [rootController.view makeToast:@"Resigned from game."];
   }
 }
 

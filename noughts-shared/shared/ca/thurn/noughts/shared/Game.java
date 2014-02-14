@@ -99,6 +99,12 @@ public class Game extends Entity implements Comparable<Game> {
    * True if this game is in local multiplayer mode
    */
   private Boolean localMultiplayer;
+  
+  /**
+   * True if this is a minimal game representation, as returned by
+   * {@link Game#minimalGame()}.
+   */
+  private Boolean isMinimal;
 
   /**
    * An array of player IDs who have resigned the game.
@@ -126,6 +132,7 @@ public class Game extends Entity implements Comparable<Game> {
     victors = getIntegerList(getList(gameMap, "victors"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
+    isMinimal = getBoolean(gameMap, "isMinimal");
     resignedPlayers = getList(gameMap, "resignedPlayers");
   }
   
@@ -148,6 +155,7 @@ public class Game extends Entity implements Comparable<Game> {
     result.put("victors", getVictorsMutable());
     result.put("gameOver", gameOver);
     result.put("localMultiplayer", localMultiplayer);
+    result.put("isMinimal", isMinimal);
     result.put("resignedPlayers", getResignedPlayersMutable());
     return result;
   }
@@ -188,7 +196,7 @@ public class Game extends Entity implements Comparable<Game> {
   }
   
   public Action currentAction() {
-    return getActionsMutable().get(getCurrentActionNumber());
+    return getActions().get(getCurrentActionNumber());
   }
   
   public boolean isGameOver() {
@@ -197,6 +205,10 @@ public class Game extends Entity implements Comparable<Game> {
   
   public boolean isLocalMultiplayer() {
     return localMultiplayer != null && localMultiplayer == true;
+  }
+  
+  public boolean isMinimal() {
+    return isMinimal != null && isMinimal == true;
   }
 
   void setGameOver(Boolean gameOver) {
@@ -434,5 +446,17 @@ public class Game extends Entity implements Comparable<Game> {
     }
     number = duration / ONE_SECOND;
     return timeAgoString(viewerId, number, "second");
+  }
+  
+  /**
+   * @return A representation of this game suitable for inclusion in a user's
+   *     game list, with the game actions omitted.
+   */
+  public Game minimalGame() {
+    Map<String, Object> serialized = serialize();
+    serialized.remove("actions");
+    serialized.remove("currentActionNumber");
+    serialized.put("isMinimal", true);
+    return new Game(serialized);
   }
 }
