@@ -114,8 +114,9 @@ public class Model implements ChildEventListener {
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
-    gameUpdateListeners = new HashMap<String, ValueEventListener>();
+    gameUpdateListeners = new HashMap<String, ValueEventListener>();    
     userGameList = new HashMap<String, Game>();
+    firebase.child("users").child(userId).child("games").addChildEventListener(this);    
   }
   
   /**
@@ -147,7 +148,8 @@ public class Model implements ChildEventListener {
     if (gameUpdateListeners.containsKey(gameId)) {
       gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
     }
-    ValueEventListener valueListener = new ValueEventListener() {
+    ValueEventListener valueListener = gameReference(gameId).addValueEventListener(
+        new ValueEventListener() {
       @Override
       public void onCancelled(FirebaseError error) {
       }
@@ -163,8 +165,7 @@ public class Model implements ChildEventListener {
           listener.onGameUpdate(game);
         }
       }
-    };
-    gameReference(gameId).addValueEventListener(valueListener);
+    });
     gameUpdateListeners.put(gameId, valueListener);
   }
 
@@ -188,9 +189,6 @@ public class Model implements ChildEventListener {
    * @param listener The listener to add.
    */
   public void setGameListListener(final GameListListener listener) {
-    if (gameListListener == null) {
-      firebase.child("users").child(userId).child("games").addChildEventListener(this);
-    }
     gameListListener = listener;
   }
   

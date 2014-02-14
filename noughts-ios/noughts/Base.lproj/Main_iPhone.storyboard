@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="13B3116" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
@@ -36,10 +36,10 @@
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
                                     <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e4r-SB-bb9" userLabel="Game List">
-                                        <rect key="frame" x="67" y="60" width="124" height="36"/>
+                                        <rect key="frame" x="67" y="60" width="90" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="Saved Games">
+                                        <state key="normal" title="Game List">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
@@ -274,7 +274,7 @@
                             <outlet property="delegate" destination="clg-Vl-XHO" id="aqK-Fb-YEh"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Saved Games" id="aCI-ly-2ju"/>
+                    <navigationItem key="navigationItem" title="Game List" id="aCI-ly-2ju"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1GB-2k-ags" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

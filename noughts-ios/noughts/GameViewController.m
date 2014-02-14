@@ -60,14 +60,23 @@
 
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
-    case kResignGame: {
-      UIAlertView *alert = [[UIAlertView alloc]
-                            initWithTitle:@"Confirm"
-                                  message:@"Are you sure you want to leave the game?"
-                                 delegate:self
-                        cancelButtonTitle:@"Cancel"
-                        otherButtonTitles: @"Resign", nil];
-      [alert show];
+    case kResignOrArchive: {
+      if ([self.currentGame isGameOver]) {
+        [self.model archiveGameWithNTSGame:self.currentGame];
+        [[self navigationController] setNavigationBarHidden:NO animated:YES];
+        [self.navigationController popToRootViewControllerAnimated:YES];
+        UIViewController *rootController =
+        [self.navigationController.viewControllers objectAtIndex:0];
+        [rootController.view makeToast:@"Archived game."];
+      } else {
+        UIAlertView *alert = [[UIAlertView alloc]
+                              initWithTitle:@"Confirm"
+                                    message:@"Are you sure you want to leave the game?"
+                                   delegate:self
+                          cancelButtonTitle:@"Cancel"
+                          otherButtonTitles: @"Resign", nil];
+        [alert show];
+      }
       break;
     }
     case kMainMenu: {
@@ -118,11 +127,7 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
     [self.model resignGameWithNTSGame:self.currentGame];
-    [[self navigationController] setNavigationBarHidden:NO animated:YES];
-    [self.navigationController popToRootViewControllerAnimated:YES];
-    UIViewController *rootController =
-        [self.navigationController.viewControllers objectAtIndex:0];
-    [rootController.view makeToast:@"Resigned from game."];
+    [self.view makeToast:@"Resigned from game."];
   }
 }
 
@@ -169,6 +174,10 @@
 
 - (void)handleRedo {
   [self.model redoCommandWithNTSGame:self.currentGame];
+}
+
+- (BOOL)isGameOver {
+  return [self.currentGame isGameOver];
 }
 
 @end

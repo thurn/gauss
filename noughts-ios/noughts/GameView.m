@@ -140,10 +140,11 @@
 }
 
 - (void)menuButtonClicked:(UIButton*)button {
+  NSString *destructiveTitle = [self.delegate isGameOver] ? @"Archive Game" : @"Resign";
   UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
                                                      delegate:self
                                             cancelButtonTitle:@"Cancel"
-                                       destructiveButtonTitle:@"Resign"
+                                       destructiveButtonTitle:destructiveTitle
                                             otherButtonTitles:@"Main Menu", @"Game List",
                                                               @"New Game", nil];
   [sheet showInView:self];
@@ -165,7 +166,7 @@
   GameMenuSelection selection = kUnknownSelection;
   switch (buttonIndex) {
     case 0: {
-      selection = kResignGame;
+      selection = kResignOrArchive;
       break;
     }
     case 1: {

@@ -14,7 +14,7 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
   kNewGameMenu,
   kMainMenu,
   kGameList,
-  kResignGame
+  kResignOrArchive
 };
 
 @protocol GameViewDelegate
@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 - (void)handleSubmit;
 - (void)handleUndo;
 - (void)handleRedo;
+- (BOOL)isGameOver;
 @end
 
 @interface GameView : UIView <UIActionSheetDelegate>

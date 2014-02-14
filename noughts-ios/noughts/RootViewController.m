@@ -15,7 +15,7 @@
   [super viewDidLoad];
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio-demo.com"];
-  self.model = [[NTSModel alloc] initWithNSString:@"userid" withFCFirebase:firebase];
+  self.model = [[NTSModel alloc] initWithNSString:@"dthurn" withFCFirebase:firebase];
   [self.model setGameListListenerWithNTSModel_GameListListener:self];
 }
 

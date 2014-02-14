@@ -26,7 +26,7 @@ public class Query {
        [listener onDataChangeWithFCDataSnapshot: javaSnapshot];
     };
     void (^onCancel)() = ^{
-      [listener onCancelled];
+      [listener onCancelledWithFCFirebaseError: nil];
     };
     [firebase observeSingleEventOfType: FEventTypeValue
                              withBlock: onDataChange
@@ -40,7 +40,7 @@ public class Query {
       [listener onDataChangeWithFCDataSnapshot: javaSnapshot];
     };
     void (^onCancel)() = ^{
-      [listener onCancelled];
+      [listener onCancelledWithFCFirebaseError: nil];
     };
     FirebaseHandle handle = [firebase observeEventType: FEventTypeValue
                                              withBlock: onDataChange
