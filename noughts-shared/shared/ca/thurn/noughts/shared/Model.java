@@ -481,6 +481,7 @@ public class Model implements ChildEventListener {
     ensureIsPlayer(game);
     if (!game.isGameOver()) die("Can't archive a game which is in progress");
     userRefForGame(game, userId).removeValue();
+    userGameList.remove(game.getId());
   }
   
   /**
@@ -583,7 +584,10 @@ public class Model implements ChildEventListener {
     for (String player : new HashSet<String>(game.getPlayers())) {
       Firebase userRef = userRefForGame(game, player);
       userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
-    }    
+    }
+    if (userGameList.containsKey(game.getId())) {
+      function.mutate(userGameList.get(game.getId()));
+    }
   }
   
   /**

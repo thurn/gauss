@@ -9,7 +9,7 @@
 #import "GameViewController.h"
 #import "GameView.h"
 #import "NewGameViewController.h"
-#import "SavedGamesViewController.h"
+#import "GameListViewController.h"
 #import "Model.h"
 #import "Firebase.h"
 #import "Command.h"
@@ -103,8 +103,8 @@
     }
     case kGameList: {
       [[self navigationController] setNavigationBarHidden:NO animated:YES];
-      SavedGamesViewController *savedGamesController =
-          (SavedGamesViewController*)[self findViewController:[SavedGamesViewController class]];
+      GameListViewController *savedGamesController =
+          (GameListViewController*)[self findViewController:[GameListViewController class]];
       if (savedGamesController == nil) {
         // Add saved games controller to back stack
         savedGamesController =

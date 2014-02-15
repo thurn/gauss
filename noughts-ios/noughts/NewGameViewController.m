@@ -7,7 +7,6 @@
 //
 
 #import "NewGameViewController.h"
-#import "GameViewController.h"
 
 @interface NewGameViewController ()
 @property(weak,nonatomic) NTSModel* model;
@@ -36,14 +35,6 @@
 {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
-}
-
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  if (((UIView*)sender).tag == 100) {
-    GameViewController* destination = segue.destinationViewController;
-    [destination setNTSModel:self.model];
-    [destination createLocalMultiplayerGame];
-  }
 }
 
 @end
