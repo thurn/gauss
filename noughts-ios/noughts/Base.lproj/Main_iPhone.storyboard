@@ -303,55 +303,75 @@
                                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 1" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8Yw-ao-DaT">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 1" borderStyle="roundedRect" placeholder="Player 1" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="8Yw-ao-DaT">
                                         <rect key="frame" x="10" y="120" width="120" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="120" id="aw7-E5-z8f"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="dzj-Dg-VdJ" id="fty-Fe-FAg"/>
+                                        </connections>
                                     </textField>
-                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 2" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jhe-XQ-mvK">
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 2" borderStyle="roundedRect" placeholder="Player 2" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jhe-XQ-mvK">
                                         <rect key="frame" x="150" y="120" width="120" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="120" id="Dn9-aK-bX5"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="dzj-Dg-VdJ" id="24v-T4-9xo"/>
+                                        </connections>
                                     </textField>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="player_bull" translatesAutoresizingMaskIntoConstraints="NO" id="IUR-8I-GXJ">
-                                        <rect key="frame" x="10" y="10" width="100" height="100"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="iaB-da-Kcb">
+                                        <rect key="frame" x="160" y="10" width="100" height="100"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="100" id="Itj-nG-iK7"/>
-                                            <constraint firstAttribute="width" constant="100" id="kCs-bC-pRu"/>
+                                            <constraint firstAttribute="width" constant="100" id="0uB-Ol-g4K"/>
+                                            <constraint firstAttribute="height" constant="100" id="xeO-Ch-JzM"/>
                                         </constraints>
-                                    </imageView>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="player_chicken" translatesAutoresizingMaskIntoConstraints="NO" id="oiS-aU-4MC">
-                                        <rect key="frame" x="170" y="10" width="100" height="100"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onP2ImageClicked:" destination="dzj-Dg-VdJ" eventType="touchUpInside" id="nop-LQ-ak2"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nOr-si-OZT">
+                                        <rect key="frame" x="20" y="10" width="100" height="100"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="100" id="7oM-OV-60G"/>
-                                            <constraint firstAttribute="height" constant="100" id="YfM-o3-NEI"/>
+                                            <constraint firstAttribute="width" constant="100" id="EtF-QN-3vr"/>
+                                            <constraint firstAttribute="height" constant="100" id="VTA-uP-tLY"/>
                                         </constraints>
-                                    </imageView>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onP1ImageClicked:" destination="dzj-Dg-VdJ" eventType="touchUpInside" id="D1k-X6-nb7"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                 <constraints>
                                     <constraint firstAttribute="centerX" secondItem="xz6-y6-md8" secondAttribute="centerX" id="5j2-Af-lSX"/>
                                     <constraint firstAttribute="height" constant="160" id="BNw-hB-qxL"/>
                                     <constraint firstItem="8Yw-ao-DaT" firstAttribute="leading" secondItem="UcP-Nm-7C7" secondAttribute="leading" constant="10" id="Lk0-4M-VQI"/>
+                                    <constraint firstItem="nOr-si-OZT" firstAttribute="centerX" secondItem="8Yw-ao-DaT" secondAttribute="centerX" id="MDv-4A-fhc"/>
                                     <constraint firstAttribute="trailing" secondItem="jhe-XQ-mvK" secondAttribute="trailing" constant="10" id="Mal-sP-c1Y"/>
                                     <constraint firstAttribute="centerY" secondItem="xz6-y6-md8" secondAttribute="centerY" id="N1j-ax-VT7"/>
-                                    <constraint firstItem="IUR-8I-GXJ" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="top" constant="10" id="NNz-8C-HRg"/>
-                                    <constraint firstItem="IUR-8I-GXJ" firstAttribute="leading" secondItem="UcP-Nm-7C7" secondAttribute="leading" constant="10" id="RHD-ri-aO8"/>
-                                    <constraint firstAttribute="trailing" secondItem="oiS-aU-4MC" secondAttribute="trailing" constant="10" id="Uzh-dO-DA4"/>
+                                    <constraint firstItem="jhe-XQ-mvK" firstAttribute="centerX" secondItem="iaB-da-Kcb" secondAttribute="centerX" id="OCh-he-DJd"/>
                                     <constraint firstAttribute="bottom" secondItem="jhe-XQ-mvK" secondAttribute="bottom" constant="10" id="V79-gj-r7S"/>
                                     <constraint firstAttribute="centerY" secondItem="xz6-y6-md8" secondAttribute="centerY" id="Vud-V0-8f7"/>
                                     <constraint firstAttribute="width" constant="280" id="X6U-Aa-ua4"/>
-                                    <constraint firstItem="oiS-aU-4MC" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="top" constant="10" id="gx4-rL-XTh"/>
+                                    <constraint firstItem="iaB-da-Kcb" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="top" constant="10" id="r7t-CN-bIR"/>
+                                    <constraint firstItem="nOr-si-OZT" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="top" constant="10" id="uiu-Op-oeW"/>
                                     <constraint firstAttribute="bottom" secondItem="8Yw-ao-DaT" secondAttribute="bottom" constant="10" id="yGa-2D-2bN"/>
                                 </constraints>
                             </view>
@@ -375,6 +395,12 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Create" id="nJz-wm-hB1"/>
+                    <connections>
+                        <outlet property="p1Image" destination="nOr-si-OZT" id="JzN-AR-Kao"/>
+                        <outlet property="p1TextField" destination="8Yw-ao-DaT" id="lN3-vO-pej"/>
+                        <outlet property="p2Image" destination="iaB-da-Kcb" id="FGh-bM-QDt"/>
+                        <outlet property="p2TextField" destination="jhe-XQ-mvK" id="Y71-VY-Ofd"/>
+                    </connections>
                 </viewController>
                 <navigationItem title="New Local Game" id="wqP-f6-eb1"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="J10-rN-HIG" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -444,8 +470,6 @@
         <image name="ic_new_game" width="32" height="32"/>
         <image name="ic_settings" width="32" height="32"/>
         <image name="ic_vs_computer" width="32" height="32"/>
-        <image name="player_bull" width="181" height="181"/>
-        <image name="player_chicken" width="181" height="181"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
