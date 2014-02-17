@@ -8,6 +8,8 @@
 
 #import "NewLocalGameViewController.h"
 #import "GameViewController.h"
+#import "J2obcUtils.h"
+#import "Profile.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *p1TextField;
@@ -102,11 +104,19 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  if (((UIView*)sender).tag == 100) {
-    GameViewController* destination = segue.destinationViewController;
-    [destination setNTSModel:self.model];
-    [destination createLocalMultiplayerGame];
-  }
+  GameViewController *destination = segue.destinationViewController;
+  NTSProfile *p1Profile = [NTSProfile new];
+  [p1Profile setNameWithNSString:self.p1TextField.text];
+  [p1Profile setPhotoUrlWithNSString:[self.playerImages objectAtIndex:self.p1ImageIndex]];
+  NTSProfile *p2Profile = [NTSProfile new];
+  [p2Profile setNameWithNSString:self.p2TextField.text];
+  [p2Profile setPhotoUrlWithNSString:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  NSDictionary *localProfiles = @{@0 : p1Profile,
+                                  @1 : p2Profile};
+  NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilMap:
+                      [J2obcUtils nsDictionaryToJavaUtilMap:localProfiles]];
+  [destination setNTSModel:self.model];
+  destination.currentGameId = gameId;
 }
 
 @end

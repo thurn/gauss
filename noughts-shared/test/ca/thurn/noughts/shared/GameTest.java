@@ -1,9 +1,7 @@
 package ca.thurn.noughts.shared;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import ca.thurn.noughts.shared.Game.VsType;
+import ca.thurn.noughts.shared.Profile.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 public class GameTest extends SharedTestCase {
@@ -61,9 +59,9 @@ public class GameTest extends SharedTestCase {
     testGame.getPlayersMutable().add("viewerId");
     testGame.getPlayersMutable().add("opponentId");
     testGame.getVictorsMutable().add(1);
-    Map<String, String> profile = new HashMap<String, String>();
-    profile.put("gender", "female");
-    testGame.getProfilesMutable().put("opponentId", profile);
+    Profile opponentProfile = new Profile();
+    opponentProfile.setPronoun(Pronoun.FEMALE);
+    testGame.getProfilesMutable().put("opponentId", opponentProfile);
     testGame.setLastModified(currentTime);
     assertEquals("She won a second ago", testGame.lastUpdatedString("viewerId"));
     
@@ -100,7 +98,7 @@ public class GameTest extends SharedTestCase {
     testGame = new Game("four");
     testGame.getPlayersMutable().add("one");
     testGame.getPlayersMutable().add("two");
-    Map<String, String> profile = new HashMap<String, String>();
+    Profile profile = new Profile();
     testGame.getProfilesMutable().put("two", profile);
     assertEquals(VsType.OPPONENT_WITH_PROFILE, testGame.getVsType("one"));
   }
@@ -119,8 +117,8 @@ public class GameTest extends SharedTestCase {
     testGame = new Game("four");
     testGame.getPlayersMutable().add("one");
     testGame.getPlayersMutable().add("two");
-    Map<String, String> profile = new HashMap<String, String>();
-    profile.put("givenName", "GivenName");
+    Profile profile = new Profile();
+    profile.setName("GivenName");
     testGame.getProfilesMutable().put("two", profile);
     assertEquals("vs. GivenName", testGame.vsString("one"));
   }

@@ -45,27 +45,38 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.getLastModified() > 0);
         assertTrue(game.isLocalMultiplayer());
         assertFalse(game.isGameOver());
+        assertTrue(game.isMinimal());
         assertEquals(0, game.getActionsMutable().size());
+        assertEquals("John", game.getLocalProfiles().get(0).getName());
         finished();
       }
     });
-    String id = model.newGame(true, null, null);
-    assertTrue(!id.equals(""));
+    Map<Integer, Profile> localProfiles = new HashMap<Integer, Profile>();
+    Profile profile = new Profile();
+    profile.setName("John");
+    localProfiles.put(0, profile);
+    String id = model.newLocalMultiplayerGame(localProfiles);
+    assertFalse(id.equals(""));
     endAsyncTestBlock();
   }
   
   public void testNewGameGameUpdate() {
     beginAsyncTestBlock();
-    String id = model.newGame(true, null, null);
+    Map<String, Profile> profiles = new HashMap<String, Profile>();
+    Profile profile = new Profile();
+    profile.setName("John");
+    profiles.put(userId, profile);
+    String id = model.newGame(profiles);    
     model.setGameUpdateListener(id, new GameUpdateListener() {
       @Override
       public void onGameUpdate(Game game) {
         assertTrue(game.getPlayersMutable().contains(userId));
         assertEquals(Model.X_PLAYER, (int)game.getCurrentPlayerNumber());
         assertTrue(game.getLastModified() > 0);
-        assertTrue(game.isLocalMultiplayer());
+        assertFalse(game.isLocalMultiplayer());
         assertFalse(game.isGameOver());
         assertEquals(0, game.getActionsMutable().size());
+        assertEquals("John", game.getProfiles().get(userId).getName());
         finished();
       }
     });

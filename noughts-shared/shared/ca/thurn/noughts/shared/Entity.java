@@ -76,7 +76,11 @@ public abstract class Entity {
   }
 
   String getString(Map<String, Object> map, String key) {
-    return (String)map.get(key);
+    if (map.containsKey(key)) {
+      return (String)map.get(key);
+    } else {
+      return null;
+    }
   }
 
   Integer getInteger(Map<String, Object> map, String key) {
@@ -88,7 +92,11 @@ public abstract class Entity {
   }
   
   Long getLong(Map<String, Object> map, String key) {
-    return (Long)map.get(key);
+    if (map.containsKey(key)) {
+      return (Long)map.get(key);
+    } else {
+      return null;
+    }
   }
   
   Boolean getBoolean(Map<String, Object> map, String key) {

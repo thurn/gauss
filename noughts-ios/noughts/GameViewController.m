@@ -31,6 +31,7 @@
 }
 
 - (void)loadView {
+  [super loadView];
   GameView *view = [GameView new];
   view.delegate = self;
   self.view = view;
@@ -41,17 +42,10 @@
   self.model = model;
 }
 
-- (void)viewDidLoad {
-  [super viewDidLoad];
+- (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
   [self.model setGameUpdateListenerWithNSString: self.currentGameId
                 withNTSModel_GameUpdateListener: self];
-}
-
-- (void)createLocalMultiplayerGame {
-  NSString *gameId = [self.model newGameWithBoolean: YES
-                                    withJavaUtilMap: nil
-                                    withJavaUtilMap: nil];
-  self.currentGameId = gameId;
 }
 
 - (void)viewDidAppear:(BOOL)animated {

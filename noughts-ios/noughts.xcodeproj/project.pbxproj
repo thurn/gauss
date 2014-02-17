@@ -94,6 +94,8 @@
 		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
+		7CEB472918B275B100CDA9EA /* Profile.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472818B275B100CDA9EA /* Profile.java */; };
+		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -304,6 +306,9 @@
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
 		7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewLocalGameViewController.m; sourceTree = "<group>"; };
+		7CEB472818B275B100CDA9EA /* Profile.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Profile.java; sourceTree = "<group>"; };
+		7CEB472A18B276A900CDA9EA /* J2obcUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = J2obcUtils.h; sourceTree = "<group>"; };
+		7CEB472B18B276A900CDA9EA /* J2obcUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = J2obcUtils.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -561,6 +566,8 @@
 				7C69776418ADA6D50073BA7D /* Toast+UIView.m */,
 				7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */,
 				7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */,
+				7CEB472A18B276A900CDA9EA /* J2obcUtils.h */,
+				7CEB472B18B276A900CDA9EA /* J2obcUtils.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -631,6 +638,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7CEB472818B275B100CDA9EA /* Profile.java */,
 				7C92C02918920FD800DF8816 /* Clock.java */,
 				7C69CD38187908BB0040AD75 /* GameListPartitions.java */,
 				7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */,
@@ -801,8 +809,10 @@
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
 				7C69776518ADA6D50073BA7D /* Toast+UIView.m in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
+				7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
+				7CEB472918B275B100CDA9EA /* Profile.java in Sources */,
 				7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
 				7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */,
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,

@@ -14,5 +14,4 @@
                                                   GameViewDelegate,
                                                   HasModel>
 @property (strong,nonatomic) NSString *currentGameId;
-- (void)createLocalMultiplayerGame;
 @end

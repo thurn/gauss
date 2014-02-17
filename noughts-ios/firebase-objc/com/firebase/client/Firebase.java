@@ -65,7 +65,9 @@ public class Firebase extends Query {
   }
   
   static Object convertToObjcValue(Object value) {
-    if (value == null || value instanceof Number || value instanceof String) {
+    if (value == null) {
+      return nsNull();
+    } else if (value instanceof Number || value instanceof String) {
       return value;
     } else if (value instanceof Boolean) {
       return booleanToBool((Boolean)value);
@@ -77,6 +79,10 @@ public class Firebase extends Query {
       throw new IllegalArgumentException("Can't convert value " + value);
     }
   }
+  
+  private static native Object nsNull() /*-[
+    return [NSNull null];
+  ]-*/;
   
   private static native Object booleanToBool(Boolean value) /*-[
     if ([value booleanValue]) {

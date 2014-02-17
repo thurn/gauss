@@ -7,20 +7,13 @@
 //
 
 #import "NewGameViewController.h"
+#import "HasModel.h"
 
 @interface NewGameViewController ()
 @property(weak,nonatomic) NTSModel* model;
 @end
 
 @implementation NewGameViewController
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {
-  }
-  return self;
-}
 
 - (void)setNTSModel:(NTSModel *)model {
   self.model = model;
@@ -31,10 +24,13 @@
   [super viewDidLoad];
 }
 
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  [(id <HasModel>)segue.destinationViewController setNTSModel:self.model];
+}
+
 - (void)didReceiveMemoryWarning
 {
   [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
 }
 
 @end

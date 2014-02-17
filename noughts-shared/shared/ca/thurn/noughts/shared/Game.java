@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ca.thurn.noughts.shared.Action.ActionDeserializer;
 
@@ -52,7 +53,13 @@ public class Game extends Entity implements Comparable<Game> {
   /**
    * A mapping from player IDs to profile information about the player.
    */
-  private final Map<String, Map<String, String>> profiles;
+  private final Map<String, Profile> profiles;
+  
+  /**
+   * A mapping from player numbers to profile information about the player,
+   * takes precedence over ID-based profiles.
+   */
+  private final Map<Integer, Profile> localProfiles;
 
   /**
    * The number of the player whose turn it is, that is, their index within
@@ -113,7 +120,8 @@ public class Game extends Entity implements Comparable<Game> {
   
   public Game(String id) {
     players = new ArrayList<String>();
-    profiles = new HashMap<String, Map<String, String>>();
+    profiles = new HashMap<String, Profile>();
+    localProfiles = new HashMap<Integer, Profile>();
     actions = new ArrayList<Action>();
     victors = new ArrayList<Integer>();
     resignedPlayers = new ArrayList<String>();
@@ -123,7 +131,8 @@ public class Game extends Entity implements Comparable<Game> {
   public Game(Map<String, Object> gameMap) {
     id = getString(gameMap, "id");
     players = getList(gameMap, "players");
-    profiles = getMap(gameMap, "profiles");
+    profiles = extractProfiles(gameMap);
+    localProfiles = extractLocalProfiles(gameMap);
     setCurrentPlayerNumber(getInteger(gameMap, "currentPlayerNumber"));
     actions = getEntities(gameMap, "actions", new ActionDeserializer());
     setCurrentActionNumber(getInteger(gameMap, "currentActionNumber"));
@@ -134,6 +143,53 @@ public class Game extends Entity implements Comparable<Game> {
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
     isMinimal = getBoolean(gameMap, "isMinimal");
     resignedPlayers = getList(gameMap, "resignedPlayers");
+  }
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Profile> extractProfiles(Map<String, Object> gameMap) {
+    Map<String, Profile> result = new HashMap<String, Profile>();
+    if (gameMap.containsKey("profiles")) {
+      Map<String, Object> profilesMap = (Map<String, Object>)gameMap.get("profiles");
+      for(Entry<String, Object> entry : profilesMap.entrySet()) {
+        Map<String, Object> profileObject = (Map<String, Object>)entry.getValue();
+        result.put(entry.getKey(), new Profile(profileObject));
+      }
+    }
+    return result;    
+  }
+  
+  private Map<String, Object> serializeProfiles() {
+    Map<String, Object> result = new HashMap<String, Object>();
+    for (Entry<String, Profile> entry : profiles.entrySet()) {
+      result.put(entry.getKey(), entry.getValue().serialize());
+    }
+    return result;
+  }
+  
+  @SuppressWarnings("unchecked")
+  private Map<Integer, Profile> extractLocalProfiles(Map<String, Object> gameMap) {
+    Map<Integer, Profile> result = new HashMap<Integer, Profile>();
+    if (gameMap.containsKey("localProfiles")) {
+      List<Object> mapProfiles = (List<Object>)gameMap.get("localProfiles");
+      for (int i = 0; i < mapProfiles.size(); ++i) {
+        Map<String, Object> localProfile = (Map<String, Object>)mapProfiles.get(i);
+        if (localProfile != null) {
+          result.put(i, new Profile(localProfile));
+        }
+      }
+    }
+    return result;    
+  }
+  
+  private List<Object> serializeLocalProfiles() {
+    List<Object> result = new ArrayList<Object>();
+    for (int i = 0; i < localProfiles.size(); ++i) {
+      result.add(null);
+    }
+    for (Entry<Integer, Profile> entry : localProfiles.entrySet()) {
+      result.set(entry.getKey(), entry.getValue().serialize());
+    }
+    return result;
   }
   
   @Override
@@ -146,7 +202,8 @@ public class Game extends Entity implements Comparable<Game> {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("id", getId());
     result.put("players", getPlayersMutable());
-    result.put("profiles", getProfilesMutable());
+    result.put("profiles", serializeProfiles());
+    result.put("localProfiles", serializeLocalProfiles());
     result.put("currentPlayerNumber", getCurrentPlayerNumber());
     result.put("actions", serializeEntities(getActionsMutable()));
     result.put("currentActionNumber", getCurrentActionNumber());
@@ -231,12 +288,20 @@ public class Game extends Entity implements Comparable<Game> {
     return players;
   }
 
-  public Map<String, Map<String, String>> getProfiles() {
+  public Map<String, Profile> getProfiles() {
     return Collections.unmodifiableMap(getProfilesMutable());
   }
   
-  Map<String, Map<String, String>> getProfilesMutable() {
+  Map<String, Profile> getProfilesMutable() {
     return profiles;
+  }
+  
+  public Map<Integer, Profile> getLocalProfiles() {
+    return Collections.unmodifiableMap(getLocalProfilesMutable());
+  }
+  
+  Map<Integer, Profile> getLocalProfilesMutable() {
+    return localProfiles;
   }
 
   public Integer getCurrentPlayerNumber() {
@@ -330,7 +395,7 @@ public class Game extends Entity implements Comparable<Game> {
    * @param viewerId viewer's player ID
    * @return The profile of your opponent or null if there isn't one.
    */
-  public Map<String, String> getOpponentProfile(String viewerId) {
+  public Profile getOpponentProfile(String viewerId) {
     int opponentNumber = getOpponentPlayerNumber(viewerId);
     if (opponentNumber == -1) return null;
     String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
@@ -363,13 +428,17 @@ public class Game extends Entity implements Comparable<Game> {
   public String vsString(String viewerId) {
     switch (getVsType(viewerId)) {
       case LOCAL_MULTIPLAYER: {
-        return "Local Multiplayer Game";
+        if (localProfiles.size() == 2) {
+          return localProfiles.get(0).getName() + " vs. " + localProfiles.get(1).getName();
+        } else {
+          return "Local Multiplayer Game";
+        }
       }
       case NO_OPPONENT: {
         return "vs. (No Opponent Yet)";
       }
       case OPPONENT_WITH_PROFILE: {
-        return "vs. " + getOpponentProfile(viewerId).get("givenName");
+        return "vs. " + getOpponentProfile(viewerId).getName();
       }
       default: { // ANONYMOUS_OPPONENT
         return "vs. Anonymous";
@@ -389,10 +458,12 @@ public class Game extends Entity implements Comparable<Game> {
         } else if (playerNumbers.size() == 1 && victors.contains(playerNumbers.get(0))) {
           statusString = "You won";
         } else if (victors.contains(getOpponentPlayerNumber(viewerId))){
-          Map<String, String> opponentProfile = getOpponentProfile(viewerId);
-          if (opponentProfile != null && opponentProfile.get("gender").equals("male")) {
+          Profile opponentProfile = getOpponentProfile(viewerId);
+          if (opponentProfile != null && 
+              opponentProfile.getPronoun() == Profile.Pronoun.MALE) {
             statusString = "He won";
-          } else if (opponentProfile != null && opponentProfile.get("gender").equals("female")) {
+          } else if (opponentProfile != null && 
+              opponentProfile.getPronoun() == Profile.Pronoun.FEMALE) {
             statusString = "She won";
           } else {
             statusString = "They won";

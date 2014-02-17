@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -145,6 +146,9 @@ public class Model implements ChildEventListener {
    * @param listener The listener to add.
    */
   public void setGameUpdateListener(String gameId, final GameUpdateListener listener) {
+    if (gameId == null || listener == null) {
+      throw new IllegalArgumentException("Null argument to setGameUpdateListener");
+    }
     if (gameUpdateListeners.containsKey(gameId)) {
       gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
     }
@@ -250,19 +254,42 @@ public class Model implements ChildEventListener {
   public int gameCount() {
     return userGameList.size();
   }
+  
+  /**
+   * Partially create a new game with no opponent specified yet, returning the
+   * game ID.
+   * 
+   * @param profiles Map from player IDs in this game to their user profiles.
+   * @return The newly created game's ID.
+   */
+  public String newGame(Map<String, Profile> profiles) {
+    return newGame(false /* localMultiplayer */, profiles,
+        Collections.<Integer, Profile>emptyMap());
+  }
+  
+  /**
+   * Create a new local multiplayer game.
+   *
+   * @param localProfiles Map from player numbers in this game to their user
+   *     profiles.
+   * @return The newly created game's ID.
+   */
+  public String newLocalMultiplayerGame(Map<Integer, Profile> localProfiles) {
+    return newGame(true /* localMultiplayer */, Collections.<String, Profile>emptyMap(),
+        localProfiles);
+  }
 
   /**
    * Partially create a new game with no opponent specified yet, returning the
    * game ID.
    *
    * @param localMultiplayer Sets whether the game is a local multiplayer game.
-   * @param userProfile Optionally, the profile of the current user.
-   * @param opponentProfile Optionally, the profile of the opponent
-   *     for this game.
+   * @param userProfile Map from user IDs to profiles.
+   * @param localProfiles Map from player numbers to profiles. 
    * @return The newly created game's ID.
    */  
-  public String newGame(boolean localMultiplayer, Map<String, String> userProfile,
-      Map<String, String> opponentProfile) {
+  private String newGame(boolean localMultiplayer, Map<String, Profile> profiles,
+      Map<Integer, Profile> localProfiles) {
     Firebase ref = firebase.child("games").push();
     Game game = new Game(ref.getName());
     game.getPlayersMutable().add(userId);
@@ -272,21 +299,11 @@ public class Model implements ChildEventListener {
     game.setCurrentActionNumber(null);
     game.setLastModified(Clock.getInstance().currentTimeMillis());
     game.setGameOver(false);
-    
-    if (userProfile != null) {
-      if (userProfile.get("id") != userId) {
-        die("Expected user ID in profile to match model user ID");
-      }
-      game.getProfilesMutable().put(userId, userProfile);
-    }
-    if (opponentProfile != null) {
-      game.getProfilesMutable().put(opponentProfile.get("id"), opponentProfile);
-      game.getPlayersMutable().add(opponentProfile.get("id"));
-    }
-    
+    game.getProfilesMutable().putAll(profiles);
+    game.getLocalProfilesMutable().putAll(localProfiles);
     ref.setValue(game.serialize());
     Firebase userRef = userRefForGame(game, userId);
-    userRef.setValue(game.serialize());
+    userRef.setValue(game.minimalGame().serialize());
     return game.getId();
   }
   
