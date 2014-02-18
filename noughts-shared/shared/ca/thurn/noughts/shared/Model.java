@@ -317,6 +317,7 @@ public class Model implements ChildEventListener {
    */  
   public void addCommand(final Game game, final Command command) {
     ensureIsCurrentPlayer(game);
+    ensureIsNotMinimal(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
     final long timestamp = Clock.getInstance().currentTimeMillis();
     mutateCanonicalGame(game, new GameMutation() {
@@ -366,6 +367,7 @@ public class Model implements ChildEventListener {
    *     which can be undone.
    */  
   public boolean canUndo(Game game) {
+    ensureIsNotMinimal(game);
     if (game == null || !game.hasCurrentAction()) return false;
     return game.currentAction().getCommands().size() > 0;    
   }
@@ -378,6 +380,7 @@ public class Model implements ChildEventListener {
    *     current action of "game" and thus can be redone.
    */  
   public boolean canRedo(Game game) {
+    ensureIsNotMinimal(game);
     if (game == null || !game.hasCurrentAction()) return false;
     return game.currentAction().getFutureCommands().size() > 0;    
   }
@@ -390,6 +393,7 @@ public class Model implements ChildEventListener {
    *     submitted. 
    */
   public boolean canSubmit(Game game) {
+    ensureIsNotMinimal(game);
     if (game == null || !game.hasCurrentAction()) return false;
     Action action = game.currentAction();
     if (action.getCommands().size() == 0) return false;
@@ -408,16 +412,19 @@ public class Model implements ChildEventListener {
   */  
   public void submitCurrentAction(Game game) {
     ensureIsCurrentPlayer(game);
+    ensureIsNotMinimal(game);
     if (!canSubmit(game)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
+    // mark move submitted in advance to make computeVictors() work.
+    game.currentAction().setSubmitted(true);
+    final List<Integer> victors = computeVictors(game);
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game game) {
         if (!game.isMinimal()) {
           game.currentAction().setSubmitted(true);
         }
-        List<Integer> victors = computeVictors(game);
         game.setLastModified(timestamp);
         if (victors == null) {
           game.setCurrentPlayerNumber(newPlayerNumber);
@@ -432,6 +439,7 @@ public class Model implements ChildEventListener {
     }};
     mutateCanonicalGame(game, mutation);
     mutateGameLists(game, mutation);
+    mutation.mutate(game);
   }
   
   /**
@@ -512,6 +520,7 @@ public class Model implements ChildEventListener {
    */
   // Visible for testing only
   List<Integer> computeVictors(Game game) {
+    ensureIsNotMinimal(game);
     // 1) check for win
     
     Action[][] actionTable = makeActionTable(game);
@@ -637,7 +646,17 @@ public class Model implements ChildEventListener {
     if (!isCurrentPlayer(game)) die("Unauthorized user: " + userId);
   }
   
+  /**
+   * Ensures the current user is a player in the provided game.
+   */
   void ensureIsPlayer(Game game) {
     if (!game.getPlayers().contains(userId)) die("Unauthorized user: " + userId);
+  }
+  
+  /**
+   * Ensures the provided game is not in minimal form.
+   */
+  void ensureIsNotMinimal(Game game) {
+    if (game.isMinimal()) die("Unexpected minimal game");
   }
 }

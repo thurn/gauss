@@ -18,7 +18,7 @@ public class Profile extends Entity {
   }
 
   private String name;
-  private String photoUrl;
+  private String photoString;
   private Pronoun pronoun;
   
   public Profile() {
@@ -27,7 +27,7 @@ public class Profile extends Entity {
   
   public Profile(Map<String, Object> map) {
     this.name = getString(map, "name");
-    this.photoUrl = getString(map, "photoUrl");
+    this.photoString = getString(map, "photoString");
     this.pronoun = Pronoun.valueOf(getString(map, "pronoun"));
   }
   
@@ -35,7 +35,7 @@ public class Profile extends Entity {
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("name", getName());
-    result.put("photoUrl", getPhotoUrl());
+    result.put("photoString", getPhotoString());
     result.put("pronoun", getPronoun().name());
     return result;
   }
@@ -53,12 +53,12 @@ public class Profile extends Entity {
     this.name = name;
   }
 
-  public String getPhotoUrl() {
-    return photoUrl;
+  public String getPhotoString() {
+    return photoString;
   }
 
-  public void setPhotoUrl(String photoUrl) {
-    this.photoUrl = photoUrl;
+  public void setPhotoString(String photoString) {
+    this.photoString = photoString;
   }
 
   public Pronoun getPronoun() {

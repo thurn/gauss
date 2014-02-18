@@ -27,6 +27,12 @@
 @property (strong,nonatomic) UIButton *submitButton;
 @property (strong,nonatomic) UIButton *undoButton;
 @property (strong,nonatomic) UIButton *redoButton;
+@property (weak, nonatomic) IBOutlet UIImageView *gameStatusImage;
+@property (weak, nonatomic) IBOutlet UIView *gameStatusColorView;
+@property (weak, nonatomic) IBOutlet UILabel *gameStatusLabel;
+@property (strong, nonatomic) UIView *gameStatusView;
+@property (strong, nonatomic) NSLayoutConstraint* gameStatusConstraint;
+@property double taskId;
 @end
 
 @implementation GameView
@@ -90,11 +96,19 @@
     redoButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:redoButton];
 
+    NSArray *subviewArray = [[NSBundle mainBundle]
+                             loadNibNamed:@"GameStatusView"
+                             owner:self
+                             options:nil];
+    UIView *gameStatusView = [subviewArray objectAtIndex:0];
+    gameStatusView.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:gameStatusView];
 
     NSDictionary *views = NSDictionaryOfVariableBindings(gameMenuButton,
                                                          submitButton,
                                                          undoButton,
-                                                         redoButton);
+                                                         redoButton,
+                                                         gameStatusView);
     NSNumber *statusBarHeight = [NSNumber numberWithFloat:
                                  [UIApplication sharedApplication].statusBarFrame.size.height];
     NSDictionary *metrics = @{@"statusBarHeight": statusBarHeight};
@@ -104,6 +118,16 @@
                      views:views
                    metrics:metrics];
     [self visualConstraint:@"V:|-(statusBarHeight)-[submitButton]" views:views metrics:metrics];
+    [self visualConstraint:@"V:[gameStatusView(==75)]" views:views metrics:metrics];
+    [self visualConstraint:@"H:|[gameStatusView]|" views:views metrics:metrics];
+    self.gameStatusConstraint = [NSLayoutConstraint constraintWithItem:gameStatusView
+                                 attribute:NSLayoutAttributeBottom
+                                 relatedBy:NSLayoutRelationEqual
+                                    toItem:self
+                                 attribute:NSLayoutAttributeBottom
+                                multiplier:1
+                                  constant:75];
+    [self addConstraint:self.gameStatusConstraint];
     [self addConstraint:
      [NSLayoutConstraint constraintWithItem:undoButton
                                   attribute:NSLayoutAttributeCenterY
@@ -125,8 +149,36 @@
     self.submitButton = submitButton;
     self.undoButton = undoButton;
     self.redoButton = redoButton;
+    self.gameStatusView = gameStatusView;
   }
   return self;
+}
+
+-(void)displayGameStatusWithImage:(UIImage*)image
+                       withString:(NSString*)string
+                        withColor:(UIColor*)color {
+  self.gameStatusImage.image = image;
+  self.gameStatusLabel.text = string;
+  self.gameStatusColorView.backgroundColor = color;
+  [self layoutIfNeeded];
+  [UIView animateWithDuration:0.3 animations:^{
+    self.gameStatusConstraint.constant = 0;
+    [self layoutIfNeeded];
+  }];
+  dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC);
+  double taskId = rand();
+  self.taskId = taskId;
+  // We keep track of the ID of the last scheduled task and only animate
+  // the view going back down if we're still the last scheduled task when
+  // it's time to run.
+  dispatch_after(delay, dispatch_get_main_queue(), ^{
+    if (taskId == self.taskId) {
+    [UIView animateWithDuration:0.3 animations:^{
+      self.gameStatusConstraint.constant = 75;
+      [self layoutIfNeeded];
+    }];
+    }
+  });
 }
 
 - (void)visualConstraint:(NSString*)visualFormat

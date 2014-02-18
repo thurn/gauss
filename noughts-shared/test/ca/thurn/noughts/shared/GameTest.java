@@ -100,7 +100,7 @@ public class GameTest extends SharedTestCase {
     testGame.getPlayersMutable().add("two");
     Profile profile = new Profile();
     testGame.getProfilesMutable().put("two", profile);
-    assertEquals(VsType.OPPONENT_WITH_PROFILE, testGame.getVsType("one"));
+    assertEquals(VsType.FACEBOOK_OPPONENT, testGame.getVsType("one"));
   }
 
   public void testVsString() {
@@ -129,4 +129,8 @@ public class GameTest extends SharedTestCase {
     assertEquals("id", testGame.minimalGame().getId());
     assertEquals(0, testGame.minimalGame().getActions().size());
   }
+  
+  // todo test photo list
+  
+  // todo test current player profile & opponent profile
 }

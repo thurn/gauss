@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C0444BC18B2B101006275CA /* GameStatusView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C0444BB18B2B101006275CA /* GameStatusView.xib */; };
 		7C1F83B518680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C1F83B818680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
 		7C1F83B918680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
@@ -123,6 +124,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		7C0444BB18B2B101006275CA /* GameStatusView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GameStatusView.xib; sourceTree = "<group>"; };
 		7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libSVGKit-iOS.1.2.0pre.a"; sourceTree = "<group>"; };
 		7C1F834518680F6600D66C78 /* AppleSucksDOMImplementation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleSucksDOMImplementation.h; sourceTree = "<group>"; };
 		7C1F834618680F6600D66C78 /* Attr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Attr.h; sourceTree = "<group>"; };
@@ -568,6 +570,7 @@
 				7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */,
 				7CEB472A18B276A900CDA9EA /* J2obcUtils.h */,
 				7CEB472B18B276A900CDA9EA /* J2obcUtils.m */,
+				7C0444BB18B2B101006275CA /* GameStatusView.xib */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -778,6 +781,7 @@
 				7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */,
 				7C1F83CB1868167F00D66C78 /* background.svg in Resources */,
 				7C1F83C61868115E00D66C78 /* o.svg in Resources */,
+				7C0444BC18B2B101006275CA /* GameStatusView.xib in Resources */,
 				7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */,
 				7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */,
 				7C2E640C18641F3500D34AD0 /* InfoPlist.strings in Resources */,

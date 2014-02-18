@@ -7,6 +7,7 @@
 //
 
 #import "NewGameViewController.h"
+#import "NewLocalGameViewController.h"
 #import "HasModel.h"
 
 @interface NewGameViewController ()
@@ -25,7 +26,25 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  UIView *sendingView = sender;
   [(id <HasModel>)segue.destinationViewController setNTSModel:self.model];
+  switch (sendingView.tag) {
+    case 100: {
+      NewLocalGameViewController *controller =
+          (NewLocalGameViewController*)segue.destinationViewController;
+      controller.playVsComputerMode = NO;
+      break;
+    }
+    case 101: {
+      NewLocalGameViewController *controller =
+          (NewLocalGameViewController*)segue.destinationViewController;
+      controller.playVsComputerMode = YES;
+      break;
+    }
+    default: {
+      @throw @"Unknown sender tag";
+    }
+  }
 }
 
 - (void)didReceiveMemoryWarning

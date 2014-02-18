@@ -10,6 +10,11 @@
 
 @implementation RootViewController
 
+-(void)awakeFromNib {
+  UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
+  self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];

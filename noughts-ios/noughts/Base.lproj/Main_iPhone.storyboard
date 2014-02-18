@@ -111,7 +111,7 @@
                             <constraint firstAttribute="centerY" secondItem="khQ-qh-q60" secondAttribute="centerY" priority="900" id="iW1-eB-ycF"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="noughts" id="uep-Ef-BRl"/>
+                    <navigationItem key="navigationItem" title="Main" id="uep-Ef-BRl"/>
                     <connections>
                         <outlet property="savedGamesButton" destination="e4r-SB-bb9" id="fyJ-1g-eSc"/>
                     </connections>
@@ -175,13 +175,16 @@
                                         <rect key="frame" x="20" y="109" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hA7-hx-29u" userLabel="Play vs Computer">
+                                    <button opaque="NO" tag="101" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hA7-hx-29u" userLabel="Play vs Computer">
                                         <rect key="frame" x="72" y="154" width="157" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <state key="normal" title="Play vs Computer">
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
+                                        <connections>
+                                            <segue destination="SSR-Lv-DBn" kind="push" id="7og-5I-nRB"/>
+                                        </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_vs_computer" translatesAutoresizingMaskIntoConstraints="NO" id="g7j-Ye-Jgy" userLabel="ic_vs_computer">
                                         <rect key="frame" x="20" y="156" width="32" height="32"/>
@@ -279,6 +282,127 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1GB-2k-ags" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="750" y="784"/>
+        </scene>
+        <!--GameVsComputer-->
+        <scene sceneID="1jR-al-Llp">
+            <objects>
+                <viewController id="SSR-Lv-DBn" userLabel="GameVsComputer" customClass="NewLocalGameViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="mVd-zD-bHd"/>
+                        <viewControllerLayoutGuide type="bottom" id="6hd-Cm-y0M"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="eGY-rz-dJH">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rOm-Yd-ERE">
+                                <rect key="frame" x="20" y="64" width="280" height="225"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <subviews>
+                                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="vs." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6P0-zK-0fY">
+                                        <rect key="frame" x="129" y="102" width="22" height="21"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 1" borderStyle="roundedRect" placeholder="Player 1" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aa0-iK-ZBb">
+                                        <rect key="frame" x="0.0" y="163" width="120" height="30"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="120" id="7DH-aM-beS"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="SSR-Lv-DBn" id="39c-N3-TWn"/>
+                                        </connections>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5rf-3x-NRr">
+                                        <rect key="frame" x="160" y="10" width="100" height="100"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="100" id="92H-eV-2OR"/>
+                                            <constraint firstAttribute="width" constant="100" id="lHu-en-Bz3"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oog-Ol-0Xq">
+                                        <rect key="frame" x="10" y="10" width="100" height="100"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="100" id="IO7-2E-i8s"/>
+                                            <constraint firstAttribute="height" constant="100" id="q90-EK-bQg"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                        <state key="normal">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onP1ImageClicked:" destination="SSR-Lv-DBn" eventType="touchUpInside" id="b6V-M6-Adz"/>
+                                        </connections>
+                                    </button>
+                                    <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dcX-ri-bcr">
+                                        <rect key="frame" x="140" y="97" width="140" height="162"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="140" id="hwh-Q6-Mmp"/>
+                                        </constraints>
+                                        <connections>
+                                            <outlet property="dataSource" destination="SSR-Lv-DBn" id="Rym-Dn-WRv"/>
+                                            <outlet property="delegate" destination="SSR-Lv-DBn" id="pD0-7Y-GZ2"/>
+                                        </connections>
+                                    </pickerView>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="oog-Ol-0Xq" firstAttribute="centerX" secondItem="aa0-iK-ZBb" secondAttribute="centerX" id="7Gz-Tm-pRC"/>
+                                    <constraint firstAttribute="centerY" secondItem="6P0-zK-0fY" secondAttribute="centerY" id="Ehs-nL-Xrf"/>
+                                    <constraint firstItem="dcX-ri-bcr" firstAttribute="centerX" secondItem="5rf-3x-NRr" secondAttribute="centerX" id="Hjv-Wv-O6V"/>
+                                    <constraint firstAttribute="centerX" secondItem="6P0-zK-0fY" secondAttribute="centerX" id="Nga-Aa-hnz"/>
+                                    <constraint firstAttribute="bottom" secondItem="aa0-iK-ZBb" secondAttribute="bottom" constant="32" id="YEK-02-FVk"/>
+                                    <constraint firstAttribute="width" constant="280" id="b5R-lt-0sH"/>
+                                    <constraint firstItem="dcX-ri-bcr" firstAttribute="centerY" secondItem="aa0-iK-ZBb" secondAttribute="centerY" id="dVi-fL-EBT"/>
+                                    <constraint firstAttribute="trailing" secondItem="dcX-ri-bcr" secondAttribute="trailing" id="jNq-Rb-AwR"/>
+                                    <constraint firstItem="aa0-iK-ZBb" firstAttribute="leading" secondItem="rOm-Yd-ERE" secondAttribute="leading" id="o6b-pa-hL0"/>
+                                    <constraint firstItem="5rf-3x-NRr" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="10" id="qob-Zv-KeQ"/>
+                                    <constraint firstItem="oog-Ol-0Xq" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="10" id="uCZ-01-2dT"/>
+                                    <constraint firstAttribute="height" constant="225" id="yTf-0g-Z4e"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MRa-jw-XQT">
+                                <rect key="frame" x="97" y="426" width="126" height="42"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <state key="normal" title="Start Game">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="MRa-jw-XQT" firstAttribute="top" relation="greaterThanOrEqual" secondItem="rOm-Yd-ERE" secondAttribute="bottom" constant="25" id="0ba-mI-9Zf"/>
+                            <constraint firstAttribute="centerX" secondItem="MRa-jw-XQT" secondAttribute="centerX" id="CTs-N8-J2W"/>
+                            <constraint firstItem="6hd-Cm-y0M" firstAttribute="top" secondItem="MRa-jw-XQT" secondAttribute="bottom" priority="900" constant="100" id="Pri-eT-0sS"/>
+                            <constraint firstAttribute="centerX" secondItem="rOm-Yd-ERE" secondAttribute="centerX" id="qa0-Gi-IaF"/>
+                            <constraint firstItem="rOm-Yd-ERE" firstAttribute="top" secondItem="mVd-zD-bHd" secondAttribute="bottom" id="vj4-tB-5ll"/>
+                            <constraint firstItem="6hd-Cm-y0M" firstAttribute="top" relation="greaterThanOrEqual" secondItem="MRa-jw-XQT" secondAttribute="bottom" id="xRs-1G-Sg9"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Create" id="aDx-F0-bk3"/>
+                    <connections>
+                        <outlet property="difficultyPicker" destination="dcX-ri-bcr" id="5Bf-wD-zpN"/>
+                        <outlet property="p1Image" destination="oog-Ol-0Xq" id="1BC-m4-gA3"/>
+                        <outlet property="p1TextField" destination="aa0-iK-ZBb" id="Mge-9n-IEO"/>
+                        <outlet property="p2Image" destination="5rf-3x-NRr" id="VxM-oe-lNm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="d05-dg-8Oe" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1294" y="809"/>
         </scene>
         <!--NewLocalGameViewController-->
         <scene sceneID="5wE-Mm-AAz">
@@ -391,10 +515,10 @@
                         <constraints>
                             <constraint firstItem="dou-QV-u8d" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="bottom" constant="30" id="7OF-Wy-BeE"/>
                             <constraint firstAttribute="centerX" secondItem="UcP-Nm-7C7" secondAttribute="centerX" id="99W-t4-Qno"/>
-                            <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" secondItem="yRQ-UO-LQr" secondAttribute="bottom" priority="900" constant="50" id="RZH-ay-1tF"/>
-                            <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" relation="greaterThanOrEqual" secondItem="yRQ-UO-LQr" secondAttribute="bottom" constant="10" id="S7I-MO-ONA"/>
+                            <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" secondItem="yRQ-UO-LQr" secondAttribute="bottom" priority="900" constant="50" id="STY-Yw-S5a"/>
+                            <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" relation="greaterThanOrEqual" secondItem="yRQ-UO-LQr" secondAttribute="bottom" constant="10" id="TuO-wS-WHY"/>
+                            <constraint firstItem="c0t-5Q-3NG" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dou-QV-u8d" secondAttribute="bottom" constant="50" id="ZRU-Dy-RUj"/>
                             <constraint firstAttribute="centerX" secondItem="dou-QV-u8d" secondAttribute="centerX" id="bFt-cf-dv8"/>
-                            <constraint firstItem="c0t-5Q-3NG" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dou-QV-u8d" secondAttribute="bottom" constant="50" id="wDW-rW-JaX"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Create" id="nJz-wm-hB1"/>

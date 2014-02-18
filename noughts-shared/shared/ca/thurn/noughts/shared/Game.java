@@ -28,7 +28,66 @@ public class Game extends Entity implements Comparable<Game> {
     NO_OPPONENT,
     LOCAL_MULTIPLAYER,
     ANONYMOUS_OPPONENT,
-    OPPONENT_WITH_PROFILE
+    FACEBOOK_OPPONENT
+  }
+  
+  /**
+   * Represents the current status of the game.
+   */
+  public static class GameStatus {
+    private final static int NO_PLAYER_NUMBER = -1;
+    private final String statusString;
+    private final String statusPhotoString;
+    private final boolean photoIsUrl;
+    private final int statusColor;
+    
+    private GameStatus(String statusString, String statusPhotoString, boolean photoIsUrl, 
+        int statusColor) {
+      this.statusString = statusString;
+      this.statusPhotoString = statusPhotoString;
+      this.photoIsUrl = photoIsUrl;
+      this.statusColor = statusColor;
+    }
+    
+    /**
+     * @return True if the value for "photo string" corresponds to an image
+     *     URL, false if the value corresponds to a local resource.
+     */
+    public boolean photoIsUrl() {
+      return photoIsUrl;
+    }
+
+    /**
+     * @return True if no player color is associated with the current game state.
+     */
+    public boolean useDefaultColor() {
+      return statusColor == NO_PLAYER_NUMBER;
+    }
+
+    /**
+     * @return A short string describing the current game state.
+     */
+    public String getStatusString() {
+      return statusString;
+    }
+
+    /**
+     * @return An image string for the current game state, either a URL or a
+     *     local resource string depending on the value of photoIsUrl().
+     */
+    public String getStatusPhotoString() {
+      return statusPhotoString;
+    }
+
+    /**
+     * @return The player whose color should be associated with this status.
+     */
+    public int getStatusPlayerColor() {
+      if (useDefaultColor()) {
+        throw new IllegalStateException("No status color, use the default color.");
+      }
+      return statusColor;
+    }
   }
   
   public static class GameDeserializer extends EntityDeserializer<Game> {
@@ -396,10 +455,42 @@ public class Game extends Entity implements Comparable<Game> {
    * @return The profile of your opponent or null if there isn't one.
    */
   public Profile getOpponentProfile(String viewerId) {
+    // todo fetch from local profiles
     int opponentNumber = getOpponentPlayerNumber(viewerId);
     if (opponentNumber == -1) return null;
     String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
     return profiles.get(opponentId);
+  }
+  
+  public Profile getPlayerProfile(Integer playerNumber) {
+    if (localProfiles.containsKey(playerNumber)) {
+      return localProfiles.get(playerNumber);
+    }
+    Profile result = profiles.get(getPlayerIdFromPlayerNumber(playerNumber));
+    if (result != null) {
+      return result;
+    } else {
+      throw new IllegalArgumentException("No profile for player " + playerNumber);
+    }
+  }
+  
+  public GameStatus getGameStatus() {
+    if (isGameOver()) {
+      if (getVictors().size() == 1) {
+        int winnerNumber = getVictors().get(0);
+        Profile winnerProfile = getPlayerProfile(winnerNumber);
+        String winner = winnerProfile.getName();
+        return new GameStatus(winner + " won the game!", winnerProfile.getPhotoString(),
+            !isLocalMultiplayer(), winnerNumber);
+      } else {
+        return new GameStatus("Game over", "game_over", false /* imageIsUrl */,
+            GameStatus.NO_PLAYER_NUMBER);
+      }
+    } else {
+      Profile currentPlayerProfile = getPlayerProfile(getCurrentPlayerNumber());
+      return new GameStatus(currentPlayerProfile.getName() + "'s turn",
+          currentPlayerProfile.getPhotoString(), !isLocalMultiplayer(), getCurrentPlayerNumber());
+    }
   }
   
   /**
@@ -414,7 +505,7 @@ public class Game extends Entity implements Comparable<Game> {
       return VsType.NO_OPPONENT;
     }
     if (getOpponentProfile(viewerId) != null) {
-      return VsType.OPPONENT_WITH_PROFILE;
+      return VsType.FACEBOOK_OPPONENT;
     } else {
       return VsType.ANONYMOUS_OPPONENT;
     }    
@@ -437,7 +528,7 @@ public class Game extends Entity implements Comparable<Game> {
       case NO_OPPONENT: {
         return "vs. (No Opponent Yet)";
       }
-      case OPPONENT_WITH_PROFILE: {
+      case FACEBOOK_OPPONENT: {
         return "vs. " + getOpponentProfile(viewerId).getName();
       }
       default: { // ANONYMOUS_OPPONENT
@@ -517,6 +608,24 @@ public class Game extends Entity implements Comparable<Game> {
     }
     number = duration / ONE_SECOND;
     return timeAgoString(viewerId, number, "second");
+  }
+  
+  /**
+   * @return A list of photo strings to use to represent this game in the game
+   *     list. If the VsType of the game is FACEBOOK_OPPONENT, they will be
+   *     Facebook profile URLs. Otherwise, they will be the names of local
+   *     resources.
+   */
+  public List<String> photoList(String viewerId) {
+    List<String> result = new ArrayList<String>();
+    if (getVsType(viewerId) == VsType.LOCAL_MULTIPLAYER) {
+      for (Profile profile : localProfiles.values()) {
+        result.add(profile.getPhotoString());
+      }
+    } else {
+      result.add(getOpponentProfile(viewerId).getPhotoString());      
+    }
+    return result;
   }
   
   /**

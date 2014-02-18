@@ -11,14 +11,18 @@
 #import "J2obcUtils.h"
 #import "Profile.h"
 
-@interface NewLocalGameViewController () <UITextFieldDelegate>
+@interface NewLocalGameViewController () <UITextFieldDelegate,
+                                          UIPickerViewDataSource,
+                                          UIPickerViewDelegate>
 @property (weak, nonatomic) IBOutlet UITextField *p1TextField;
 @property (weak, nonatomic) IBOutlet UITextField *p2TextField;
 @property (weak, nonatomic) IBOutlet UIButton *p1Image;
 @property (weak, nonatomic) IBOutlet UIButton *p2Image;
+@property (weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
 @property (weak, nonatomic) NTSModel *model;
 @property (nonatomic) BOOL isEditing;
 @property (strong, nonatomic) NSArray *playerImages;
+@property (strong, nonatomic) NSArray *computerImages;
 @property (nonatomic) int p1ImageIndex;
 @property (nonatomic) int p2ImageIndex;
 @end
@@ -28,17 +32,27 @@
 -(void)awakeFromNib {
   self.playerImages = @[@"player_bull", @"player_chick", @"player_cow", @"player_donkey",
                         @"player_goat", @"player_goose", @"player_chicken", @"player_sheep"];
-  self.p1ImageIndex = rand() % [self.playerImages count];
-  self.p2ImageIndex = rand() % [self.playerImages count];
+  self.computerImages = @[@"computer_easy", @"computer_medium", @"computer_hard"];
+  self.p1ImageIndex = arc4random() % [self.playerImages count];
+  self.p2ImageIndex = arc4random() % [self.playerImages count];
   while (self.p1ImageIndex == self.p2ImageIndex) {
     self.p2ImageIndex = rand() % [self.playerImages count];
   }
 }
 
 - (void)viewDidLoad {
+  if (self.playVsComputerMode) {
+    self.p2ImageIndex = 0;
+    [self.difficultyPicker selectRow:self.p2ImageIndex inComponent:0 animated:YES];
+  }
   UIImage *image1 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p1ImageIndex]];
   [self.p1Image setImage:image1 forState:UIControlStateNormal];
-  UIImage *image2 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  UIImage *image2;
+  if (self.playVsComputerMode) {
+    image2 = [UIImage imageNamed:[self.computerImages objectAtIndex:self.p2ImageIndex]];
+  } else {
+    image2 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  }
   [self.p2Image setImage:image2 forState:UIControlStateNormal];
 }
 
@@ -103,14 +117,61 @@
   self.model = model;
 }
 
+- (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
+  return 1;
+}
+
+- (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
+  return 3;
+}
+
+-(UIView*)pickerView:(UIPickerView *)pickerView
+          viewForRow:(NSInteger)row
+        forComponent:(NSInteger)component
+         reusingView:(UIView *)view {
+  UILabel* label = (UILabel*)view;
+  if (!label) {
+    label = [[UILabel alloc] init];
+    [label setFont:[UIFont systemFontOfSize:14]];
+    [label sizeToFit];
+  }
+  label.text = [self labelForDifficultyLevel:row];
+  return label;
+}
+
+- (NSString *)labelForDifficultyLevel:(NSInteger)level {
+  switch (level) {
+    case 0: {
+      return @"Easy Computer";
+    }
+    case 1: {
+      return @"Medium Computer";
+    }
+    case 2: {
+      return @"Difficult Computer";
+    }
+    default: {
+      @throw @"Unknown difficulty level";
+    }
+  }
+}
+
+- (void)pickerView:(UIPickerView *)pickerView
+      didSelectRow:(NSInteger)row
+       inComponent:(NSInteger)component {
+  self.p2ImageIndex = row;
+  UIImage *image = [UIImage imageNamed:[self.computerImages objectAtIndex:self.p2ImageIndex]];
+  [self.p2Image setImage:image forState:UIControlStateNormal];
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   GameViewController *destination = segue.destinationViewController;
   NTSProfile *p1Profile = [NTSProfile new];
   [p1Profile setNameWithNSString:self.p1TextField.text];
-  [p1Profile setPhotoUrlWithNSString:[self.playerImages objectAtIndex:self.p1ImageIndex]];
+  [p1Profile setPhotoStringWithNSString:[self.playerImages objectAtIndex:self.p1ImageIndex]];
   NTSProfile *p2Profile = [NTSProfile new];
   [p2Profile setNameWithNSString:self.p2TextField.text];
-  [p2Profile setPhotoUrlWithNSString:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  [p2Profile setPhotoStringWithNSString:[self.playerImages objectAtIndex:self.p2ImageIndex]];
   NSDictionary *localProfiles = @{@0 : p1Profile,
                                   @1 : p2Profile};
   NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilMap:

@@ -13,7 +13,9 @@
 #import "Model.h"
 #import "Firebase.h"
 #import "Command.h"
+#import "Profile.h"
 #import "Toast+UIView.h"
+#import "java/lang/Integer.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
 @property (weak,nonatomic) NTSModel *model;
@@ -50,6 +52,41 @@
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
+  [self displayGameStatus:self.currentGame];
+}
+
+-(void)displayGameStatus:(NTSGame*)game {
+  NTSGame_GameStatus *status = [self.currentGame getGameStatus];
+  UIColor *color;
+  if ([status useDefaultColor]) {
+    color = [UIColor grayColor];
+  } else {
+    color = [self colorFromPlayerNumber: [status getStatusPlayerColor]];
+  }
+  UIImage *image;
+  if ([status photoIsUrl]) {
+    // TODO: handle urls
+  } else {
+    image = [UIImage imageNamed:[status getStatusPhotoString]];
+  }
+  [self.gameView displayGameStatusWithImage:image
+                                 withString:[status getStatusString]
+                                  withColor:color];
+}
+
+-(UIColor*)colorFromPlayerNumber:(int)playerNumber {
+  switch (playerNumber) {
+    case 0: {
+      return [UIColor blackColor];
+    }
+    case 1: {
+      return [UIColor colorWithRed:203.0/256.0
+                             green:68.0/256.0
+                              blue:55.0/256.0
+                             alpha:1.0];
+    }
+  }
+  return nil;
 }
 
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
@@ -160,6 +197,7 @@
 
 - (void)handleSubmit {
   [self.model submitCurrentActionWithNTSGame:self.currentGame];
+  [self displayGameStatus:self.currentGame];
 }
 
 - (void)handleUndo {

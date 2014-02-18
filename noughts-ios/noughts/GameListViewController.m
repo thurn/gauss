@@ -95,8 +95,29 @@
   NTSGame *game = [self gameForIndexPath:indexPath];
   cell.textLabel.text = [game vsStringWithNSString:[self.model getUserId]];
   cell.detailTextLabel.text = [game lastUpdatedStringWithNSString:[self.model getUserId]];
-  cell.imageView.image = [UIImage imageNamed:@"ic_local_multiplayer"];
+  id <JavaUtilList> photoList = [game photoListWithNSString:[self.model getUserId]];
+  UIImage *image;
+  if ([photoList size] == 2) {
+    image = [self imageForTwoPhotos:photoList];
+  } else {
+    // not implemented;
+    @throw @"remember to do this";
+  }
+  cell.imageView.image = image;
   return cell;
+}
+
+- (UIImage*)imageForTwoPhotos:(id<JavaUtilList>)photoList {
+  NSString *image1Name = [[photoList getWithInt:0] stringByAppendingString:@"_20"];
+  UIImage *image1 = [UIImage imageNamed:image1Name];
+  NSString *image2Name = [[photoList getWithInt:1] stringByAppendingString:@"_20"];
+  UIImage *image2 = [UIImage imageNamed:image2Name];
+  UIGraphicsBeginImageContextWithOptions(CGSizeMake(40,40), NO, 0);
+  [image1 drawAtPoint:CGPointMake(0, 10)];
+  [image2 drawAtPoint:CGPointMake(20, 10)];
+  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
+  UIGraphicsEndImageContext();
+  return result;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
