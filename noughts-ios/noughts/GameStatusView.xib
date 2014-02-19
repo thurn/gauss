@@ -28,8 +28,8 @@
                     <rect key="frame" x="95" y="0.0" width="155" height="75"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xQE-2d-I9d">
-                            <rect key="frame" x="78" y="38" width="0.0" height="0.0"/>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="wordWrap" numberOfLines="3" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" preferredMaxLayoutWidth="155" translatesAutoresizingMaskIntoConstraints="NO" id="xQE-2d-I9d">
+                            <rect key="frame" x="0.0" y="0.0" width="155" height="75"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -38,8 +38,10 @@
                     </subviews>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
-                        <constraint firstAttribute="centerX" secondItem="xQE-2d-I9d" secondAttribute="centerX" id="Fv4-d8-olH"/>
-                        <constraint firstAttribute="centerY" secondItem="xQE-2d-I9d" secondAttribute="centerY" id="wf9-go-cRO"/>
+                        <constraint firstAttribute="bottom" secondItem="xQE-2d-I9d" secondAttribute="bottom" id="Gb7-fj-ai0"/>
+                        <constraint firstAttribute="trailing" secondItem="xQE-2d-I9d" secondAttribute="trailing" id="GrK-ff-pAd"/>
+                        <constraint firstItem="xQE-2d-I9d" firstAttribute="leading" secondItem="56i-nF-IXM" secondAttribute="leading" id="dV6-BM-Pd6"/>
+                        <constraint firstItem="xQE-2d-I9d" firstAttribute="top" secondItem="56i-nF-IXM" secondAttribute="top" id="uRQ-rl-Uhh"/>
                     </constraints>
                 </view>
             </subviews>

@@ -313,7 +313,7 @@
                                             <constraint firstAttribute="width" constant="120" id="7DH-aM-beS"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="SSR-Lv-DBn" id="39c-N3-TWn"/>
                                         </connections>
@@ -380,6 +380,9 @@
                                 <state key="normal" title="Start Game">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <segue destination="kaa-M7-0XV" kind="push" id="43Q-Kf-agi"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
@@ -434,7 +437,7 @@
                                             <constraint firstAttribute="width" constant="120" id="aw7-E5-z8f"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" returnKeyType="done"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="dzj-Dg-VdJ" id="fty-Fe-FAg"/>
                                         </connections>
@@ -446,7 +449,7 @@
                                             <constraint firstAttribute="width" constant="120" id="Dn9-aK-bX5"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="words" returnKeyType="done"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="dzj-Dg-VdJ" id="24v-T4-9xo"/>
                                         </connections>
@@ -603,4 +606,7 @@
         <simulatedOrientationMetrics key="orientation"/>
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
+    <inferredMetricsTieBreakers>
+        <segue reference="43Q-Kf-agi"/>
+    </inferredMetricsTieBreakers>
 </document>

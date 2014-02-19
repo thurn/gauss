@@ -483,7 +483,7 @@ public class Game extends Entity implements Comparable<Game> {
         return new GameStatus(winner + " won the game!", winnerProfile.getPhotoString(),
             !isLocalMultiplayer(), winnerNumber);
       } else {
-        return new GameStatus("Game over", "game_over", false /* imageIsUrl */,
+        return new GameStatus("Game drawn.", "game_over", false /* imageIsUrl */,
             GameStatus.NO_PLAYER_NUMBER);
       }
     } else {

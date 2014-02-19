@@ -11,6 +11,9 @@
 #import "J2obcUtils.h"
 #import "Profile.h"
 
+NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
+NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
+
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
                                           UIPickerViewDelegate>
@@ -20,7 +23,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *p2Image;
 @property (weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
 @property (weak, nonatomic) NTSModel *model;
-@property (nonatomic) BOOL isEditing;
 @property (strong, nonatomic) NSArray *playerImages;
 @property (strong, nonatomic) NSArray *computerImages;
 @property (nonatomic) int p1ImageIndex;
@@ -45,6 +47,15 @@
     self.p2ImageIndex = 0;
     [self.difficultyPicker selectRow:self.p2ImageIndex inComponent:0 animated:YES];
   }
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(keyboardWillBeShown:)
+                                               name:UIKeyboardWillShowNotification
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(keyboardWillBeHidden:)
+                                               name:UIKeyboardWillHideNotification
+                                             object:nil];
   UIImage *image1 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p1ImageIndex]];
   [self.p1Image setImage:image1 forState:UIControlStateNormal];
   UIImage *image2;
@@ -54,6 +65,21 @@
     image2 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
   }
   [self.p2Image setImage:image2 forState:UIControlStateNormal];
+  
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  NSString *p1Name = [userDefaults objectForKey:kP1LocalNameKey];
+  if (!p1Name) {
+    p1Name = @"Player 1";
+  }
+  self.p1TextField.placeholder = p1Name;
+  self.p1TextField.text = p1Name;
+  
+  NSString *p2Name = [userDefaults objectForKey:kP2LocalNameKey];
+  if (!p2Name) {
+    p2Name = @"Player 2";
+  }
+  self.p2TextField.placeholder = p2Name;
+  self.p2TextField.text = p2Name;
 }
 
 - (void)animateViewByDeltaY:(int)deltaY {
@@ -64,24 +90,25 @@
   [UIView commitAnimations];
 }
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField {
-  self.isEditing = true;
+- (void)keyboardWillBeShown:(NSNotification*)aNotification
+{
   [self animateViewByDeltaY:-100];
-
-  __weak UITextField *weakSelf = textField;
-  dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.25 * NSEC_PER_SEC);
-  dispatch_after(delay, dispatch_get_main_queue(), ^{
-    __strong UITextField *strongSelf = weakSelf;
-    UITextRange *range = [strongSelf textRangeFromPosition:strongSelf.beginningOfDocument
-                                                toPosition:strongSelf.endOfDocument];
-    [strongSelf setSelectedTextRange:range];
-  });
 }
 
--(void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-                                        duration:(NSTimeInterval)duration {
-  if (self.isEditing) {
-    [self animateViewByDeltaY:-100];
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification
+{
+  [self animateViewByDeltaY:100];
+}
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+  if ([textField.text isEqualToString:textField.placeholder]) {
+    textField.text = @"";
+  }
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+  if ([textField.text isEqualToString:@""]) {
+    textField.text = textField.placeholder;
   }
 }
 
@@ -101,11 +128,6 @@
   }
   UIImage *image = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
   [sender setImage:image forState:UIControlStateNormal];
-}
-
-- (void)textFieldDidEndEditing:(UITextField *)textField {
-  self.isEditing = false;
-  [self animateViewByDeltaY:100];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -133,13 +155,16 @@
   if (!label) {
     label = [[UILabel alloc] init];
     [label setFont:[UIFont systemFontOfSize:14]];
-    [label sizeToFit];
   }
-  label.text = [self labelForDifficultyLevel:row];
+  label.text = [self nameForDifficultyLevel:row];
   return label;
 }
 
-- (NSString *)labelForDifficultyLevel:(NSInteger)level {
+- (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
+  return 25.0;
+}
+
+- (NSString *)nameForDifficultyLevel:(NSInteger)level {
   switch (level) {
     case 0: {
       return @"Easy Computer";
@@ -164,14 +189,42 @@
   [self.p2Image setImage:image forState:UIControlStateNormal];
 }
 
+- (BOOL)isAllWhitespace:(NSString*)string {
+  NSCharacterSet *whitespace = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+  return [[string stringByTrimmingCharactersInSet:whitespace] length] == 0;
+}
+
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   GameViewController *destination = segue.destinationViewController;
+  NSString *p1Name = self.p1TextField.text;
+  if (!p1Name || [self isAllWhitespace:p1Name]) {
+    p1Name = self.p1TextField.placeholder;
+  }
+  NSString *p2Name = self.p2TextField.text;
+  if (!p2Name || [self isAllWhitespace:p2Name]) {
+    p2Name = self.p2TextField.placeholder;
+  }
+  
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  [userDefaults setObject:p1Name forKey:kP1LocalNameKey];
+  [userDefaults setObject:p2Name forKey:kP2LocalNameKey];
+  [userDefaults synchronize];
+  
   NTSProfile *p1Profile = [NTSProfile new];
-  [p1Profile setNameWithNSString:self.p1TextField.text];
+  [p1Profile setNameWithNSString:p1Name];
   [p1Profile setPhotoStringWithNSString:[self.playerImages objectAtIndex:self.p1ImageIndex]];
   NTSProfile *p2Profile = [NTSProfile new];
-  [p2Profile setNameWithNSString:self.p2TextField.text];
-  [p2Profile setPhotoStringWithNSString:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  if (self.playVsComputerMode) {
+    int difficultyLevel = [self.difficultyPicker selectedRowInComponent:0];
+    [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
+    [p2Profile setPhotoStringWithNSString:[self.computerImages objectAtIndex:difficultyLevel]];
+    [p2Profile setIsComputerPlayerWithBoolean:YES];
+    [p2Profile setComputerDifficultyLevelWithInt:difficultyLevel];
+  } else {
+    [p2Profile setNameWithNSString:p2Name];
+    [p2Profile setPhotoStringWithNSString:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  }
+
   NSDictionary *localProfiles = @{@0 : p1Profile,
                                   @1 : p2Profile};
   NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilMap:

@@ -99,8 +99,12 @@ public abstract class Entity {
     }
   }
   
-  Boolean getBoolean(Map<String, Object> map, String key) {
-    return (Boolean)map.get(key);
+  boolean getBoolean(Map<String, Object> map, String key) {
+    if (map.containsKey(key)) {
+      return (Boolean)map.get(key);
+    } else {
+      return false;
+    }
   }
   
   @SuppressWarnings("unchecked")

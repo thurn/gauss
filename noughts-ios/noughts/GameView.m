@@ -102,6 +102,11 @@
                              options:nil];
     UIView *gameStatusView = [subviewArray objectAtIndex:0];
     gameStatusView.translatesAutoresizingMaskIntoConstraints = NO;
+    UITapGestureRecognizer *singleTap =
+        [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                action:@selector(handleGameStatusTap:)];
+    [gameStatusView addGestureRecognizer:singleTap];
+    
     [self addSubview:gameStatusView];
 
     NSDictionary *views = NSDictionaryOfVariableBindings(gameMenuButton,
@@ -179,6 +184,14 @@
     }];
     }
   });
+}
+
+- (void)handleGameStatusTap:(UITapGestureRecognizer *)recognizer {
+  // Tap game status to dismiss.
+  [UIView animateWithDuration:0.3 animations:^{
+    self.gameStatusConstraint.constant = 75;
+    [self layoutIfNeeded];
+  }];
 }
 
 - (void)visualConstraint:(NSString*)visualFormat
