@@ -8,8 +8,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import ca.thurn.noughts.shared.Action.ActionDeserializer;
+import ca.thurn.uct.core.Copyable;
 
-public class Game extends Entity implements Comparable<Game> {
+public class Game extends Entity implements Comparable<Game>, Copyable {
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
   private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
@@ -159,18 +160,18 @@ public class Game extends Entity implements Comparable<Game> {
   /**
    * True if this game has ended.
    */
-  private Boolean gameOver;
+  private boolean gameOver;
 
   /**
    * True if this game is in local multiplayer mode
    */
-  private Boolean localMultiplayer;
+  private boolean localMultiplayer;
   
   /**
    * True if this is a minimal game representation, as returned by
    * {@link Game#minimalGame()}.
    */
-  private Boolean isMinimal;
+  private boolean isMinimal;
 
   /**
    * An array of player IDs who have resigned the game.
@@ -316,22 +317,22 @@ public class Game extends Entity implements Comparable<Game> {
   }
   
   public boolean isGameOver() {
-    return gameOver != null && gameOver == true;
+    return gameOver;
   }
   
   public boolean isLocalMultiplayer() {
-    return localMultiplayer != null && localMultiplayer == true;
+    return localMultiplayer;
   }
   
   public boolean isMinimal() {
-    return isMinimal != null && isMinimal == true;
+    return isMinimal;
   }
 
-  void setGameOver(Boolean gameOver) {
+  void setGameOver(boolean gameOver) {
     this.gameOver = gameOver;
   }
 
-  void setLocalMultiplayer(Boolean localMultiplayer) {
+  void setLocalMultiplayer(boolean localMultiplayer) {
     this.localMultiplayer = localMultiplayer;
   }
 
@@ -638,5 +639,10 @@ public class Game extends Entity implements Comparable<Game> {
     serialized.remove("currentActionNumber");
     serialized.put("isMinimal", true);
     return new Game(serialized);
+  }
+
+  @Override
+  public Game copy() {
+    return new Game(serialize());
   }
 }

@@ -6,8 +6,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import ca.thurn.noughts.shared.Game.GameDeserializer;
+import ca.thurn.noughts.shared.Game.GameStatus;
+import ca.thurn.uct.algorithm.MonteCarloSearch;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -44,6 +48,8 @@ public class Model implements ChildEventListener {
    */
   public static interface GameUpdateListener {
     public void onGameUpdate(Game game);
+    
+    public void onGameStatusChanged(GameStatus status);
   }
   
   /**
@@ -108,14 +114,16 @@ public class Model implements ChildEventListener {
   
   private final String userId;
   private final Firebase firebase;
-  private final Map<String, ValueEventListener> gameUpdateListeners;
+  private final Map<String, ValueEventListener> valueEventListeners;
+  private final Map<String, GameUpdateListener> gameUpdateListeners;
+  private final Map<String, Game> userGameList;
   private GameListListener gameListListener;
-  private Map<String, Game> userGameList;
   
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
-    gameUpdateListeners = new HashMap<String, ValueEventListener>();    
+    valueEventListeners = new HashMap<String, ValueEventListener>();
+    gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     userGameList = new HashMap<String, Game>();
     firebase.child("users").child(userId).child("games").addChildEventListener(this);    
   }
@@ -145,12 +153,12 @@ public class Model implements ChildEventListener {
    * @param gameId The ID of the game.
    * @param listener The listener to add.
    */
-  public void setGameUpdateListener(String gameId, final GameUpdateListener listener) {
+  public void setGameUpdateListener(final String gameId, final GameUpdateListener listener) {
     if (gameId == null || listener == null) {
       throw new IllegalArgumentException("Null argument to setGameUpdateListener");
     }
-    if (gameUpdateListeners.containsKey(gameId)) {
-      gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
+    if (valueEventListeners.containsKey(gameId)) {
+      gameReference(gameId).removeEventListener(valueEventListeners.get(gameId));
     }
     ValueEventListener valueListener = gameReference(gameId).addValueEventListener(
         new ValueEventListener() {
@@ -170,7 +178,8 @@ public class Model implements ChildEventListener {
         }
       }
     });
-    gameUpdateListeners.put(gameId, valueListener);
+    valueEventListeners.put(gameId, valueListener);
+    gameUpdateListeners.put(gameId, listener);
   }
 
   
@@ -180,10 +189,10 @@ public class Model implements ChildEventListener {
    * @param gameId ID of game to remove listener for.
    */
   public void removeGameUpdateListener(String gameId) {
-    if (gameUpdateListeners.containsKey(gameId)) {
-      gameReference(gameId).removeEventListener(gameUpdateListeners.get(gameId));
+    if (valueEventListeners.containsKey(gameId)) {
+      gameReference(gameId).removeEventListener(valueEventListeners.get(gameId));
     }
-    gameUpdateListeners.remove(gameId);
+    valueEventListeners.remove(gameId);
   }
   
   /**
@@ -320,7 +329,7 @@ public class Model implements ChildEventListener {
     ensureIsNotMinimal(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
     final long timestamp = Clock.getInstance().currentTimeMillis();
-    mutateCanonicalGame(game, new GameMutation() {
+    GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game game) {
         game.setLastModified(timestamp);
         if (game.hasCurrentAction()) {
@@ -336,12 +345,14 @@ public class Model implements ChildEventListener {
           game.setCurrentActionNumber(game.getActions().size() - 1);
         }
       }
-    });
+    };
+    mutateCanonicalGame(game, mutation);
     mutateGameLists(game, new GameMutation() {
       @Override public void mutate(Game game) {
         game.setLastModified(timestamp);        
       }
     });
+    mutation.mutate(game);
   }
 
   /**
@@ -416,10 +427,12 @@ public class Model implements ChildEventListener {
     if (!canSubmit(game)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
-    final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
+    final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER; 
+    
     // mark move submitted in advance to make computeVictors() work.
     game.currentAction().setSubmitted(true);
     final List<Integer> victors = computeVictors(game);
+
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game game) {
         if (!game.isMinimal()) {
@@ -440,6 +453,61 @@ public class Model implements ChildEventListener {
     mutateCanonicalGame(game, mutation);
     mutateGameLists(game, mutation);
     mutation.mutate(game);
+    if (gameUpdateListeners.containsKey(game.getId())) {
+      gameUpdateListeners.get(game.getId()).onGameStatusChanged(game.getGameStatus());
+    }
+    handleComputerAction(game);
+  }
+
+  /**
+   * Checks if it is the computer's turn in this game, and performs the
+   * appropriate computer move if it is.
+   * 
+   * @param game Game to check.
+   */
+  public void handleComputerAction(final Game game) {
+    if (game.isGameOver()) return;
+    Profile currentProfile = game.getPlayerProfile(game.getCurrentPlayerNumber());
+    if (currentProfile.isComputerPlayer()) {
+      final ComputerState computerState = new ComputerState();
+      computerState.initializeFrom(game);
+      int numSimulations;
+      switch (currentProfile.getComputerDifficultyLevel()) {
+        case 0: {
+          // ~70% player win rate
+          numSimulations = 10;
+          break;
+        }
+        case 1: {
+          // ~50% player win rate
+          numSimulations = 100;
+          break;
+        }
+        case 2: {
+          // ~10% player win rate
+          numSimulations = 1000;
+          break;
+        }
+        default: {
+          throw die("Unknown difficulty level");
+        }
+      }
+      final MonteCarloSearch agent = MonteCarloSearch.builder(new ComputerState())
+          .setNumSimulations(numSimulations)
+          .build();
+      int player = computerState.convertPlayerNumber(game.getCurrentPlayerNumber());
+      agent.beginAsynchronousSearch(player, computerState);
+      Timer timer = new Timer();
+      timer.schedule(new TimerTask() {
+        @Override public void run() {
+          long action = agent.getAsynchronousSearchResult().getAction();
+          System.out.println("AI picks action " + computerState.actionToString(action));        
+          Command command = computerState.longToCommand(action);
+          addCommand(game, command);
+          submitCurrentAction(game);
+        }
+      }, 4000L);
+    }
   }
   
   /**

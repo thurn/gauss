@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.thurn.noughts.shared.Game.GameStatus;
 import ca.thurn.noughts.shared.Model.GameUpdateListener;
+import ca.thurn.noughts.shared.Profile.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 import com.firebase.client.Firebase;
@@ -17,12 +19,18 @@ public class ModelTest extends SharedTestCase {
   private String userId;
   private Firebase firebase;
 
+  private static abstract class NoStatusGameUpdateListener implements GameUpdateListener {
+    @Override
+    public void onGameStatusChanged(GameStatus status) {
+    }
+  }
+  
   @Override
   public void sharedSetUp(final Runnable done) {
     firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase firebase) {
-        userId = randomInteger() + "";
+        userId = "id" + randomInteger();
         model = new Model(userId, firebase);
         done.run();        
       }
@@ -65,9 +73,10 @@ public class ModelTest extends SharedTestCase {
     Map<String, Profile> profiles = new HashMap<String, Profile>();
     Profile profile = new Profile();
     profile.setName("John");
+    profile.setPronoun(Pronoun.NEUTRAL);
     profiles.put(userId, profile);
-    String id = model.newGame(profiles);    
-    model.setGameUpdateListener(id, new GameUpdateListener() {
+    String id = model.newGame(profiles);
+    model.setGameUpdateListener(id, new NoStatusGameUpdateListener() {
       @Override
       public void onGameUpdate(Game game) {
         assertTrue(game.getPlayersMutable().contains(userId));
@@ -97,7 +106,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertNotNull(game);
@@ -134,7 +143,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(0, (int)game.getCurrentActionNumber());
@@ -184,7 +193,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(123L, (long)game.getLastModified());
@@ -293,7 +302,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(1, (int)game.getCurrentPlayerNumber());
@@ -332,11 +341,13 @@ public class ModelTest extends SharedTestCase {
     beginAsyncTestBlock();
     final Game game = newGameWithCurrentCommand();
     game.setLocalMultiplayer(true);
+    game.getPlayersMutable().clear();
+    game.getPlayersMutable().add(userId);
     game.getPlayersMutable().add(userId);
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(userId, game.currentPlayerId());
@@ -354,6 +365,14 @@ public class ModelTest extends SharedTestCase {
     final Game game = newGame();
     game.getPlayersMutable().add(userId);
     game.getPlayersMutable().add("o");
+    game.getProfilesMutable().put(userId, new Profile(map(
+        "name", "User",
+        "pronoun", "MALE"
+        )));
+    game.getProfilesMutable().put("o", new Profile(map(
+        "name", "Opponent",
+        "pronoun", "FEMALE"
+        )));    
     game.getActionsMutable().addAll(list(
       action(0, 0, 2),
       action(1, 1, 1),
@@ -369,7 +388,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertNull(game.getCurrentPlayerNumber());
@@ -392,7 +411,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(), game.currentAction().getCommandsMutable());
@@ -416,7 +435,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(command), game.currentAction().getCommandsMutable());
@@ -466,7 +485,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new GameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertTrue(game.getResignedPlayers().contains(userId));
@@ -600,13 +619,26 @@ public class ModelTest extends SharedTestCase {
   private Game newGameWithCurrentCommand() {
     return newGame(map(
         "currentPlayerNumber", 0,
-        "players", list(userId),
+        "players", list(userId, "opponentId"),
+        "gameOver", false,
+        "localMultiplayer", false,
+        "isMinimal", false,
         "actions", list(map(
           "commands", list(map(
             "column", 2,
             "row", 1
           ))
         )),
+        "profiles", map(
+          userId, map(
+            "name", "User",
+            "pronoun", "MALE"
+          ),
+          "opponentId", map(
+            "name", "Opponent",
+            "pronoun", "FEMALE"
+          )
+        ),
         "lastModified", 123L,
         "currentActionNumber", 0
         ));

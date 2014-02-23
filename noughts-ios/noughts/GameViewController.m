@@ -52,11 +52,11 @@
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
-  [self displayGameStatus:self.currentGame];
+  [self displayGameStatus:[self.currentGame getGameStatus]];
+  [self.model handleComputerActionWithNTSGame:self.currentGame];
 }
 
--(void)displayGameStatus:(NTSGame*)game {
-  NTSGame_GameStatus *status = [self.currentGame getGameStatus];
+-(void)displayGameStatus:(NTSGame_GameStatus*)status {
   UIColor *color;
   if ([status useDefaultColor]) {
     color = [UIColor grayColor];
@@ -178,9 +178,13 @@
   }
 }
 
-- (void)onGameUpdateWithNTSGame:(NTSGame *)game {
+- (void)onGameUpdateWithNTSGame:(NTSGame*)game {
   self.currentGame = game;
   [self.gameView drawGame: game];
+}
+
+- (void)onGameStatusChangedWithNTSGame_GameStatus:(NTSGame_GameStatus*)status {
+  [self displayGameStatus:status];
 }
 
 - (BOOL)canSubmit {
@@ -197,7 +201,6 @@
 
 - (void)handleSubmit {
   [self.model submitCurrentActionWithNTSGame:self.currentGame];
-  [self displayGameStatus:self.currentGame];
 }
 
 - (void)handleUndo {

@@ -100,10 +100,10 @@ public abstract class Entity {
   }
   
   boolean getBoolean(Map<String, Object> map, String key) {
-    if (map.containsKey(key)) {
-      return (Boolean)map.get(key);
-    } else {
+    if (!map.containsKey(key) || map.get(key) == null) {
       return false;
+    } else {
+      return ((Boolean)map.get(key));
     }
   }
   

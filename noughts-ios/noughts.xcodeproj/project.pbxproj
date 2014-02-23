@@ -8,6 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		7C0444BC18B2B101006275CA /* GameStatusView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C0444BB18B2B101006275CA /* GameStatusView.xib */; };
+		7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C218B73124006275CA /* MonteCarloSearch.java */; };
+		7C0444D218B73124006275CA /* NegamaxSearch.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C318B73124006275CA /* NegamaxSearch.java */; };
+		7C0444D318B73124006275CA /* UctSearch.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C418B73124006275CA /* UctSearch.java */; };
+		7C0444D418B73124006275CA /* ActionScore.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C618B73124006275CA /* ActionScore.java */; };
+		7C0444D518B73124006275CA /* ActionTree.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C718B73124006275CA /* ActionTree.java */; };
+		7C0444D618B73124006275CA /* Agent.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C818B73124006275CA /* Agent.java */; };
+		7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C918B73124006275CA /* AgentEvaluator.java */; };
+		7C0444D818B73124006275CA /* AsynchronousAgent.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CA18B73124006275CA /* AsynchronousAgent.java */; };
+		7C0444D918B73124006275CA /* Copyable.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CB18B73124006275CA /* Copyable.java */; };
+		7C0444DA18B73124006275CA /* Evaluator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CC18B73124006275CA /* Evaluator.java */; };
+		7C0444DB18B73124006275CA /* Main.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CD18B73124006275CA /* Main.java */; };
+		7C0444DC18B73124006275CA /* Player.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CE18B73124006275CA /* Player.java */; };
+		7C0444DD18B73124006275CA /* State.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444CF18B73124006275CA /* State.java */; };
+		7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444D018B73124006275CA /* WinLossEvaluator.java */; };
+		7C0444E018B73139006275CA /* ComputerState.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444DF18B73139006275CA /* ComputerState.java */; };
 		7C1F83B518680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C1F83B818680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
 		7C1F83B918680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
@@ -125,6 +140,21 @@
 
 /* Begin PBXFileReference section */
 		7C0444BB18B2B101006275CA /* GameStatusView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GameStatusView.xib; sourceTree = "<group>"; };
+		7C0444C218B73124006275CA /* MonteCarloSearch.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = MonteCarloSearch.java; sourceTree = "<group>"; };
+		7C0444C318B73124006275CA /* NegamaxSearch.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = NegamaxSearch.java; sourceTree = "<group>"; };
+		7C0444C418B73124006275CA /* UctSearch.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = UctSearch.java; sourceTree = "<group>"; };
+		7C0444C618B73124006275CA /* ActionScore.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ActionScore.java; sourceTree = "<group>"; };
+		7C0444C718B73124006275CA /* ActionTree.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ActionTree.java; sourceTree = "<group>"; };
+		7C0444C818B73124006275CA /* Agent.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Agent.java; sourceTree = "<group>"; };
+		7C0444C918B73124006275CA /* AgentEvaluator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AgentEvaluator.java; sourceTree = "<group>"; };
+		7C0444CA18B73124006275CA /* AsynchronousAgent.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AsynchronousAgent.java; sourceTree = "<group>"; };
+		7C0444CB18B73124006275CA /* Copyable.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Copyable.java; sourceTree = "<group>"; };
+		7C0444CC18B73124006275CA /* Evaluator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Evaluator.java; sourceTree = "<group>"; };
+		7C0444CD18B73124006275CA /* Main.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Main.java; sourceTree = "<group>"; };
+		7C0444CE18B73124006275CA /* Player.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Player.java; sourceTree = "<group>"; };
+		7C0444CF18B73124006275CA /* State.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = State.java; sourceTree = "<group>"; };
+		7C0444D018B73124006275CA /* WinLossEvaluator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = WinLossEvaluator.java; sourceTree = "<group>"; };
+		7C0444DF18B73139006275CA /* ComputerState.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ComputerState.java; sourceTree = "<group>"; };
 		7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libSVGKit-iOS.1.2.0pre.a"; sourceTree = "<group>"; };
 		7C1F834518680F6600D66C78 /* AppleSucksDOMImplementation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppleSucksDOMImplementation.h; sourceTree = "<group>"; };
 		7C1F834618680F6600D66C78 /* Attr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Attr.h; sourceTree = "<group>"; };
@@ -352,6 +382,43 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7C0444C018B73124006275CA /* uct */ = {
+			isa = PBXGroup;
+			children = (
+				7C0444C118B73124006275CA /* algorithm */,
+				7C0444C518B73124006275CA /* core */,
+			);
+			path = uct;
+			sourceTree = "<group>";
+		};
+		7C0444C118B73124006275CA /* algorithm */ = {
+			isa = PBXGroup;
+			children = (
+				7C0444C218B73124006275CA /* MonteCarloSearch.java */,
+				7C0444C318B73124006275CA /* NegamaxSearch.java */,
+				7C0444C418B73124006275CA /* UctSearch.java */,
+			);
+			path = algorithm;
+			sourceTree = "<group>";
+		};
+		7C0444C518B73124006275CA /* core */ = {
+			isa = PBXGroup;
+			children = (
+				7C0444C618B73124006275CA /* ActionScore.java */,
+				7C0444C718B73124006275CA /* ActionTree.java */,
+				7C0444C818B73124006275CA /* Agent.java */,
+				7C0444C918B73124006275CA /* AgentEvaluator.java */,
+				7C0444CA18B73124006275CA /* AsynchronousAgent.java */,
+				7C0444CB18B73124006275CA /* Copyable.java */,
+				7C0444CC18B73124006275CA /* Evaluator.java */,
+				7C0444CD18B73124006275CA /* Main.java */,
+				7C0444CE18B73124006275CA /* Player.java */,
+				7C0444CF18B73124006275CA /* State.java */,
+				7C0444D018B73124006275CA /* WinLossEvaluator.java */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
 		7C1F834018680F6600D66C78 /* SVGKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -624,6 +691,7 @@
 		7C8EF5DD1866577F0075D0C1 /* thurn */ = {
 			isa = PBXGroup;
 			children = (
+				7C0444C018B73124006275CA /* uct */,
 				7C8EF5DE1866577F0075D0C1 /* noughts */,
 			);
 			path = thurn;
@@ -641,6 +709,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7C0444DF18B73139006275CA /* ComputerState.java */,
 				7CEB472818B275B100CDA9EA /* Profile.java */,
 				7C92C02918920FD800DF8816 /* Clock.java */,
 				7C69CD38187908BB0040AD75 /* GameListPartitions.java */,
@@ -805,15 +874,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C0444E018B73139006275CA /* ComputerState.java in Sources */,
+				7C0444DC18B73124006275CA /* Player.java in Sources */,
 				7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
+				7C0444D818B73124006275CA /* AsynchronousAgent.java in Sources */,
 				7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */,
+				7C0444DB18B73124006275CA /* Main.java in Sources */,
+				7C0444DA18B73124006275CA /* Evaluator.java in Sources */,
+				7C0444D318B73124006275CA /* UctSearch.java in Sources */,
 				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
 				7C69776518ADA6D50073BA7D /* Toast+UIView.m in Sources */,
+				7C0444D218B73124006275CA /* NegamaxSearch.java in Sources */,
+				7C0444DD18B73124006275CA /* State.java in Sources */,
+				7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */,
+				7C0444D418B73124006275CA /* ActionScore.java in Sources */,
+				7C0444D918B73124006275CA /* Copyable.java in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */,
+				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
 				7CEB472918B275B100CDA9EA /* Profile.java in Sources */,
@@ -823,6 +904,7 @@
 				7C8EF6EC18667EAC0075D0C1 /* Command.java in Sources */,
 				7C8EF6E618667E700075D0C1 /* Entity.java in Sources */,
 				7C92C02A18920FD800DF8816 /* Clock.java in Sources */,
+				7C0444D518B73124006275CA /* ActionTree.java in Sources */,
 				7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */,
 				7C8EF76418668E120075D0C1 /* MutableData.java in Sources */,
 				7C8EF6F618668CB40075D0C1 /* Game.java in Sources */,
@@ -832,8 +914,10 @@
 				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF6F418668CB40075D0C1 /* Action.java in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
+				7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */,
 				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C72157F186F232500F1188B /* GameListViewController.m in Sources */,
+				7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */,
 				7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
 				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
