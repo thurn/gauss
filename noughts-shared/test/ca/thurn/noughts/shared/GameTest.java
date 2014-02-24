@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared;
 
-import ca.thurn.noughts.shared.Game.VsType;
+import static ca.thurn.noughts.shared.ModelTest.map;
+import static ca.thurn.noughts.shared.ModelTest.list;
 import ca.thurn.noughts.shared.Profile.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
@@ -11,6 +12,15 @@ public class GameTest extends SharedTestCase {
     g1.setLastModified(100L);
     g2.setLastModified(200L);
     assertTrue(g1.compareTo(g2) > 0);
+  }
+  
+  public void testCurrentAction() {
+    Game test = new Game("foo");
+    assertFalse(test.hasCurrentAction());
+    test.setCurrentActionNumber(0);
+    test.getActionsMutable().add(new Action(0));
+    assertTrue(test.hasCurrentAction());
+    assertEquals(0, test.currentAction().getPlayerNumber());
   }
 
   public void testLastUpdatedString() {
@@ -59,7 +69,7 @@ public class GameTest extends SharedTestCase {
     testGame.getPlayersMutable().add("viewerId");
     testGame.getPlayersMutable().add("opponentId");
     testGame.getVictorsMutable().add(1);
-    Profile opponentProfile = new Profile();
+    Profile opponentProfile = new Profile("Opponent");
     opponentProfile.setPronoun(Pronoun.FEMALE);
     testGame.getProfilesMutable().put("opponentId", opponentProfile);
     testGame.setLastModified(currentTime);
@@ -81,26 +91,51 @@ public class GameTest extends SharedTestCase {
     testGame.getPlayersMutable().add("opponentId");
     assertEquals(1, testGame.getOpponentPlayerNumber("viewerId"));
     testGame = new Game("two");
-    assertEquals(-1, testGame.getOpponentPlayerNumber("viewerId"));
+    try {
+      testGame.getOpponentPlayerNumber("viewerId");
+      fail();
+    } catch (IllegalStateException expected) {}
   }
   
-  public void testVsType() {
-    Game testGame = new Game("one");
-    testGame.setLocalMultiplayer(true);
-    assertEquals(VsType.LOCAL_MULTIPLAYER, testGame.getVsType(""));
-    testGame = new Game("two");
-    testGame.getPlayersMutable().add("one");
-    assertEquals(VsType.NO_OPPONENT, testGame.getVsType(""));
-    testGame = new Game("three");
-    testGame.getPlayersMutable().add("one");
-    testGame.getPlayersMutable().add("two");
-    assertEquals(VsType.ANONYMOUS_OPPONENT, testGame.getVsType(""));
-    testGame = new Game("four");
-    testGame.getPlayersMutable().add("one");
-    testGame.getPlayersMutable().add("two");
-    Profile profile = new Profile();
-    testGame.getProfilesMutable().put("two", profile);
-    assertEquals(VsType.FACEBOOK_OPPONENT, testGame.getVsType("one"));
+  public void testGetOpponentProfile() {
+    Game g1 = new Game("g1");
+    g1.getPlayersMutable().add("user");
+    g1.getPlayersMutable().add("user");
+    g1.getProfilesMutable().put("user", new Profile("John"));
+    try {
+      g1.getOpponentProfile("user");
+      fail();
+    } catch (IllegalStateException expected) {}
+    
+    Game g2 = new Game("g2");
+    g2.getPlayersMutable().add("user1");
+    g2.getPlayersMutable().add("user2");
+    g2.getProfilesMutable().put("user2", new Profile("John"));
+    g2.getLocalProfilesMutable().put(1, new Profile("Jane"));
+    assertEquals("Jane", g2.getOpponentProfile("user1").getName());
+    
+    Game g3 = new Game("g3");
+    g3.getPlayersMutable().add("user1");
+    g3.getPlayersMutable().add("user2");
+    g3.getProfilesMutable().put("user2", new Profile("John"));
+    assertEquals("John", g3.getOpponentProfile("user1").getName());
+    
+    try {
+      g3.getOpponentProfile("user2");
+      fail();
+    } catch (IllegalStateException expected) {}
+  }
+  
+  public void testGetPlayerProfile() {
+    
+  }
+  
+  public void testGetPlayerNumbersForPlayerId() {
+    Game test = new Game("one");
+    test.getPlayersMutable().add("viewerid");
+    test.getPlayersMutable().add("viewerid");
+    assertEquals(0, (int)test.getPlayerNumbersForPlayerId("viewerid").get(0));
+    assertEquals(1, (int)test.getPlayerNumbersForPlayerId("viewerid").get(1));
   }
 
   public void testVsString() {
@@ -110,15 +145,10 @@ public class GameTest extends SharedTestCase {
     testGame = new Game("two");
     testGame.getPlayersMutable().add("one");
     assertEquals("vs. (No Opponent Yet)", testGame.vsString(""));
-    testGame = new Game("three");
-    testGame.getPlayersMutable().add("one");
-    testGame.getPlayersMutable().add("two");
-    assertEquals("vs. Anonymous", testGame.vsString(""));
     testGame = new Game("four");
     testGame.getPlayersMutable().add("one");
     testGame.getPlayersMutable().add("two");
-    Profile profile = new Profile();
-    profile.setName("GivenName");
+    Profile profile = new Profile("GivenName");
     testGame.getProfilesMutable().put("two", profile);
     assertEquals("vs. GivenName", testGame.vsString("one"));
   }
@@ -130,7 +160,46 @@ public class GameTest extends SharedTestCase {
     assertEquals(0, testGame.minimalGame().getActions().size());
   }
   
-  // todo test photo list
+  public void testHasOpponent() {
+    Game test = new Game("id");
+    assertFalse(test.hasOpponent("user"));
+    test.getPlayersMutable().add("user");
+    assertFalse(test.hasOpponent("user"));
+    test.getPlayersMutable().add("user");
+    assertFalse(test.hasOpponent("user"));
+    test.getPlayersMutable().clear();
+    test.getPlayersMutable().add("user");
+    test.getPlayersMutable().add("other");
+    assertTrue(test.hasOpponent("user"));
+  }
   
-  // todo test current player profile & opponent profile
+  public void testPhotoList() {
+    Game testGame = new Game(map(
+      "players", list("userid", "opponentid"),
+      "currentPlayerNumber", 0,
+      "profiles", map(
+        "opponentid", map(
+          "pronoun", "NEUTRAL",
+          "photoString", "thestring"
+        )
+      )
+    ));
+    assertEquals("thestring", testGame.photoList("userid").get(0));
+  }
+  
+  public void testPhotoListLocalMultiplayer() {
+    // do this
+  }
+  
+  public void testPhotoListNoOpponent() {
+    // do this too
+  }
+  
+  public void testGameStatus() {
+    
+  }
+  
+  public void testGameStatusGameOver() {
+    
+  }
 }

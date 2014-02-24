@@ -60,8 +60,7 @@ public class ModelTest extends SharedTestCase {
       }
     });
     Map<Integer, Profile> localProfiles = new HashMap<Integer, Profile>();
-    Profile profile = new Profile();
-    profile.setName("John");
+    Profile profile = new Profile("John");
     localProfiles.put(0, profile);
     String id = model.newLocalMultiplayerGame(localProfiles);
     assertFalse(id.equals(""));
@@ -71,8 +70,7 @@ public class ModelTest extends SharedTestCase {
   public void testNewGameGameUpdate() {
     beginAsyncTestBlock();
     Map<String, Profile> profiles = new HashMap<String, Profile>();
-    Profile profile = new Profile();
-    profile.setName("John");
+    Profile profile = new Profile("John");
     profile.setPronoun(Pronoun.NEUTRAL);
     profiles.put(userId, profile);
     String id = model.newGame(profiles);
@@ -149,7 +147,7 @@ public class ModelTest extends SharedTestCase {
             assertEquals(0, (int)game.getCurrentActionNumber());
             assertTrue(game.getLastModified() > 0);
             Action action = game.currentAction();
-            assertEquals(new Integer(0), action.getPlayerNumber());
+            assertEquals(0, action.getPlayerNumber());
             assertFalse(action.isSubmitted());
             assertEquals(game.getId(), action.getGameId());
             assertEquals(1, action.getCommandsMutable().size());
@@ -624,6 +622,7 @@ public class ModelTest extends SharedTestCase {
         "localMultiplayer", false,
         "isMinimal", false,
         "actions", list(map(
+          "playerNumber", 0,
           "commands", list(map(
             "column", 2,
             "row", 1
@@ -663,7 +662,7 @@ public class ModelTest extends SharedTestCase {
         .setValue(game.minimalGame().serialize());
   }
   
-  private final <T> List<T> list(T... objects) {
+  final static <T> List<T> list(T... objects) {
     List<T> result = new ArrayList<T>();
     for (T t : objects) {
       result.add(t);
@@ -671,7 +670,7 @@ public class ModelTest extends SharedTestCase {
     return result;
   }
   
-  private Map<String, Object> map(Object... objects) {
+  static Map<String, Object> map(Object... objects) {
     Map<String, Object> result = new HashMap<String, Object>();
     for (int i = 0; i < objects.length; i += 2) {
       result.put(objects[i].toString(), objects[i + 1]);

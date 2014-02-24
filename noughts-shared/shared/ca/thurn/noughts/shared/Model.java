@@ -601,8 +601,8 @@ public class Model implements ChildEventListener {
       Action action2 = actionTable[lines[i][1][0]][lines[i][1][1]];
       Action action3 = actionTable[lines[i][2][0]][lines[i][2][1]];
       if (action1 != null && action2 != null && action3 != null &&
-          action1.getPlayerNumber().equals(action2.getPlayerNumber()) &&
-          action2.getPlayerNumber().equals(action3.getPlayerNumber())) {
+          action1.getPlayerNumber() == action2.getPlayerNumber() &&
+          action2.getPlayerNumber() == action3.getPlayerNumber()) {
         List<Integer> result = new ArrayList<Integer>();
         result.add(action1.getPlayerNumber());
         return result;

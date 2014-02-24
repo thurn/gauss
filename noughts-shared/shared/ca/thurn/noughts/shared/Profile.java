@@ -17,14 +17,15 @@ public class Profile extends Entity {
     NEUTRAL
   }
 
-  private String name;
+  private final String name;
   private String photoString;
   private Pronoun pronoun;
   private boolean isComputerPlayer;
   private Integer computerDifficultyLevel;
   
-  public Profile() {
+  public Profile(String name) {
     this.pronoun = Pronoun.NEUTRAL;
+    this.name = name;
   }
   
   public Profile(Map<String, Object> map) {
@@ -55,40 +56,76 @@ public class Profile extends Entity {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
   public String getPhotoString() {
     return photoString;
   }
 
-  public void setPhotoString(String photoString) {
+  public Profile setPhotoString(String photoString) {
     this.photoString = photoString;
+    return this;
   }
 
   public Pronoun getPronoun() {
     return pronoun;
   }
+  
+  /**
+   * @param capitalize Whether to capitalize the word.
+   * @return The correct singular nominative pronoun for this user.
+   */
+  public String getNominativePronoun(boolean capitalize) {
+    switch (pronoun) {
+      case MALE: {
+        return capitalize ? "He" : "he";
+      }
+      case FEMALE: {
+        return capitalize ? "She" : "she";
+      }
+      default: {
+        return capitalize ? "They" : "they";
+      }
+    }
+  }
+  
+  /**
+   * @param capitalize Whether to capitalize the word.
+   * @return The correct singular objective pronoun for this user.
+   */  
+  public String getObjectivePronoun(boolean capitalize) {
+    switch (pronoun) {
+      case MALE: {
+        return capitalize ? "Him" : "him";
+      }
+      case FEMALE: {
+        return capitalize ? "Her" : "her";
+      }
+      default: {
+        return capitalize ? "Them" : "them";
+      }
+    }
+  }
 
-  public void setPronoun(Pronoun pronoun) {
+  public Profile setPronoun(Pronoun pronoun) {
     this.pronoun = pronoun;
+    return this;
   }
 
   public boolean isComputerPlayer() {
     return isComputerPlayer;
   }
 
-  public void setIsComputerPlayer(boolean isComputerPlayer) {
+  public Profile setIsComputerPlayer(boolean isComputerPlayer) {
     this.isComputerPlayer = isComputerPlayer;
+    return this;
   }
 
   public Integer getComputerDifficultyLevel() {
     return computerDifficultyLevel;
   }
 
-  public void setComputerDifficultyLevel(int computerDifficultyLevel) {
+  public Profile setComputerDifficultyLevel(int computerDifficultyLevel) {
     this.computerDifficultyLevel = computerDifficultyLevel;
+    return this;
   }
 
 }

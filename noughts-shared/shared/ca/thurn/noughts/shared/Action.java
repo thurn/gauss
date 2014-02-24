@@ -16,7 +16,7 @@ public class Action extends Entity {
     }    
   }
   
-  private final Integer playerNumber;
+  private final int playerNumber;
   
   private String gameId;
   
@@ -60,11 +60,12 @@ public class Action extends Entity {
     return submitted != null && submitted == true;
   }
 
-  void setSubmitted(Boolean submitted) {
+  Action setSubmitted(Boolean submitted) {
     this.submitted = submitted;
+    return this;
   }
 
-  public Integer getPlayerNumber() {
+  public int getPlayerNumber() {
     return playerNumber;
   }
 
@@ -72,8 +73,9 @@ public class Action extends Entity {
     return gameId;
   }
 
-  void setGameId(String gameId) {
+  Action setGameId(String gameId) {
     this.gameId = gameId;
+    return this;
   }
 
   public List<Command> getCommands() {

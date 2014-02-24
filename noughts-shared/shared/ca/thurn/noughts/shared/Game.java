@@ -11,6 +11,8 @@ import ca.thurn.noughts.shared.Action.ActionDeserializer;
 import ca.thurn.uct.core.Copyable;
 
 public class Game extends Entity implements Comparable<Game>, Copyable {
+  private static final String GAME_OVER_PHOTO_STRING = "game_over";
+  private static final String NO_OPPONENT_PHOTO_STRING = "no_opponent";
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
   private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
@@ -24,13 +26,6 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   private static final long ONE_MONTH = (long)WEEKS * ONE_WEEK;
   private static final long MONTHS = 12;
   private static final long ONE_YEAR = MONTHS * ONE_MONTH;
-  
-  public static enum VsType {
-    NO_OPPONENT,
-    LOCAL_MULTIPLAYER,
-    ANONYMOUS_OPPONENT,
-    FACEBOOK_OPPONENT
-  }
   
   /**
    * Represents the current status of the game.
@@ -91,6 +86,44 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     }
   }
   
+  /**
+   * Represents a game entry in the game list.
+   */
+  public static class GameListEntry {
+    private final String vsString;
+    private final String modifiedString;
+    private final List<PhotoString> photoStrings;
+    
+    private GameListEntry(String vsString, String modifiedString,
+        List<PhotoString> photoStrings) {
+      this.vsString = vsString;
+      this.modifiedString = modifiedString;
+      this.photoStrings = photoStrings;
+    }
+    
+    /**
+     * @return A short string describing who the players are in this game.
+     */
+    public String getVsString() {
+      return vsString;
+    }
+
+    /**
+     * @return A short string describing the current status of this game and
+     *     when it was last modified.
+     */
+    public String getModifiedString() {
+      return modifiedString;
+    }
+
+    /**
+     * @return A list of photo strings of players in this game.
+     */
+    public List<PhotoString> getPhotoStrings() {
+      return photoStrings;
+    }
+  }
+  
   public static class GameDeserializer extends EntityDeserializer<Game> {
     @Override 
     public Game deserialize(Map<String, Object> map) {
@@ -123,7 +156,7 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
 
   /**
    * The number of the player whose turn it is, that is, their index within
-   * the players array. -1 when the game is not in progress.
+   * the players array. Null when the game is not in progress.
    */
   private Integer currentPlayerNumber;
 
@@ -277,37 +310,6 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return result;
   }
 
-  /**
-   * @return The ID of the current player
-   */
-  public String currentPlayerId() {
-    if (getCurrentPlayerNumber() == null) return null;
-    return getPlayerIdFromPlayerNumber(currentPlayerNumber);
-  }
-  
-  /**
-   * @param playerNumber A player's player number
-   * @return That player's player ID
-   */
-  public String getPlayerIdFromPlayerNumber(int playerNumber) {
-    return players.get(playerNumber);
-  }
-  
-  /**
-   * @param playerId A player ID
-   * @return All player numbers (if any) associated with this player ID
-   */
-  public List<Integer> getPlayerNumbersForPlayerId(String playerId) {
-    if (playerId == null) throw new IllegalArgumentException("Null playerId");
-    List<Integer> results = new ArrayList<Integer>();
-    for (int i = 0; i < players.size(); ++i) {
-      if (players.get(i).equals(playerId)) {
-        results.add(i);
-      }
-    }
-    return results;
-  }
-
   public boolean hasCurrentAction() {
     return getCurrentActionNumber() != null;
   }
@@ -328,12 +330,14 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return isMinimal;
   }
 
-  void setGameOver(boolean gameOver) {
+  Game setGameOver(boolean gameOver) {
     this.gameOver = gameOver;
+    return this;
   }
 
-  void setLocalMultiplayer(boolean localMultiplayer) {
+  Game setLocalMultiplayer(boolean localMultiplayer) {
     this.localMultiplayer = localMultiplayer;
+    return this;
   }
 
   public String getId() {
@@ -368,8 +372,9 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return currentPlayerNumber;
   }
 
-  void setCurrentPlayerNumber(Integer currentPlayerNumber) {
+  Game setCurrentPlayerNumber(Integer currentPlayerNumber) {
     this.currentPlayerNumber = currentPlayerNumber;
+    return this;
   }
 
   public List<Action> getActions() {
@@ -384,24 +389,27 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return currentActionNumber;
   }
 
-  void setCurrentActionNumber(Integer currentActionNumber) {
+  Game setCurrentActionNumber(Integer currentActionNumber) {
     this.currentActionNumber = currentActionNumber;
+    return this;
   }
 
   public Long getLastModified() {
     return lastModified;
   }
 
-  void setLastModified(Long lastModified) {
+  Game setLastModified(Long lastModified) {
     this.lastModified = lastModified;
+    return this;
   }
 
   public String getRequestId() {
     return requestId;
   }
 
-  void setRequestId(String requestId) {
+  Game setRequestId(String requestId) {
     this.requestId = requestId;
+    return this;
   }
   
   public List<Integer> getVictors() {
@@ -437,33 +445,108 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   }
 
   /**
+   * @return The ID of the current player, or null if there is no current
+   *     player.
+   */
+  public String currentPlayerId() {
+    if (getCurrentPlayerNumber() == null) return null;
+    return getPlayerIdFromPlayerNumber(currentPlayerNumber);
+  }
+  
+  /**
+   * @param playerNumber A player's player number
+   * @return That player's player ID
+   * @throw {@link IndexOutOfBoundsException} if the player number is not
+   *     currently in the game.
+   */
+  public String getPlayerIdFromPlayerNumber(int playerNumber) {
+    return players.get(playerNumber);
+  }
+  
+  /**
+   * @param playerId A player ID
+   * @return All player numbers (if any) associated with this player ID
+   */
+  public List<Integer> getPlayerNumbersForPlayerId(String playerId) {
+    if (playerId == null) throw new IllegalArgumentException("Null playerId");
+    List<Integer> results = new ArrayList<Integer>();
+    for (int i = 0; i < players.size(); ++i) {
+      if (players.get(i).equals(playerId)) {
+        results.add(i);
+      }
+    }
+    return results;
+  }
+  
+  /**
    * @param viewerId viewer's player ID
-   * @return The player number of your opponent or -1 if there isn't one. 
+   * @return True if there is an opponent in this game who is distinct from
+   *     the viewer. False if there's no opponent or the viewer is playing
+   *     both sides in this game. 
+   */
+  public boolean hasOpponent(String viewerId) {
+    return players.size() == 2 && !players.get(0).equals(players.get(1));
+  }
+
+  /**
+   * @param viewerId viewer's player ID
+   * @return The player number of your opponent.
+   * @throw IllegalStateException If there is no opponent as defined by
+   *     {@link Game#hasOpponent(String)}.
    */
   public int getOpponentPlayerNumber(String viewerId) {
-    List<Integer> playerNumbers = getPlayerNumbersForPlayerId(viewerId);
-    if (playerNumbers.size() != 1 || players.size() < 2){
-      return -1;
-    } else if (playerNumbers.get(0) == 0){
+    if (!hasOpponent(viewerId)) {
+      throw new IllegalStateException("No opponent or viewer is both players.");
+    } else if (players.get(0).equals(viewerId)) {
       return 1;
     } else {
       return 0;
     }
   }
+  
+  /**
+   *
+   * @param viewerId viewer's player ID
+   * @return True if the game has an opponent who has a profile, false
+   *     otherwise.
+   */
+  public boolean hasOpponentProfile(String viewerId) {
+    if (!hasOpponent(viewerId)) return false;
+    int opponentNumber = getOpponentPlayerNumber(viewerId);
+    if (localProfiles.containsKey(opponentNumber)) {
+      return true;
+    }
+    String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
+    return profiles.containsKey(opponentId);
+  }
 
   /**
    * @param viewerId viewer's player ID
-   * @return The profile of your opponent or null if there isn't one.
+   * @return The profile of your opponent or null if there isn't one. Local
+   *     profiles take precedence over regular profiles.
+   * @throw IllegalStateException If there is no opponent as defined by
+   *     {@link Game#hasOpponent(String)} or there is no opponent profile.
    */
   public Profile getOpponentProfile(String viewerId) {
-    // todo fetch from local profiles
+    if (!hasOpponentProfile(viewerId)) {
+      throw new IllegalStateException("No opponent profile found.");
+    }
     int opponentNumber = getOpponentPlayerNumber(viewerId);
-    if (opponentNumber == -1) return null;
-    String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
-    return profiles.get(opponentId);
+    if (localProfiles.containsKey(opponentNumber)) {
+      return localProfiles.get(opponentNumber);
+    } else {
+      String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
+      return profiles.get(opponentId);
+    }
   }
-  
-  public Profile getPlayerProfile(Integer playerNumber) {
+
+  /**
+   * @param playerNumber A player number current in this game.
+   * @return The Profile object for that player, with local profiles taking
+   *     precedence over regular profiles.
+   * @throw IllegalArgumentException If there is no profile for this player.
+   */
+  public Profile getPlayerProfile(int playerNumber) {
     if (localProfiles.containsKey(playerNumber)) {
       return localProfiles.get(playerNumber);
     }
@@ -475,6 +558,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     }
   }
   
+  /**
+   * @return A GameStatus object summarizing whose turn it is in the game (or
+   *     if the game is over), along with an associated photo string and player
+   *     number.
+   */
   public GameStatus getGameStatus() {
     if (isGameOver()) {
       if (getVictors().size() == 1) {
@@ -484,60 +572,46 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
         return new GameStatus(winner + " won the game!", winnerProfile.getPhotoString(),
             !isLocalMultiplayer(), winnerNumber);
       } else {
-        return new GameStatus("Game drawn.", "game_over", false /* imageIsUrl */,
+        return new GameStatus("Game drawn.", GAME_OVER_PHOTO_STRING, false /* photoIsUrl */,
             GameStatus.NO_PLAYER_NUMBER);
       }
     } else {
       Profile currentPlayerProfile = getPlayerProfile(getCurrentPlayerNumber());
       return new GameStatus(currentPlayerProfile.getName() + "'s turn",
-          currentPlayerProfile.getPhotoString(), !isLocalMultiplayer(), getCurrentPlayerNumber());
+          currentPlayerProfile.getPhotoString(), !isLocalMultiplayer() /* photoIsUrl*/,
+          getCurrentPlayerNumber());
     }
-  }
-  
-  /**
-   * @param viewerId viewer's player ID
-   * @return A VsType corresponding to the type of opponent this game has.
-   */
-  public VsType getVsType(String viewerId) {
-    if (isLocalMultiplayer()) {
-      return VsType.LOCAL_MULTIPLAYER;
-    }
-    if (players.size() < 2) {
-      return VsType.NO_OPPONENT;
-    }
-    if (getOpponentProfile(viewerId) != null) {
-      return VsType.FACEBOOK_OPPONENT;
-    } else {
-      return VsType.ANONYMOUS_OPPONENT;
-    }    
   }
 
   /**
    * @param viewerId viewer's player ID
    * @return A string describing the opponent of this game, such as
-   * "vs. Frank".
+   *     "vs. Frank".
    */
   public String vsString(String viewerId) {
-    switch (getVsType(viewerId)) {
-      case LOCAL_MULTIPLAYER: {
-        if (localProfiles.size() == 2) {
-          return localProfiles.get(0).getName() + " vs. " + localProfiles.get(1).getName();
-        } else {
-          return "Local Multiplayer Game";
-        }
+    if (isLocalMultiplayer()) {
+      if (localProfiles.size() == 2) {
+        return localProfiles.get(0).getName() + " vs. " + localProfiles.get(1).getName();
+      } else {
+        return "Local Multiplayer Game";
       }
-      case NO_OPPONENT: {
-        return "vs. (No Opponent Yet)";
-      }
-      case FACEBOOK_OPPONENT: {
-        return "vs. " + getOpponentProfile(viewerId).getName();
-      }
-      default: { // ANONYMOUS_OPPONENT
-        return "vs. Anonymous";
-      }
+    }
+    else if (hasOpponentProfile(viewerId)) {
+      return "vs. " + getOpponentProfile(viewerId).getName();
+    } else {
+      return "vs. (No Opponent Yet)";
     }
   }
   
+  /**
+   * @param viewerId Viewer's ID.
+   * @param number The number of "unit"s ago the game was last modified.
+   * @param unit The unit. For example, if the game was modified 3 hours ago,
+   *     "unit" should be "hour" and "number" should be "3".
+   * @return A string describing the status of the game in the past tense,
+   *     along with how long ago the last update was. For example: "He won 3
+   *     hours ago".
+   */
   private String timeAgoString(String viewerId, long number, String unit) {
     String statusString;
     if (isGameOver()) {
@@ -550,13 +624,9 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
         } else if (playerNumbers.size() == 1 && victors.contains(playerNumbers.get(0))) {
           statusString = "You won";
         } else if (victors.contains(getOpponentPlayerNumber(viewerId))){
-          Profile opponentProfile = getOpponentProfile(viewerId);
-          if (opponentProfile != null && 
-              opponentProfile.getPronoun() == Profile.Pronoun.MALE) {
-            statusString = "He won";
-          } else if (opponentProfile != null && 
-              opponentProfile.getPronoun() == Profile.Pronoun.FEMALE) {
-            statusString = "She won";
+          if (hasOpponentProfile(viewerId)) {
+            Profile opponentProfile = getOpponentProfile(viewerId);
+            statusString = opponentProfile.getNominativePronoun(true /* capitalize */) + " won";
           } else {
             statusString = "They won";
           }
@@ -577,8 +647,8 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
 
   /**
    * @param viewerId viewer's player ID
-   * @return A string describing the last state of the game, such as "updated 1
-   * second ago" or "You won 4 years ago". 
+   * @return A string describing the last state of the game, such as "Updated 1
+   *     second ago" or "You won 4 years ago". 
    */
   public String lastUpdatedString(String viewerId) {
     long duration = Math.max(Clock.getInstance().currentTimeMillis() - lastModified, 0);
@@ -613,18 +683,21 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   
   /**
    * @return A list of photo strings to use to represent this game in the game
-   *     list. If the VsType of the game is FACEBOOK_OPPONENT, they will be
-   *     Facebook profile URLs. Otherwise, they will be the names of local
-   *     resources.
+   *     list.
    */
   public List<String> photoList(String viewerId) {
     List<String> result = new ArrayList<String>();
-    if (getVsType(viewerId) == VsType.LOCAL_MULTIPLAYER) {
+    if (isLocalMultiplayer()) {
       for (Profile profile : localProfiles.values()) {
         result.add(profile.getPhotoString());
       }
     } else {
-      result.add(getOpponentProfile(viewerId).getPhotoString());      
+      if (hasOpponentProfile(viewerId)) {
+        result.add(getOpponentProfile(viewerId).getPhotoString());      
+      } else {
+        result.add(NO_OPPONENT_PHOTO_STRING);
+      }
+      
     }
     return result;
   }
@@ -641,6 +714,9 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return new Game(serialized);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public Game copy() {
     return new Game(serialize());
