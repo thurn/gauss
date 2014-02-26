@@ -6,7 +6,7 @@ import java.util.Map;
 public class Command extends Entity {
   public static class CommandDeserializer extends EntityDeserializer<Command> {
     @Override
-    public Command deserialize(Map<String, Object> commandMap) {
+    Command deserialize(Map<String, Object> commandMap) {
       return new Command(commandMap);
     }    
   }
@@ -20,19 +20,21 @@ public class Command extends Entity {
     this.row = row;
   }
 
-  public Command(Map<String, Object> commandMap) {
+  private Command(Map<String, Object> commandMap) {
+    checkExists(commandMap, "column");
     column = getInteger(commandMap, "column");
+    checkExists(commandMap, "row");
     row = getInteger(commandMap, "row");
   }
 
   @Override
-  public Map<String, Object> serialize() {
+  Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("column", getColumn());
     result.put("row", getRow());
     return result;
   }
-
+  
   @Override
   public String entityName() {
     return "Command";

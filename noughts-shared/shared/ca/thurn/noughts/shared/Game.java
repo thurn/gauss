@@ -5,14 +5,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import ca.thurn.noughts.shared.Action.ActionDeserializer;
+import ca.thurn.noughts.shared.ImageString.ImageType;
 import ca.thurn.uct.core.Copyable;
 
 public class Game extends Entity implements Comparable<Game>, Copyable {
-  private static final String GAME_OVER_PHOTO_STRING = "game_over";
-  private static final String NO_OPPONENT_PHOTO_STRING = "no_opponent";
+  public static final ImageString GAME_OVER_IMAGE_STRING = 
+      new ImageString("game_over", ImageType.LOCAL);
+  public static final ImageString NO_OPPONENT_IMAGE_STRING = 
+      new ImageString("no_oppoent", ImageType.LOCAL);
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
   private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
@@ -26,38 +27,33 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   private static final long ONE_MONTH = (long)WEEKS * ONE_WEEK;
   private static final long MONTHS = 12;
   private static final long ONE_YEAR = MONTHS * ONE_MONTH;
-  
+
+  public static class GameDeserializer extends EntityDeserializer<Game> {
+    @Override 
+    Game deserialize(Map<String, Object> gameMap) {
+      return new Game(gameMap);
+    }    
+  }  
+
   /**
    * Represents the current status of the game.
    */
   public static class GameStatus {
-    private final static int NO_PLAYER_NUMBER = -1;
     private final String statusString;
-    private final String statusPhotoString;
-    private final boolean photoIsUrl;
-    private final int statusColor;
+    private final ImageString statusImageString;
+    private final Integer statusPlayer;
     
-    private GameStatus(String statusString, String statusPhotoString, boolean photoIsUrl, 
-        int statusColor) {
+    private GameStatus(String statusString, ImageString statusImageString, Integer statusPlayer) {
       this.statusString = statusString;
-      this.statusPhotoString = statusPhotoString;
-      this.photoIsUrl = photoIsUrl;
-      this.statusColor = statusColor;
-    }
-    
-    /**
-     * @return True if the value for "photo string" corresponds to an image
-     *     URL, false if the value corresponds to a local resource.
-     */
-    public boolean photoIsUrl() {
-      return photoIsUrl;
+      this.statusImageString = statusImageString;
+      this.statusPlayer = statusPlayer;
     }
 
     /**
-     * @return True if no player color is associated with the current game state.
+     * @return True if there's a player associated with this status.
      */
-    public boolean useDefaultColor() {
-      return statusColor == NO_PLAYER_NUMBER;
+    public boolean hasStatusPlayer() {
+      return statusPlayer != null;
     }
 
     /**
@@ -69,20 +65,20 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
 
     /**
      * @return An image string for the current game state, either a URL or a
-     *     local resource string depending on the value of photoIsUrl().
+     *     local resource string depending on the value of imageIsUrl().
      */
-    public String getStatusPhotoString() {
-      return statusPhotoString;
+    public ImageString getStatusImageString() {
+      return statusImageString;
     }
 
     /**
-     * @return The player whose color should be associated with this status.
+     * @return The player who should be associated with this status.
      */
-    public int getStatusPlayerColor() {
-      if (useDefaultColor()) {
-        throw new IllegalStateException("No status color, use the default color.");
+    public int getStatusPlayer() {
+      if (!hasStatusPlayer()) {
+        throw new IllegalStateException("No status player.");
       }
-      return statusColor;
+      return statusPlayer;
     }
   }
   
@@ -92,13 +88,13 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   public static class GameListEntry {
     private final String vsString;
     private final String modifiedString;
-    private final List<PhotoString> photoStrings;
+    private final List<ImageString> imageStrings;
     
     private GameListEntry(String vsString, String modifiedString,
-        List<PhotoString> photoStrings) {
+        List<ImageString> imageStrings) {
       this.vsString = vsString;
       this.modifiedString = modifiedString;
-      this.photoStrings = photoStrings;
+      this.imageStrings = imageStrings;
     }
     
     /**
@@ -117,18 +113,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     }
 
     /**
-     * @return A list of photo strings of players in this game.
+     * @return A list of image strings of players in this game.
      */
-    public List<PhotoString> getPhotoStrings() {
-      return photoStrings;
+    public List<ImageString> getImageStrings() {
+      return imageStrings;
     }
-  }
-  
-  public static class GameDeserializer extends EntityDeserializer<Game> {
-    @Override 
-    public Game deserialize(Map<String, Object> map) {
-      return new Game(map);
-    }    
   }
   
   /**
@@ -139,7 +128,7 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   /**
    * An array of the players in the game, which can be though of as a bimap
    * from Player Number to Player ID. A player who leaves the game will have
-   * her entry in this array replaced with null.
+   * their entry in this array replaced with null.
    */
   private final List<String> players;
 
@@ -149,10 +138,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   private final Map<String, Profile> profiles;
   
   /**
-   * A mapping from player numbers to profile information about the player,
-   * takes precedence over ID-based profiles.
+   * List of player profiles in the same order as the player list, these
+   * profiles takes precedence over the ID-based profiles above. Null
+   * indicates a missing profile.
    */
-  private final Map<Integer, Profile> localProfiles;
+  private final List<Profile> localProfiles;
 
   /**
    * The number of the player whose turn it is, that is, their index within
@@ -207,107 +197,61 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   private boolean isMinimal;
 
   /**
-   * An array of player IDs who have resigned the game.
+   * An array of player numbers who have resigned the game.
    */
-  private final List<String> resignedPlayers;
+  private final List<Integer> resignedPlayers;
   
   public Game(String id) {
     players = new ArrayList<String>();
     profiles = new HashMap<String, Profile>();
-    localProfiles = new HashMap<Integer, Profile>();
+    localProfiles = new ArrayList<Profile>();
     actions = new ArrayList<Action>();
     victors = new ArrayList<Integer>();
-    resignedPlayers = new ArrayList<String>();
+    resignedPlayers = new ArrayList<Integer>();
     this.id = id;
   }
 
-  public Game(Map<String, Object> gameMap) {
+  private Game(Map<String, Object> gameMap) {
+    checkExists(gameMap, "id");
     id = getString(gameMap, "id");
     players = getList(gameMap, "players");
-    profiles = extractProfiles(gameMap);
-    localProfiles = extractLocalProfiles(gameMap);
-    setCurrentPlayerNumber(getInteger(gameMap, "currentPlayerNumber"));
-    actions = getEntities(gameMap, "actions", new ActionDeserializer());
-    setCurrentActionNumber(getInteger(gameMap, "currentActionNumber"));
-    setLastModified(getLong(gameMap, "lastModified"));
-    setRequestId(getString(gameMap, "requestId"));
+    profiles = getEntityMap(gameMap, "profiles", new Profile.ProfileDeserializer());
+    localProfiles = getEntities(gameMap, "localProfiles", new Profile.ProfileDeserializer());
+    currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
+    actions = getEntities(gameMap, "actions", new Action.ActionDeserializer());
+    currentActionNumber = getInteger(gameMap, "currentActionNumber");
+    lastModified = getLong(gameMap, "lastModified");
+    requestId = getString(gameMap, "requestId");
     victors = getIntegerList(getList(gameMap, "victors"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
     isMinimal = getBoolean(gameMap, "isMinimal");
-    resignedPlayers = getList(gameMap, "resignedPlayers");
-  }
-
-  @SuppressWarnings("unchecked")
-  private Map<String, Profile> extractProfiles(Map<String, Object> gameMap) {
-    Map<String, Profile> result = new HashMap<String, Profile>();
-    if (gameMap.containsKey("profiles")) {
-      Map<String, Object> profilesMap = (Map<String, Object>)gameMap.get("profiles");
-      for(Entry<String, Object> entry : profilesMap.entrySet()) {
-        Map<String, Object> profileObject = (Map<String, Object>)entry.getValue();
-        result.put(entry.getKey(), new Profile(profileObject));
-      }
-    }
-    return result;    
+    resignedPlayers = getIntegerList(getList(gameMap, "resignedPlayers"));
   }
   
-  private Map<String, Object> serializeProfiles() {
+  @Override
+  Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    for (Entry<String, Profile> entry : profiles.entrySet()) {
-      result.put(entry.getKey(), entry.getValue().serialize());
-    }
+    result.put("id", getId());
+    result.put("players", getPlayers());
+    result.put("profiles", serializeEntityMap(getProfiles()));
+    result.put("localProfiles", serializeEntities(getLocalProfiles()));
+    result.put("currentPlayerNumber", getCurrentPlayerNumber());
+    result.put("actions", serializeEntities(getActions()));
+    result.put("currentActionNumber", getCurrentActionNumber());
+    result.put("lastModified", getLastModified());
+    result.put("requestId", getRequestId());
+    result.put("victors", getVictors());
+    result.put("gameOver", isGameOver());
+    result.put("localMultiplayer", isLocalMultiplayer());
+    result.put("isMinimal", isMinimal());
+    result.put("resignedPlayers", getResignedPlayers());
     return result;
-  }
-  
-  @SuppressWarnings("unchecked")
-  private Map<Integer, Profile> extractLocalProfiles(Map<String, Object> gameMap) {
-    Map<Integer, Profile> result = new HashMap<Integer, Profile>();
-    if (gameMap.containsKey("localProfiles")) {
-      List<Object> mapProfiles = (List<Object>)gameMap.get("localProfiles");
-      for (int i = 0; i < mapProfiles.size(); ++i) {
-        Map<String, Object> localProfile = (Map<String, Object>)mapProfiles.get(i);
-        if (localProfile != null) {
-          result.put(i, new Profile(localProfile));
-        }
-      }
-    }
-    return result;    
-  }
-  
-  private List<Object> serializeLocalProfiles() {
-    List<Object> result = new ArrayList<Object>();
-    for (int i = 0; i < localProfiles.size(); ++i) {
-      result.add(null);
-    }
-    for (Entry<Integer, Profile> entry : localProfiles.entrySet()) {
-      result.set(entry.getKey(), entry.getValue().serialize());
-    }
-    return result;
-  }
+  } 
   
   @Override
   public String entityName() {
     return "Game";
-  }
-  
-  @Override 
-  public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
-    result.put("id", getId());
-    result.put("players", getPlayersMutable());
-    result.put("profiles", serializeProfiles());
-    result.put("localProfiles", serializeLocalProfiles());
-    result.put("currentPlayerNumber", getCurrentPlayerNumber());
-    result.put("actions", serializeEntities(getActionsMutable()));
-    result.put("currentActionNumber", getCurrentActionNumber());
-    result.put("lastModified", getLastModified());
-    result.put("requestId", getRequestId());
-    result.put("victors", getVictorsMutable());
-    result.put("gameOver", gameOver);
-    result.put("localMultiplayer", localMultiplayer);
-    result.put("isMinimal", isMinimal);
-    result.put("resignedPlayers", getResignedPlayersMutable());
-    return result;
   }
 
   public boolean hasCurrentAction() {
@@ -360,11 +304,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return profiles;
   }
   
-  public Map<Integer, Profile> getLocalProfiles() {
-    return Collections.unmodifiableMap(getLocalProfilesMutable());
+  public List<Profile> getLocalProfiles() {
+    return Collections.unmodifiableList(getLocalProfilesMutable());
   }
   
-  Map<Integer, Profile> getLocalProfilesMutable() {
+  List<Profile> getLocalProfilesMutable() {
     return localProfiles;
   }
 
@@ -420,11 +364,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
     return victors;
   }
   
-  public List<String> getResignedPlayers() {
+  public List<Integer> getResignedPlayers() {
     return Collections.unmodifiableList(getResignedPlayersMutable());
   }
 
-  List<String> getResignedPlayersMutable() {
+  List<Integer> getResignedPlayersMutable() {
     return resignedPlayers;
   }
 
@@ -450,24 +394,28 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    */
   public String currentPlayerId() {
     if (getCurrentPlayerNumber() == null) return null;
-    return getPlayerIdFromPlayerNumber(currentPlayerNumber);
+    return playerIdFromPlayerNumber(currentPlayerNumber);
   }
   
   /**
    * @param playerNumber A player's player number
    * @return That player's player ID
-   * @throw {@link IndexOutOfBoundsException} if the player number is not
-   *     currently in the game.
+   * @throws IllegalArgumentException if the player number is not currently in
+   *     the game.
    */
-  public String getPlayerIdFromPlayerNumber(int playerNumber) {
-    return players.get(playerNumber);
+  public String playerIdFromPlayerNumber(int playerNumber) {
+    try {
+      return players.get(playerNumber);
+    } catch (IndexOutOfBoundsException exception) {
+      throw new IllegalArgumentException(exception);
+    }
   }
   
   /**
    * @param playerId A player ID
    * @return All player numbers (if any) associated with this player ID
    */
-  public List<Integer> getPlayerNumbersForPlayerId(String playerId) {
+  public List<Integer> playerNumbersForPlayerId(String playerId) {
     if (playerId == null) throw new IllegalArgumentException("Null playerId");
     List<Integer> results = new ArrayList<Integer>();
     for (int i = 0; i < players.size(); ++i) {
@@ -491,10 +439,10 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   /**
    * @param viewerId viewer's player ID
    * @return The player number of your opponent.
-   * @throw IllegalStateException If there is no opponent as defined by
+   * @throws IllegalStateException If there is no opponent as defined by
    *     {@link Game#hasOpponent(String)}.
    */
-  public int getOpponentPlayerNumber(String viewerId) {
+  public int opponentPlayerNumber(String viewerId) {
     if (!hasOpponent(viewerId)) {
       throw new IllegalStateException("No opponent or viewer is both players.");
     } else if (players.get(0).equals(viewerId)) {
@@ -505,6 +453,28 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   }
   
   /**
+   * @param playerNumber A player number.
+   * @return True if the provided player has a local profile.
+   */
+  public boolean hasLocalProfile(int playerNumber) {
+    if (playerNumber < 0 || playerNumber >= localProfiles.size()) return false;
+    return localProfiles.get(playerNumber) != null;
+  }
+  
+  /**
+   * @param playerNumber A player number.
+   * @return The local profile for this player.
+   * @throws IllegalArgumentException if this player does not have a local
+   *     profile as defined by {@link Game#hasLocalProfile(int)}.
+   */
+  public Profile getLocalProfile(int playerNumber) {
+    if (!hasLocalProfile(playerNumber)) {
+      throw new IllegalArgumentException("No profile for player " + playerNumber);
+    }
+    return localProfiles.get(playerNumber);
+  }
+  
+  /**
    *
    * @param viewerId viewer's player ID
    * @return True if the game has an opponent who has a profile, false
@@ -512,11 +482,11 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    */
   public boolean hasOpponentProfile(String viewerId) {
     if (!hasOpponent(viewerId)) return false;
-    int opponentNumber = getOpponentPlayerNumber(viewerId);
-    if (localProfiles.containsKey(opponentNumber)) {
+    int opponentNumber = opponentPlayerNumber(viewerId);
+    if (hasLocalProfile(opponentNumber)) {
       return true;
     }
-    String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
+    String opponentId = playerIdFromPlayerNumber(opponentNumber);
     return profiles.containsKey(opponentId);
   }
 
@@ -524,18 +494,18 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    * @param viewerId viewer's player ID
    * @return The profile of your opponent or null if there isn't one. Local
    *     profiles take precedence over regular profiles.
-   * @throw IllegalStateException If there is no opponent as defined by
+   * @throws IllegalStateException If there is no opponent as defined by
    *     {@link Game#hasOpponent(String)} or there is no opponent profile.
    */
-  public Profile getOpponentProfile(String viewerId) {
+  public Profile opponentProfile(String viewerId) {
     if (!hasOpponentProfile(viewerId)) {
       throw new IllegalStateException("No opponent profile found.");
     }
-    int opponentNumber = getOpponentPlayerNumber(viewerId);
-    if (localProfiles.containsKey(opponentNumber)) {
-      return localProfiles.get(opponentNumber);
+    int opponentNumber = opponentPlayerNumber(viewerId);
+    if (hasLocalProfile(opponentNumber)) {
+      return getLocalProfile(opponentNumber);
     } else {
-      String opponentId = getPlayerIdFromPlayerNumber(opponentNumber);
+      String opponentId = playerIdFromPlayerNumber(opponentNumber);
       return profiles.get(opponentId);
     }
   }
@@ -544,13 +514,13 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    * @param playerNumber A player number current in this game.
    * @return The Profile object for that player, with local profiles taking
    *     precedence over regular profiles.
-   * @throw IllegalArgumentException If there is no profile for this player.
+   * @throws IllegalArgumentException If there is no profile for this player.
    */
-  public Profile getPlayerProfile(int playerNumber) {
-    if (localProfiles.containsKey(playerNumber)) {
-      return localProfiles.get(playerNumber);
+  public Profile playerProfile(int playerNumber) {
+    if (hasLocalProfile(playerNumber)) {
+      return getLocalProfile(playerNumber);
     }
-    Profile result = profiles.get(getPlayerIdFromPlayerNumber(playerNumber));
+    Profile result = profiles.get(playerIdFromPlayerNumber(playerNumber));
     if (result != null) {
       return result;
     } else {
@@ -560,27 +530,29 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   
   /**
    * @return A GameStatus object summarizing whose turn it is in the game (or
-   *     if the game is over), along with an associated photo string and player
+   *     if the game is over), along with an associated image string and player
    *     number.
    */
-  public GameStatus getGameStatus() {
+  public GameStatus gameStatus() {
     if (isGameOver()) {
       if (getVictors().size() == 1) {
         int winnerNumber = getVictors().get(0);
-        Profile winnerProfile = getPlayerProfile(winnerNumber);
+        Profile winnerProfile = playerProfile(winnerNumber);
         String winner = winnerProfile.getName();
-        return new GameStatus(winner + " won the game!", winnerProfile.getPhotoString(),
-            !isLocalMultiplayer(), winnerNumber);
+        return new GameStatus(winner + " won the game!", winnerProfile.getImageString(),
+            winnerNumber);
       } else {
-        return new GameStatus("Game drawn.", GAME_OVER_PHOTO_STRING, false /* photoIsUrl */,
-            GameStatus.NO_PLAYER_NUMBER);
+        return new GameStatus("Game drawn.", GAME_OVER_IMAGE_STRING, null /* statusPlayer */);
       }
     } else {
-      Profile currentPlayerProfile = getPlayerProfile(getCurrentPlayerNumber());
+      Profile currentPlayerProfile = playerProfile(getCurrentPlayerNumber());
       return new GameStatus(currentPlayerProfile.getName() + "'s turn",
-          currentPlayerProfile.getPhotoString(), !isLocalMultiplayer() /* photoIsUrl*/,
-          getCurrentPlayerNumber());
+          currentPlayerProfile.getImageString(), getCurrentPlayerNumber());
     }
+  }
+  
+  public GameListEntry gameListEntry(String viewerId) {
+    return new GameListEntry(vsString(viewerId), lastUpdatedString(viewerId), imageList(viewerId));
   }
 
   /**
@@ -588,16 +560,16 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    * @return A string describing the opponent of this game, such as
    *     "vs. Frank".
    */
-  public String vsString(String viewerId) {
+  String vsString(String viewerId) {
     if (isLocalMultiplayer()) {
       if (localProfiles.size() == 2) {
-        return localProfiles.get(0).getName() + " vs. " + localProfiles.get(1).getName();
+        return getLocalProfile(0).getName() + " vs. " + getLocalProfile(1).getName();
       } else {
         return "Local Multiplayer Game";
       }
     }
     else if (hasOpponentProfile(viewerId)) {
-      return "vs. " + getOpponentProfile(viewerId).getName();
+      return "vs. " + opponentProfile(viewerId).getName();
     } else {
       return "vs. (No Opponent Yet)";
     }
@@ -618,14 +590,14 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
       if (isLocalMultiplayer()) {
         statusString = "Game ended";
       } else {
-        List<Integer> playerNumbers = getPlayerNumbersForPlayerId(viewerId);
+        List<Integer> playerNumbers = playerNumbersForPlayerId(viewerId);
         if (victors.size() == 2) {
           statusString = "Game tied";
         } else if (playerNumbers.size() == 1 && victors.contains(playerNumbers.get(0))) {
           statusString = "You won";
-        } else if (victors.contains(getOpponentPlayerNumber(viewerId))){
+        } else if (victors.contains(opponentPlayerNumber(viewerId))){
           if (hasOpponentProfile(viewerId)) {
-            Profile opponentProfile = getOpponentProfile(viewerId);
+            Profile opponentProfile = opponentProfile(viewerId);
             statusString = opponentProfile.getNominativePronoun(true /* capitalize */) + " won";
           } else {
             statusString = "They won";
@@ -650,7 +622,7 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
    * @return A string describing the last state of the game, such as "Updated 1
    *     second ago" or "You won 4 years ago". 
    */
-  public String lastUpdatedString(String viewerId) {
+  String lastUpdatedString(String viewerId) {
     long duration = Math.max(Clock.getInstance().currentTimeMillis() - lastModified, 0);
     long number;
     number = duration / ONE_YEAR;
@@ -682,22 +654,21 @@ public class Game extends Entity implements Comparable<Game>, Copyable {
   }
   
   /**
-   * @return A list of photo strings to use to represent this game in the game
+   * @return A list of image strings to use to represent this game in the game
    *     list.
    */
-  public List<String> photoList(String viewerId) {
-    List<String> result = new ArrayList<String>();
+  List<ImageString> imageList(String viewerId) {
+    List<ImageString> result = new ArrayList<ImageString>();
     if (isLocalMultiplayer()) {
-      for (Profile profile : localProfiles.values()) {
-        result.add(profile.getPhotoString());
+      for (Profile profile : localProfiles) {
+        result.add(profile.getImageString());
       }
     } else {
       if (hasOpponentProfile(viewerId)) {
-        result.add(getOpponentProfile(viewerId).getPhotoString());      
+        result.add(opponentProfile(viewerId).getImageString());      
       } else {
-        result.add(NO_OPPONENT_PHOTO_STRING);
+        result.add(NO_OPPONENT_IMAGE_STRING);
       }
-      
     }
     return result;
   }

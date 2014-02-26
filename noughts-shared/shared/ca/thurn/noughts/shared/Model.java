@@ -66,11 +66,11 @@ public class Model implements ChildEventListener {
   /**
    * Function to mutate a game.
    */
-  private static interface GameMutation {
+  private static abstract class GameMutation {
     /**
      * @param game Game to mutate.
      */
-    public void mutate(Game game);
+    public abstract void mutate(Game game);
   }
   
   /**
@@ -272,18 +272,16 @@ public class Model implements ChildEventListener {
    * @return The newly created game's ID.
    */
   public String newGame(Map<String, Profile> profiles) {
-    return newGame(false /* localMultiplayer */, profiles,
-        Collections.<Integer, Profile>emptyMap());
+    return newGame(false /* localMultiplayer */, profiles, Collections.<Profile>emptyList());
   }
   
   /**
    * Create a new local multiplayer game.
    *
-   * @param localProfiles Map from player numbers in this game to their user
-   *     profiles.
+   * @param localProfiles List of local profiles for players in this game.
    * @return The newly created game's ID.
    */
-  public String newLocalMultiplayerGame(Map<Integer, Profile> localProfiles) {
+  public String newLocalMultiplayerGame(List<Profile> localProfiles) {
     return newGame(true /* localMultiplayer */, Collections.<String, Profile>emptyMap(),
         localProfiles);
   }
@@ -294,11 +292,11 @@ public class Model implements ChildEventListener {
    *
    * @param localMultiplayer Sets whether the game is a local multiplayer game.
    * @param userProfile Map from user IDs to profiles.
-   * @param localProfiles Map from player numbers to profiles. 
+   * @param localProfiles List of local profiles for players in this game. 
    * @return The newly created game's ID.
    */  
   private String newGame(boolean localMultiplayer, Map<String, Profile> profiles,
-      Map<Integer, Profile> localProfiles) {
+      List<Profile> localProfiles) {
     Firebase ref = firebase.child("games").push();
     Game game = new Game(ref.getName());
     game.getPlayersMutable().add(userId);
@@ -309,7 +307,7 @@ public class Model implements ChildEventListener {
     game.setLastModified(Clock.getInstance().currentTimeMillis());
     game.setGameOver(false);
     game.getProfilesMutable().putAll(profiles);
-    game.getLocalProfilesMutable().putAll(localProfiles);
+    game.getLocalProfilesMutable().addAll(localProfiles);
     ref.setValue(game.serialize());
     Firebase userRef = userRefForGame(game, userId);
     userRef.setValue(game.minimalGame().serialize());
@@ -454,7 +452,7 @@ public class Model implements ChildEventListener {
     mutateGameLists(game, mutation);
     mutation.mutate(game);
     if (gameUpdateListeners.containsKey(game.getId())) {
-      gameUpdateListeners.get(game.getId()).onGameStatusChanged(game.getGameStatus());
+      gameUpdateListeners.get(game.getId()).onGameStatusChanged(game.gameStatus());
     }
     handleComputerAction(game);
   }
@@ -467,7 +465,7 @@ public class Model implements ChildEventListener {
    */
   public void handleComputerAction(final Game game) {
     if (game.isGameOver()) return;
-    Profile currentProfile = game.getPlayerProfile(game.getCurrentPlayerNumber());
+    Profile currentProfile = game.playerProfile(game.getCurrentPlayerNumber());
     if (currentProfile.isComputerPlayer()) {
       final ComputerState computerState = new ComputerState();
       computerState.initializeFrom(game);
@@ -475,7 +473,7 @@ public class Model implements ChildEventListener {
       switch (currentProfile.getComputerDifficultyLevel()) {
         case 0: {
           // ~70% player win rate
-          numSimulations = 10;
+          numSimulations = 5;
           break;
         }
         case 1: {
@@ -501,12 +499,11 @@ public class Model implements ChildEventListener {
       timer.schedule(new TimerTask() {
         @Override public void run() {
           long action = agent.getAsynchronousSearchResult().getAction();
-          System.out.println("AI picks action " + computerState.actionToString(action));        
           Command command = computerState.longToCommand(action);
           addCommand(game, command);
           submitCurrentAction(game);
         }
-      }, 4000L);
+      }, 10000L);
     }
   }
   
@@ -555,14 +552,16 @@ public class Model implements ChildEventListener {
     final long timestamp = Clock.getInstance().currentTimeMillis();
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game game) {
-        game.getResignedPlayersMutable().add(userId);
+        game.getResignedPlayersMutable().add(game.getCurrentPlayerNumber());
         game.setGameOver(true);
         game.setCurrentActionNumber(null);
-        game.setCurrentPlayerNumber(null);
-        int opponentPlayerNumber = game.getOpponentPlayerNumber(userId);
-        if (opponentPlayerNumber != -1) {
+        if (game.isLocalMultiplayer() && game.getPlayers().size() == 2) {
+          game.getVictorsMutable().add(game.getCurrentPlayerNumber() == 0 ? 1 : 0);
+        } else if (game.hasOpponent(userId)) {
+          int opponentPlayerNumber = game.opponentPlayerNumber(userId);          
           game.getVictorsMutable().add(opponentPlayerNumber);
         }
+        game.setCurrentPlayerNumber(null);
         game.setLastModified(timestamp);
       }
     };

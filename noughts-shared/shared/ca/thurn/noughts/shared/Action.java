@@ -11,7 +11,7 @@ import ca.thurn.noughts.shared.Command.CommandDeserializer;
 public class Action extends Entity {
   public static class ActionDeserializer extends EntityDeserializer<Action> {
     @Override
-    public Action deserialize(Map<String, Object> actionMap) {
+    Action deserialize(Map<String, Object> actionMap) {
       return new Action(actionMap);
     }    
   }
@@ -32,7 +32,8 @@ public class Action extends Entity {
     this.playerNumber = playerNumber;
   }
   
-  public Action(Map<String, Object> actionMap) {
+  private Action(Map<String, Object> actionMap) {
+    checkExists(actionMap, "playerNumber");
     this.playerNumber = getInteger(actionMap, "playerNumber"); 
     setGameId(getString(actionMap, "gameId"));
     submitted = getBoolean(actionMap, "submitted");
@@ -46,7 +47,7 @@ public class Action extends Entity {
   }
   
   @Override
-  public Map<String, Object> serialize() {
+  Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     result.put("playerNumber", getPlayerNumber());
     result.put("gameId", getGameId());

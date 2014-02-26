@@ -16,6 +16,7 @@
 #import "Profile.h"
 #import "Toast+UIView.h"
 #import "java/lang/Integer.h"
+#import "ImageString.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
 @property (weak,nonatomic) NTSModel *model;
@@ -52,23 +53,19 @@
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
-  [self displayGameStatus:[self.currentGame getGameStatus]];
+  [self displayGameStatus:[self.currentGame gameStatus]];
   [self.model handleComputerActionWithNTSGame:self.currentGame];
 }
 
 -(void)displayGameStatus:(NTSGame_GameStatus*)status {
   UIColor *color;
-  if ([status useDefaultColor]) {
+  if (![status hasStatusPlayer]) {
     color = [UIColor grayColor];
   } else {
-    color = [self colorFromPlayerNumber: [status getStatusPlayerColor]];
+    color = [self colorFromPlayerNumber: [status getStatusPlayer]];
   }
   UIImage *image;
-  if ([status photoIsUrl]) {
-    // TODO: handle urls
-  } else {
-    image = [UIImage imageNamed:[status getStatusPhotoString]];
-  }
+    image = [UIImage imageNamed:[[status getStatusImageString] getString]];
   [self.gameView displayGameStatusWithImage:image
                                  withString:[status getStatusString]
                                   withColor:color];

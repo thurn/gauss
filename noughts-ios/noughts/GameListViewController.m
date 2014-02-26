@@ -14,6 +14,7 @@
 #import "java/util/List.h"
 #import "Toast+UIView.h"
 #import <objc/runtime.h>
+#import "ImageString.h"
 
 @interface GameListViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
@@ -93,12 +94,13 @@
   static NSString *CellIdentifier = @"Cell";
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
   NTSGame *game = [self gameForIndexPath:indexPath];
-  cell.textLabel.text = [game vsStringWithNSString:[self.model getUserId]];
-  cell.detailTextLabel.text = [game lastUpdatedStringWithNSString:[self.model getUserId]];
-  id <JavaUtilList> photoList = [game photoListWithNSString:[self.model getUserId]];
+  NTSGame_GameListEntry *listEntry = [game gameListEntryWithNSString:[self.model getUserId]];
+  cell.textLabel.text = [listEntry getVsString];
+  cell.detailTextLabel.text = [listEntry getModifiedString];
+  id <JavaUtilList> imageList = [listEntry getImageStrings];
   UIImage *image;
-  if ([photoList size] == 2) {
-    image = [self imageForTwoPhotos:photoList];
+  if ([imageList size] == 2) {
+    image = [self imageForTwoPhotos:imageList];
   } else {
     // not implemented;
     @throw @"remember to do this";
@@ -107,11 +109,14 @@
   return cell;
 }
 
+- (UIImage*)imageForPhotoList:(id<JavaUtilList>)photoList index:(int)index {
+  NTSImageString *imageString = [photoList getWithInt:index];
+  return [UIImage imageNamed:[[imageString getString] stringByAppendingString:@"_20"]];
+}
+
 - (UIImage*)imageForTwoPhotos:(id<JavaUtilList>)photoList {
-  NSString *image1Name = [[photoList getWithInt:0] stringByAppendingString:@"_20"];
-  UIImage *image1 = [UIImage imageNamed:image1Name];
-  NSString *image2Name = [[photoList getWithInt:1] stringByAppendingString:@"_20"];
-  UIImage *image2 = [UIImage imageNamed:image2Name];
+  UIImage *image1 = [self imageForPhotoList:photoList index:0];
+  UIImage *image2 = [self imageForPhotoList:photoList index:1];
   UIGraphicsBeginImageContextWithOptions(CGSizeMake(40,40), NO, 0);
   [image1 drawAtPoint:CGPointMake(0, 10)];
   [image2 drawAtPoint:CGPointMake(20, 10)];

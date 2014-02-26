@@ -279,7 +279,7 @@
       for (NTSCommand* command in [action getCommands]) {
         CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
                                     [command getRow] * SQUARE_SIZE + TOP_OFFSET);
-        if ([[action getPlayerNumber] intValue] == [NTSModel X_PLAYER]) {
+        if ([action getPlayerNumber] == [NTSModel X_PLAYER]) {
           [self.x drawAtPoint:point];
         } else {
           [self.o drawAtPoint:point];

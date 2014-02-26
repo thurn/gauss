@@ -107,6 +107,7 @@
 		7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
 		7C8EF7751866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
 		7C92C02A18920FD800DF8816 /* Clock.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C92C02918920FD800DF8816 /* Clock.java */; };
+		7CB3351918BD1B5B001FC445 /* ImageString.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CB3351818BD1B5B001FC445 /* ImageString.java */; };
 		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
@@ -334,6 +335,7 @@
 		7C8EF7721866B96B0075D0C1 /* GameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameViewController.h; sourceTree = "<group>"; };
 		7C8EF7731866B96B0075D0C1 /* GameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameViewController.m; sourceTree = "<group>"; };
 		7C92C02918920FD800DF8816 /* Clock.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Clock.java; sourceTree = "<group>"; };
+		7CB3351818BD1B5B001FC445 /* ImageString.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = ImageString.java; sourceTree = "<group>"; };
 		7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JBDeviceOwner.framework; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
@@ -709,6 +711,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7CB3351818BD1B5B001FC445 /* ImageString.java */,
 				7C0444DF18B73139006275CA /* ComputerState.java */,
 				7CEB472818B275B100CDA9EA /* Profile.java */,
 				7C92C02918920FD800DF8816 /* Clock.java */,
@@ -900,6 +903,7 @@
 				7CEB472918B275B100CDA9EA /* Profile.java in Sources */,
 				7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
 				7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */,
+				7CB3351918BD1B5B001FC445 /* ImageString.java in Sources */,
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C8EF6EC18667EAC0075D0C1 /* Command.java in Sources */,
 				7C8EF6E618667E700075D0C1 /* Entity.java in Sources */,

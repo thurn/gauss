@@ -4,21 +4,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.MutableData;
 
 public abstract class Entity {
   
-  public static abstract class EntityDeserializer<T extends Entity> {
+  public static abstract class EntityDeserializer<T extends Entity> {    
     /**
      * You must define this method to instantiate a new instance of your class
      * from the supplied map argument.
      *
-     * @param object The arguments to your entity.
+     * @param map The map representing your entity.
      * @return A newly instantiated entity.
-     */
-    public abstract T deserialize(Map<String, Object> object);
+     */    
+    abstract T deserialize(Map<String, Object> map);
     
     @SuppressWarnings("unchecked")
     public T fromDataSnapshot(DataSnapshot snapshot) {
@@ -39,8 +40,8 @@ public abstract class Entity {
    * the resulting map.
    * 
    * @return This entity serialized to a map.
-   */
-  public abstract Map<String, Object> serialize();
+   */  
+  abstract Map<String, Object> serialize();
   
   /**
    * You must define this method to render your entity's name in toString(). 
@@ -50,7 +51,7 @@ public abstract class Entity {
   abstract String entityName();
 
   @SuppressWarnings("unchecked")
-  <T> List<T> getList(Map<String, Object> map, String key) {
+  static <T> List<T> getList(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (List<T>)map.get(key);
     } else {
@@ -58,7 +59,7 @@ public abstract class Entity {
     }
   }
   
-  <T> List<Integer> getIntegerList(List<T> list) {
+  static <T> List<Integer> getIntegerList(List<T> list) {
     List<Integer> result = new ArrayList<Integer>();
     for (T t : list) {
       result.add(((Number)t).intValue());
@@ -67,15 +68,21 @@ public abstract class Entity {
   }
 
   @SuppressWarnings("unchecked")
-  <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
+  static <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (Map<K,V>)map.get(key);
     } else {
       return new HashMap<K,V>();
     }
   }
+  
+  static void checkExists(Map<String, Object> map, String key) {
+    if (!map.containsKey(key) || map.get(key) == null) {
+      throw new IllegalArgumentException("Missing key " + key + "!");
+    }
+  }
 
-  String getString(Map<String, Object> map, String key) {
+  static String getString(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (String)map.get(key);
     } else {
@@ -83,7 +90,7 @@ public abstract class Entity {
     }
   }
 
-  Integer getInteger(Map<String, Object> map, String key) {
+  static Integer getInteger(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return new Integer(((Number)map.get(key)).intValue());
     } else {
@@ -91,7 +98,7 @@ public abstract class Entity {
     }
   }
   
-  Long getLong(Map<String, Object> map, String key) {
+  static Long getLong(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (Long)map.get(key);
     } else {
@@ -99,7 +106,7 @@ public abstract class Entity {
     }
   }
   
-  boolean getBoolean(Map<String, Object> map, String key) {
+  static boolean getBoolean(Map<String, Object> map, String key) {
     if (!map.containsKey(key) || map.get(key) == null) {
       return false;
     } else {
@@ -108,7 +115,17 @@ public abstract class Entity {
   }
   
   @SuppressWarnings("unchecked")
-  <T extends Entity> List<T> getEntities(Map<String, Object> map, String key,
+  static <T extends Entity> T getEntity(Map<String, Object> map, String key,
+      EntityDeserializer<T> deserializer) {
+    if (map.containsKey(key)) {
+      return deserializer.deserialize((Map<String, Object>)map.get(key));
+    } else {
+      return null;
+    }
+  }
+  
+  @SuppressWarnings("unchecked")
+  static <T extends Entity> List<T> getEntities(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     ArrayList<T> result = new ArrayList<T>();
     if (map.containsKey(key)) {
@@ -119,10 +136,32 @@ public abstract class Entity {
     return (List<T>)result;
   }
   
-  List<Map<String, Object>> serializeEntities(List<? extends Entity> list) {
+  static List<Map<String, Object>> serializeEntities(List<? extends Entity> list) {
     List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
     for (Entity entity : list) {
       result.add(entity.serialize());
+    }
+    return result;
+  }
+  
+  @SuppressWarnings("unchecked")
+  static <T extends Entity> Map<String, T> getEntityMap(Map<String, Object> gameMap, String key,
+      EntityDeserializer<T> deserializer) {
+    Map<String, T> result = new HashMap<String, T>();
+    if (gameMap.containsKey(key)) {
+      Map<String, Object> map = (Map<String, Object>)gameMap.get(key);
+      for(Entry<String, Object> entry : map.entrySet()) {
+        Map<String, Object> entity = (Map<String, Object>)entry.getValue();
+        result.put(entry.getKey(), deserializer.deserialize(entity));
+      }
+    }
+    return result;    
+  }
+  
+  static <T extends Entity> Map<String, Object> serializeEntityMap(Map<String, T> entities) {
+    Map<String, Object> result = new HashMap<String, Object>();
+    for (Entry<String, T> entry : entities.entrySet()) {
+      result.put(entry.getKey(), entry.getValue().serialize());
     }
     return result;
   }
