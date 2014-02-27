@@ -95,7 +95,6 @@ public class Model implements ChildEventListener {
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private final Map<String, Game> userGameList;
-  private final Map<String, Game> games;
   private GameListListener gameListListener;
   
   public Model(String userId, Firebase firebase) {
@@ -104,7 +103,6 @@ public class Model implements ChildEventListener {
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     userGameList = new HashMap<String, Game>();
-    games = new HashMap<String, Game>();
     firebase.child("users").child(userId).child("games").addChildEventListener(this);    
   }
   
@@ -155,7 +153,6 @@ public class Model implements ChildEventListener {
           // system.
           Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
           listener.onGameUpdate(game);
-          games.put(game.getId(), game);
         }
       }
     });
@@ -296,6 +293,18 @@ public class Model implements ChildEventListener {
   }
   
   /**
+   * Adds the provided command as in {@link Model#addCommand(Game, Command)}
+   * and also submits the resulting action as in
+   * {@link Model#submitCurrentAction(Game)}.
+   *
+   * @param game The game.
+   * @param command Command to add.
+   */
+  public void addCommandAndSubmit(Game game, Command command) {
+    addCommand(game, command, true /* submit */);
+  }
+
+  /**
    * Adds the provided command to the current action's command list. If there
    * is no current action, creates one. Any commands beyond the current
    * location in the undo history are deleted.
@@ -304,7 +313,14 @@ public class Model implements ChildEventListener {
    * @param command The command to add.
    * @return The game with the command added.
    */  
-  public Game addCommand(final Game game, final Command command) {
+  public void addCommand(Game game, Command command) {
+    addCommand(game, command, false /* submit */);
+  }
+  
+  /**
+   * Add the provided command to the game, optionally also submitting the command.
+   */
+  private void addCommand(final Game game, final Command command, final boolean submit) {
     ensureIsCurrentPlayer(game);
     ensureIsNotMinimal(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
@@ -326,6 +342,9 @@ public class Model implements ChildEventListener {
           game.getActionsMutable().add(action.build());
           game.setCurrentActionNumber(game.getActions().size() - 1);
         }
+        if (submit) {
+          submitActionMutation(game).mutate(game);
+        }
       }
     };
     mutateCanonicalGame(game, mutation);
@@ -334,7 +353,9 @@ public class Model implements ChildEventListener {
         game.setLastModified(timestamp);        
       }
     });
-    return mutateCopy(game, mutation);
+    if (submit) {
+      onGameStatusChanged(mutateCopy(game, mutation));
+    }
   }
 
   /**
@@ -404,20 +425,29 @@ public class Model implements ChildEventListener {
   * @param game The game to submit the current action of.
   * @return The game with the action submitted.
   */  
-  public Game submitCurrentAction(Game game) {
+  public void submitCurrentAction(Game game) {
     ensureIsCurrentPlayer(game);
     ensureIsNotMinimal(game);
     if (!canSubmit(game)) die("Illegal action!");
+    GameMutation mutation = submitActionMutation(game);
+    mutateCanonicalGame(game, mutation);
+    mutateGameLists(game, mutation);
+    onGameStatusChanged(mutateCopy(game, mutation));
+    handleComputerAction(mutateCopy(game, mutation));
+  }
+  
+  private void onGameStatusChanged(Game game) {
+    if (gameUpdateListeners.containsKey(game.getId())) {
+      gameUpdateListeners.get(game.getId()).onGameStatusChanged(game.gameStatus());
+    }    
+  }
+  
+  private GameMutation submitActionMutation(Game game) {
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER; 
-    
-    // mark move submitted in advance to make computeVictors() work.
-    game.getActionsMutable().set(game.getCurrentActionNumber(),
-        Action.newBuilder(game.currentAction()).setSubmitted(true).build());
-    final List<Integer> victors = computeVictors(game);
-
-    GameMutation mutation = new GameMutation() {
+    final List<Integer> victors = computeVictorsIfCurrentActionSubmitted(game);    
+    return new GameMutation() {
       @Override public void mutate(Game game) {
         if (!game.isMinimal()) {
           game.getActionsMutable().set(game.getCurrentActionNumber(),
@@ -433,16 +463,8 @@ public class Model implements ChildEventListener {
           game.setCurrentActionNumber(null);
           game.getVictorsMutable().addAll(victors);
           game.setGameOver(true);
-        }        
+        }
     }};
-    mutateCanonicalGame(game, mutation);
-    mutateGameLists(game, mutation);
-    handleComputerAction(mutateCopy(game, mutation));
-    if (gameUpdateListeners.containsKey(game.getId())) {
-      gameUpdateListeners.get(game.getId()).onGameStatusChanged(
-          mutateCopy(game, mutation).gameStatus());
-    }
-    return mutateCopy(game, mutation);
   }
 
   /**
@@ -488,8 +510,7 @@ public class Model implements ChildEventListener {
         @Override public void run() {
           long action = agent.getAsynchronousSearchResult().getAction();
           Command command = computerState.longToCommand(action);
-          Game newGame = addCommand(game, command);
-          submitCurrentAction(newGame);
+          addCommandAndSubmit(game, command);
         }
       }, 4000L);
     }
@@ -502,7 +523,7 @@ public class Model implements ChildEventListener {
    * @param game The game to undo the previous command of.
    * @return The game with the command undone.
    */  
-  public Game undoCommand(Game game) {
+  public void undoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (!canUndo(game)) die("Can't undo.");
     GameMutation mutation = new GameMutation() {
@@ -513,7 +534,6 @@ public class Model implements ChildEventListener {
         setCurrentAction(game, action);
     }};
     mutateCanonicalGame(game, mutation);
-    return mutateCopy(game, mutation);
   }
   
   /**
@@ -523,7 +543,7 @@ public class Model implements ChildEventListener {
    * @param game The game to redo the previous command of.
    * @return The game with the command redone.
    */
-  public Game redoCommand(Game game) {
+  public void redoCommand(Game game) {
     ensureIsCurrentPlayer(game);
     if (!canRedo(game)) die("Can't redo.");
     GameMutation mutation = new GameMutation() {
@@ -535,7 +555,6 @@ public class Model implements ChildEventListener {
         setCurrentAction(game, action);
     }};
     mutateCanonicalGame(game, mutation);
-    return mutateCopy(game, mutation);
   }
   
   /**
@@ -544,7 +563,7 @@ public class Model implements ChildEventListener {
    * @param game Game to resign from.
    * @return The game after resignation.
    */
-  public Game resignGame(Game game) {
+  public void resignGame(Game game) {
     ensureIsPlayer(game);
     if (game.isGameOver()) die("Can't resign from a game which is already over");
     final long timestamp = Clock.getInstance().currentTimeMillis();
@@ -565,7 +584,6 @@ public class Model implements ChildEventListener {
     };
     mutateCanonicalGame(game, mutation);
     mutateGameLists(game, mutation);
-    return mutateCopy(game, mutation);
   }
   
   /**
@@ -583,18 +601,19 @@ public class Model implements ChildEventListener {
   /**
    * Builds the "victors" array for the game. If the game is over, a list will be
    * returned containing the victorious or drawing players (which may be empty to
-   * indicate that "nobody wins"). Otherwise, null is returned.
+   * indicate that "nobody wins"). Otherwise, null is returned. The computation
+   * is done *as if* the current action were submitted.
    * 
    * @param game The game to find the victors for
    * @return A list of player numbers of victors or null if the game is not
    *     over.
    */
   // Visible for testing only
-  List<Integer> computeVictors(Game game) {
+  List<Integer> computeVictorsIfCurrentActionSubmitted(Game game) {
     ensureIsNotMinimal(game);
     // 1) check for win
     
-    Action[][] actionTable = makeActionTable(game);
+    Action[][] actionTable = makeActionTable(game, true /* includeCurrent */);
     // All possible winning lines in [column, row] format:
     int[][][] lines =  { {{0,0}, {1,0}, {2,0}}, {{0,1}, {1,1}, {2,1}},
         {{0,2}, {1,2}, {2,2}}, {{0,0}, {0,1}, {0,2}}, {{1,0}, {1,1}, {1,2}},
@@ -639,17 +658,19 @@ public class Model implements ChildEventListener {
     if (column < 0 || row < 0 || column > 2 || row > 2) {
       return false;
     }
-    return makeActionTable(game)[column][row] == null;    
+    return makeActionTable(game, false /* includeCurrent */)[column][row] == null;    
   }
   
   /** 
-   * Returns a 2-dimensional map of *submitted* game actions spatially indexed
-   * by [column][row], so e.g. table[0][2] is the bottom-left square's action. 
+   * Returns a 2-dimensional map of game actions spatially indexed by
+   * [column][row], so e.g. table[0][2] is the bottom-left square's action.
+   * If includeCurrent is true, the game's current action will also be included
+   * in the action table.
    */  
-  private Action[][] makeActionTable(Game game) {
+  private Action[][] makeActionTable(Game game, boolean includeCurrent) {
     Action[][] result = new Action[3][3];
     for (Action action : game.getActions()) {
-      if (action.getSubmitted()) {
+      if (action.getSubmitted() || (includeCurrent && action.equals(game.currentAction()))) {
         for (Command command : action.getCommandList()) {
           result[command.getColumn()][command.getRow()] = action;
         }
@@ -668,7 +689,6 @@ public class Model implements ChildEventListener {
   private void mutateCanonicalGame(Game game, final GameMutation function) {
     Firebase gameRef = firebase.child("games").child(game.getId());
     gameRef.runTransaction(new GameMutationHandler(function, false /* useMinimalForm */));
-    games.put(game.getId(), mutateCopy(game, function));
   }
 
   /**
