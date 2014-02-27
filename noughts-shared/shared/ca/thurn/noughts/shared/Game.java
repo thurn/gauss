@@ -239,6 +239,10 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
   List<Profile> getLocalProfilesMutable() {
     return localProfiles;
   }
+  
+  public boolean hasCurrentPlayerNumber() {
+    return currentPlayerNumber != null;
+  }
 
   public Integer getCurrentPlayerNumber() {
     return currentPlayerNumber;
