@@ -1,6 +1,5 @@
 package ca.thurn.noughts.shared;
 
-import ca.thurn.noughts.shared.Model.GameListListener;
 
 public class AbstractGameListListener implements GameListListener {
 

@@ -1,8 +1,8 @@
-#import "Model.h"
 #import "GameView.h"
 #import "HasModel.h"
+#import "GameUpdateListener.h"
 
-@interface GameViewController : UIViewController <NTSModel_GameUpdateListener,
+@interface GameViewController : UIViewController <NTSGameUpdateListener,
                                                   GameViewDelegate,
                                                   HasModel>
 @property (strong,nonatomic) NSString *currentGameId;

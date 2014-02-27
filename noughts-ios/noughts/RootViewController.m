@@ -1,9 +1,10 @@
 #import "RootViewController.h"
 #import "Model.h"
 #import "Firebase.h"
+#import "GameListListener.h"
 #import "HasModel.h"
 
-@interface RootViewController () <NTSModel_GameListListener>
+@interface RootViewController () <NTSGameListListener>
 @property (weak, nonatomic) IBOutlet UIButton *savedGamesButton;
 @property(strong,nonatomic) NTSModel *model;
 @end
@@ -21,7 +22,7 @@
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio-demo.com"];
   self.model = [[NTSModel alloc] initWithNSString:@"dthurn" withFCFirebase:firebase];
-  [self.model setGameListListenerWithNTSModel_GameListListener:self];
+  [self.model setGameListListenerWithNTSGameListListener:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {

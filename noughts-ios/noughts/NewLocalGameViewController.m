@@ -11,6 +11,7 @@
 #import "J2obcUtils.h"
 #import "Profile.h"
 #import "ImageString.h"
+#import "ImageType.h"
 
 NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
 NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
@@ -196,8 +197,10 @@ NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
 }
 
 - (NTSImageString*)localImageString:(NSString*)name {
-  return [[NTSImageString alloc] initWithNSString:name
-                 withNTSImageString_ImageTypeEnum:[NTSImageString_ImageTypeEnum LOCAL]];
+  return [[[[NTSImageString newBuilder]
+            setStringWithNSString:name]
+           setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]]
+          build];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -216,26 +219,26 @@ NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
   [userDefaults setObject:p2Name forKey:kP2LocalNameKey];
   [userDefaults synchronize];
   
-  NTSProfile *p1Profile = [[NTSProfile alloc] initWithNSString:p1Name];
+  NTSProfile_Builder *p1Profile = [NTSProfile newBuilder];
+  [p1Profile setNameWithNSString:p1Name];
   [p1Profile setImageStringWithNTSImageString:
    [self localImageString: [self.playerImages objectAtIndex:self.p1ImageIndex]]];
-  NTSProfile *p2Profile;
+  NTSProfile_Builder *p2Profile = [NTSProfile newBuilder];
   if (self.playVsComputerMode) {
     int difficultyLevel = [self.difficultyPicker selectedRowInComponent:0];
-    p2Profile = [[NTSProfile alloc] initWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
-    
+    [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[self.computerImages objectAtIndex:difficultyLevel]]];
     [p2Profile setIsComputerPlayerWithBoolean:YES];
     [p2Profile setComputerDifficultyLevelWithInt:difficultyLevel];
   } else {
-    p2Profile = [[NTSProfile alloc] initWithNSString:p2Name];
+    [p2Profile setNameWithNSString:p2Name];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString: [self.playerImages objectAtIndex:self.p2ImageIndex]]];
   }
 
    NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilList:
-                       [J2obcUtils nsArrayToJavaUtilList:@[p1Profile, p2Profile]]];
+                       [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
   [destination setNTSModel:self.model];
   destination.currentGameId = gameId;
 }

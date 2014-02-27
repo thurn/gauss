@@ -15,6 +15,7 @@
 #import "Toast+UIView.h"
 #import <objc/runtime.h>
 #import "ImageString.h"
+#import "GameListEntry.h"
 
 @interface GameListViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
@@ -94,10 +95,10 @@
   static NSString *CellIdentifier = @"Cell";
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
   NTSGame *game = [self gameForIndexPath:indexPath];
-  NTSGame_GameListEntry *listEntry = [game gameListEntryWithNSString:[self.model getUserId]];
+  NTSGameListEntry *listEntry = [game gameListEntryWithNSString:[self.model getUserId]];
   cell.textLabel.text = [listEntry getVsString];
   cell.detailTextLabel.text = [listEntry getModifiedString];
-  id <JavaUtilList> imageList = [listEntry getImageStrings];
+  id <JavaUtilList> imageList = [listEntry getImageStringList];
   UIImage *image;
   if ([imageList size] == 2) {
     image = [self imageForTwoPhotos:imageList];

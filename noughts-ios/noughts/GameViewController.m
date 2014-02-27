@@ -14,6 +14,7 @@
 #import "Firebase.h"
 #import "Command.h"
 #import "Profile.h"
+#import "GameStatus.h"
 #import "Toast+UIView.h"
 #import "java/lang/Integer.h"
 #import "ImageString.h"
@@ -48,7 +49,7 @@
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
   [self.model setGameUpdateListenerWithNSString: self.currentGameId
-                withNTSModel_GameUpdateListener: self];
+                      withNTSGameUpdateListener: self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -57,7 +58,7 @@
   [self.model handleComputerActionWithNTSGame:self.currentGame];
 }
 
--(void)displayGameStatus:(NTSGame_GameStatus*)status {
+-(void)displayGameStatus:(NTSGameStatus*)status {
   UIColor *color;
   if (![status hasStatusPlayer]) {
     color = [UIColor grayColor];
@@ -169,7 +170,10 @@
 }
 
 - (void)handleSquareTapAtX: (int)x AtY: (int)y {
-  NTSCommand *command = [[NTSCommand alloc] initWithInt:x withInt:y];
+  NTSCommand *command = [[[[NTSCommand newBuilder]
+                           setColumnWithInt:x]
+                          setRowWithInt:y]
+                         build];
   if ([self.model couldSubmitCommandWithNTSGame: self.currentGame withNTSCommand: command]) {
     [self.model addCommandWithNTSGame: self.currentGame withNTSCommand: command];
   }
@@ -180,7 +184,7 @@
   [self.gameView drawGame: game];
 }
 
-- (void)onGameStatusChangedWithNTSGame_GameStatus:(NTSGame_GameStatus*)status {
+- (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {
   [self displayGameStatus:status];
 }
 

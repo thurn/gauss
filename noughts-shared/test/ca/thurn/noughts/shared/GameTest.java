@@ -2,9 +2,6 @@ package ca.thurn.noughts.shared;
 
 import static ca.thurn.noughts.shared.ModelTest.map;
 import static ca.thurn.noughts.shared.ModelTest.list;
-import ca.thurn.noughts.shared.Game.GameStatus;
-import ca.thurn.noughts.shared.ImageString.ImageType;
-import ca.thurn.noughts.shared.Profile.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 public class GameTest extends SharedTestCase {
@@ -20,7 +17,7 @@ public class GameTest extends SharedTestCase {
     Game test = new Game("foo");
     assertFalse(test.hasCurrentAction());
     test.setCurrentActionNumber(0);
-    test.getActionsMutable().add(new Action(0));
+    test.getActionsMutable().add(Action.newBuilder().setPlayerNumber(0).build());
     assertTrue(test.hasCurrentAction());
     assertEquals(0, test.currentAction().getPlayerNumber());
   }
@@ -71,9 +68,10 @@ public class GameTest extends SharedTestCase {
     testGame.getPlayersMutable().add("viewerId");
     testGame.getPlayersMutable().add("opponentId");
     testGame.getVictorsMutable().add(1);
-    Profile opponentProfile = new Profile("Opponent");
+    Profile.Builder opponentProfile = Profile.newBuilder();
+    opponentProfile.setName("Opponent");
     opponentProfile.setPronoun(Pronoun.FEMALE);
-    testGame.getProfilesMutable().put("opponentId", opponentProfile);
+    testGame.getProfilesMutable().put("opponentId", opponentProfile.build());
     testGame.setLastModified(currentTime);
     assertEquals("She won a second ago", testGame.lastUpdatedString("viewerId"));
     
@@ -103,7 +101,8 @@ public class GameTest extends SharedTestCase {
     Game g1 = new Game("g1");
     g1.getPlayersMutable().add("user");
     g1.getPlayersMutable().add("user");
-    g1.getProfilesMutable().put("user", new Profile("John"));
+    Profile john = Profile.newBuilder().setName("John").build();
+    g1.getProfilesMutable().put("user", john);
     try {
       g1.opponentProfile("user");
       fail();
@@ -112,15 +111,15 @@ public class GameTest extends SharedTestCase {
     Game g2 = new Game("g2");
     g2.getPlayersMutable().add("user1");
     g2.getPlayersMutable().add("user2");
-    g2.getProfilesMutable().put("user2", new Profile("John"));
+    g2.getProfilesMutable().put("user2", john);
     g2.getLocalProfilesMutable().add(null);
-    g2.getLocalProfilesMutable().add(new Profile("Jane"));
+    g2.getLocalProfilesMutable().add(Profile.newBuilder().setName("Jane").build());
     assertEquals("Jane", g2.opponentProfile("user1").getName());
     
     Game g3 = new Game("g3");
     g3.getPlayersMutable().add("user1");
     g3.getPlayersMutable().add("user2");
-    g3.getProfilesMutable().put("user2", new Profile("John"));
+    g3.getProfilesMutable().put("user2", john);
     assertEquals("John", g3.opponentProfile("user1").getName());
     
     try {
@@ -133,13 +132,13 @@ public class GameTest extends SharedTestCase {
     Game g1 = new Game("g1");
     g1.getPlayersMutable().add("user");
     g1.getPlayersMutable().add("opponent");        
-    g1.getProfilesMutable().put("user", new Profile("John"));
+    g1.getProfilesMutable().put("user",  Profile.newBuilder().setName("John").build());
     assertEquals("John", g1.playerProfile(0).getName());
     try {
       g1.playerProfile(1);
       fail();
     } catch (IllegalArgumentException expected) {}
-    g1.getLocalProfilesMutable().add(new Profile("James"));
+    g1.getLocalProfilesMutable().add(Profile.newBuilder().setName("James").build());
     assertEquals("James", g1.playerProfile(0).getName());
   }
   
@@ -160,14 +159,14 @@ public class GameTest extends SharedTestCase {
     testGame = new Game("four");
     testGame.getPlayersMutable().add("one");
     testGame.getPlayersMutable().add("two");
-    Profile profile = new Profile("GivenName");
+    Profile profile = Profile.newBuilder().setName("GivenName").build();
     testGame.getProfilesMutable().put("two", profile);
     assertEquals("vs. GivenName", testGame.vsString("one"));
   }
   
   public void testMinimalGame() {
     Game testGame = new Game("id");
-    testGame.getActionsMutable().add(new Action(0));
+    testGame.getActionsMutable().add(Action.newBuilder().build());
     assertEquals("id", testGame.minimalGame().getId());
     assertEquals(0, testGame.minimalGame().getActions().size());
   }
@@ -187,42 +186,39 @@ public class GameTest extends SharedTestCase {
   
   public void testGetImageList() {
     Game testGame = getTestGame();
-    ImageString string = new ImageString("thestring", ImageType.LOCAL);
+    ImageString string = newImageString("thestring");
     assertDeepEquals(list(string), testGame.imageList("userid"));
   }
   
   public void testGetImageListLocalMultiplayer() {
     Game testGame = getTestGame();
     testGame.setLocalMultiplayer(true);
-    ImageString image1 = new ImageString("one", ImageType.LOCAL);
-    testGame.getLocalProfilesMutable().add(new Profile("Alpha").setImageString(image1));
-    ImageString image2 = new ImageString("two", ImageType.LOCAL);
-    testGame.getLocalProfilesMutable().add(new Profile("Beta").setImageString(image2));
+    ImageString image1 = newImageString("one");
+    testGame.getLocalProfilesMutable().add(
+        Profile.newBuilder().setName("Alpha").setImageString(image1).build());
+    ImageString image2 = newImageString("two");
+    testGame.getLocalProfilesMutable().add(
+        Profile.newBuilder().setName("Beta").setImageString(image2).build());
     assertDeepEquals(list(image1, image2), testGame.imageList("userid"));
   }
 
   private Game getTestGame() {
-    return new Game.GameDeserializer().deserialize(map(
-        "entityVersion", 1,
+    return Game.newDeserializer().deserialize(map(
         "id", "gameId",
         "players", list("userid", "opponentid"),
         "currentPlayerNumber", 0,
         "profiles", map(
           "userid", map(
-            "entityVersion", 1,
             "pronoun", "FEMALE",
             "imageString", map(
-              "entityVersion", 1,
               "string", "otherstring",
               "type", "LOCAL"
             ),
             "name", "Player 1"
            ),            
           "opponentid", map(
-            "entityVersion", 1,
             "pronoun", "NEUTRAL",
             "imageString", map(
-                "entityVersion", 1,
                 "string", "thestring",
                 "type", "LOCAL"
               ),
@@ -243,7 +239,7 @@ public class GameTest extends SharedTestCase {
     GameStatus status = testGame.gameStatus();
     assertEquals("Player 1's turn", status.getStatusString());
     assertEquals(0, status.getStatusPlayer());
-    assertEquals(new ImageString("otherstring", ImageType.LOCAL), status.getStatusImageString());
+    assertEquals(newImageString("otherstring"), status.getStatusImageString());
   }
   
   public void testGameStatusGameOver() {
@@ -252,7 +248,7 @@ public class GameTest extends SharedTestCase {
     testGame.getVictorsMutable().add(1);
     GameStatus winnerStatus = testGame.gameStatus();
     assertEquals("Player 2 won the game!", winnerStatus.getStatusString());
-    assertEquals(new ImageString("thestring", ImageType.LOCAL),
+    assertEquals(newImageString("thestring"),
         winnerStatus.getStatusImageString());
     assertEquals(1, winnerStatus.getStatusPlayer());
     
@@ -261,5 +257,9 @@ public class GameTest extends SharedTestCase {
     assertEquals("Game drawn.", drawStatus.getStatusString());
     assertEquals(Game.GAME_OVER_IMAGE_STRING, drawStatus.getStatusImageString());
     assertFalse(drawStatus.hasStatusPlayer());
+  }
+  
+  private ImageString newImageString(String name) {
+    return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
   }
 }

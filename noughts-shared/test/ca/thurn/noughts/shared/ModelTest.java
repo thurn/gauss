@@ -5,9 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Game.GameStatus;
-import ca.thurn.noughts.shared.Model.GameUpdateListener;
-import ca.thurn.noughts.shared.Profile.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 import com.firebase.client.Firebase;
@@ -60,7 +57,7 @@ public class ModelTest extends SharedTestCase {
       }
     });
     List<Profile> localProfiles = new ArrayList<Profile>();
-    Profile profile = new Profile("John");
+    Profile profile = Profile.newBuilder().setName("John").build();
     localProfiles.add(profile);
     String id = model.newLocalMultiplayerGame(localProfiles);
     assertFalse(id.equals(""));
@@ -70,9 +67,10 @@ public class ModelTest extends SharedTestCase {
   public void testNewGameGameUpdate() {
     beginAsyncTestBlock();
     Map<String, Profile> profiles = new HashMap<String, Profile>();
-    Profile profile = new Profile("John");
+    Profile.Builder profile = Profile.newBuilder();
+    profile.setName("John");
     profile.setPronoun(Pronoun.NEUTRAL);
-    profiles.put(userId, profile);
+    profiles.put(userId, profile.build());
     String id = model.newGame(profiles);
     model.setGameUpdateListener(id, new NoStatusGameUpdateListener() {
       @Override
@@ -95,13 +93,15 @@ public class ModelTest extends SharedTestCase {
     final Game game = newGame();
     game.getPlayersMutable().add(userId);
     game.setCurrentPlayerNumber(0);
-    Action action = new Action(0);
+    Action.Builder action = Action.newBuilder();
+    action.setPlayerNumber(0);
+    action.setSubmitted(false);
     action.setGameId(game.getId());
-    game.getActionsMutable().add(action);
+    game.getActionsMutable().add(action.build());
     game.setCurrentActionNumber(0);
-    assertEquals(action, game.currentAction());
-    final Command command = new Command.CommandDeserializer()
-        .deserialize(map("entityVersion", 1, "column", 2, "row", 2));
+    assertEquals(action.build(), game.currentAction());
+    final Command command = Command.newDeserializer()
+        .deserialize(map("column", 2, "row", 2));
     withTestData(game, new Runnable() {
       @Override
       public void run() {
@@ -112,8 +112,8 @@ public class ModelTest extends SharedTestCase {
             assertNotNull(game.getLastModified());
             assertTrue(game.getLastModified() > 0);
             Action action = game.currentAction();
-            assertEquals(0, action.getFutureCommandsMutable().size());
-            assertEquals(command, action.getCommandsMutable().get(0));
+            assertEquals(0, action.getFutureCommandCount());
+            assertEquals(command, action.getCommand(0));
             model.removeGameUpdateListener(game.getId());
             finished();
           }
@@ -127,11 +127,10 @@ public class ModelTest extends SharedTestCase {
   public void testAddCommandNotCurrentPlayer() {
     assertDies(new Runnable() {
       @Override public void run() {
-        model.addCommand(new Game.GameDeserializer().deserialize(map(
-            "entityVersion", 1,
+        model.addCommand(Game.newDeserializer().deserialize(map(
             "players", list("foo", userId),
             "currentPlayerNumber", 0
-            )), new Command(0, 0));
+            )), newCommand(0, 0));
       }
     });
   }
@@ -139,7 +138,7 @@ public class ModelTest extends SharedTestCase {
   public void testAddCommandToNewAction() {
     beginAsyncTestBlock();
     final Game game = newGame(map("players", list(userId), "currentPlayerNumber", 0));
-    final Command command = new Command(1, 1);
+    final Command command = newCommand(1, 1);
     withTestData(game, new Runnable() {
       @Override
       public void run() {
@@ -150,10 +149,10 @@ public class ModelTest extends SharedTestCase {
             assertTrue(game.getLastModified() > 0);
             Action action = game.currentAction();
             assertEquals(0, action.getPlayerNumber());
-            assertFalse(action.isSubmitted());
+            assertFalse(action.getSubmitted());
             assertEquals(game.getId(), action.getGameId());
-            assertEquals(1, action.getCommandsMutable().size());
-            assertEquals(command, action.getCommandsMutable().get(0));
+            assertEquals(1, action.getCommandCount());
+            assertEquals(command, action.getCommand(0));
             finished();
           }
         });
@@ -169,7 +168,7 @@ public class ModelTest extends SharedTestCase {
         "players", list(userId),
         "currentPlayerNumber", 0,
         "lastModified", 123L));
-    final Command command = new Command(1, 1);
+    final Command command = newCommand(1, 1);
     withTestData(game, new Runnable() {
       @Override
       public void run() {
@@ -208,40 +207,51 @@ public class ModelTest extends SharedTestCase {
   }
   
   public void testCouldSubmitCommand() {
-    Command command = new Command(1, 1);
+    Command command = newCommand(1, 1);
     assertFalse(model.couldSubmitCommand(newGame(map("gameOver", true)), command));
     Game game = newGameWithCurrentCommand();
     assertFalse(model.couldSubmitCommand(game, command));
     game.setCurrentActionNumber(null);
-    game.getActionsMutable().get(0).setSubmitted(true);
+    game.getActionsMutable().set(0, game.getActions().get(0).toBuilder()
+        .setSubmitted(true)
+        .build());
     assertTrue(model.couldSubmitCommand(game, command));
-    assertFalse(model.couldSubmitCommand(game, new Command(3, 1)));
-    game.getActionsMutable().get(0).getCommandsMutable().remove(0);
-    game.getActionsMutable().get(0).getCommandsMutable().add(command);
+    Action.Builder action = game.getActions().get(0).toBuilder();
+    action.clearCommandList();
+    action.addCommand(command);
+    game.getActionsMutable().set(0, action.build());
     assertFalse(model.couldSubmitCommand(game, command));
   }
   
   public void testCanUndo() {
     Game game = newGameWithCurrentCommand();
     assertTrue(model.canUndo(game));
-    game.getActionsMutable().get(0).getCommandsMutable().clear();
+    Action.Builder action = game.getActions().get(0).toBuilder();
+    action.clearCommandList();
+    game.getActionsMutable().set(0, action.build());
     assertFalse(model.canUndo(game));
   }
   
   public void testCanRedo() {
     Game game = newGameWithCurrentCommand();
     assertFalse(model.canRedo(game));
-    Command command = game.getActionsMutable().get(0).getCommandsMutable().remove(0);
-    game.getActionsMutable().get(0).getFutureCommandsMutable().add(command);
+    Action.Builder action = game.getActions().get(0).toBuilder();
+    Command command = action.getCommandList().remove(0);
+    action.addFutureCommand(command);
+    game.getActionsMutable().set(0, action.build());
     assertTrue(model.canRedo(game));
   }
   
   public void testCanSubmit() {
     Game game = newGameWithCurrentCommand();
     assertTrue(model.canSubmit(game));
-    game.getActionsMutable().get(0).getCommandsMutable().clear();
+    Action.Builder action = game.getActions().get(0).toBuilder();
+    action.clearCommandList();
+    game.getActionsMutable().set(0, action.build());
     assertFalse(model.canSubmit(game));
-    game.getActionsMutable().get(0).getCommandsMutable().add(new Command(0, 5));
+    Action.Builder action2 = game.getActions().get(0).toBuilder();
+    action2.addCommand(newCommand(0, 5));
+    game.getActionsMutable().set(0, action2.build());    
     assertFalse(model.canSubmit(game));
   }
   
@@ -366,13 +376,11 @@ public class ModelTest extends SharedTestCase {
     final Game game = newGame();
     game.getPlayersMutable().add(userId);
     game.getPlayersMutable().add("o");
-    game.getProfilesMutable().put(userId, new Profile.ProfileDeserializer().deserialize(map(
-        "entityVersion", 1,
+    game.getProfilesMutable().put(userId, Profile.newDeserializer().deserialize(map(
         "name", "User",
         "pronoun", "MALE"
         )));
-    game.getProfilesMutable().put("o", new Profile.ProfileDeserializer().deserialize(map(
-        "entityVersion", 1,
+    game.getProfilesMutable().put("o", Profile.newDeserializer().deserialize(map(
         "name", "Opponent",
         "pronoun", "FEMALE"
         )));    
@@ -382,10 +390,12 @@ public class ModelTest extends SharedTestCase {
       action(0, 1, 2),
       action(1, 0, 1)
     ));
-    Action action = new Action(0);
-    action.getCommandsMutable().add(new Command(2, 2));
+    Action.Builder action = Action.newBuilder();
+    action.setPlayerNumber(0);
+    action.setSubmitted(false);
+    action.addCommand(newCommand(2, 2));
     action.setGameId(game.getId());
-    game.getActionsMutable().add(action);
+    game.getActionsMutable().add(action.build());
     game.setCurrentActionNumber(4);
     game.setCurrentPlayerNumber(0);
     withTestData(game, new Runnable() {
@@ -417,9 +427,9 @@ public class ModelTest extends SharedTestCase {
         model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
-            assertDeepEquals(list(), game.currentAction().getCommandsMutable());
-            assertDeepEquals(list(new Command(2, 1)),
-                game.currentAction().getFutureCommandsMutable());
+            assertDeepEquals(list(), game.currentAction().getCommandList());
+            assertDeepEquals(list(newCommand(2, 1)),
+                game.currentAction().getFutureCommandList());
             finished();
           }
         });
@@ -432,17 +442,19 @@ public class ModelTest extends SharedTestCase {
   public void testRedo() {
     beginAsyncTestBlock();
     final Game game = newGameWithCurrentCommand();
-    game.currentAction().getCommandsMutable().clear();
-    final Command command = new Command(0, 0);
-    game.currentAction().getFutureCommandsMutable().add(command);
+    Action.Builder action = game.currentAction().toBuilder();
+    action.clearCommandList();
+    final Command command = newCommand(0, 0);
+    action.addFutureCommand(command);
+    game.getActionsMutable().set(game.getCurrentActionNumber(), action.build());
     withTestData(game, new Runnable() {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
-            assertDeepEquals(list(command), game.currentAction().getCommandsMutable());
-            assertDeepEquals(list(), game.currentAction().getFutureCommandsMutable());
+            assertDeepEquals(list(command), game.currentAction().getCommandList());
+            assertDeepEquals(list(), game.currentAction().getFutureCommandList());
             finished();
           }
         });
@@ -629,12 +641,10 @@ public class ModelTest extends SharedTestCase {
   
   @SuppressWarnings("unchecked")
   private Action action(int player, int column, int row) {
-    return new Action.ActionDeserializer().deserialize(map(
-        "entityVersion", 1,
+    return Action.newDeserializer().deserialize(map(
         "playerNumber", player,
         "submitted", true,
         "commands", list(map(
-          "entityVersion", 1,
           "column", column,
           "row", row
         ))));
@@ -647,36 +657,30 @@ public class ModelTest extends SharedTestCase {
   private Game newGame(Map<String, Object> map) {
     String gameId = firebase.child("games").push().getName();
     map.put("id", gameId);
-    map.put("entityVersion", 1);
-    return new Game.GameDeserializer().deserialize(map);
+    return Game.newDeserializer().deserialize(map);
   }
   
   @SuppressWarnings("unchecked")
   private Game newGameWithCurrentCommand() {
     return newGame(map(
-        "entityVersion", 1,
         "currentPlayerNumber", 0,
         "players", list(userId, "opponentId"),
         "gameOver", false,
         "localMultiplayer", false,
         "isMinimal", false,
         "actions", list(map(
-          "entityVersion", 1,
           "playerNumber", 0,
           "commands", list(map(
-            "entityVersion", 1,
             "column", 2,
             "row", 1
           ))
         )),
         "profiles", map(
           userId, map(
-            "entityVersion", 1,
             "name", "User",
             "pronoun", "MALE"
           ),
           "opponentId", map(
-            "entityVersion", 1,
             "name", "Opponent",
             "pronoun", "FEMALE"
           )
@@ -704,6 +708,14 @@ public class ModelTest extends SharedTestCase {
     firebase.child("users").child(userId).child("games").child(game.getId())
         .setValue(game.minimalGame().serialize());
   }
+  
+  private Command newCommand(int column, int row) {
+    return Command
+        .newBuilder()
+        .setColumn(column)
+        .setRow(row)
+        .build();
+  }  
   
   final static <T> List<T> list(T... objects) {
     List<T> result = new ArrayList<T>();

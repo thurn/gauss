@@ -128,7 +128,7 @@ public class ComputerState implements State {
       setToStartingConditions();
       for (Action action : game.getActions()) {
         int player = convertPlayerNumber(action.getPlayerNumber());
-        long actionLong = commandToLong(player, action.getCommands().get(0));
+        long actionLong = commandToLong(player, action.getCommandList().get(0));
         perform(actionLong);
       }
     } else {
@@ -143,16 +143,24 @@ public class ComputerState implements State {
   
   private Map<Command, Long> commandToLongMap() {
     Map<Command, Long> commandToLong = new HashMap<Command, Long>();
-    commandToLong.put(new Command(0, 0), 0x0100L);
-    commandToLong.put(new Command(0, 1), 0x0020L);
-    commandToLong.put(new Command(0, 2), 0x0004L);
-    commandToLong.put(new Command(1, 0), 0x0080L);
-    commandToLong.put(new Command(1, 1), 0x0010L);
-    commandToLong.put(new Command(1, 2), 0x0002L);
-    commandToLong.put(new Command(2, 0), 0x0040L);
-    commandToLong.put(new Command(2, 1), 0x0008L);
-    commandToLong.put(new Command(2, 2), 0x0001L);
+    commandToLong.put(newCommand(0, 0), 0x0100L);
+    commandToLong.put(newCommand(0, 1), 0x0020L);
+    commandToLong.put(newCommand(0, 2), 0x0004L);
+    commandToLong.put(newCommand(1, 0), 0x0080L);
+    commandToLong.put(newCommand(1, 1), 0x0010L);
+    commandToLong.put(newCommand(1, 2), 0x0002L);
+    commandToLong.put(newCommand(2, 0), 0x0040L);
+    commandToLong.put(newCommand(2, 1), 0x0008L);
+    commandToLong.put(newCommand(2, 2), 0x0001L);
     return commandToLong;
+  }
+  
+  private Command newCommand(int column, int row) {
+    return Command
+        .newBuilder()
+        .setColumn(column)
+        .setRow(row)
+        .build();
   }
   
   private Map<Long, Command> longToCommandMap() {

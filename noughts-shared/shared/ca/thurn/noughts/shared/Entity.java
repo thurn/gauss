@@ -9,9 +9,9 @@ import java.util.Map.Entry;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.MutableData;
 
-public abstract class Entity {
+public abstract class Entity<T extends Entity<T>> {
   
-  public static abstract class EntityDeserializer<T extends Entity> {    
+  public static abstract class EntityDeserializer<T extends Entity<T>> {    
     /**
      * You must define this method to instantiate a new instance of your class
      * from the supplied map argument.
@@ -34,22 +34,56 @@ public abstract class Entity {
     }
   }
   
-  /**
-   * You must define this method to convert this entity into a Map. It should
-   * be possible to get back an equivalent entity by calling deserialize() on
-   * the resulting map.
-   * 
-   * @return This entity serialized to a map.
-   */  
-  abstract Map<String, Object> serialize();
+  public static interface EntityBuilder<T extends Entity<T>> {
+    public T build();
+  }
+
+  protected Entity() {
+  }
   
   /**
    * You must define this method to render your entity's name in toString(). 
    *
    * @return The name of your entity.
    */
-  abstract String entityName();
-
+  abstract String entityName();  
+  
+  /**
+   * You must define this method to convert this entity into a Map. It should
+   * be possible to get back an equivalent entity by calling 
+   * {@link EntityDeserializer#deserialize(Map)} on the result.
+   * 
+   * @return This entity serialized to a map.
+   */  
+  abstract Map<String, Object> serialize();
+  
+  /**
+   * You must define this method to convert this entity into an EntityBuilder.
+   * This allows users to initialize the builder with a copy of this Entity.
+   *
+   * @return A new EntityBuilder initialized with this entity.
+   */
+  abstract EntityBuilder<T> toBuilder();
+  
+  static void checkNotNull(Object object) {
+    if (object == null) {
+      throw new NullPointerException();
+    }
+  }
+  
+  static void checkListForNull(List<?> list) {
+    for (Object object : list) {
+      checkNotNull(object);
+    }
+  }
+  
+  static void checkMapForNull(Map<?, ?> map) {
+    for (Entry<?, ?> entry : map.entrySet()) {
+      checkNotNull(entry.getKey());
+      checkNotNull(entry.getValue());
+    }
+  }
+  
   @SuppressWarnings("unchecked")
   static <T> List<T> getList(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
@@ -81,7 +115,69 @@ public abstract class Entity {
       throw new IllegalArgumentException("Missing key " + key + "!");
     }
   }
-
+  
+  static void putSerialized(Map<String, Object> map, String key, Number object) {
+    putSerializedObject(map, key, object);
+  }  
+  
+  static void putSerialized(Map<String, Object> map, String key, String object) {
+    putSerializedObject(map, key, object);
+  }
+  
+  static void putSerialized(Map<String, Object> map, String key, Boolean object) {
+    putSerializedObject(map, key, object);
+  }
+  
+  static void putSerialized(Map<String, Object> map, String key, List<?> list) {
+    List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
+    List<Object> objects = new ArrayList<Object>();
+    for (Object object : list) {
+      if (object instanceof Entity) {
+        maps.add(((Entity<?>)object).serialize());
+      } else {
+        objects.add(object);
+      }
+    }
+    if (maps.size() > 0 && objects.size() > 0) {
+      throw new IllegalArgumentException("Cannot mix entities & non-entities in serialized list");
+    }
+    if (maps.size() > 0) {
+      map.put(key, maps);
+    }
+    if (objects.size() > 0) {
+      map.put(key, objects);
+    }
+  }  
+  
+  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
+      Map<String, T> entities) {
+    Map<String, Object> result = new HashMap<String, Object>();
+    for (Entry<String, T> entry : entities.entrySet()) {
+      result.put(entry.getKey(), entry.getValue().serialize());
+    }
+    if (result.size() > 0) {
+      map.put(key, result);
+    }
+  }  
+  
+  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key, Entity<T> entity) {
+    if (entity != null) {
+      map.put(key, entity.serialize());
+    }
+  }
+  
+  static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key, Enum<T> enumObject) {
+    if (enumObject != null) {
+      map.put(key, enumObject.name());
+    }
+  }  
+  
+  private static void putSerializedObject(Map<String, Object> map, String key, Object object) {
+    if (object != null) {
+      map.put(key, object);
+    }
+  }
+  
   static String getString(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (String)map.get(key);
@@ -114,18 +210,26 @@ public abstract class Entity {
     }
   }
   
-  @SuppressWarnings("unchecked")
-  static <T extends Entity> T getEntity(Map<String, Object> map, String key,
-      EntityDeserializer<T> deserializer) {
-    if (map.containsKey(key)) {
-      return deserializer.deserialize((Map<String, Object>)map.get(key));
+  static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key, Class<T> enumClass) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return Enum.valueOf(enumClass, map.get(key).toString());
     } else {
       return null;
     }
   }
   
   @SuppressWarnings("unchecked")
-  static <T extends Entity> List<T> getEntities(Map<String, Object> map, String key,
+  static <T extends Entity<T>> T getEntity(Map<String, Object> map, String key,
+      EntityDeserializer<T> deserializer) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return deserializer.deserialize((Map<String, Object>)map.get(key));
+    } else {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  static <T extends Entity<T>> List<T> getEntities(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     ArrayList<T> result = new ArrayList<T>();
     if (map.containsKey(key)) {
@@ -135,35 +239,19 @@ public abstract class Entity {
     }
     return (List<T>)result;
   }
-  
-  static List<Map<String, Object>> serializeEntities(List<? extends Entity> list) {
-    List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
-    for (Entity entity : list) {
-      result.add(entity.serialize());
-    }
-    return result;
-  }
-  
+
   @SuppressWarnings("unchecked")
-  static <T extends Entity> Map<String, T> getEntityMap(Map<String, Object> gameMap, String key,
+  static <T extends Entity<T>> Map<String, T> getEntityMap(Map<String, Object> output, String key,
       EntityDeserializer<T> deserializer) {
     Map<String, T> result = new HashMap<String, T>();
-    if (gameMap.containsKey(key)) {
-      Map<String, Object> map = (Map<String, Object>)gameMap.get(key);
+    if (output.containsKey(key)) {
+      Map<String, Object> map = (Map<String, Object>)output.get(key);
       for(Entry<String, Object> entry : map.entrySet()) {
         Map<String, Object> entity = (Map<String, Object>)entry.getValue();
         result.put(entry.getKey(), deserializer.deserialize(entity));
       }
     }
     return result;    
-  }
-  
-  static <T extends Entity> Map<String, Object> serializeEntityMap(Map<String, T> entities) {
-    Map<String, Object> result = new HashMap<String, Object>();
-    for (Entry<String, T> entry : entities.entrySet()) {
-      result.put(entry.getKey(), entry.getValue().serialize());
-    }
-    return result;
   }
   
   @Override
@@ -187,7 +275,7 @@ public abstract class Entity {
     if (getClass() != object.getClass()) {
       return false;
     }
-    Entity other = (Entity)object;
+    Entity<?> other = (Entity<?>)object;
     return serialize().equals(other.serialize());
   }
 }

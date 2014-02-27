@@ -276,7 +276,7 @@
   [self.back drawAtPoint:CGPointZero];
   if (self.currentGame) {
     for (NTSAction *action in [self.currentGame getActions]) {
-      for (NTSCommand* command in [action getCommands]) {
+      for (NTSCommand* command in [action getCommandList]) {
         CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
                                     [command getRow] * SQUARE_SIZE + TOP_OFFSET);
         if ([action getPlayerNumber] == [NTSModel X_PLAYER]) {

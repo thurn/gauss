@@ -3,36 +3,169 @@ package ca.thurn.noughts.shared;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Profile extends Entity {
-  public static class ProfileDeserializer extends EntityDeserializer<Profile> {
+public class Profile extends Entity<Profile> {
+  public static class Deserializer extends EntityDeserializer<Profile> {
+    private Deserializer() {
+    }
+
     @Override
     Profile deserialize(Map<String, Object> profileMap) {
       return new Profile(profileMap);
     }
   }
   
-  public static enum Pronoun {
-    MALE,
-    FEMALE,
-    NEUTRAL
+  public static class Builder implements EntityBuilder<Profile> {
+    private final Profile profile;
+    
+    private Builder() {
+      this.profile = new Profile();
+    }
+    
+    private Builder(Profile profile) {
+      this.profile = new Profile(profile);
+    }
+    
+    @Override
+    public Profile build() {
+      return new Profile(profile);
+    }
+
+    public boolean hasName() {
+      return profile.hasName();
+    }
+
+    public String getName() {
+      return profile.getName();
+    }
+    
+    public Builder setName(String name) {
+      checkNotNull(name);
+      profile.name = name;
+      return this;
+    }
+    
+    public Builder clearName() {
+      profile.name = null;
+      return this;
+    }
+
+    public boolean hasImageString() {
+      return profile.hasImageString();
+    }
+
+    public ImageString getImageString() {
+      return profile.getImageString();
+    }
+    
+    public Builder setImageString(EntityBuilder<ImageString> imageString) {
+      return setImageString(imageString.build());
+    }
+    
+    public Builder setImageString(ImageString imageString) {
+      checkNotNull(imageString);
+      profile.imageString = imageString;
+      return this;
+    }
+    
+    public Builder clearImageString() {
+      profile.imageString = null;
+      return this;
+    }
+
+    public boolean hasPronoun() {
+      return profile.hasPronoun();
+    }
+
+    public Pronoun getPronoun() {
+      return profile.getPronoun();
+    }
+    
+    public Builder setPronoun(Pronoun pronoun) {
+      checkNotNull(pronoun);
+      profile.pronoun = pronoun;
+      return this;
+    }
+    
+    public Builder clearPronoun() {
+      profile.pronoun = null;
+      return this;
+    }
+
+    public boolean hasIsComputerPlayer() {
+      return profile.hasIsComputerPlayer();
+    }
+
+    public boolean getIsComputerPlayer() {
+      return profile.getIsComputerPlayer();
+    }
+    
+    public Builder setIsComputerPlayer(boolean isComputerPlayer) {
+      profile.isComputerPlayer = isComputerPlayer;
+      return this;
+    }
+    
+    public Builder clearIsComputerPlayer() {
+      profile.isComputerPlayer = null;
+      return this;
+    }
+
+    public boolean hasComputerDifficultyLevel() {
+      return profile.hasComputerDifficultyLevel();
+    }
+
+    public int getComputerDifficultyLevel() {
+      return profile.getComputerDifficultyLevel();
+    }
+    
+    public Builder setComputerDifficultyLevel(int computerDifficultyLevel) {
+      profile.computerDifficultyLevel = computerDifficultyLevel;
+      return this;
+    }
+    
+    public Builder clearComputerDifficultyLevel() {
+      profile.computerDifficultyLevel = null;
+      return this;
+    }
+  }
+  
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+  
+  public static Builder newBuilder(Profile profile) {
+    return new Builder(profile);
+  }
+  
+  public static Deserializer newDeserializer() {
+    return new Deserializer();
   }
 
-  private final String name;
+  private String name;
   private ImageString imageString;
   private Pronoun pronoun;
-  private boolean isComputerPlayer;
+  private Boolean isComputerPlayer;
   private Integer computerDifficultyLevel;
   
-  public Profile(String name) {
-    this.pronoun = Pronoun.NEUTRAL;
-    this.name = name;
+  private Profile() {
   }
   
+  private Profile(Profile profile) {
+    this.name = profile.name;
+    this.imageString = profile.imageString;
+    this.pronoun = profile.pronoun;
+    this.isComputerPlayer = profile.isComputerPlayer;
+    this.computerDifficultyLevel = profile.computerDifficultyLevel;
+  }
+  
+  @Override
+  String entityName() {
+    return "Profile";
+  }  
+  
   private Profile(Map<String, Object> map) {
-    checkExists(map, "name");
     this.name = getString(map, "name");
-    this.imageString = getEntity(map, "imageString", new ImageString.ImageStringDeserializer());
-    this.pronoun = Pronoun.valueOf(getString(map, "pronoun"));
+    this.imageString = getEntity(map, "imageString", ImageString.newDeserializer());
+    this.pronoun = getEnum(map, "pronoun", Pronoun.class);
     this.isComputerPlayer = getBoolean(map, "isComputerPlayer");
     this.computerDifficultyLevel = getInteger(map, "computerDifficultyLevel");
   }
@@ -40,95 +173,61 @@ public class Profile extends Entity {
   @Override
   Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    result.put("name", getName());
-    if (imageString != null) {
-      result.put("imageString", getImageString().serialize());
-    }
-    result.put("pronoun", getPronoun().name());
-    result.put("isComputerPlayer", isComputerPlayer());
-    result.put("computerDifficultyLevel", getComputerDifficultyLevel());
+    putSerialized(result, "name", name);
+    putSerialized(result, "imageString", imageString);
+    putSerialized(result, "pronoun", pronoun);
+    putSerialized(result, "isComputerPlayer", isComputerPlayer);
+    putSerialized(result, "computerDifficultyLevel", computerDifficultyLevel);
     return result;
   }
-
+  
   @Override
-  String entityName() {
-    return "Profile";
+  public Builder toBuilder() {
+    return new Builder(this);
+  }
+  
+  public boolean hasName() {
+    return name != null;
   }
 
   public String getName() {
+    checkNotNull(name);
     return name;
   }
 
+  public boolean hasImageString() {
+    return imageString != null;
+  }
+  
   public ImageString getImageString() {
+    checkNotNull(imageString);
     return imageString;
   }
-
-  public Profile setImageString(ImageString imageString) {
-    this.imageString = imageString;
-    return this;
+  
+  public boolean hasPronoun() {
+    return pronoun != null;
   }
 
   public Pronoun getPronoun() {
+    checkNotNull(pronoun);
     return pronoun;
   }
-  
-  /**
-   * @param capitalize Whether to capitalize the word.
-   * @return The correct singular nominative pronoun for this user.
-   */
-  public String getNominativePronoun(boolean capitalize) {
-    switch (pronoun) {
-      case MALE: {
-        return capitalize ? "He" : "he";
-      }
-      case FEMALE: {
-        return capitalize ? "She" : "she";
-      }
-      default: {
-        return capitalize ? "They" : "they";
-      }
-    }
+
+  public boolean hasIsComputerPlayer() {
+    return isComputerPlayer != null;
   }
   
-  /**
-   * @param capitalize Whether to capitalize the word.
-   * @return The correct singular objective pronoun for this user.
-   */  
-  public String getObjectivePronoun(boolean capitalize) {
-    switch (pronoun) {
-      case MALE: {
-        return capitalize ? "Him" : "him";
-      }
-      case FEMALE: {
-        return capitalize ? "Her" : "her";
-      }
-      default: {
-        return capitalize ? "Them" : "them";
-      }
-    }
-  }
-
-  public Profile setPronoun(Pronoun pronoun) {
-    this.pronoun = pronoun;
-    return this;
-  }
-
-  public boolean isComputerPlayer() {
+  public boolean getIsComputerPlayer() {
+    checkNotNull(isComputerPlayer);
     return isComputerPlayer;
   }
 
-  public Profile setIsComputerPlayer(boolean isComputerPlayer) {
-    this.isComputerPlayer = isComputerPlayer;
-    return this;
+  public boolean hasComputerDifficultyLevel() {
+    return computerDifficultyLevel != null;
   }
-
-  public Integer getComputerDifficultyLevel() {
+  
+  public int getComputerDifficultyLevel() {
+    checkNotNull(computerDifficultyLevel);
     return computerDifficultyLevel;
   }
-
-  public Profile setComputerDifficultyLevel(int computerDifficultyLevel) {
-    this.computerDifficultyLevel = computerDifficultyLevel;
-    return this;
-  }
-
 }
