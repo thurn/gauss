@@ -1,7 +1,9 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.thurn.noughts.shared.Entity;
 
 /**
  * A string which represents an image, either a URL or a local resource.
@@ -12,12 +14,12 @@ public class ImageString extends Entity<ImageString> {
     }
 
     @Override
-    ImageString deserialize(Map<String, Object> map) {
+    public ImageString deserialize(Map<String, Object> map) {
       return new ImageString(map);
     }
   }  
   
-  public static class Builder implements EntityBuilder<ImageString> {
+  public static class Builder extends EntityBuilder<ImageString> {
     private final ImageString imageString;
     
     private Builder() {
@@ -33,6 +35,10 @@ public class ImageString extends Entity<ImageString> {
       return new ImageString(imageString);
     }
 
+    @Override protected ImageString getInternalEntity() {
+      return imageString;
+    }    
+    
     public boolean hasString() {
       return imageString.hasString();
     }
@@ -101,12 +107,12 @@ public class ImageString extends Entity<ImageString> {
   }
 
   @Override
-  String entityName() {
+  public String entityName() {
     return "imageString";
   }
 
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "string", string);
     putSerialized(result, "type", type);

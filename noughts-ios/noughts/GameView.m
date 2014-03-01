@@ -272,20 +272,27 @@
   }
 }
 
+-(void)drawAction:(NTSAction*)action {
+  for (NTSCommand* command in [action getCommandList]) {
+    CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
+                                [command getRow] * SQUARE_SIZE + TOP_OFFSET);
+    if ([action getPlayerNumber] == [NTSModel X_PLAYER]) {
+      [self.x drawAtPoint:point];
+    } else {
+      [self.o drawAtPoint:point];
+    }
+  }
+}
+
 - (void)drawRect:(CGRect)rect {
   [self.back drawAtPoint:CGPointZero];
   if (self.currentGame) {
-    for (NTSAction *action in [self.currentGame getActionList]) {
-      for (NTSCommand* command in [action getCommandList]) {
-        CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
-                                    [command getRow] * SQUARE_SIZE + TOP_OFFSET);
-        if ([action getPlayerNumber] == [NTSModel X_PLAYER]) {
-          [self.x drawAtPoint:point];
-        } else {
-          [self.o drawAtPoint:point];
-        }
-      }
+    for (NTSAction *action in [self.currentGame getSubmittedActionList]) {
+      [self drawAction:action];
     }
+  }
+  if ([self.currentGame hasCurrentAction]) {
+    [self drawAction:[self.currentGame getCurrentAction]];
   }
 }
 

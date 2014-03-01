@@ -229,7 +229,7 @@ NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[self.computerImages objectAtIndex:difficultyLevel]]];
-    [p2Profile setComputerPlayerWithBoolean:YES];
+    [p2Profile setIsComputerPlayerWithBoolean:YES];
     [p2Profile setComputerDifficultyLevelWithInt:difficultyLevel];
   } else {
     [p2Profile setNameWithNSString:p2Name];

@@ -1,5 +1,8 @@
 package ca.thurn.noughts.shared;
 
+import ca.thurn.noughts.shared.entities.Game;
+import ca.thurn.noughts.shared.entities.GameStatus;
+
 /**
  * Interface to implement to listen for game updates.
  */

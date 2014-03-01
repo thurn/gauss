@@ -19,7 +19,7 @@ public abstract class Entity<T extends Entity<T>> {
      * @param map The map representing your entity.
      * @return A newly instantiated entity.
      */    
-    abstract T deserialize(Map<String, Object> map);
+    public abstract T deserialize(Map<String, Object> map);
     
     @SuppressWarnings("unchecked")
     public T fromDataSnapshot(DataSnapshot snapshot) {
@@ -34,8 +34,36 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  public static interface EntityBuilder<T extends Entity<T>> {
-    public T build();
+  public static abstract class EntityBuilder<T extends Entity<T>> {
+    public abstract T build();
+    
+    protected abstract T getInternalEntity();
+    
+    @Override
+    public String toString() {
+      T entity = getInternalEntity();
+      return entity.entityName() + "Builder: " + entity.serialize().toString();
+    }
+    
+    @Override
+    public int hashCode() {
+      return getInternalEntity().serialize().hashCode();
+    }
+    
+    @Override
+    public boolean equals(Object object) {
+      if (this == object) {
+        return true;
+      }
+      if (object == null) {
+        return false;
+      }
+      if (getClass() != object.getClass()) {
+        return false;
+      }
+      EntityBuilder<?> other = (EntityBuilder<?>)object;
+      return getInternalEntity().serialize().equals(other.getInternalEntity().serialize());
+    }    
   }
 
   protected Entity() {
@@ -46,7 +74,7 @@ public abstract class Entity<T extends Entity<T>> {
    *
    * @return The name of your entity.
    */
-  abstract String entityName();  
+  public abstract String entityName();  
   
   /**
    * You must define this method to convert this entity into a Map. It should
@@ -55,7 +83,7 @@ public abstract class Entity<T extends Entity<T>> {
    * 
    * @return This entity serialized to a map.
    */  
-  abstract Map<String, Object> serialize();
+  public abstract Map<String, Object> serialize();
   
   /**
    * You must define this method to convert this entity into an EntityBuilder.
@@ -63,21 +91,21 @@ public abstract class Entity<T extends Entity<T>> {
    *
    * @return A new EntityBuilder initialized with this entity.
    */
-  abstract EntityBuilder<T> toBuilder();
+  public abstract EntityBuilder<T> toBuilder();
   
-  static void checkNotNull(Object object) {
+  public static void checkNotNull(Object object) {
     if (object == null) {
       throw new NullPointerException();
     }
   }
   
-  static void checkListForNull(List<?> list) {
+  public static void checkListForNull(List<?> list) {
     for (Object object : list) {
       checkNotNull(object);
     }
   }
   
-  static void checkMapForNull(Map<?, ?> map) {
+  public static void checkMapForNull(Map<?, ?> map) {
     for (Entry<?, ?> entry : map.entrySet()) {
       checkNotNull(entry.getKey());
       checkNotNull(entry.getValue());
@@ -85,7 +113,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
   
   @SuppressWarnings("unchecked")
-  static <T> List<T> getList(Map<String, Object> map, String key) {
+  public static <T> List<T> getList(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (List<T>)map.get(key);
     } else {
@@ -93,7 +121,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static <T> List<Integer> getIntegerList(List<T> list) {
+  public static <T> List<Integer> getIntegerList(List<T> list) {
     List<Integer> result = new ArrayList<Integer>();
     for (T t : list) {
       result.add(((Number)t).intValue());
@@ -102,7 +130,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   @SuppressWarnings("unchecked")
-  static <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
+  public static <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (Map<K,V>)map.get(key);
     } else {
@@ -110,25 +138,25 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static void checkExists(Map<String, Object> map, String key) {
+  public static void checkExists(Map<String, Object> map, String key) {
     if (!map.containsKey(key) || map.get(key) == null) {
       throw new IllegalArgumentException("Missing key " + key + "!");
     }
   }
   
-  static void putSerialized(Map<String, Object> map, String key, Number object) {
+  public static void putSerialized(Map<String, Object> map, String key, Number object) {
     putSerializedObject(map, key, object);
   }  
   
-  static void putSerialized(Map<String, Object> map, String key, String object) {
+  public static void putSerialized(Map<String, Object> map, String key, String object) {
     putSerializedObject(map, key, object);
   }
   
-  static void putSerialized(Map<String, Object> map, String key, Boolean object) {
+  public static void putSerialized(Map<String, Object> map, String key, Boolean object) {
     putSerializedObject(map, key, object);
   }
   
-  static void putSerialized(Map<String, Object> map, String key, List<?> list) {
+  public static void putSerialized(Map<String, Object> map, String key, List<?> list) {
     List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
     List<Object> objects = new ArrayList<Object>();
     for (Object object : list) {
@@ -149,7 +177,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }  
   
-  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
+  public static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
       Map<String, T> entities) {
     Map<String, Object> result = new HashMap<String, Object>();
     for (Entry<String, T> entry : entities.entrySet()) {
@@ -160,13 +188,13 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }  
   
-  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key, Entity<T> entity) {
+  public static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key, Entity<T> entity) {
     if (entity != null) {
       map.put(key, entity.serialize());
     }
   }
   
-  static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key, Enum<T> enumObject) {
+  public static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key, Enum<T> enumObject) {
     if (enumObject != null) {
       map.put(key, enumObject.name());
     }
@@ -178,7 +206,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static String getString(Map<String, Object> map, String key) {
+  public static String getString(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (String)map.get(key);
     } else {
@@ -186,7 +214,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
 
-  static Integer getInteger(Map<String, Object> map, String key) {
+  public static Integer getInteger(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return new Integer(((Number)map.get(key)).intValue());
     } else {
@@ -194,7 +222,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static Long getLong(Map<String, Object> map, String key) {
+  public static Long getLong(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (Long)map.get(key);
     } else {
@@ -202,7 +230,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static boolean getBoolean(Map<String, Object> map, String key) {
+  public static boolean getBoolean(Map<String, Object> map, String key) {
     if (!map.containsKey(key) || map.get(key) == null) {
       return false;
     } else {
@@ -210,7 +238,7 @@ public abstract class Entity<T extends Entity<T>> {
     }
   }
   
-  static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key, Class<T> enumClass) {
+  public static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key, Class<T> enumClass) {
     if (map.containsKey(key) && map.get(key) != null) {
       return Enum.valueOf(enumClass, map.get(key).toString());
     } else {
@@ -219,7 +247,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
   
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> T getEntity(Map<String, Object> map, String key,
+  public static <T extends Entity<T>> T getEntity(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     if (map.containsKey(key) && map.get(key) != null) {
       return deserializer.deserialize((Map<String, Object>)map.get(key));
@@ -229,7 +257,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> List<T> getEntities(Map<String, Object> map, String key,
+  public static <T extends Entity<T>> List<T> getEntities(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     ArrayList<T> result = new ArrayList<T>();
     if (map.containsKey(key)) {
@@ -241,7 +269,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> Map<String, T> getEntityMap(Map<String, Object> output, String key,
+  public static <T extends Entity<T>> Map<String, T> getEntityMap(Map<String, Object> output, String key,
       EntityDeserializer<T> deserializer) {
     Map<String, T> result = new HashMap<String, T>();
     if (output.containsKey(key)) {

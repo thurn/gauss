@@ -1,7 +1,9 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.thurn.noughts.shared.Entity;
 
 /**
  * Represents the current status of the game.
@@ -12,12 +14,12 @@ public class GameStatus extends Entity<GameStatus> {
     }
     
     @Override
-    GameStatus deserialize(Map<String, Object> map) {
+    public GameStatus deserialize(Map<String, Object> map) {
       return new GameStatus(map);
     }
   }
   
-  public static class Builder implements EntityBuilder<GameStatus> {
+  public static class Builder extends EntityBuilder<GameStatus> {
     private final GameStatus status;
     
     private Builder() {
@@ -30,6 +32,10 @@ public class GameStatus extends Entity<GameStatus> {
     
     @Override public GameStatus build() {
       return new GameStatus(status);
+    }
+    
+    @Override protected GameStatus getInternalEntity() {
+      return status;
     }
 
     public boolean hasStatusString() {
@@ -121,12 +127,12 @@ public class GameStatus extends Entity<GameStatus> {
   }
 
   @Override
-  String entityName() {
+  public String entityName() {
     return "GameStatus";
   }
   
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "statusString", statusString);
     putSerialized(result, "statusImageString", statusImageString);

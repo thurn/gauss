@@ -9,6 +9,7 @@
 #import "GameListViewController.h"
 #import "Model.h"
 #import "Game.h"
+#import "Games.h"
 #import "GameListPartitions.h"
 #import "GameViewController.h"
 #import "java/util/List.h"
@@ -95,7 +96,8 @@
   static NSString *CellIdentifier = @"Cell";
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
   NTSGame *game = [self gameForIndexPath:indexPath];
-  NTSGameListEntry *listEntry = [game gameListEntryWithNSString:[self.model getUserId]];
+  NTSGameListEntry *listEntry = [NTSGames gameListEntryWithNTSGame:game
+                                                      withNSString:[self.model getUserId]];
   cell.textLabel.text = [listEntry getVsString];
   cell.detailTextLabel.text = [listEntry getModifiedString];
   id <JavaUtilList> imageList = [listEntry getImageStringList];

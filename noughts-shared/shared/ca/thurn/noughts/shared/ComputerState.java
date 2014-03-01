@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import ca.thurn.noughts.shared.entities.Action;
+import ca.thurn.noughts.shared.entities.Command;
+import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.uct.core.Copyable;
 import ca.thurn.uct.core.Player;
 import ca.thurn.uct.core.State;
@@ -25,6 +28,23 @@ public class ComputerState implements State {
   static {
     for (int i = 0; i < WINNING_X_LINES.length; ++i) {
       WINNING_O_LINES[i] = WINNING_X_LINES[i] << 12;
+    }
+  }
+  
+  static class GameInitializer implements Copyable {
+    private final Game game;
+    
+    GameInitializer(Game game) {
+      this.game = game;
+    }
+    
+    public Game getGame() {
+      return game;
+    }
+
+    @Override
+    public GameInitializer copy() {
+      return new GameInitializer(game);
     }
   }
   
@@ -123,10 +143,10 @@ public class ComputerState implements State {
       this.board = copy.board;
       this.currentPlayer = copy.currentPlayer;
       this.actions = copy.actions;        
-    } else if (state instanceof Game) {
-      Game game = (Game)state;
+    } else if (state instanceof GameInitializer) {
+      Game game = ((GameInitializer)state).getGame();
       setToStartingConditions();
-      for (Action action : game.getActionList()) {
+      for (Action action : game.getSubmittedActionList()) {
         int player = convertPlayerNumber(action.getPlayerNumber());
         long actionLong = commandToLong(player, action.getCommandList().get(0));
         perform(actionLong);

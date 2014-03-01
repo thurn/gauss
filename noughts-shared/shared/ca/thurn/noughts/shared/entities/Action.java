@@ -1,4 +1,4 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,18 +6,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import ca.thurn.noughts.shared.Entity;
+
 public class Action extends Entity<Action> {
   public static class Deserializer extends EntityDeserializer<Action> {
     private Deserializer() {
     }
 
     @Override
-    Action deserialize(Map<String, Object> actionMap) {
+    public Action deserialize(Map<String, Object> actionMap) {
       return new Action(actionMap);
     }    
   }
   
-  public static class Builder implements EntityBuilder<Action> {
+  public static class Builder extends EntityBuilder<Action> {
     private final Action action;  
     
     private Builder() {
@@ -32,6 +34,10 @@ public class Action extends Entity<Action> {
     public Action build() {
       return new Action(action);
     }
+    
+    @Override protected Action getInternalEntity() {
+      return action;
+    }    
 
     public boolean hasPlayerNumber() {
       return action.hasPlayerNumber();
@@ -70,20 +76,20 @@ public class Action extends Entity<Action> {
       return this;
     }
 
-    public boolean hasSubmitted() {
-      return action.hasSubmitted();
+    public boolean hasIsSubmitted() {
+      return action.hasIsSubmitted();
     }
     
     public boolean isSubmitted() {
       return action.isSubmitted();
     }
     
-    public Builder setSubmitted(boolean submitted) {
+    public Builder setIsSubmitted(boolean submitted) {
       action.submitted = submitted;
       return this;
     }
     
-    public Builder clearSubmitted() {
+    public Builder clearIsSubmitted() {
       action.submitted = null;
       return this;
     }
@@ -97,7 +103,7 @@ public class Action extends Entity<Action> {
     }
     
     public List<Command> getCommandList() {
-      return action.commands;
+      return action.commandList;
     }
     
     public Builder setCommand(int index, EntityBuilder<Command> command) {
@@ -106,7 +112,7 @@ public class Action extends Entity<Action> {
 
     public Builder setCommand(int index, Command command) {
       checkNotNull(command);
-      action.commands.set(index, command);
+      action.commandList.set(index, command);
       return this;
     }
     
@@ -116,18 +122,18 @@ public class Action extends Entity<Action> {
     
     public Builder addCommand(Command command) {
       checkNotNull(command);
-      action.commands.add(command);
+      action.commandList.add(command);
       return this;
     }
     
     public Builder addAllCommand(List<Command> commands) {
       checkListForNull(commands);
-      action.commands.addAll(commands);
+      action.commandList.addAll(commands);
       return this;
     }
     
     public Builder clearCommandList() {
-      action.commands.clear();
+      action.commandList.clear();
       return this;
     }
     
@@ -140,7 +146,7 @@ public class Action extends Entity<Action> {
     }
     
     public List<Command> getFutureCommandList() {
-      return action.futureCommands;
+      return action.futureCommandList;
     }
     
     public Builder setFutureCommand(int index, EntityBuilder<Command> futureCommand) {
@@ -149,7 +155,7 @@ public class Action extends Entity<Action> {
     
     public Builder setFutureCommand(int index, Command futureCommand) {
       checkNotNull(futureCommand);
-      action.futureCommands.set(index, futureCommand);
+      action.futureCommandList.set(index, futureCommand);
       return this;
     }
     
@@ -159,18 +165,18 @@ public class Action extends Entity<Action> {
     
     public Builder addFutureCommand(Command futureCommand) {
       checkNotNull(futureCommand);
-      action.futureCommands.add(futureCommand);
+      action.futureCommandList.add(futureCommand);
       return this;
     }
 
     public Builder addAllFutureCommand(List<Command> futureCommands) {
       checkListForNull(futureCommands);
-      action.futureCommands.addAll(futureCommands);
+      action.futureCommandList.addAll(futureCommands);
       return this;
     }
     
     public Builder clearFutureCommandList() {
-      action.futureCommands.clear();
+      action.futureCommandList.clear();
       return this;
     }
   }
@@ -190,28 +196,28 @@ public class Action extends Entity<Action> {
   private Integer playerNumber;
   private String gameId;
   private Boolean submitted;
-  private final List<Command> commands;
-  private final List<Command> futureCommands;  
+  private final List<Command> commandList;
+  private final List<Command> futureCommandList;  
 
   private Action() {
-    this.commands = new ArrayList<Command>();
-    this.futureCommands = new ArrayList<Command>();
+    this.commandList = new ArrayList<Command>();
+    this.futureCommandList = new ArrayList<Command>();
   }
   
   private Action(Action action) {
     this.playerNumber = action.playerNumber;
     this.gameId = action.gameId;
     this.submitted = action.submitted;
-    this.commands = new ArrayList<Command>(action.commands);
-    this.futureCommands = new ArrayList<Command>(action.futureCommands);
+    this.commandList = new ArrayList<Command>(action.commandList);
+    this.futureCommandList = new ArrayList<Command>(action.futureCommandList);
   }
 
   private Action(Map<String, Object> actionMap) {
     playerNumber = getInteger(actionMap, "playerNumber"); 
     gameId = getString(actionMap, "gameId");
     submitted = getBoolean(actionMap, "submitted");
-    commands = getEntities(actionMap, "commands", Command.newDeserializer());
-    futureCommands = getEntities(actionMap, "futureCommands", Command.newDeserializer());
+    commandList = getEntities(actionMap, "commandList", Command.newDeserializer());
+    futureCommandList = getEntities(actionMap, "futureCommandList", Command.newDeserializer());
   }
 
   @Override
@@ -220,13 +226,13 @@ public class Action extends Entity<Action> {
   }
   
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "playerNumber", playerNumber);
     putSerialized(result, "gameId", gameId);
     putSerialized(result, "submitted", submitted);
-    putSerialized(result, "commands", commands);
-    putSerialized(result, "futureCommands", futureCommands);
+    putSerialized(result, "commandList", commandList);
+    putSerialized(result, "futureCommandList", futureCommandList);
     return result;
   }
   
@@ -235,7 +241,7 @@ public class Action extends Entity<Action> {
     return new Builder(this);
   }
   
-  public boolean hasSubmitted() {
+  public boolean hasIsSubmitted() {
     return submitted != null;
   }
   
@@ -263,26 +269,26 @@ public class Action extends Entity<Action> {
   }
   
   public int getCommandCount() {
-    return commands.size();
+    return commandList.size();
   }
   
   public Command getCommand(int index) {
-    return commands.get(index);
+    return commandList.get(index);
   }
   
   public List<Command> getCommandList() {
-    return Collections.unmodifiableList(commands);
+    return Collections.unmodifiableList(commandList);
   }
 
   public int getFutureCommandCount() {
-    return futureCommands.size();
+    return futureCommandList.size();
   }
   
   public Command getFutureCommand(int index) {
-    return futureCommands.get(index);
+    return futureCommandList.get(index);
   }
   
   public List<Command> getFutureCommandList() {
-    return Collections.unmodifiableList(futureCommands);
+    return Collections.unmodifiableList(futureCommandList);
   }
 }

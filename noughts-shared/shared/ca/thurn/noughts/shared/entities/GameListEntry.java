@@ -1,10 +1,12 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import ca.thurn.noughts.shared.Entity;
 
 /**
  * Represents a game entry in the game list.
@@ -15,12 +17,12 @@ public class GameListEntry extends Entity<GameListEntry> {
     }
     
     @Override
-    GameListEntry deserialize(Map<String, Object> map) {
+    public GameListEntry deserialize(Map<String, Object> map) {
       return new GameListEntry(map);
     }
   }
   
-  public static class Builder implements EntityBuilder<GameListEntry> {
+  public static class Builder extends EntityBuilder<GameListEntry> {
     private final GameListEntry gameListEntry;
     
     private Builder() {
@@ -35,6 +37,10 @@ public class GameListEntry extends Entity<GameListEntry> {
     public GameListEntry build() {
       return new GameListEntry(gameListEntry);
     }
+    
+    @Override protected GameListEntry getInternalEntity() {
+      return gameListEntry;
+    }    
 
     public boolean hasVsString() {
       return gameListEntry.hasVsString();
@@ -83,7 +89,7 @@ public class GameListEntry extends Entity<GameListEntry> {
     }
 
     public List<ImageString> getImageStringList() {
-      return gameListEntry.imageStrings;
+      return gameListEntry.imageStringList;
     }
     
     public Builder setImageString(int index, EntityBuilder<ImageString> imageString) {
@@ -92,7 +98,7 @@ public class GameListEntry extends Entity<GameListEntry> {
     
     public Builder setImageString(int index, ImageString imageString) {
       checkNotNull(imageString);
-      gameListEntry.imageStrings.set(index, imageString);
+      gameListEntry.imageStringList.set(index, imageString);
       return this;
     }
     
@@ -102,18 +108,18 @@ public class GameListEntry extends Entity<GameListEntry> {
     
     public Builder addImageString(ImageString imageString) {
       checkNotNull(imageString);
-      gameListEntry.imageStrings.add(imageString);
+      gameListEntry.imageStringList.add(imageString);
       return this;
     }
     
     public Builder addAllImageString(List<ImageString> imageStrings) {
       checkListForNull(imageStrings);
-      gameListEntry.imageStrings.addAll(imageStrings);
+      gameListEntry.imageStringList.addAll(imageStrings);
       return this;
     }
     
     public Builder clearImageStringList() {
-      gameListEntry.imageStrings.clear();
+      gameListEntry.imageStringList.clear();
       return this;
     }
   }
@@ -132,22 +138,22 @@ public class GameListEntry extends Entity<GameListEntry> {
   
   private String vsString;
   private String modifiedString;
-  private final List<ImageString> imageStrings;
+  private final List<ImageString> imageStringList;
   
   private GameListEntry() {
-    this.imageStrings = new ArrayList<ImageString>();
+    this.imageStringList = new ArrayList<ImageString>();
   }
   
   private GameListEntry(GameListEntry gameListEntry) {
     this.vsString = gameListEntry.vsString;
     this.modifiedString = gameListEntry.modifiedString;
-    this.imageStrings = gameListEntry.imageStrings;
+    this.imageStringList = gameListEntry.imageStringList;
   }
   
   private GameListEntry(Map<String, Object> map) {
     vsString = getString(map, "vsString");
     modifiedString = getString(map, "modifiedString");
-    imageStrings = getEntities(map, "imageStrings", ImageString.newDeserializer());
+    imageStringList = getEntities(map, "imageStringList", ImageString.newDeserializer());
   }
   
   @Override
@@ -156,11 +162,11 @@ public class GameListEntry extends Entity<GameListEntry> {
   }
   
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "vsString", vsString);
     putSerialized(result, "modifiedString", modifiedString);
-    putSerialized(result, "imageStrings", imageStrings);
+    putSerialized(result, "imageStringList", imageStringList);
     return result;
   }
   
@@ -188,14 +194,14 @@ public class GameListEntry extends Entity<GameListEntry> {
   }
   
   public int getImageStringCount() {
-    return imageStrings.size();
+    return imageStringList.size();
   }
   
   public ImageString getImageString(int index) {
-    return imageStrings.get(index);
+    return imageStringList.get(index);
   }
 
   public List<ImageString> getImageStringList() {
-    return Collections.unmodifiableList(imageStrings);
+    return Collections.unmodifiableList(imageStringList);
   }
 }

@@ -1,7 +1,9 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.thurn.noughts.shared.Entity;
 
 public class Command extends Entity<Command> {
   public static class Deserializer extends EntityDeserializer<Command> {
@@ -9,12 +11,12 @@ public class Command extends Entity<Command> {
     }
 
     @Override
-    Command deserialize(Map<String, Object> commandMap) {
+    public Command deserialize(Map<String, Object> commandMap) {
       return new Command(commandMap);
     }    
   }
   
-  public static class Builder implements EntityBuilder<Command> {
+  public static class Builder extends EntityBuilder<Command> {
     private final Command command;
     
     private Builder() {
@@ -29,6 +31,10 @@ public class Command extends Entity<Command> {
     public Command build() {
       return new Command(command);
     }
+    
+    @Override protected Command getInternalEntity() {
+      return command;
+    }    
     
     public boolean hasColumn() {
       return command.hasColumn();
@@ -101,7 +107,7 @@ public class Command extends Entity<Command> {
   }  
   
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "column", column);
     putSerialized(result, "row", row);

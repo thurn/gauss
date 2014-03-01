@@ -1,5 +1,7 @@
 package ca.thurn.noughts.shared;
 
+import ca.thurn.noughts.shared.entities.Pronoun;
+
 public class Pronouns {
   /**
    * @param pronoun The pronoun.

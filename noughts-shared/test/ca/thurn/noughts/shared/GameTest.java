@@ -2,6 +2,13 @@ package ca.thurn.noughts.shared;
 
 import static ca.thurn.noughts.shared.ModelTest.map;
 import static ca.thurn.noughts.shared.ModelTest.list;
+import ca.thurn.noughts.shared.entities.Action;
+import ca.thurn.noughts.shared.entities.Game;
+import ca.thurn.noughts.shared.entities.GameStatus;
+import ca.thurn.noughts.shared.entities.ImageString;
+import ca.thurn.noughts.shared.entities.ImageType;
+import ca.thurn.noughts.shared.entities.Profile;
+import ca.thurn.noughts.shared.entities.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 public class GameTest extends SharedTestCase {
@@ -10,66 +17,57 @@ public class GameTest extends SharedTestCase {
     Game.Builder g2 = Game.newBuilder().setId("two");
     g1.setLastModified(100L);
     g2.setLastModified(200L);
-    assertTrue(g1.build().compareTo(g2.build()) > 0);
-  }
-  
-  public void testCurrentAction() {
-    Game.Builder test = Game.newBuilder().setId("foo");
-    assertFalse(test.hasCurrentActionNumber());
-    test.setCurrentActionNumber(0);
-    test.addAction(Action.newBuilder().setPlayerNumber(0).build());
-    assertTrue(test.hasCurrentActionNumber());
-    assertEquals(0, test.getAction(test.getCurrentActionNumber()).getPlayerNumber());
+    assertTrue(Games.compareGames(g1.build(), (g2.build())) > 0);
   }
 
   public void testLastUpdatedString() {
     long currentTime = 300000000000L;
     Game.Builder testGame = Game.newBuilder().setId("test");
-    testGame.setGameOver(false);
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsGameOver(false);
+    testGame.setIsLocalMultiplayer(false);
     Clock.getInstance().setCurrentTimeForTesting(currentTime);
     testGame.setLastModified(currentTime - 157700000000L);
-    assertEquals("Updated 5 years ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 5 years ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 31556952000L);
-    assertEquals("Updated a year ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated a year ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 5259490000L);
-    assertEquals("Updated 2 months ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 2 months ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 1555200000L);
-    assertEquals("Updated 2 weeks ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 2 weeks ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 432000000L);
-    assertEquals("Updated 5 days ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 5 days ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 10800000L);
-    assertEquals("Updated 3 hours ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 3 hours ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 3600000L);
-    assertEquals("Updated an hour ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated an hour ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 240000L);
-    assertEquals("Updated 4 minutes ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 4 minutes ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime - 3000L);
-    assertEquals("Updated 3 seconds ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated 3 seconds ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime);
-    assertEquals("Updated a second ago", testGame.build().lastUpdatedString(""));
+    assertEquals("Updated a second ago", Games.lastUpdatedString(testGame.build(), ""));
     
     testGame = Game.newBuilder().setId("test2");
-    testGame.setGameOver(true);
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsGameOver(true);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("viewerId");
     testGame.addPlayer("opponentId");
     testGame.addVictor(0);
     testGame.setLastModified(currentTime);
-    assertEquals("You won a second ago", testGame.build().lastUpdatedString("viewerId"));
+    assertEquals("You won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
     
     testGame = Game.newBuilder().setId("test3");
-    testGame.setGameOver(true);
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsGameOver(true);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("viewerId");
     testGame.addPlayer("opponentId");
     testGame.addVictor(1);
     testGame.setLastModified(currentTime);
-    assertEquals("They won a second ago", testGame.build().lastUpdatedString("viewerId"));
+    assertEquals("They won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
     
     testGame = Game.newBuilder().setId("test3");
-    testGame.setGameOver(true);
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsGameOver(true);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("viewerId");
     testGame.addPlayer("opponentId");
     testGame.addVictor(1);
@@ -78,27 +76,27 @@ public class GameTest extends SharedTestCase {
     opponentProfile.setPronoun(Pronoun.FEMALE);
     testGame.putProfile("opponentId", opponentProfile.build());
     testGame.setLastModified(currentTime);
-    assertEquals("She won a second ago", testGame.build().lastUpdatedString("viewerId"));
+    assertEquals("She won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
     
     testGame = Game.newBuilder().setId("test3");
-    testGame.setGameOver(true);
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsGameOver(true);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("viewerId");
     testGame.addPlayer("opponentId");
     testGame.addVictor(0);
     testGame.addVictor(1);
     testGame.setLastModified(currentTime);
-    assertEquals("Game tied a second ago", testGame.build().lastUpdatedString("viewerId"));
+    assertEquals("Game tied a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
   }
   
   public void testGetOpponentPlayerNumber() {
     Game.Builder testGame = Game.newBuilder().setId("one");
     testGame.addPlayer("viewerId");
     testGame.addPlayer("opponentId");
-    assertEquals(1, testGame.build().opponentPlayerNumber("viewerId"));
+    assertEquals(1, Games.opponentPlayerNumber(testGame.build(), ("viewerId")));
     testGame = Game.newBuilder().setId("two");
     try {
-      testGame.build().opponentPlayerNumber("viewerId");
+      Games.opponentPlayerNumber(testGame.build(),("viewerId"));
       fail();
     } catch (IllegalStateException expected) {}
   }
@@ -110,7 +108,7 @@ public class GameTest extends SharedTestCase {
     Profile john = Profile.newBuilder().setName("John").build();
     g1.putProfile("user", john);
     try {
-      g1.build().opponentProfile("user");
+      Games.opponentProfile(g1.build(),("user"));
       fail();
     } catch (IllegalStateException expected) {}
     
@@ -120,16 +118,16 @@ public class GameTest extends SharedTestCase {
     g2.putProfile("user2", john);
     g2.addLocalProfile(Profile.newBuilder().build());
     g2.addLocalProfile(Profile.newBuilder().setName("Jane").build());
-    assertEquals("Jane", g2.build().opponentProfile("user1").getName());
+    assertEquals("Jane", Games.opponentProfile(g2.build(), "user1").getName());
     
     Game.Builder g3 = Game.newBuilder().setId("g3");
     g3.addPlayer("user1");
     g3.addPlayer("user2");
     g3.putProfile("user2", john);
-    assertEquals("John", g3.build().opponentProfile("user1").getName());
+    assertEquals("John", Games.opponentProfile(g3.build(), "user1").getName());
     
     try {
-      g3.build().opponentProfile("user2");
+      Games.opponentProfile(g3.build(), "user2");
       fail();
     } catch (IllegalStateException expected) {}
   }
@@ -139,83 +137,83 @@ public class GameTest extends SharedTestCase {
     g1.addPlayer("user");
     g1.addPlayer("opponent");        
     g1.putProfile("user",  Profile.newBuilder().setName("John").build());
-    assertEquals("John", g1.build().playerProfile(0).getName());
+    assertEquals("John", Games.playerProfile(g1.build(),0).getName());
     try {
-      g1.build().playerProfile(1);
+      Games.playerProfile(g1.build(),1);
       fail();
     } catch (IllegalArgumentException expected) {}
     g1.addLocalProfile(Profile.newBuilder().setName("James").build());
-    assertEquals("James", g1.build().playerProfile(0).getName());
+    assertEquals("James", Games.playerProfile(g1.build(),0).getName());
   }
   
   public void testGetPlayerNumbersForPlayerId() {
     Game.Builder test = Game.newBuilder().setId("one");
     test.addPlayer("viewerid");
     test.addPlayer("viewerid");
-    assertDeepEquals(list(0, 1), test.build().playerNumbersForPlayerId("viewerid"));
+    assertDeepEquals(list(0, 1), Games.playerNumbersForPlayerId(test.build(),"viewerid"));
   }
 
   public void testVsString() {
     Game.Builder testGame = Game.newBuilder().setId("one");
-    testGame.setLocalMultiplayer(true);
-    assertEquals("Local Multiplayer Game", testGame.build().vsString(""));
+    testGame.setIsLocalMultiplayer(true);
+    assertEquals("Local Multiplayer Game", Games.vsString(testGame.build(),""));
     testGame = Game.newBuilder().setId("two");
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("one");
-    assertEquals("vs. (No Opponent Yet)", testGame.build().vsString(""));
+    assertEquals("vs. (No Opponent Yet)", Games.vsString(testGame.build(),""));
     testGame = Game.newBuilder().setId("four");
-    testGame.setLocalMultiplayer(false);    
+    testGame.setIsLocalMultiplayer(false);    
     testGame.addPlayer("one");
     testGame.addPlayer("two");
     Profile profile = Profile.newBuilder().setName("GivenName").build();
     testGame.putProfile("two", profile);
-    assertEquals("vs. GivenName", testGame.build().vsString("one"));
+    assertEquals("vs. GivenName", Games.vsString(testGame.build(),"one"));
   }
   
   public void testMinimalGame() {
     Game.Builder testGame = Game.newBuilder().setId("id");
-    testGame.addAction(Action.newBuilder().build());
-    assertEquals("id", testGame.build().minimalGame().getId());
-    assertEquals(0, testGame.build().minimalGame().getActionCount());
+    testGame.addSubmittedAction(Action.newBuilder().build());
+    assertEquals("id", Games.minimalGame(testGame.build()).getId());
+    assertEquals(0, Games.minimalGame(testGame.build()).getSubmittedActionCount());
   }
   
   public void testHasOpponent() {
     Game.Builder test = Game.newBuilder().setId("id");
-    assertFalse(test.build().hasOpponent("user"));
+    assertFalse(Games.hasOpponent(test.build(),"user"));
     test.addPlayer("user");
-    assertFalse(test.build().hasOpponent("user"));
+    assertFalse(Games.hasOpponent(test.build(),"user"));
     test.addPlayer("user");
-    assertFalse(test.build().hasOpponent("user"));
+    assertFalse(Games.hasOpponent(test.build(),"user"));
     test.clearPlayerList();
     test.addPlayer("user");
     test.addPlayer("other");
-    assertTrue(test.build().hasOpponent("user"));
+    assertTrue(Games.hasOpponent(test.build(),"user"));
   }
   
   public void testGetImageList() {
     Game.Builder testGame = getTestGame();
     ImageString string = newImageString("thestring");
-    assertDeepEquals(list(string), testGame.build().imageList("userid"));
+    assertDeepEquals(list(string), Games.imageList(testGame.build(),"userid"));
   }
   
   public void testGetImageListLocalMultiplayer() {
     Game.Builder testGame = getTestGame();
-    testGame.setLocalMultiplayer(true);
+    testGame.setIsLocalMultiplayer(true);
     ImageString image1 = newImageString("one");
     testGame.addLocalProfile(
         Profile.newBuilder().setName("Alpha").setImageString(image1).build());
     ImageString image2 = newImageString("two");
     testGame.addLocalProfile(
         Profile.newBuilder().setName("Beta").setImageString(image2).build());
-    assertDeepEquals(list(image1, image2), testGame.build().imageList("userid"));
+    assertDeepEquals(list(image1, image2), Games.imageList(testGame.build(),"userid"));
   }
 
   private Game.Builder getTestGame() {
     return Game.newDeserializer().deserialize(map(
         "id", "gameId",
-        "players", list("userid", "opponentid"),
+        "playerList", list("userid", "opponentid"),
         "currentPlayerNumber", 0,
-        "profiles", map(
+        "profileMap", map(
           "userid", map(
             "pronoun", "FEMALE",
             "imageString", map(
@@ -238,14 +236,14 @@ public class GameTest extends SharedTestCase {
   
   public void testImageListNoOpponent() {
     Game.Builder testGame = Game.newBuilder().setId("id");
-    testGame.setLocalMultiplayer(false);
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("userid");
-    assertEquals(list(Game.NO_OPPONENT_IMAGE_STRING), testGame.build().imageList("userid"));
+    assertEquals(list(Games.NO_OPPONENT_IMAGE_STRING), Games.imageList(testGame.build(),"userid"));
   }
   
   public void testGameStatus() {
     Game.Builder testGame = getTestGame();
-    GameStatus status = testGame.build().gameStatus();
+    GameStatus status = Games.gameStatus(testGame.build());
     assertEquals("Player 1's turn", status.getStatusString());
     assertEquals(0, status.getStatusPlayer());
     assertEquals(newImageString("otherstring"), status.getStatusImageString());
@@ -253,18 +251,18 @@ public class GameTest extends SharedTestCase {
   
   public void testGameStatusGameOver() {
     Game.Builder testGame = getTestGame();
-    testGame.setGameOver(true);
+    testGame.setIsGameOver(true);
     testGame.addVictor(1);
-    GameStatus winnerStatus = testGame.build().gameStatus();
+    GameStatus winnerStatus = Games.gameStatus(testGame.build());
     assertEquals("Player 2 won the game!", winnerStatus.getStatusString());
     assertEquals(newImageString("thestring"),
         winnerStatus.getStatusImageString());
     assertEquals(1, winnerStatus.getStatusPlayer());
     
     testGame.addVictor(0);
-    GameStatus drawStatus = testGame.build().gameStatus();
+    GameStatus drawStatus = Games.gameStatus(testGame.build());
     assertEquals("Game drawn.", drawStatus.getStatusString());
-    assertEquals(Game.GAME_OVER_IMAGE_STRING, drawStatus.getStatusImageString());
+    assertEquals(Games.GAME_OVER_IMAGE_STRING, drawStatus.getStatusImageString());
     assertFalse(drawStatus.hasStatusPlayer());
   }
   

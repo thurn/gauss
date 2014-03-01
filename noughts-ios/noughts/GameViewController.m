@@ -15,6 +15,7 @@
 #import "Command.h"
 #import "Profile.h"
 #import "GameStatus.h"
+#import "Games.H"
 #import "Toast+UIView.h"
 #import "java/lang/Integer.h"
 #import "ImageString.h"
@@ -54,7 +55,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
-  [self displayGameStatus:[self.currentGame gameStatus]];
+  [self displayGameStatus:[NTSGames gameStatusWithNTSGame:self.currentGame]];
   [self.model handleComputerActionWithNTSGame:self.currentGame];
 }
 

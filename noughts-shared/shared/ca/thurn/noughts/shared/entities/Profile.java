@@ -1,7 +1,9 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import ca.thurn.noughts.shared.Entity;
 
 public class Profile extends Entity<Profile> {
   public static class Deserializer extends EntityDeserializer<Profile> {
@@ -9,12 +11,12 @@ public class Profile extends Entity<Profile> {
     }
 
     @Override
-    Profile deserialize(Map<String, Object> profileMap) {
+    public Profile deserialize(Map<String, Object> profileMap) {
       return new Profile(profileMap);
     }
   }
   
-  public static class Builder implements EntityBuilder<Profile> {
+  public static class Builder extends EntityBuilder<Profile> {
     private final Profile profile;
     
     private Builder() {
@@ -30,6 +32,10 @@ public class Profile extends Entity<Profile> {
       return new Profile(profile);
     }
 
+    @Override protected Profile getInternalEntity() {
+      return profile;
+    }    
+    
     public boolean hasName() {
       return profile.hasName();
     }
@@ -91,20 +97,20 @@ public class Profile extends Entity<Profile> {
       return this;
     }
 
-    public boolean hasComputerPlayer() {
-      return profile.hasComputerPlayer();
+    public boolean hasIsComputerPlayer() {
+      return profile.hasIsComputerPlayer();
     }
 
     public boolean isComputerPlayer() {
       return profile.isComputerPlayer();
     }
     
-    public Builder setComputerPlayer(boolean isComputerPlayer) {
+    public Builder setIsComputerPlayer(boolean isComputerPlayer) {
       profile.computerPlayer = isComputerPlayer;
       return this;
     }
     
-    public Builder clearComputerPlayer() {
+    public Builder clearIsComputerPlayer() {
       profile.computerPlayer = null;
       return this;
     }
@@ -158,7 +164,7 @@ public class Profile extends Entity<Profile> {
   }
   
   @Override
-  String entityName() {
+  public String entityName() {
     return "Profile";
   }  
   
@@ -171,7 +177,7 @@ public class Profile extends Entity<Profile> {
   }
   
   @Override
-  Map<String, Object> serialize() {
+  public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "name", name);
     putSerialized(result, "imageString", imageString);
@@ -213,7 +219,7 @@ public class Profile extends Entity<Profile> {
     return pronoun;
   }
 
-  public boolean hasComputerPlayer() {
+  public boolean hasIsComputerPlayer() {
     return computerPlayer != null;
   }
   

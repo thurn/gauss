@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ca.thurn.noughts.shared.entities.Action;
+import ca.thurn.noughts.shared.entities.Command;
+import ca.thurn.noughts.shared.entities.Game;
+import ca.thurn.noughts.shared.entities.Profile;
 import ca.thurn.uct.algorithm.MonteCarloSearch;
 
 import com.firebase.client.ChildEventListener;
@@ -83,7 +87,7 @@ public class Model implements ChildEventListener {
       function.mutate(builder);
       Game game = builder.build();
       if (useMinimalForm) {
-        mutableData.setValue(game.minimalGame().serialize());
+        mutableData.setValue(Games.minimalGame(game).serialize());
       } else {
         mutableData.setValue(game.serialize());
       }
@@ -96,6 +100,7 @@ public class Model implements ChildEventListener {
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private final Map<String, Game> userGameList;
+  private final Map<String, Game> games;
   private GameListListener gameListListener;
   
   public Model(String userId, Firebase firebase) {
@@ -104,6 +109,7 @@ public class Model implements ChildEventListener {
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     userGameList = new HashMap<String, Game>();
+    games = new HashMap<String, Game>();
     firebase.child("users").child(userId).child("games").addChildEventListener(this);    
   }
   
@@ -121,7 +127,7 @@ public class Model implements ChildEventListener {
    */
   public boolean isCurrentPlayer(Game game) {
     if (game.isGameOver()) return false;
-    return game.currentPlayerId().equals(userId);
+    return Games.currentPlayerId(game).equals(userId);
   }
   
   /**
@@ -154,6 +160,11 @@ public class Model implements ChildEventListener {
           // system.
           Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
           listener.onGameUpdate(game);
+          Game oldGame = games.get(game.getId());
+          if (oldGame != null && Games.differentStatus(game, oldGame)) {
+            listener.onGameStatusChanged(Games.gameStatus(game));
+          }
+          games.put(game.getId(), game);
         }
       }
     });
@@ -280,17 +291,17 @@ public class Model implements ChildEventListener {
     Game.Builder builder = Game.newBuilder();
     builder.setId(ref.getName());
     builder.addPlayer(userId);
-    builder.setLocalMultiplayer(localMultiplayer);
+    builder.setIsLocalMultiplayer(localMultiplayer);
     if (localMultiplayer) builder.addPlayer(userId);
     builder.setCurrentPlayerNumber(X_PLAYER);
     builder.setLastModified(Clock.getInstance().currentTimeMillis());
-    builder.setGameOver(false);
+    builder.setIsGameOver(false);
     builder.putAllProfile(profiles);
     builder.addAllLocalProfile(localProfiles);
     Game game = builder.build();
     ref.setValue(game.serialize());
     Firebase userRef = userRefForGame(game, userId);
-    userRef.setValue(game.minimalGame().serialize());
+    userRef.setValue(Games.minimalGame(game).serialize());
     return game.getId();
   }
   
@@ -330,19 +341,18 @@ public class Model implements ChildEventListener {
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         game.setLastModified(timestamp);
-        if (game.hasCurrentActionNumber()) {
-          Action.Builder action = Action.newBuilder(getCurrentAction(game));
+        if (game.hasCurrentAction()) {
+          Action.Builder action = game.getCurrentAction().toBuilder();
           action.clearFutureCommandList();
           action.addCommand(command);
-          setCurrentAction(game, action);
+          game.setCurrentAction(action);
         } else {
           Action.Builder action = Action.newBuilder();
           action.setPlayerNumber(game.getCurrentPlayerNumber());
           action.setGameId(game.getId());
-          action.setSubmitted(false);
+          action.setIsSubmitted(false);
           action.addCommand(command);
-          game.addAction(action.build());
-          game.setCurrentActionNumber(game.getActionCount() - 1);
+          game.setCurrentAction(action);
         }
         if (submit) {
           submitActionMutation(game.build()).mutate(game);
@@ -355,9 +365,6 @@ public class Model implements ChildEventListener {
         game.setLastModified(timestamp);        
       }
     });
-    if (submit) {
-      onGameStatusChanged(mutateCopy(game, mutation));
-    }
   }
 
   /**
@@ -370,7 +377,7 @@ public class Model implements ChildEventListener {
    */  
   public boolean couldSubmitCommand(Game game, Command command) {
     if (!isCurrentPlayer(game)) return false;
-    if (game.hasCurrentActionNumber() && getCurrentAction(game).getCommandCount() > 0) return false;
+    if (game.hasCurrentAction() && game.getCurrentAction().getCommandCount() > 0) return false;
     boolean res = isLegalCommand(game, command);
     return res;
   }
@@ -384,8 +391,8 @@ public class Model implements ChildEventListener {
    */  
   public boolean canUndo(Game game) {
     ensureIsNotMinimal(game);
-    if (game == null || !game.hasCurrentActionNumber()) return false;
-    return getCurrentAction(game).getCommandCount() > 0;    
+    if (game == null || !game.hasCurrentAction()) return false;
+    return game.getCurrentAction().getCommandCount() > 0;    
   }
   
   /**
@@ -397,8 +404,8 @@ public class Model implements ChildEventListener {
    */  
   public boolean canRedo(Game game) {
     ensureIsNotMinimal(game);
-    if (game == null || !game.hasCurrentActionNumber()) return false;
-    return getCurrentAction(game).getFutureCommandCount() > 0;    
+    if (game == null || !game.hasCurrentAction()) return false;
+    return game.getCurrentAction().getFutureCommandCount() > 0;    
   }
   
   /**
@@ -410,8 +417,8 @@ public class Model implements ChildEventListener {
    */
   public boolean canSubmit(Game game) {
     ensureIsNotMinimal(game);
-    if (game == null || !game.hasCurrentActionNumber()) return false;
-    Action action = getCurrentAction(game);
+    if (game == null || !game.hasCurrentAction()) return false;
+    Action action = game.getCurrentAction();
     if (action.getCommandCount() == 0) return false;
     for (Command command : action.getCommandList()) {
       if (!isLegalCommand(game, command)) return false;
@@ -434,38 +441,28 @@ public class Model implements ChildEventListener {
     GameMutation mutation = submitActionMutation(game);
     mutateCanonicalGame(game, mutation);
     mutateGameLists(game, mutation);
-    onGameStatusChanged(mutateCopy(game, mutation));
     handleComputerAction(mutateCopy(game, mutation));
-  }
-  
-  private void onGameStatusChanged(Game game) {
-    if (gameUpdateListeners.containsKey(game.getId())) {
-      gameUpdateListeners.get(game.getId()).onGameStatusChanged(game.gameStatus());
-    }    
   }
   
   private GameMutation submitActionMutation(Game game) {
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER; 
-    final List<Integer> victors = computeVictorsIfCurrentActionSubmitted(game);    
+    final List<Integer> victors = computeVictorsIfCurrentActionSubmitted(game);
     return new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         if (!game.isMinimal()) {
-          Action.Builder action = getCurrentAction(game).toBuilder();
-          action.setSubmitted(true);
-          setCurrentAction(game, action);
+          game.addSubmittedAction(game.getCurrentAction().toBuilder().setIsSubmitted(true));
         }
         game.setLastModified(timestamp);
+        game.clearCurrentAction();
         if (victors == null) {
           game.setCurrentPlayerNumber(newPlayerNumber);
-          game.clearCurrentActionNumber();
         } else {
           // Game over!
           game.clearCurrentPlayerNumber();
-          game.clearCurrentActionNumber();
           game.addAllVictor(victors);
-          game.setGameOver(true);
+          game.setIsGameOver(true);
         }
     }};
   }
@@ -478,10 +475,10 @@ public class Model implements ChildEventListener {
    */
   public void handleComputerAction(final Game game) {
     if (game.isGameOver()) return;
-    Profile currentProfile = game.playerProfile(game.getCurrentPlayerNumber());
+    Profile currentProfile = Games.playerProfile(game, game.getCurrentPlayerNumber());
     if (currentProfile.isComputerPlayer()) {
       final ComputerState computerState = new ComputerState();
-      computerState.initializeFrom(game);
+      computerState.initializeFrom(new ComputerState.GameInitializer(game));
       int numSimulations;
       switch (currentProfile.getComputerDifficultyLevel()) {
         case 0: {
@@ -531,10 +528,10 @@ public class Model implements ChildEventListener {
     if (!canUndo(game)) die("Can't undo.");
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        Action.Builder action = Action.newBuilder(getCurrentAction(game));
+        Action.Builder action = game.getCurrentAction().toBuilder();
         Command command = action.getCommandList().remove(action.getCommandList().size() - 1);
         action.addFutureCommand(command);
-        setCurrentAction(game, action);
+        game.setCurrentAction(action);
     }};
     mutateCanonicalGame(game, mutation);
   }
@@ -551,11 +548,11 @@ public class Model implements ChildEventListener {
     if (!canRedo(game)) die("Can't redo.");
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        Action.Builder action = Action.newBuilder(getCurrentAction(game));
+        Action.Builder action = game.getCurrentAction().toBuilder();
         Command command = action.getFutureCommandList().remove(
             action.getFutureCommandCount() - 1);
         action.addCommand(command);
-        setCurrentAction(game, action);
+        game.setCurrentAction(action);
     }};
     mutateCanonicalGame(game, mutation);
   }
@@ -573,12 +570,12 @@ public class Model implements ChildEventListener {
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         game.addResignedPlayer(game.getCurrentPlayerNumber());
-        game.setGameOver(true);
-        game.clearCurrentActionNumber();
+        game.setIsGameOver(true);
+        game.clearCurrentAction();
         if (game.isLocalMultiplayer() && game.getPlayerCount() == 2) {
           game.addVictor(game.getCurrentPlayerNumber() == 0 ? 1 : 0);
-        } else if (game.build().hasOpponent(userId)) {
-          int opponentPlayerNumber = game.build().opponentPlayerNumber(userId);          
+        } else if (Games.hasOpponent(game.build(), userId)) {
+          int opponentPlayerNumber = Games.opponentPlayerNumber(game.build(), userId);          
           game.addVictor(opponentPlayerNumber);
         }
         game.clearCurrentPlayerNumber();
@@ -637,10 +634,10 @@ public class Model implements ChildEventListener {
     // 2) check for draw
     
     int submitted = 0;
-    for (Action action : game.getActionList()) {
+    for (Action action : game.getSubmittedActionList()) {
       if (action.isSubmitted()) submitted++;
     }
-    if (submitted == 9) {
+    if (submitted >= 8) {
       List<Integer> both = new ArrayList<Integer>();
       both.add(0);
       both.add(1);
@@ -672,11 +669,14 @@ public class Model implements ChildEventListener {
    */  
   private Action[][] makeActionTable(Game game, boolean includeCurrent) {
     Action[][] result = new Action[3][3];
-    for (Action action : game.getActionList()) {
-      if (action.isSubmitted() || (includeCurrent && action.equals(getCurrentAction(game)))) {
-        for (Command command : action.getCommandList()) {
-          result[command.getColumn()][command.getRow()] = action;
-        }
+    for (Action action : game.getSubmittedActionList()) {
+      for (Command command : action.getCommandList()) {
+        result[command.getColumn()][command.getRow()] = action;
+      }
+    }
+    if (includeCurrent) {
+      for (Command command : game.getCurrentAction().getCommandList()) {
+        result[command.getColumn()][command.getRow()] = game.getCurrentAction();
       }
     }
     return result;
@@ -706,21 +706,13 @@ public class Model implements ChildEventListener {
       Firebase userRef = userRefForGame(game, player);
       userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
     }
-    userGameList.put(game.getId(), mutateCopy(game, function));
+    userGameList.put(game.getId(), mutateCopy(Games.minimalGame(game), function));
   }
   
   private Game mutateCopy(Game game, GameMutation mutation) {
     Game.Builder result = game.toBuilder();
     mutation.mutate(result);
     return result.build();
-  }
-  
-  private Action getCurrentAction(Game.Builder game) {
-    return getCurrentAction(game.build());
-  }
-  
-  private Action getCurrentAction(Game game) {
-    return game.getAction(game.getCurrentActionNumber());    
   }
   
   /**
@@ -753,10 +745,6 @@ public class Model implements ChildEventListener {
     if (!isCurrentPlayer(game)) die("Unauthorized user: " + userId);
   }
 
-  public void setCurrentAction(Game.Builder game, Action.Builder action) {
-    game.setAction(game.getCurrentActionNumber(), action.build());    
-  }    
-  
   /**
    * Ensures the current user is a player in the provided game.
    */
