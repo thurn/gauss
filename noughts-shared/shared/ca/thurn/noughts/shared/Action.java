@@ -74,8 +74,8 @@ public class Action extends Entity<Action> {
       return action.hasSubmitted();
     }
     
-    public boolean getSubmitted() {
-      return action.getSubmitted();
+    public boolean isSubmitted() {
+      return action.isSubmitted();
     }
     
     public Builder setSubmitted(boolean submitted) {
@@ -141,6 +141,16 @@ public class Action extends Entity<Action> {
     
     public List<Command> getFutureCommandList() {
       return action.futureCommands;
+    }
+    
+    public Builder setFutureCommand(int index, EntityBuilder<Command> futureCommand) {
+      return setFutureCommand(index, futureCommand.build());
+    }
+    
+    public Builder setFutureCommand(int index, Command futureCommand) {
+      checkNotNull(futureCommand);
+      action.futureCommands.set(index, futureCommand);
+      return this;
     }
     
     public Builder addFutureCommand(EntityBuilder<Command> futureCommand) {
@@ -229,7 +239,7 @@ public class Action extends Entity<Action> {
     return submitted != null;
   }
   
-  public boolean getSubmitted() {
+  public boolean isSubmitted() {
     checkNotNull(submitted);
     return submitted;
   }

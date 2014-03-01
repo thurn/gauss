@@ -126,7 +126,7 @@ public class ComputerState implements State {
     } else if (state instanceof Game) {
       Game game = (Game)state;
       setToStartingConditions();
-      for (Action action : game.getActions()) {
+      for (Action action : game.getActionList()) {
         int player = convertPlayerNumber(action.getPlayerNumber());
         long actionLong = commandToLong(player, action.getCommandList().get(0));
         perform(actionLong);

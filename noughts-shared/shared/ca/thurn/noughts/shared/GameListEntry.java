@@ -83,7 +83,17 @@ public class GameListEntry extends Entity<GameListEntry> {
     }
 
     public List<ImageString> getImageStringList() {
-      return gameListEntry.getImageStringList();
+      return gameListEntry.imageStrings;
+    }
+    
+    public Builder setImageString(int index, EntityBuilder<ImageString> imageString) {
+      return setImageString(index, imageString.build());
+    }
+    
+    public Builder setImageString(int index, ImageString imageString) {
+      checkNotNull(imageString);
+      gameListEntry.imageStrings.set(index, imageString);
+      return this;
     }
     
     public Builder addImageString(EntityBuilder<ImageString> imageString) {

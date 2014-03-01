@@ -8,6 +8,10 @@ import java.util.Map;
 
 import ca.thurn.uct.core.Copyable;
 
+// 2 fields:
+// under construction action
+// submitted actions
+
 public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
   public static final ImageString GAME_OVER_IMAGE_STRING = 
       ImageString.newBuilder().setString("game_over").setType(ImageType.LOCAL).build();
@@ -39,6 +43,398 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
     }    
   }  
 
+  public static class Builder implements EntityBuilder<Game> {
+    private final Game game;
+    
+    private Builder() {
+      this.game = new Game();
+    }
+    
+    private Builder(Game game) {
+      this.game = new Game(game);
+    }
+    
+    @Override
+    public Game build() {
+      return new Game(game);
+    }
+
+    public boolean hasId() {
+      return game.hasId();
+    }
+
+    public String getId() {
+      return game.getId();
+    }
+    
+    public Builder setId(String id) {
+      checkNotNull(id);
+      game.id = id;
+      return this;
+    }
+    
+    public Builder clearId() {
+      game.id = null;
+      return this;
+    }
+
+    public int getPlayerCount() {
+      return game.getPlayerCount();
+    }
+
+    public String getPlayer(int index) {
+      return game.getPlayer(index);
+    }
+
+    public List<String> getPlayerList() {
+      return game.players;
+    }
+    
+    public Builder setPlayer(int index, String player) {
+      checkNotNull(player);
+      game.players.set(index, player);
+      return this;
+    }
+    
+    public Builder addPlayer(String player) {
+      checkNotNull(player);
+      game.players.add(player);
+      return this;
+    }
+    
+    public Builder addAllPlayer(List<String> playerList) {
+      checkListForNull(playerList);
+      game.players.addAll(playerList);
+      return this;
+    }
+    
+    public Builder clearPlayerList() {
+      game.players.clear();
+      return this;
+    }
+
+    public int getProfileCount() {
+      return game.getProfileCount();
+    }
+
+    public Profile getProfile(String key) {
+      return game.getProfile(key);
+    }
+
+    public Map<String, Profile> getProfileMap() {
+      return game.profiles;
+    }
+    
+    public Builder putProfile(String key, EntityBuilder<Profile> profile) {
+      return putProfile(key, profile.build());
+    }
+    
+    public Builder putProfile(String key, Profile profile) {
+      checkNotNull(key);
+      checkNotNull(profile);
+      game.profiles.put(key, profile);
+      return this;
+    }
+    
+    public Builder putAllProfile(Map<String, Profile> profileMap) {
+      checkMapForNull(profileMap);
+      game.profiles.putAll(profileMap);
+      return this;
+    }
+    
+    public Builder clearProfileMap() {
+      game.profiles.clear();
+      return this;
+    }
+
+    public int getLocalProfileCount() {
+      return game.getLocalProfileCount();
+    }
+
+    public Profile getLocalProfile(int index) {
+      return game.getLocalProfile(index);
+    }
+
+    public List<Profile> getLocalProfileList() {
+      return game.localProfiles;
+    }
+    
+    public Builder setLocalProfile(int index, EntityBuilder<Profile> profile) {
+      return setLocalProfile(index, profile.build());
+    }
+    
+    public Builder setLocalProfile(int index, Profile profile) {
+      checkNotNull(profile);
+      game.localProfiles.set(index, profile);
+      return this;
+    }
+    
+    public Builder addLocalProfile(EntityBuilder<Profile> profile) {
+      return addLocalProfile(profile.build());
+    }
+    
+    public Builder addLocalProfile(Profile localProfile) {
+      checkNotNull(localProfile);
+      game.localProfiles.add(localProfile);
+      return this;
+    }
+    
+    public Builder addAllLocalProfile(List<Profile> localProfileList) {
+      checkListForNull(localProfileList);
+      game.localProfiles.addAll(localProfileList);
+      return this;
+    }
+    
+    public Builder clearLocalProfileList() {
+      game.localProfiles.clear();
+      return this;
+    }
+
+    public boolean hasCurrentPlayerNumber() {
+      return game.hasCurrentPlayerNumber();
+    }
+
+    public int getCurrentPlayerNumber() {
+      return game.getCurrentPlayerNumber();
+    }
+    
+    public Builder setCurrentPlayerNumber(int currentPlayerNumber) {
+      game.currentPlayerNumber = currentPlayerNumber;
+      return this;
+    }
+    
+    public Builder clearCurrentPlayerNumber() {
+      game.currentPlayerNumber = null;
+      return this;
+    }
+
+    public int getActionCount() {
+      return game.getActionCount();
+    }
+
+    public Action getAction(int index) {
+      return game.getAction(index);
+    }
+
+    public List<Action> getActionList() {
+      return game.actions;
+    }
+    
+    public Builder setAction(int index, EntityBuilder<Action> action) {
+      return setAction(index, action.build());
+    }
+    
+    public Builder setAction(int index, Action action) {
+      checkNotNull(action);
+      game.actions.set(index, action);
+      return this;
+    }
+    
+    public Builder addAction(EntityBuilder<Action> action) {
+      return addAction(action.build());
+    }
+    
+    public Builder addAction(Action action) {
+      checkNotNull(action);
+      game.actions.add(action);
+      return this;
+    }
+    
+    public Builder addAllAction(List<Action> actionList) {
+      checkListForNull(actionList);
+      game.actions.addAll(actionList);
+      return this;
+    }
+    
+    public Builder clearActionList() {
+      game.actions.clear();
+      return this;
+    }
+
+    public boolean hasCurrentActionNumber() {
+      return game.hasCurrentActionNumber();
+    }
+
+    public int getCurrentActionNumber() {
+      return game.getCurrentActionNumber();
+    }
+    
+    public Builder setCurrentActionNumber(int currentActionNumber) {
+      game.currentActionNumber = currentActionNumber;
+      return this;
+    }
+    
+    public Builder clearCurrentActionNumber() {
+      game.currentActionNumber = null;
+      return this;
+    }
+
+    public boolean hasLastModified() {
+      return game.hasLastModified();
+    }
+
+    public long getLastModified() {
+      return game.getLastModified();
+    }
+    
+    public Builder setLastModified(long lastModified) {
+      game.lastModified = lastModified;
+      return this;
+    }
+    
+    public Builder clearLastModified() {
+      game.lastModified = null;
+      return this;
+    }
+
+    public boolean hasRequestId() {
+      return game.hasRequestId();
+    }
+
+    public String getRequestId() {
+      return game.getRequestId();
+    }
+    
+    public Builder setRequestId(String requestId) {
+      checkNotNull(requestId);
+      game.requestId = requestId;
+      return this;
+    }
+    
+    public Builder clearRequestId() {
+      game.requestId = null;
+      return this;
+    }
+
+    public int getVictorCount() {
+      return game.getVictorCount();
+    }
+
+    public int getVictor(int index) {
+      return game.getVictor(index);
+    }
+
+    public List<Integer> getVictorList() {
+      return game.victors;
+    }
+    
+    public Builder setVictor(int index, int victor) {
+      game.victors.set(index, victor);
+      return this;
+    }
+    
+    public Builder addVictor(int victor) {
+      game.victors.add(victor);
+      return this;
+    }
+    
+    public Builder addAllVictor(List<Integer> victorList) {
+      checkListForNull(victorList);
+      game.victors.addAll(victorList);
+      return this;
+    }
+    
+    public Builder clearVictorList() {
+      game.victors.clear();
+      return this;
+    }
+
+    public boolean hasGameOver() {
+      return game.hasGameOver();
+    }
+
+    public boolean isGameOver() {
+      return game.isGameOver();
+    }
+    
+    public Builder setGameOver(boolean gameOver) {
+      game.gameOver = gameOver;
+      return this;
+    }
+    
+    public Builder clearGameOver() {
+      game.gameOver = null;
+      return this;
+    }
+
+    public boolean hasLocalMultiplayer() {
+      return game.hasLocalMultiplayer();
+    }
+
+    public boolean isLocalMultiplayer() {
+      return game.isLocalMultiplayer();
+    }
+    
+    public Builder setLocalMultiplayer(boolean localMultiplayer) {
+      game.localMultiplayer = localMultiplayer;
+      return this;
+    }
+    
+    public Builder clearLocalMultiplayer() {
+      game.localMultiplayer = null;
+      return this;
+    }
+    
+    public boolean hasMinimal() {
+      return game.hasMinimal();
+    }
+
+    public boolean isMinimal() {
+      return game.isMinimal();
+    }
+    
+    public Builder setMinimal(boolean isMinimal) {
+      game.minimal = isMinimal;
+      return this;
+    }
+    
+    public Builder clearMinimal() {
+      game.minimal = null;
+      return this;
+    }
+
+    public int getResignedPlayerCount() {
+      return game.getResignedPlayerCount();
+    }
+
+    public int getResignedPlayer(int index) {
+      return game.getResignedPlayer(index);
+    }
+
+    public List<Integer> getResignedPlayerList() {
+      return game.resignedPlayers;
+    }
+    
+    public Builder setResignedPlayer(int index, int resignedPlayer) {
+      game.resignedPlayers.set(index, resignedPlayer);
+      return this;
+    }
+    
+    public Builder addResignedPlayer(int resignedPlayer) {
+      game.resignedPlayers.add(resignedPlayer);
+      return this;
+    }
+    
+    public Builder addAllResignedPlayer(List<Integer> resignedPlayer) {
+      checkListForNull(resignedPlayer);
+      game.resignedPlayers.addAll(resignedPlayer);
+      return this;
+    }
+    
+    public Builder clearResignedPlayerList() {
+      game.resignedPlayers.clear();
+      return this;
+    }
+  }
+  
+  public static Builder newBuilder() {
+    return new Builder();
+  }
+  
+  public static Builder newBuilder(Game game) {
+    return new Builder(game);
+  }
+  
   public static Deserializer newDeserializer() {
     return new Deserializer();
   }
@@ -46,7 +442,7 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
   /**
    * The game ID
    */
-  private final String id;
+  private String id;
 
   /**
    * An array of the players in the game, which can be though of as a bimap
@@ -106,32 +502,48 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
   /**
    * True if this game has ended.
    */
-  private boolean gameOver;
+  private Boolean gameOver;
 
   /**
    * True if this game is in local multiplayer mode
    */
-  private boolean localMultiplayer;
+  private Boolean localMultiplayer;
   
   /**
    * True if this is a minimal game representation, as returned by
    * {@link Game#minimalGame()}.
    */
-  private boolean isMinimal;
+  private Boolean minimal;
 
   /**
    * An array of player numbers who have resigned the game.
    */
   private final List<Integer> resignedPlayers;
   
-  public Game(String id) {
+  public Game() {
     players = new ArrayList<String>();
     profiles = new HashMap<String, Profile>();
     localProfiles = new ArrayList<Profile>();
     actions = new ArrayList<Action>();
     victors = new ArrayList<Integer>();
     resignedPlayers = new ArrayList<Integer>();
-    this.id = id;
+  }
+  
+  public Game(Game game) {
+    this.id = game.id;
+    this.players = new ArrayList<String>(game.players);
+    this.profiles = new HashMap<String, Profile>(game.profiles);
+    this.localProfiles = new ArrayList<Profile>(game.localProfiles);
+    this.currentPlayerNumber = game.currentPlayerNumber;
+    this.actions = new ArrayList<Action>(game.actions);
+    this.currentActionNumber = game.currentActionNumber;
+    this.lastModified = game.lastModified;
+    this.requestId = game.requestId;
+    this.victors = new ArrayList<Integer>(game.victors);
+    this.gameOver = game.gameOver;
+    this.localMultiplayer = game.localMultiplayer;
+    this.minimal = game.minimal;
+    this.resignedPlayers = new ArrayList<Integer>(game.resignedPlayers);
   }
 
   private Game(Map<String, Object> gameMap) {
@@ -148,9 +560,14 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
     victors = getIntegerList(getList(gameMap, "victors"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
-    isMinimal = getBoolean(gameMap, "isMinimal");
+    minimal = getBoolean(gameMap, "isMinimal");
     resignedPlayers = getIntegerList(getList(gameMap, "resignedPlayers"));
   }
+  
+  @Override
+  public String entityName() {
+    return "Game";
+  }  
   
   @Override
   Map<String, Object> serialize() {
@@ -167,142 +584,173 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
     putSerialized(result, "victors", victors);
     putSerialized(result, "gameOver", gameOver);
     putSerialized(result, "localMultiplayer", localMultiplayer);
-    putSerialized(result, "isMinimal", isMinimal);
+    putSerialized(result, "isMinimal", minimal);
     putSerialized(result, "resignedPlayers", resignedPlayers);
     return result;
-  } 
-  
-  @Override
-  public String entityName() {
-    return "Game";
   }
   
   @Override
-  public EntityBuilder<Game> toBuilder() {
-    return null;
-  }
-
-  public boolean hasCurrentAction() {
-    return getCurrentActionNumber() != null;
+  public Builder toBuilder() {
+    return new Builder(this);
   }
   
-  public Action currentAction() {
-    return getActions().get(getCurrentActionNumber());
+  public boolean hasId() {
+    return id != null;
   }
   
-  public boolean isGameOver() {
-    return gameOver;
-  }
-  
-  public boolean isLocalMultiplayer() {
-    return localMultiplayer;
-  }
-  
-  public boolean isMinimal() {
-    return isMinimal;
-  }
-
-  Game setGameOver(boolean gameOver) {
-    this.gameOver = gameOver;
-    return this;
-  }
-
-  Game setLocalMultiplayer(boolean localMultiplayer) {
-    this.localMultiplayer = localMultiplayer;
-    return this;
-  }
-
   public String getId() {
+    checkNotNull(id);
     return id;
   }
   
-  public List<String> getPlayers() {
-    return Collections.unmodifiableList(getPlayersMutable());
-  }
-
-  List<String> getPlayersMutable() {
-    return players;
-  }
-
-  public Map<String, Profile> getProfiles() {
-    return Collections.unmodifiableMap(getProfilesMutable());
+  public int getPlayerCount() {
+    return players.size();
   }
   
-  Map<String, Profile> getProfilesMutable() {
-    return profiles;
+  public String getPlayer(int index) {
+    return players.get(index);
   }
   
-  public List<Profile> getLocalProfiles() {
-    return Collections.unmodifiableList(getLocalProfilesMutable());
+  public List<String> getPlayerList() {
+    return Collections.unmodifiableList(players);
   }
   
-  List<Profile> getLocalProfilesMutable() {
-    return localProfiles;
+  public int getProfileCount() {
+    return profiles.size();
+  }
+  
+  public Profile getProfile(String key) {
+    checkNotNull(key);
+    return profiles.get(key);
+  }
+  
+  public Map<String, Profile> getProfileMap() {
+    return Collections.unmodifiableMap(profiles);
+  }
+  
+  public int getLocalProfileCount() {
+    return localProfiles.size();
+  }
+  
+  public Profile getLocalProfile(int index) {
+    return localProfiles.get(index);
+  }
+  
+  public List<Profile> getLocalProfileList() {
+    return Collections.unmodifiableList(localProfiles);
   }
   
   public boolean hasCurrentPlayerNumber() {
     return currentPlayerNumber != null;
   }
-
-  public Integer getCurrentPlayerNumber() {
+  
+  public int getCurrentPlayerNumber() {
+    checkNotNull(currentPlayerNumber);
     return currentPlayerNumber;
   }
-
-  Game setCurrentPlayerNumber(Integer currentPlayerNumber) {
-    this.currentPlayerNumber = currentPlayerNumber;
-    return this;
-  }
-
-  public List<Action> getActions() {
-    return Collections.unmodifiableList(getActionsMutable());
+  
+  public int getActionCount() {
+    return actions.size();
   }
   
-  List<Action> getActionsMutable() {
-    return actions;
+  public Action getAction(int index) {
+    return actions.get(index);
   }
-
-  public Integer getCurrentActionNumber() {
+  
+  public List<Action> getActionList() {
+    return Collections.unmodifiableList(actions);
+  }
+  
+  public boolean hasCurrentActionNumber() {
+    return currentActionNumber != null;
+  }
+  
+  public int getCurrentActionNumber() {
+    checkNotNull(currentActionNumber);
     return currentActionNumber;
   }
-
-  Game setCurrentActionNumber(Integer currentActionNumber) {
-    this.currentActionNumber = currentActionNumber;
-    return this;
+  
+  public boolean hasLastModified() {
+    return lastModified != null;
   }
-
-  public Long getLastModified() {
+  
+  public long getLastModified() {
+    checkNotNull(lastModified);
     return lastModified;
   }
-
-  Game setLastModified(Long lastModified) {
-    this.lastModified = lastModified;
-    return this;
+  
+  public boolean hasRequestId() {
+    return requestId != null;
   }
-
+  
   public String getRequestId() {
+    checkNotNull(requestId);
     return requestId;
   }
-
-  Game setRequestId(String requestId) {
-    this.requestId = requestId;
-    return this;
+  
+  public int getVictorCount() {
+    return victors.size();
   }
   
-  public List<Integer> getVictors() {
-    return Collections.unmodifiableList(getVictorsMutable());
-  }
-
-  List<Integer> getVictorsMutable() {
-    return victors;
+  public int getVictor(int index) {
+    return victors.get(index);
   }
   
-  public List<Integer> getResignedPlayers() {
-    return Collections.unmodifiableList(getResignedPlayersMutable());
+  public List<Integer> getVictorList() {
+    return Collections.unmodifiableList(victors);
   }
-
-  List<Integer> getResignedPlayersMutable() {
-    return resignedPlayers;
+  
+  public boolean hasGameOver() {
+    return gameOver != null;
   }
+  
+  public boolean isGameOver() {
+    checkNotNull(gameOver);
+    return gameOver;
+  }
+  
+  public boolean hasLocalMultiplayer() {
+    return localMultiplayer != null;
+  }
+  
+  public boolean isLocalMultiplayer() {
+    checkNotNull(localMultiplayer);
+    return localMultiplayer;
+  }
+  
+  public boolean hasMinimal() {
+    return minimal != null;
+  }
+  
+  public boolean isMinimal() {
+    checkNotNull(minimal);
+    return minimal;
+  }
+  
+  public int getResignedPlayerCount() {
+    return resignedPlayers.size();
+  }
+  
+  public int getResignedPlayer(int index) {
+    return resignedPlayers.get(index);
+  }
+  
+  public List<Integer> getResignedPlayerList() {
+    return Collections.unmodifiableList(resignedPlayers);
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   @Override
   public int compareTo(Game other) {
@@ -325,7 +773,7 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
    *     player.
    */
   public String currentPlayerId() {
-    if (getCurrentPlayerNumber() == null) return null;
+    if (!hasCurrentPlayerNumber()) return null;
     return playerIdFromPlayerNumber(currentPlayerNumber);
   }
   
@@ -399,7 +847,7 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
    * @throws IllegalArgumentException if this player does not have a local
    *     profile as defined by {@link Game#hasLocalProfile(int)}.
    */
-  public Profile getLocalProfile(int playerNumber) {
+  public Profile xgetLocalProfile(int playerNumber) {
     if (!hasLocalProfile(playerNumber)) {
       throw new IllegalArgumentException("No profile for player " + playerNumber);
     }
@@ -467,8 +915,8 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
    */
   public GameStatus gameStatus() {
     if (isGameOver()) {
-      if (getVictors().size() == 1) {
-        int winnerNumber = getVictors().get(0);
+      if (getVictorCount() == 1) {
+        int winnerNumber = getVictor(0);
         Profile winnerProfile = playerProfile(winnerNumber);
         String winner = winnerProfile.getName();
         ImageString imageString = winnerProfile.hasImageString() ?
@@ -622,6 +1070,9 @@ public class Game extends Entity<Game> implements Comparable<Game>, Copyable {
     }
     return result;
   }
+  public Action currentAction() {
+    return getAction(getCurrentActionNumber());    
+  }  
   
   /**
    * @return A representation of this game suitable for inclusion in a user's

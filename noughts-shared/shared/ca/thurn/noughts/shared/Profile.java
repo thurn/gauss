@@ -91,21 +91,21 @@ public class Profile extends Entity<Profile> {
       return this;
     }
 
-    public boolean hasIsComputerPlayer() {
-      return profile.hasIsComputerPlayer();
+    public boolean hasComputerPlayer() {
+      return profile.hasComputerPlayer();
     }
 
-    public boolean getIsComputerPlayer() {
-      return profile.getIsComputerPlayer();
+    public boolean isComputerPlayer() {
+      return profile.isComputerPlayer();
     }
     
-    public Builder setIsComputerPlayer(boolean isComputerPlayer) {
-      profile.isComputerPlayer = isComputerPlayer;
+    public Builder setComputerPlayer(boolean isComputerPlayer) {
+      profile.computerPlayer = isComputerPlayer;
       return this;
     }
     
-    public Builder clearIsComputerPlayer() {
-      profile.isComputerPlayer = null;
+    public Builder clearComputerPlayer() {
+      profile.computerPlayer = null;
       return this;
     }
 
@@ -143,7 +143,7 @@ public class Profile extends Entity<Profile> {
   private String name;
   private ImageString imageString;
   private Pronoun pronoun;
-  private Boolean isComputerPlayer;
+  private Boolean computerPlayer;
   private Integer computerDifficultyLevel;
   
   private Profile() {
@@ -153,7 +153,7 @@ public class Profile extends Entity<Profile> {
     this.name = profile.name;
     this.imageString = profile.imageString;
     this.pronoun = profile.pronoun;
-    this.isComputerPlayer = profile.isComputerPlayer;
+    this.computerPlayer = profile.computerPlayer;
     this.computerDifficultyLevel = profile.computerDifficultyLevel;
   }
   
@@ -166,7 +166,7 @@ public class Profile extends Entity<Profile> {
     this.name = getString(map, "name");
     this.imageString = getEntity(map, "imageString", ImageString.newDeserializer());
     this.pronoun = getEnum(map, "pronoun", Pronoun.class);
-    this.isComputerPlayer = getBoolean(map, "isComputerPlayer");
+    this.computerPlayer = getBoolean(map, "isComputerPlayer");
     this.computerDifficultyLevel = getInteger(map, "computerDifficultyLevel");
   }
   
@@ -176,7 +176,7 @@ public class Profile extends Entity<Profile> {
     putSerialized(result, "name", name);
     putSerialized(result, "imageString", imageString);
     putSerialized(result, "pronoun", pronoun);
-    putSerialized(result, "isComputerPlayer", isComputerPlayer);
+    putSerialized(result, "isComputerPlayer", computerPlayer);
     putSerialized(result, "computerDifficultyLevel", computerDifficultyLevel);
     return result;
   }
@@ -213,13 +213,13 @@ public class Profile extends Entity<Profile> {
     return pronoun;
   }
 
-  public boolean hasIsComputerPlayer() {
-    return isComputerPlayer != null;
+  public boolean hasComputerPlayer() {
+    return computerPlayer != null;
   }
   
-  public boolean getIsComputerPlayer() {
-    checkNotNull(isComputerPlayer);
-    return isComputerPlayer;
+  public boolean isComputerPlayer() {
+    checkNotNull(computerPlayer);
+    return computerPlayer;
   }
 
   public boolean hasComputerDifficultyLevel() {

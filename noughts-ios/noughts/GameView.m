@@ -275,7 +275,7 @@
 - (void)drawRect:(CGRect)rect {
   [self.back drawAtPoint:CGPointZero];
   if (self.currentGame) {
-    for (NTSAction *action in [self.currentGame getActions]) {
+    for (NTSAction *action in [self.currentGame getActionList]) {
       for (NTSCommand* command in [action getCommandList]) {
         CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
                                     [command getRow] * SQUARE_SIZE + TOP_OFFSET);

@@ -19,3 +19,8 @@ build/
 !default.perspectivev3
 xcuserdata
 *.moved-aside
+
+Firebase.framework/Headers
+Firebase.framework/Versions/Current
+JBDeviceOwner.framework/Headers
+JBDeviceOwner.framework/Versions/Current
