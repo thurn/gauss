@@ -23,8 +23,10 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 
 @interface GameView : UIView <UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
-- (void)drawGame:(NTSGame *)game;
+-(void)drawGame:(NTSGame *)game;
 -(void)displayGameStatusWithImage:(UIImage*)image
                        withString:(NSString*)string
                         withColor:(UIColor*)color;
+-(void)showComputerThinkingIndicator;
+-(void)hideComputerThinkingIndicator;
 @end

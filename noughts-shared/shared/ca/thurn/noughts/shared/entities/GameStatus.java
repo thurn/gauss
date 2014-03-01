@@ -93,6 +93,24 @@ public class GameStatus extends Entity<GameStatus> {
       status.statusPlayer = null;
       return this;
     }
+    
+    public boolean hasIsComputerThinking() {
+      return status.hasIsComputerThinking();
+    }
+    
+    public boolean isComputerThinking() {
+      return status.isComputerThinking();
+    }
+    
+    public Builder setIsComputerThinking(boolean computerThinking) {
+      status.computerThinking = computerThinking;
+      return this;
+    }
+    
+    public Builder clearIsComputerThinking() {
+      status.computerThinking = null;
+      return this;
+    }
   }
   
   public static GameStatus.Builder newBuilder() {
@@ -110,6 +128,7 @@ public class GameStatus extends Entity<GameStatus> {
   private String statusString;
   private ImageString statusImageString;
   private Integer statusPlayer;
+  private Boolean computerThinking;
   
   private GameStatus() {
   }
@@ -118,12 +137,14 @@ public class GameStatus extends Entity<GameStatus> {
     this.statusString = status.statusString;
     this.statusImageString = status.statusImageString;
     this.statusPlayer = status.statusPlayer;
+    this.computerThinking = status.computerThinking;
   }
   
   private GameStatus(Map<String, Object> map) {
     statusString = getString(map, "statusString");
     statusImageString = getEntity(map, "statusImageString", ImageString.newDeserializer());
     statusPlayer = getInteger(map, "statusPlayer");
+    computerThinking = getBoolean(map, "computerThinking");
   }
 
   @Override
@@ -137,6 +158,7 @@ public class GameStatus extends Entity<GameStatus> {
     putSerialized(result, "statusString", statusString);
     putSerialized(result, "statusImageString", statusImageString);
     putSerialized(result, "statusPlayer", statusPlayer);
+    putSerialized(result, "computerThinking", computerThinking);
     return result;
   }
 
@@ -170,5 +192,14 @@ public class GameStatus extends Entity<GameStatus> {
   public int getStatusPlayer() {
     checkNotNull(statusPlayer);
     return statusPlayer;
+  }
+  
+  public boolean hasIsComputerThinking() {
+    return computerThinking != null;
+  }
+  
+  public boolean isComputerThinking() {
+    checkNotNull(computerThinking);
+    return computerThinking;
   }
 }

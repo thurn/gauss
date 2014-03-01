@@ -266,6 +266,14 @@ public class GameTest extends SharedTestCase {
     assertFalse(drawStatus.hasStatusPlayer());
   }
   
+  public void testIsComputerThinking() {
+    // TODO: this
+  }
+  
+  public void testIsComputerThinkingGameOver() {
+    // TODO: this
+  }
+  
   private ImageString newImageString(String name) {
     return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
   }

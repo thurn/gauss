@@ -32,6 +32,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *gameStatusLabel;
 @property (strong, nonatomic) UIView *gameStatusView;
 @property (strong, nonatomic) NSLayoutConstraint* gameStatusConstraint;
+@property (strong, nonatomic) UIActivityIndicatorView* indicatorView;
 @property double taskId;
 @end
 
@@ -52,6 +53,15 @@
     self.o = osvg.UIImage;
     SVGKImage *bgsvg = [SVGKImage imageNamed:@"background.svg"];
     self.back = bgsvg.UIImage;
+    
+    self.indicatorView = [[UIActivityIndicatorView alloc]
+                          initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self.indicatorView.center = self.center;
+    self.indicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin |
+        UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin |
+        UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight |
+        UIViewAutoresizingFlexibleBottomMargin;
+    [self addSubview:self.indicatorView];
 
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -282,6 +292,13 @@
       [self.o drawAtPoint:point];
     }
   }
+}
+-(void)showComputerThinkingIndicator {
+  [self.indicatorView startAnimating];
+}
+
+-(void)hideComputerThinkingIndicator {
+  [self.indicatorView stopAnimating];
 }
 
 - (void)drawRect:(CGRect)rect {

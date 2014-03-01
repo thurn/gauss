@@ -67,11 +67,13 @@ public class Games {
             .setStatusString(winner + " won the game!")
             .setStatusImageString(imageString)
             .setStatusPlayer(winnerNumber)
+            .setIsComputerThinking(false)
             .build();
       } else {
         return GameStatus.newBuilder()
             .setStatusString("Game drawn.")
             .setStatusImageString(GAME_OVER_IMAGE_STRING)
+            .setIsComputerThinking(false)
             .build();
       }
     } else {
@@ -82,6 +84,7 @@ public class Games {
           .setStatusString(currentPlayerProfile.getName() + "'s turn")
           .setStatusImageString(imageString)
           .setStatusPlayer(game.getCurrentPlayerNumber())
+          .setIsComputerThinking(currentPlayerProfile.isComputerPlayer())
           .build();
     }
   }  

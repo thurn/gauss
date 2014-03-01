@@ -61,15 +61,30 @@ public class Model implements ChildEventListener {
   private static class GameMutationHandler implements Handler {
     private final GameMutation function;
     private final boolean useMinimalForm;
+    private final Game original;
+    
+    /**
+     * @param function Mutation function to use.
+     * @param useMinimalForm If true, write only the game's minimal form as
+     *     returned by {@link Game#minimalGame()}. 
+     */
+    public GameMutationHandler(GameMutation function, boolean useMinimalForm) {
+      this(function, useMinimalForm, null);
+    }
     
     /**
      * @param function Mutation function to use.
      * @param useMinimalForm If true, write only the game's minimal form as
      *     returned by {@link Game#minimalGame()}.
-     */
-    public GameMutationHandler(GameMutation function, boolean useMinimalForm) {
+     * @param original The original value of the game you are mutating.
+     *     Specifying this argument causes the mutation to be aborted if the
+     *     current value of the game at this location is different from
+     *     original.
+     */    
+    public GameMutationHandler(GameMutation function, boolean useMinimalForm, Game original) {
       this.function = function;
       this.useMinimalForm = useMinimalForm;
+      this.original = original;
     }
     
     @Override
@@ -83,9 +98,11 @@ public class Model implements ChildEventListener {
         // for the current value. It is safe to ignore these.
         return Transaction.success(mutableData);
       }
-      Game.Builder builder = Game.newDeserializer().fromMutableData(mutableData).toBuilder();
-      function.mutate(builder);
-      Game game = builder.build();
+      Game deserialized = Game.newDeserializer().fromMutableData(mutableData);
+      if (original != null && !original.equals(deserialized)) {
+        return Transaction.abort();
+      }
+      Game game = applyMutation(deserialized, function);
       if (useMinimalForm) {
         mutableData.setValue(Games.minimalGame(game).serialize());
       } else {
@@ -210,7 +227,7 @@ public class Model implements ChildEventListener {
 
   @Override
   public void onChildAdded(DataSnapshot snapshot, String previous) {
-    Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+    Game game = Games.minimalGame(Game.newDeserializer().fromDataSnapshot(snapshot));
     if (gameListListener != null) {
       gameListListener.onGameAdded(game);
     }
@@ -219,7 +236,7 @@ public class Model implements ChildEventListener {
 
   @Override
   public void onChildChanged(DataSnapshot snapshot, String previous) {
-    Game game = Game.newDeserializer().fromDataSnapshot(snapshot); 
+    Game game = Games.minimalGame(Game.newDeserializer().fromDataSnapshot(snapshot)); 
     if (gameListListener != null) {
       gameListListener.onGameChanged(game);
     }
@@ -359,7 +376,7 @@ public class Model implements ChildEventListener {
         }
       }
     };
-    mutateCanonicalGame(game, mutation);
+    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
     mutateGameLists(game, new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         game.setLastModified(timestamp);        
@@ -439,9 +456,9 @@ public class Model implements ChildEventListener {
     ensureIsNotMinimal(game);
     if (!canSubmit(game)) die("Illegal action!");
     GameMutation mutation = submitActionMutation(game);
-    mutateCanonicalGame(game, mutation);
+    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
     mutateGameLists(game, mutation);
-    handleComputerAction(mutateCopy(game, mutation));
+    handleComputerAction(applyMutation(game, mutation));
   }
   
   private GameMutation submitActionMutation(Game game) {
@@ -533,7 +550,7 @@ public class Model implements ChildEventListener {
         action.addFutureCommand(command);
         game.setCurrentAction(action);
     }};
-    mutateCanonicalGame(game, mutation);
+    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
   }
   
   /**
@@ -554,7 +571,7 @@ public class Model implements ChildEventListener {
         action.addCommand(command);
         game.setCurrentAction(action);
     }};
-    mutateCanonicalGame(game, mutation);
+    mutateCanonicalGame(game, mutation, true /* abortOnCoflict */);
   }
   
   /**
@@ -582,7 +599,7 @@ public class Model implements ChildEventListener {
         game.setLastModified(timestamp);
       }
     };
-    mutateCanonicalGame(game, mutation);
+    mutateCanonicalGame(game, mutation, false /* abortOnConflict */);
     mutateGameLists(game, mutation);
   }
   
@@ -688,10 +705,16 @@ public class Model implements ChildEventListener {
    * 
    * @param game Game to mutate.
    * @param function Mutation function to employ
+   * @param abortOnConflict If true, abort the transaction if the current game
+   *     at this ID is different from "game".
    */
-  private void mutateCanonicalGame(Game game, final GameMutation function) {
+  private void mutateCanonicalGame(Game game, final GameMutation function,
+      boolean abortOnConflict) {
     Firebase gameRef = firebase.child("games").child(game.getId());
-    gameRef.runTransaction(new GameMutationHandler(function, false /* useMinimalForm */));
+    GameMutationHandler handler = abortOnConflict ? 
+        new GameMutationHandler(function, false /* useMinimalForm */, game) :
+          new GameMutationHandler(function, false /* useMinimalForm */);
+    gameRef.runTransaction(handler);
   }
 
   /**
@@ -706,13 +729,13 @@ public class Model implements ChildEventListener {
       Firebase userRef = userRefForGame(game, player);
       userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
     }
-    userGameList.put(game.getId(), mutateCopy(Games.minimalGame(game), function));
+    userGameList.put(game.getId(), Games.minimalGame(applyMutation(game, function)));
   }
   
-  private Game mutateCopy(Game game, GameMutation mutation) {
-    Game.Builder result = game.toBuilder();
-    mutation.mutate(result);
-    return result.build();
+  private static Game applyMutation(Game game, GameMutation mutation) {
+    Game.Builder builder = game.toBuilder();
+    mutation.mutate(builder);
+    return builder.build();
   }
   
   /**

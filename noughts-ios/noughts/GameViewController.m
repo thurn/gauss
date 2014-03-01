@@ -71,6 +71,11 @@
   [self.gameView displayGameStatusWithImage:image
                                  withString:[status getStatusString]
                                   withColor:color];
+  if ([status isComputerThinking]) {
+    [self.gameView showComputerThinkingIndicator];
+  } else {
+    [self.gameView hideComputerThinkingIndicator];
+  }
 }
 
 -(UIColor*)colorFromPlayerNumber:(int)playerNumber {
