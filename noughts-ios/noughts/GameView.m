@@ -32,7 +32,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *gameStatusLabel;
 @property (strong, nonatomic) UIView *gameStatusView;
 @property (strong, nonatomic) NSLayoutConstraint* gameStatusConstraint;
-@property (strong, nonatomic) UIActivityIndicatorView* indicatorView;
+@property (strong, nonatomic) UIActivityIndicatorView* activityView;
 @property double taskId;
 @end
 
@@ -54,14 +54,18 @@
     SVGKImage *bgsvg = [SVGKImage imageNamed:@"background.svg"];
     self.back = bgsvg.UIImage;
     
-    self.indicatorView = [[UIActivityIndicatorView alloc]
-                          initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    self.indicatorView.center = self.center;
-    self.indicatorView.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin |
-        UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleRightMargin |
-        UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleHeight |
-        UIViewAutoresizingFlexibleBottomMargin;
-    [self addSubview:self.indicatorView];
+    UIActivityIndicatorView* activityView = [[UIActivityIndicatorView alloc]
+                                             initWithActivityIndicatorStyle:
+                                             UIActivityIndicatorViewStyleWhiteLarge];
+    activityView.center = self.center;
+    activityView.color = [UIColor blackColor];
+    activityView.backgroundColor = [UIColor whiteColor];
+    activityView.layer.cornerRadius = 5;
+    activityView.translatesAutoresizingMaskIntoConstraints = NO;
+    activityView.hidesWhenStopped = NO;
+    activityView.opaque = NO;
+    activityView.hidden = YES;
+    [self addSubview:activityView];
 
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -123,7 +127,8 @@
                                                          submitButton,
                                                          undoButton,
                                                          redoButton,
-                                                         gameStatusView);
+                                                         gameStatusView,
+                                                         activityView);
     NSNumber *statusBarHeight = [NSNumber numberWithFloat:
                                  [UIApplication sharedApplication].statusBarFrame.size.height];
     NSDictionary *metrics = @{@"statusBarHeight": statusBarHeight};
@@ -133,8 +138,10 @@
                      views:views
                    metrics:metrics];
     [self visualConstraint:@"V:|-(statusBarHeight)-[submitButton]" views:views metrics:metrics];
-    [self visualConstraint:@"V:[gameStatusView(==75)]" views:views metrics:metrics];
+    [self visualConstraint:@"V:[gameStatusView(75)]" views:views metrics:metrics];
     [self visualConstraint:@"H:|[gameStatusView]|" views:views metrics:metrics];
+    [self visualConstraint:@"H:[activityView(200)]" views:views metrics:metrics];
+    [self visualConstraint:@"V:[activityView(50)]" views:views metrics:metrics];
     self.gameStatusConstraint = [NSLayoutConstraint constraintWithItem:gameStatusView
                                  attribute:NSLayoutAttributeBottom
                                  relatedBy:NSLayoutRelationEqual
@@ -142,6 +149,7 @@
                                  attribute:NSLayoutAttributeBottom
                                 multiplier:1
                                   constant:75];
+    
     [self addConstraint:self.gameStatusConstraint];
     [self addConstraint:
      [NSLayoutConstraint constraintWithItem:undoButton
@@ -159,12 +167,29 @@
                                   attribute:NSLayoutAttributeCenterY
                                  multiplier:1
                                    constant:0]];
+    [self addConstraint:
+     [NSLayoutConstraint constraintWithItem:activityView
+                                  attribute:NSLayoutAttributeCenterX
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeCenterX
+                                 multiplier:1
+                                   constant:0]];
+    [self addConstraint:
+     [NSLayoutConstraint constraintWithItem:activityView
+                                  attribute:NSLayoutAttributeCenterY
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self
+                                  attribute:NSLayoutAttributeCenterY
+                                 multiplier:1
+                                   constant:0]];
 
     self.gameMenuButton = gameMenuButton;
     self.submitButton = submitButton;
     self.undoButton = undoButton;
     self.redoButton = redoButton;
     self.gameStatusView = gameStatusView;
+    self.activityView = activityView;
   }
   return self;
 }
@@ -294,11 +319,21 @@
   }
 }
 -(void)showComputerThinkingIndicator {
-  [self.indicatorView startAnimating];
+  self.activityView.hidden = NO;
+  self.activityView.alpha = 0.0;
+  [self.activityView startAnimating];
+  [UIView animateWithDuration:0.3 animations:^{
+    self.activityView.alpha = 0.95;
+  }];
 }
 
 -(void)hideComputerThinkingIndicator {
-  [self.indicatorView stopAnimating];
+  [self.activityView stopAnimating];
+  [UIView animateWithDuration:0.3 animations:^{
+    self.activityView.alpha = 0.0;
+  } completion: ^(BOOL finished){
+    self.activityView.hidden = YES;
+  }];
 }
 
 - (void)drawRect:(CGRect)rect {
