@@ -13,6 +13,7 @@
 #import "Action.h"
 #import "Command.h"
 #include "java/lang/Integer.h"
+#import "SMCalloutView.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
@@ -31,8 +32,10 @@
 @property (weak, nonatomic) IBOutlet UIView *gameStatusColorView;
 @property (weak, nonatomic) IBOutlet UILabel *gameStatusLabel;
 @property (strong, nonatomic) UIView *gameStatusView;
-@property (strong, nonatomic) NSLayoutConstraint* gameStatusConstraint;
-@property (strong, nonatomic) UIActivityIndicatorView* activityView;
+@property (strong, nonatomic) NSLayoutConstraint *gameStatusConstraint;
+@property (strong, nonatomic) UIActivityIndicatorView *activityView;
+@property (strong, nonatomic) SMCalloutView *squareTapCallout;
+@property (strong, nonatomic) SMCalloutView *submitCallout;
 @property double taskId;
 @end
 
@@ -66,6 +69,16 @@
     activityView.opaque = NO;
     activityView.hidden = YES;
     [self addSubview:activityView];
+    
+    self.squareTapCallout = [SMCalloutView new];
+    self.squareTapCallout.title = @"Tap a square";
+    self.squareTapCallout.subtitle = @"to make your move";
+    self.squareTapCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
+    
+    self.submitCallout = [SMCalloutView new];
+    self.submitCallout.title = @"Hit submit";
+    self.submitCallout.subtitle = @"to confirm";
+    self.submitCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
 
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -334,6 +347,32 @@
   } completion: ^(BOOL finished){
     self.activityView.hidden = YES;
   }];
+}
+
+- (void)showTapSquareCallout {
+  CGRect calloutRect = CGRectMake(1.5 * SQUARE_SIZE,
+                                  SQUARE_SIZE + TOP_OFFSET + 5,
+                                  1,
+                                  1);
+  [self.squareTapCallout presentCalloutFromRect:calloutRect
+                               inView:self
+                    constrainedToView:self
+                             animated:YES];
+}
+
+-(void)hideTapSquareCallout {
+  [self.squareTapCallout dismissCalloutAnimated:YES];
+}
+
+- (void)showSubmitCallout {
+  [self.submitCallout presentCalloutFromRect:self.submitButton.frame
+                               inView:self
+                    constrainedToView:self
+                             animated:YES];
+}
+
+-(void)hideSubmitCallout {
+  [self.submitCallout dismissCalloutAnimated:YES];
 }
 
 - (void)drawRect:(CGRect)rect {

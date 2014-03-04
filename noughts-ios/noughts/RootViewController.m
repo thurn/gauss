@@ -3,6 +3,7 @@
 #import "Firebase.h"
 #import "GameListListener.h"
 #import "HasModel.h"
+#import "GameViewController.h"
 
 @interface RootViewController () <NTSGameListListener>
 @property (weak, nonatomic) IBOutlet UIButton *savedGamesButton;
@@ -57,6 +58,11 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   [(id <HasModel>)segue.destinationViewController setNTSModel:self.model];
+  if (((UIView*)sender).tag == 102) {
+    NSLog(@"tutorail");
+    GameViewController *gvc = segue.destinationViewController;
+    gvc.tutorialMode = YES;
+  }
 }
 
 @end

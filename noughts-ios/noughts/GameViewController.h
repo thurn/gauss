@@ -6,4 +6,5 @@
                                                   GameViewDelegate,
                                                   HasModel>
 @property (strong,nonatomic) NSString *currentGameId;
+@property (nonatomic) BOOL tutorialMode;
 @end

@@ -15,6 +15,7 @@
 
 NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
 NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
+NSString *const kSawTutorialKey = @"kSawTutorialKey";
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -240,6 +241,10 @@ NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
    NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilList:
                        [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
   [destination setNTSModel:self.model];
+  id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
+  if (sawTutorial == nil) {
+    destination.tutorialMode = YES;
+  }
   destination.currentGameId = gameId;
 }
 

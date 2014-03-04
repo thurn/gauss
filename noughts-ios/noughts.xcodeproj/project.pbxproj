@@ -118,6 +118,7 @@
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
 		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
+		7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -356,6 +357,8 @@
 		7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewLocalGameViewController.m; sourceTree = "<group>"; };
 		7CEB472A18B276A900CDA9EA /* J2obcUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = J2obcUtils.h; sourceTree = "<group>"; };
 		7CEB472B18B276A900CDA9EA /* J2obcUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = J2obcUtils.m; sourceTree = "<group>"; };
+		7CF4F40E18C3CE8000AD3AB0 /* SMCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMCalloutView.h; sourceTree = "<group>"; };
+		7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -653,6 +656,8 @@
 				7CEB472A18B276A900CDA9EA /* J2obcUtils.h */,
 				7CEB472B18B276A900CDA9EA /* J2obcUtils.m */,
 				7C0444BB18B2B101006275CA /* GameStatusView.xib */,
+				7CF4F40E18C3CE8000AD3AB0 /* SMCalloutView.h */,
+				7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -916,6 +921,7 @@
 				7C0444DB18B73124006275CA /* Main.java in Sources */,
 				7C0444DA18B73124006275CA /* Evaluator.java in Sources */,
 				7C0444D318B73124006275CA /* UctSearch.java in Sources */,
+				7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */,
 				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,

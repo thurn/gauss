@@ -19,6 +19,7 @@
 #import "Toast+UIView.h"
 #import "java/lang/Integer.h"
 #import "ImageString.h"
+#import "NewLocalGameViewController.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
 @property (weak,nonatomic) NTSModel *model;
@@ -57,6 +58,9 @@
   [[self navigationController] setNavigationBarHidden: YES animated: animated];
   [self displayGameStatus:[NTSGames gameStatusWithNTSGame:self.currentGame]];
   [self.model handleComputerActionWithNTSGame:self.currentGame];
+  if (self.tutorialMode) {
+    [self.gameView showTapSquareCallout];
+  }
 }
 
 -(void)displayGameStatus:(NTSGameStatus*)status {
@@ -181,6 +185,10 @@
                           setRowWithInt:y]
                          build];
   if ([self.model couldSubmitCommandWithNTSGame: self.currentGame withNTSCommand: command]) {
+    if (self.tutorialMode) {
+      [self.gameView hideTapSquareCallout];
+      [self.gameView showSubmitCallout];
+    }
     [self.model addCommandWithNTSGame: self.currentGame withNTSCommand: command];
   }
 }
@@ -207,6 +215,12 @@
 }
 
 - (void)handleSubmit {
+  if (self.tutorialMode) {
+    [self.gameView hideSubmitCallout];
+    self.tutorialMode = NO;
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    [userDefaults setObject:@YES forKey:kSawTutorialKey];
+  }
   [self.model submitCurrentActionWithNTSGame:self.currentGame];
 }
 

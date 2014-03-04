@@ -27,6 +27,10 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 -(void)displayGameStatusWithImage:(UIImage*)image
                        withString:(NSString*)string
                         withColor:(UIColor*)color;
+-(void)showTapSquareCallout;
+-(void)hideTapSquareCallout;
+-(void)showSubmitCallout;
+-(void)hideSubmitCallout;
 -(void)showComputerThinkingIndicator;
 -(void)hideComputerThinkingIndicator;
 @end
