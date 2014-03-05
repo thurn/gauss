@@ -1,11 +1,3 @@
-//
-//  NewLocalGameViewController.m
-//  noughts
-//
-//  Created by Derek Thurn on 2/14/14.
-//  Copyright (c) 2014 Derek Thurn. All rights reserved.
-//
-
 #import "NewLocalGameViewController.h"
 #import "GameViewController.h"
 #import "J2obcUtils.h"

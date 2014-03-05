@@ -1,11 +1,3 @@
-//
-//  SavedGamesViewController.m
-//  noughts
-//
-//  Created by Derek Thurn on 12/28/13.
-//  Copyright (c) 2013 Derek Thurn. All rights reserved.
-//
-
 #import "GameListViewController.h"
 #import "Model.h"
 #import "Game.h"
@@ -17,6 +9,7 @@
 #import <objc/runtime.h>
 #import "ImageString.h"
 #import "GameListEntry.h"
+#import "GameListEntryView.h"
 
 @interface GameListViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
@@ -33,7 +26,6 @@
 {
     self = [super initWithStyle:style];
     if (self) {
-        // Custom initialization
     }
     return self;
 }
@@ -44,6 +36,7 @@
   // self.clearsSelectionOnViewWillAppear = NO;
   // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
+  self.tableView.rowHeight = 50;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -98,8 +91,27 @@
   NTSGame *game = [self gameForIndexPath:indexPath];
   NTSGameListEntry *listEntry = [NTSGames gameListEntryWithNTSGame:game
                                                       withNSString:[self.model getUserId]];
-  cell.textLabel.text = [listEntry getVsString];
-  cell.detailTextLabel.text = [listEntry getModifiedString];
+//  cell.textLabel.text = [listEntry getVsString];
+//  UILabel *label2 = [UILabel new];
+//  label2.text = [listEntry getVsString];
+//  [label2 sizeToFit];
+//  [cell.contentView addSubview:label2];
+//  
+//  UILabel *label = [UILabel new];
+//  label.text = [listEntry getModifiedString];
+//  [label sizeToFit];
+//  [cell.contentView addSubview:label];
+  
+  NSArray *subviewArray = [[NSBundle mainBundle]
+                           loadNibNamed:@"GameListEntryView"
+                           owner:self
+                           options:nil];
+  GameListEntryView *entry = [subviewArray objectAtIndex:0];
+  entry.primaryLabel.text = [listEntry getVsString];
+  entry.secondaryLabel.text = [listEntry getModifiedString];
+  [cell.contentView addSubview:entry];
+  NSLog(@"entry frame %@", NSStringFromCGRect(entry.frame));
+  
   id <JavaUtilList> imageList = [listEntry getImageStringList];
   UIImage *image;
   if ([imageList size] == 2) {
@@ -108,7 +120,8 @@
     // not implemented;
     @throw @"remember to do this";
   }
-  cell.imageView.image = image;
+  entry.imageView.image = image;
+//  cell.imageView.image = image;
   return cell;
 }
 
@@ -140,7 +153,8 @@
   return nil;
 }
 
--(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:
+    (NSIndexPath *)indexPath {
   NTSGame *game = [self gameForIndexPath:indexPath];
   return [game isGameOver] ? @"Archive" : @"Resign";
 }
@@ -165,17 +179,22 @@
       self.gameListPartitions = [self.model getGameListPartitions];
       [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     } else {
-      [self.model resignGameWithNTSGame:game];
-      self.gameListPartitions = [self.model getGameListPartitions];
-      NSIndexPath *newPath = [NSIndexPath indexPathForItem:0 inSection:GAME_OVER_SECTION];
-      [self.tableView moveRowAtIndexPath:indexPath toIndexPath:newPath];
-      
-      // Hack to hide the resign button after you click it:
-      dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 100 * NSEC_PER_MSEC);
-      dispatch_after(delay, dispatch_get_main_queue(), ^{
-        [self.tableView setEditing:NO animated:NO];
-        [self.tableView setEditing:YES animated:NO];
-      });
+//      [self.tableView moveRowAtIndexPath:indexPath toIndexPath:newPath];
+//      [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+//                       withRowAnimation:UITableViewRowAnimationFade];
+//      dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 300 * NSEC_PER_MSEC);
+//      dispatch_after(delay, dispatch_get_main_queue(), ^{
+//        [self.model resignGameWithNTSGame:game];
+//        self.gameListPartitions = [self.model getGameListPartitions];
+//        NSIndexPath *newPath = [NSIndexPath indexPathForItem:0 inSection:GAME_OVER_SECTION];
+//        [self.tableView moveRowAtIndexPath:indexPath toIndexPath:newPath];
+//      });
+//      [self.model resignGameWithNTSGame:game];
+//      self.gameListPartitions = [self.model getGameListPartitions];
+//      NSIndexPath *newPath = [NSIndexPath indexPathForItem:0 inSection:GAME_OVER_SECTION];
+//      [self.tableView moveRowAtIndexPath:indexPath toIndexPath:newPath];
+//      [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:newPath]
+//                       withRowAnimation:UITableViewRowAnimationNone];
     }
   }
 }

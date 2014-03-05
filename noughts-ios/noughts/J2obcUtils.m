@@ -1,11 +1,3 @@
-//
-//  J2obcUtils.m
-//  noughts
-//
-//  Created by Derek Thurn on 2/17/14.
-//  Copyright (c) 2014 Derek Thurn. All rights reserved.
-//
-
 #import "J2obcUtils.h"
 #import "java/util/HashMap.h"
 #import "java/util/ArrayList.h"
