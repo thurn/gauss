@@ -79,6 +79,7 @@
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
+		7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C89B79518CC38FB00878DC1 /* GameCanvas.m */; };
 		7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
 		7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
 		7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */; };
@@ -337,6 +338,8 @@
 		7C69CD3B18790B600040AD75 /* HasModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HasModel.h; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
+		7C89B79418CC38FB00878DC1 /* GameCanvas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCanvas.h; sourceTree = "<group>"; };
+		7C89B79518CC38FB00878DC1 /* GameCanvas.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameCanvas.m; sourceTree = "<group>"; };
 		7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractChildEventListener.java; sourceTree = "<group>"; };
 		7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = Shared.gwt.xml; sourceTree = "<group>"; };
 		7C8EF6E518667E700075D0C1 /* Entity.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Entity.java; sourceTree = "<group>"; };
@@ -668,6 +671,8 @@
 				7C27F70718C67A0300ADA495 /* UIView+AutoLayout.m */,
 				7C27F71118C8FF2D00ADA495 /* GameListEntryCell.h */,
 				7C27F71218C8FF2D00ADA495 /* GameListEntryCell.m */,
+				7C89B79418CC38FB00878DC1 /* GameCanvas.h */,
+				7C89B79518CC38FB00878DC1 /* GameCanvas.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -967,6 +972,7 @@
 				7C58BE1618C1BD4D008D2C9D /* GameListEntry.java in Sources */,
 				7C8EF6F218668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
 				7C2E640E18641F3500D34AD0 /* main.m in Sources */,
+				7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */,
 				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
 				7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */,
