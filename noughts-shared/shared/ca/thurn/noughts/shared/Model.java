@@ -176,11 +176,13 @@ public class Model implements ChildEventListener {
           // listener should still be triggered once the new game is in the
           // system.
           Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
-          listener.onGameUpdate(game);
           Game oldGame = games.get(game.getId());
-          if (oldGame != null && Games.differentStatus(game, oldGame)) {
-            listener.onGameStatusChanged(Games.gameStatus(game));
+          if (oldGame == null || !game.equals(oldGame)) {
+            listener.onGameUpdate(game);
           }
+          if (oldGame != null && Games.differentStatus(game, oldGame)) {
+            listener.onGameStatusChanged(Games.gameStatus(game));              
+          }          
           games.put(game.getId(), game);
         }
       }

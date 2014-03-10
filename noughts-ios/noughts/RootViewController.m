@@ -6,24 +6,23 @@
 #import "GameViewController.h"
 
 @interface RootViewController () <NTSGameListListener>
-@property (weak, nonatomic) IBOutlet UIButton *savedGamesButton;
+@property(weak, nonatomic) IBOutlet UIButton *savedGamesButton;
 @property(strong,nonatomic) NTSModel *model;
 @end
 
 @implementation RootViewController
 
--(void)awakeFromNib {
+- (void)awakeFromNib {
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
   self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio-demo.com"];
-  self.model = [[NTSModel alloc] initWithNSString:@"dthurn" withFCFirebase:firebase];
-  [self.model setGameListListenerWithNTSGameListListener:self];
+  _model = [[NTSModel alloc] initWithNSString:@"dthurn" withFCFirebase:firebase];
+  [_model setGameListListenerWithNTSGameListListener:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -31,10 +30,10 @@
 }
 
 - (void)toggleSaveButtonEnabled {
-  if ([self.model gameCount] == 0) {
-    [self.savedGamesButton setEnabled:NO];
+  if ([_model gameCount] == 0) {
+    [_savedGamesButton setEnabled:NO];
   } else {
-    [self.savedGamesButton setEnabled:YES];
+    [_savedGamesButton setEnabled:YES];
   }
 }
 
@@ -57,7 +56,7 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  [(id <HasModel>)segue.destinationViewController setNTSModel:self.model];
+  [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
   if (((UIView*)sender).tag == 102) {
     NSLog(@"tutorail");
     GameViewController *gvc = segue.destinationViewController;

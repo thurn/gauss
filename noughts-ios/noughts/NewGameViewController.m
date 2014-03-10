@@ -9,17 +9,16 @@
 @implementation NewGameViewController
 
 - (void)setNTSModel:(NTSModel *)model {
-  self.model = model;
+  _model = model;
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
   [super viewDidLoad];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   UIView *sendingView = sender;
-  [(id <HasModel>)segue.destinationViewController setNTSModel:self.model];
+  [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
   switch (sendingView.tag) {
     case 100: {
       NewLocalGameViewController *controller =
@@ -39,8 +38,7 @@
   }
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
 }
 

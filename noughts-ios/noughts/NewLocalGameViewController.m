@@ -27,20 +27,20 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 @implementation NewLocalGameViewController
 
 -(void)awakeFromNib {
-  self.playerImages = @[@"player_bull", @"player_chick", @"player_cow", @"player_donkey",
-                        @"player_goat", @"player_goose", @"player_chicken", @"player_sheep"];
-  self.computerImages = @[@"computer_easy", @"computer_medium", @"computer_hard"];
-  self.p1ImageIndex = arc4random() % [self.playerImages count];
-  self.p2ImageIndex = arc4random() % [self.playerImages count];
-  while (self.p1ImageIndex == self.p2ImageIndex) {
-    self.p2ImageIndex = rand() % [self.playerImages count];
+  _playerImages = @[@"player_bull", @"player_chick", @"player_cow", @"player_donkey",
+                      @"player_goat", @"player_goose", @"player_chicken", @"player_sheep"];
+  _computerImages = @[@"computer_easy", @"computer_medium", @"computer_hard"];
+  _p1ImageIndex = arc4random() % [_playerImages count];
+  _p2ImageIndex = arc4random() % [_playerImages count];
+  while (_p1ImageIndex == _p2ImageIndex) {
+    _p2ImageIndex = rand() % [_playerImages count];
   }
 }
 
 - (void)viewDidLoad {
-  if (self.playVsComputerMode) {
-    self.p2ImageIndex = 0;
-    [self.difficultyPicker selectRow:self.p2ImageIndex inComponent:0 animated:YES];
+  if (_playVsComputerMode) {
+    _p2ImageIndex = 0;
+    [_difficultyPicker selectRow:_p2ImageIndex inComponent:0 animated:YES];
   }
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(keyboardWillBeShown:)
@@ -51,30 +51,30 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
                                            selector:@selector(keyboardWillBeHidden:)
                                                name:UIKeyboardWillHideNotification
                                              object:nil];
-  UIImage *image1 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p1ImageIndex]];
-  [self.p1Image setImage:image1 forState:UIControlStateNormal];
+  UIImage *image1 = [UIImage imageNamed:[_playerImages objectAtIndex:_p1ImageIndex]];
+  [_p1Image setImage:image1 forState:UIControlStateNormal];
   UIImage *image2;
-  if (self.playVsComputerMode) {
-    image2 = [UIImage imageNamed:[self.computerImages objectAtIndex:self.p2ImageIndex]];
+  if (_playVsComputerMode) {
+    image2 = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
   } else {
-    image2 = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+    image2 = [UIImage imageNamed:[_playerImages objectAtIndex:_p2ImageIndex]];
   }
-  [self.p2Image setImage:image2 forState:UIControlStateNormal];
+  [_p2Image setImage:image2 forState:UIControlStateNormal];
   
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   NSString *p1Name = [userDefaults objectForKey:kP1LocalNameKey];
   if (!p1Name) {
     p1Name = @"Player 1";
   }
-  self.p1TextField.placeholder = p1Name;
-  self.p1TextField.text = p1Name;
+  _p1TextField.placeholder = p1Name;
+  _p1TextField.text = p1Name;
   
   NSString *p2Name = [userDefaults objectForKey:kP2LocalNameKey];
   if (!p2Name) {
     p2Name = @"Player 2";
   }
-  self.p2TextField.placeholder = p2Name;
-  self.p2TextField.text = p2Name;
+  _p2TextField.placeholder = p2Name;
+  _p2TextField.text = p2Name;
 }
 
 - (void)animateViewByDeltaY:(int)deltaY {
@@ -108,20 +108,20 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 }
 
 - (IBAction)onP1ImageClicked:(UIButton *)sender {
-  self.p1ImageIndex = (self.p1ImageIndex + 1) % [self.playerImages count];
-  if (self.p1ImageIndex == self.p2ImageIndex) {
-    self.p1ImageIndex = (self.p1ImageIndex + 1) % [self.playerImages count];
+  _p1ImageIndex = (_p1ImageIndex + 1) % [_playerImages count];
+  if (_p1ImageIndex == _p2ImageIndex) {
+    _p1ImageIndex = (_p1ImageIndex + 1) % [_playerImages count];
   }
-  UIImage *image = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p1ImageIndex]];
+  UIImage *image = [UIImage imageNamed:[_playerImages objectAtIndex:_p1ImageIndex]];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
 - (IBAction)onP2ImageClicked:(UIButton *)sender {
-  self.p2ImageIndex = (self.p2ImageIndex + 1) % [self.playerImages count];
-  if (self.p1ImageIndex == self.p2ImageIndex) {
-    self.p2ImageIndex = (self.p2ImageIndex + 1) % [self.playerImages count];
+  _p2ImageIndex = (_p2ImageIndex + 1) % [_playerImages count];
+  if (_p1ImageIndex == _p2ImageIndex) {
+    _p2ImageIndex = (_p2ImageIndex + 1) % [_playerImages count];
   }
-  UIImage *image = [UIImage imageNamed:[self.playerImages objectAtIndex:self.p2ImageIndex]];
+  UIImage *image = [UIImage imageNamed:[_playerImages objectAtIndex:_p2ImageIndex]];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -131,7 +131,7 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 }
 
 -(void)setNTSModel:(NTSModel *)model {
-  self.model = model;
+  _model = model;
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
@@ -142,10 +142,10 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
   return 3;
 }
 
--(UIView*)pickerView:(UIPickerView *)pickerView
-          viewForRow:(NSInteger)row
-        forComponent:(NSInteger)component
-         reusingView:(UIView *)view {
+- (UIView*)pickerView:(UIPickerView *)pickerView
+           viewForRow:(NSInteger)row
+         forComponent:(NSInteger)component
+          reusingView:(UIView *)view {
   UILabel* label = (UILabel*)view;
   if (!label) {
     label = [[UILabel alloc] init];
@@ -179,9 +179,9 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 - (void)pickerView:(UIPickerView *)pickerView
       didSelectRow:(NSInteger)row
        inComponent:(NSInteger)component {
-  self.p2ImageIndex = row;
-  UIImage *image = [UIImage imageNamed:[self.computerImages objectAtIndex:self.p2ImageIndex]];
-  [self.p2Image setImage:image forState:UIControlStateNormal];
+  _p2ImageIndex = row;
+  UIImage *image = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
+  [_p2Image setImage:image forState:UIControlStateNormal];
 }
 
 - (BOOL)isAllWhitespace:(NSString*)string {
@@ -198,13 +198,13 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   GameViewController *destination = segue.destinationViewController;
-  NSString *p1Name = self.p1TextField.text;
+  NSString *p1Name = _p1TextField.text;
   if (!p1Name || [self isAllWhitespace:p1Name]) {
-    p1Name = self.p1TextField.placeholder;
+    p1Name = _p1TextField.placeholder;
   }
-  NSString *p2Name = self.p2TextField.text;
+  NSString *p2Name = _p2TextField.text;
   if (!p2Name || [self isAllWhitespace:p2Name]) {
-    p2Name = self.p2TextField.placeholder;
+    p2Name = _p2TextField.placeholder;
   }
   
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -215,24 +215,24 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
   NTSProfile_Builder *p1Profile = [NTSProfile newBuilder];
   [p1Profile setNameWithNSString:p1Name];
   [p1Profile setImageStringWithNTSImageString:
-   [self localImageString: [self.playerImages objectAtIndex:self.p1ImageIndex]]];
+   [self localImageString:[_playerImages objectAtIndex:_p1ImageIndex]]];
   NTSProfile_Builder *p2Profile = [NTSProfile newBuilder];
-  if (self.playVsComputerMode) {
-    int difficultyLevel = [self.difficultyPicker selectedRowInComponent:0];
+  if (_playVsComputerMode) {
+    int difficultyLevel = [_difficultyPicker selectedRowInComponent:0];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
-     [self localImageString:[self.computerImages objectAtIndex:difficultyLevel]]];
+     [self localImageString:[_computerImages objectAtIndex:difficultyLevel]]];
     [p2Profile setIsComputerPlayerWithBoolean:YES];
     [p2Profile setComputerDifficultyLevelWithInt:difficultyLevel];
   } else {
     [p2Profile setNameWithNSString:p2Name];
     [p2Profile setImageStringWithNTSImageString:
-     [self localImageString: [self.playerImages objectAtIndex:self.p2ImageIndex]]];
+     [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]]];
   }
 
-   NSString *gameId = [self.model newLocalMultiplayerGameWithJavaUtilList:
+   NSString *gameId = [_model newLocalMultiplayerGameWithJavaUtilList:
                        [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
-  [destination setNTSModel:self.model];
+  [destination setNTSModel:_model];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

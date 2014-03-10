@@ -7,11 +7,12 @@
 #include "java/lang/Integer.h"
 #import "SMCalloutView.h"
 #import "UIView+AutoLayout.h"
+#import "GameCanvas.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
 
-@interface GameView ()
+@interface GameView () <GameCanvasDelegate>
 @property(strong,nonatomic) UIImage *logo;
 @property(strong,nonatomic) UIImage *x;
 @property(strong,nonatomic) UIImage *o;
@@ -32,6 +33,7 @@
 @property(strong, nonatomic) UIActivityIndicatorView *activityView;
 @property(strong, nonatomic) SMCalloutView *squareTapCallout;
 @property(strong, nonatomic) SMCalloutView *submitCallout;
+@property(strong, nonatomic) GameCanvas *gameCanvas;
 @property double taskId;
 @end
 
@@ -52,6 +54,11 @@
     _o = osvg.UIImage;
     SVGKImage *bgsvg = [SVGKImage imageNamed:@"background.svg"];
     _backgroundImage = bgsvg.UIImage;
+    
+    _gameCanvas = [GameCanvas new];
+    _gameCanvas.translatesAutoresizingMaskIntoConstraints = NO;
+    _gameCanvas.delegate = self;
+    [self addSubview:_gameCanvas];
     
     _activityView = [[UIActivityIndicatorView alloc]
                      initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -74,10 +81,6 @@
     _submitCallout.title = @"Hit submit";
     _submitCallout.subtitle = @"to confirm";
     _submitCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
-
-    [self addGestureRecognizer:
-     [[UITapGestureRecognizer alloc] initWithTarget:self
-                                             action:@selector(handleTap:)]];
 
     _gameMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
     UIImage *gameMenuIcon = [UIImage imageNamed:@"ic_game_menu.png"];
@@ -150,6 +153,7 @@
   CGFloat statusBarHeight = [[NSNumber numberWithFloat:
                               [UIApplication sharedApplication].statusBarFrame.size.height]
                              floatValue];
+  [_gameCanvas autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero];
   [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:5];
   [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
   [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
@@ -196,16 +200,6 @@
   }];
 }
 
-- (void)visualConstraint:(NSString*)visualFormat
-                   views:(NSDictionary*)views
-                 metrics:(NSDictionary*)metrics{
-    [self addConstraints: [NSLayoutConstraint
-                           constraintsWithVisualFormat:visualFormat
-                           options:0
-                           metrics:metrics
-                           views:views]];
-}
-
 - (void)menuButtonClicked:(UIButton*)button {
   NSString *destructiveTitle = [_delegate isGameOver] ? @"Archive Game" : @"Resign";
   UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil
@@ -250,15 +244,16 @@
     }
   }
   if (selection != kUnknownSelection) {
-    [_delegate handleGameMenuSelection: selection];
+    [_delegate handleGameMenuSelection:selection];
   }
 }
 
-- (void)drawGame: (NTSGame*)game {
+- (void)drawGame:(NTSGame*)game {
   _currentGame = game;
   [self setButtonsEnabledSubmit:[_delegate canSubmit]
                            undo:[_delegate canUndo]
                            redo:[_delegate canRedo]];
+  [_gameCanvas drawGame:game];
   [self setNeedsDisplay];
 }
 
@@ -282,28 +277,16 @@
   }];
 }
 
-- (void)handleTap:(UITapGestureRecognizer*)sender {
-  if (sender.state == UIGestureRecognizerStateEnded) {
-    CGPoint point = [sender locationInView: self];
-    if (point.y < TOP_OFFSET || point.y > TOP_OFFSET + 3 * SQUARE_SIZE ||
-        point.x < 0 || point.x > 3 * SQUARE_SIZE) {
-      return; // Out of bounds
-    }
-    [_delegate handleSquareTapAtX:point.x / SQUARE_SIZE
-                                  AtY:(point.y - TOP_OFFSET) / SQUARE_SIZE];
-  }
+- (void)handleSquareTapAtX:(int)x AtY:(int)y {
+  [_delegate handleSquareTapAtX:x AtY:y];
 }
 
-- (void)drawRect:(CGRect)rect {
-  [_backgroundImage drawAtPoint:CGPointZero];
-  if (_currentGame) {
-    for (NTSAction *action in (id<NSFastEnumeration>)[_currentGame getSubmittedActionList]) {
-      [self drawAction:action animate:NO];
-    }
-  }
-  if ([_currentGame hasCurrentAction]) {
-    [self drawAction:[_currentGame getCurrentAction] animate:YES];
-  }
+- (void)handleDragToX:(int)x toY:(int)y {
+  [_delegate handleDragToX:x toY:y];
+}
+
+- (BOOL)allowDragToX:(int)x toY:(int)y {
+  return [_delegate allowDragToX:x toY:y];
 }
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate {
@@ -331,7 +314,7 @@
   [_activityView stopAnimating];
   [UIView animateWithDuration:0.3 animations:^{
     _activityView.alpha = 0.0;
-  } completion: ^(BOOL finished){
+  } completion:^(BOOL finished){
     _activityView.hidden = YES;
   }];
 }

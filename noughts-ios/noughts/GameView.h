@@ -10,8 +10,10 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 };
 
 @protocol GameViewDelegate
-- (void)handleSquareTapAtX: (int)x AtY: (int)y;
-- (void)handleGameMenuSelection: (GameMenuSelection)selection;
+- (void)handleSquareTapAtX:(int)x AtY:(int)y;
+- (void)handleDragToX:(int)x toY:(int)y;
+- (BOOL)allowDragToX:(int)x toY:(int)y;
+- (void)handleGameMenuSelection:(GameMenuSelection)selection;
 - (BOOL)canSubmit;
 - (BOOL)canUndo;
 - (BOOL)canRedo;

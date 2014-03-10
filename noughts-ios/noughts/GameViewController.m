@@ -14,9 +14,9 @@
 #import "NewLocalGameViewController.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
-@property (weak,nonatomic) NTSModel *model;
-@property (weak,nonatomic) GameView *gameView;
-@property (strong,nonatomic) NTSGame *currentGame;
+@property(weak,nonatomic) NTSModel *model;
+@property(weak,nonatomic) GameView *gameView;
+@property(strong,nonatomic) NTSGame *currentGame;
 @end
 
 @implementation GameViewController
@@ -33,48 +33,48 @@
   GameView *view = [GameView new];
   view.delegate = self;
   self.view = view;
-  self.gameView = view;
+  _gameView = view;
 }
 
 - (void)setNTSModel:(NTSModel *)model {
-  self.model = model;
+  _model = model;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  [self.model setGameUpdateListenerWithNSString: self.currentGameId
-                      withNTSGameUpdateListener: self];
+  [_model setGameUpdateListenerWithNSString:_currentGameId
+                      withNTSGameUpdateListener:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-  [[self navigationController] setNavigationBarHidden: YES animated: animated];
-  [self displayGameStatus:[NTSGames gameStatusWithNTSGame:self.currentGame]];
-  [self.model handleComputerActionWithNTSGame:self.currentGame];
-  if (self.tutorialMode) {
-    [self.gameView showTapSquareCallout];
+  [[self navigationController] setNavigationBarHidden:YES animated:animated];
+  [self displayGameStatus:[NTSGames gameStatusWithNTSGame:_currentGame]];
+  [_model handleComputerActionWithNTSGame:_currentGame];
+  if (_tutorialMode) {
+    [_gameView showTapSquareCallout];
   }
 }
 
--(void)displayGameStatus:(NTSGameStatus*)status {
+- (void)displayGameStatus:(NTSGameStatus*)status {
   UIColor *color;
   if (![status hasStatusPlayer]) {
     color = [UIColor grayColor];
   } else {
-    color = [self colorFromPlayerNumber: [status getStatusPlayer]];
+    color = [self colorFromPlayerNumber:[status getStatusPlayer]];
   }
   UIImage *image;
-    image = [UIImage imageNamed:[[status getStatusImageString] getString]];
-  [self.gameView displayGameStatusWithImage:image
-                                 withString:[status getStatusString]
-                                  withColor:color];
+  image = [UIImage imageNamed:[[status getStatusImageString] getString]];
+  [_gameView displayGameStatusWithImage:image
+                             withString:[status getStatusString]
+                              withColor:color];
   if ([status isComputerThinking]) {
-    [self.gameView showComputerThinkingIndicator];
+    [_gameView showComputerThinkingIndicator];
   } else {
-    [self.gameView hideComputerThinkingIndicator];
+    [_gameView hideComputerThinkingIndicator];
   }
 }
 
--(UIColor*)colorFromPlayerNumber:(int)playerNumber {
+- (UIColor*)colorFromPlayerNumber:(int)playerNumber {
   switch (playerNumber) {
     case 0: {
       return [UIColor blackColor];
@@ -92,12 +92,12 @@
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
     case kResignOrArchive: {
-      if ([self.currentGame isGameOver]) {
-        [self.model archiveGameWithNTSGame:self.currentGame];
+      if ([_currentGame isGameOver]) {
+        [_model archiveGameWithNTSGame:_currentGame];
         [[self navigationController] setNavigationBarHidden:NO animated:YES];
         [self.navigationController popToRootViewControllerAnimated:YES];
         UIViewController *rootController =
-        [self.navigationController.viewControllers objectAtIndex:0];
+            [self.navigationController.viewControllers objectAtIndex:0];
         [rootController.view makeToast:@"Archived game."];
       } else {
         UIAlertView *alert = [[UIAlertView alloc]
@@ -105,7 +105,7 @@
                                     message:@"Are you sure you want to leave the game?"
                                    delegate:self
                           cancelButtonTitle:@"Cancel"
-                          otherButtonTitles: @"Resign", nil];
+                          otherButtonTitles:@"Resign", nil];
         [alert show];
       }
       break;
@@ -123,7 +123,7 @@
         // Add new game controller to back stack
         newGameController =
             [self.storyboard instantiateViewControllerWithIdentifier:@"NewGameViewController"];
-        [newGameController setNTSModel:self.model];
+        [newGameController setNTSModel:_model];
         UIViewController *rootController =
             [self.navigationController.viewControllers objectAtIndex:0];
         [self.navigationController setViewControllers:@[rootController, newGameController, self]
@@ -140,7 +140,7 @@
         // Add saved games controller to back stack
         savedGamesController =
             [self.storyboard instantiateViewControllerWithIdentifier:@"SavedGamesViewController"];
-        [savedGamesController setNTSModel:self.model];
+        [savedGamesController setNTSModel:_model];
         UIViewController *rootController =
             [self.navigationController.viewControllers objectAtIndex:0];
         [self.navigationController setViewControllers:@[rootController, savedGamesController, self]
@@ -157,7 +157,7 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
-    [self.model resignGameWithNTSGame:self.currentGame];
+    [_model resignGameWithNTSGame:_currentGame];
     [self.view makeToast:@"Resigned from game."];
   }
 }
@@ -171,23 +171,36 @@
   return nil;
 }
 
-- (void)handleSquareTapAtX: (int)x AtY: (int)y {
-  NTSCommand *command = [[[[NTSCommand newBuilder]
-                           setColumnWithInt:x]
-                          setRowWithInt:y]
-                         build];
-  if ([self.model couldSubmitCommandWithNTSGame: self.currentGame withNTSCommand: command]) {
-    if (self.tutorialMode) {
-      [self.gameView hideTapSquareCallout];
-      [self.gameView showSubmitCallout];
+- (NTSCommand*)commandFromX:(int)x fromY:(int)y {
+  return [[[[NTSCommand newBuilder]
+            setColumnWithInt:x]
+           setRowWithInt:y]
+          build];
+}
+
+- (void)handleSquareTapAtX:(int)x AtY:(int)y {
+  NTSCommand *command = [self commandFromX:x fromY:y];
+  if ([_model couldSubmitCommandWithNTSGame:_currentGame withNTSCommand:command]) {
+    if (_tutorialMode) {
+      [_gameView hideTapSquareCallout];
+      [_gameView showSubmitCallout];
     }
-    [self.model addCommandWithNTSGame: self.currentGame withNTSCommand: command];
+    [_model addCommandWithNTSGame:_currentGame withNTSCommand:command];
   }
 }
 
+- (void)handleDragToX:(int)x toY:(int)y {
+  // [_model updateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
+}
+
+- (BOOL)allowDragToX:(int)x toY:(int)y {
+  // return [_model couldUpdateCommandWithNTSGame:_currentGame withNTSCommand:command];
+  return YES;
+}
+
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  self.currentGame = game;
-  [self.gameView drawGame: game];
+  _currentGame = game;
+  [_gameView drawGame:game];
 }
 
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {
@@ -195,37 +208,37 @@
 }
 
 - (BOOL)canSubmit {
-  return [self.model canSubmitWithNTSGame:self.currentGame];
+  return [_model canSubmitWithNTSGame:_currentGame];
 }
 
 - (BOOL)canUndo {
-  return [self.model canUndoWithNTSGame:self.currentGame];
+  return [_model canUndoWithNTSGame:_currentGame];
 }
 
 - (BOOL)canRedo {
-  return [self.model canRedoWithNTSGame:self.currentGame];
+  return [_model canRedoWithNTSGame:_currentGame];
 }
 
 - (void)handleSubmit {
-  if (self.tutorialMode) {
-    [self.gameView hideSubmitCallout];
-    self.tutorialMode = NO;
+  if (_tutorialMode) {
+    [_gameView hideSubmitCallout];
+    _tutorialMode = NO;
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:@YES forKey:kSawTutorialKey];
   }
-  [self.model submitCurrentActionWithNTSGame:self.currentGame];
+  [_model submitCurrentActionWithNTSGame:_currentGame];
 }
 
 - (void)handleUndo {
-  [self.model undoCommandWithNTSGame:self.currentGame];
+  [_model undoCommandWithNTSGame:_currentGame];
 }
 
 - (void)handleRedo {
-  [self.model redoCommandWithNTSGame:self.currentGame];
+  [_model redoCommandWithNTSGame:_currentGame];
 }
 
 - (BOOL)isGameOver {
-  return [self.currentGame isGameOver];
+  return [_currentGame isGameOver];
 }
 
 @end

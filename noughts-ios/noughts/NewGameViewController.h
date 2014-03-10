@@ -2,5 +2,4 @@
 #import "HasModel.h"
 
 @interface NewGameViewController : UIViewController <HasModel>
-
 @end

@@ -10,5 +10,5 @@
 #import "Model.h"
 
 @protocol HasModel <NSObject>
--(void)setNTSModel:(NTSModel *)model;
+- (void)setNTSModel:(NTSModel *)model;
 @end
