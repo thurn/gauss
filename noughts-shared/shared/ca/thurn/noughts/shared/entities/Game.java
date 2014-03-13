@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Entity;
-
 // 2 fields:
 // under construction action
 // submitted actions
@@ -540,7 +538,7 @@ public class Game extends Entity<Game> {
     id = getString(gameMap, "id");
     playerList = getList(gameMap, "playerList");
     profileMap = getEntityMap(gameMap, "profileMap", Profile.newDeserializer());
-    localProfileList = getEntities(gameMap, "localProfileMap", Profile.newDeserializer());
+    localProfileList = getEntities(gameMap, "localProfileList", Profile.newDeserializer());
     currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
     submittedActionList = getEntities(gameMap, "submittedActionList", Action.newDeserializer());
     currentAction = getEntity(gameMap, "currentAction", Action.newDeserializer());
@@ -564,7 +562,7 @@ public class Game extends Entity<Game> {
     putSerialized(result, "id", id);
     putSerialized(result, "playerList", playerList);
     putSerialized(result, "profileMap", profileMap);
-    putSerialized(result, "localProfileMap", localProfileList);
+    putSerialized(result, "localProfileList", localProfileList);
     putSerialized(result, "currentPlayerNumber", currentPlayerNumber);
     putSerialized(result, "submittedActionList", submittedActionList);
     putSerialized(result, "currentAction", currentAction);

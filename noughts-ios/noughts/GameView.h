@@ -1,5 +1,6 @@
 #import <UIKit/UIKit.h>
-#import "game.h"
+#import "Game.h"
+#import "GameCanvas.h"
 
 typedef NS_ENUM(NSUInteger, GameMenuSelection) {
   kUnknownSelection,
@@ -10,9 +11,6 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 };
 
 @protocol GameViewDelegate
-- (void)handleSquareTapAtX:(int)x AtY:(int)y;
-- (void)handleDragToX:(int)x toY:(int)y;
-- (BOOL)allowDragToX:(int)x toY:(int)y;
 - (void)handleGameMenuSelection:(GameMenuSelection)selection;
 - (BOOL)canSubmit;
 - (BOOL)canUndo;
@@ -25,6 +23,8 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 
 @interface GameView : UIView <UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
+-(void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
+- (id<NTSCommandUpdateListener>)getCommandUpdateListener;
 -(void)drawGame:(NTSGame *)game;
 -(void)displayGameStatusWithImage:(UIImage*)image
                        withString:(NSString*)string

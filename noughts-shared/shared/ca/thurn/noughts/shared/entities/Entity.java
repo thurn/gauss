@@ -1,4 +1,4 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.Map.Entry;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.MutableData;
 
-public abstract class Entity<T extends Entity<T>> {
+public abstract class Entity<T extends Entity<T>> implements Cloneable {
   
   public static abstract class EntityDeserializer<T extends Entity<T>> {    
     /**
@@ -305,5 +305,11 @@ public abstract class Entity<T extends Entity<T>> {
     }
     Entity<?> other = (Entity<?>)object;
     return serialize().equals(other.serialize());
+  }
+  
+  @Override
+  public Entity<T> clone() {
+    // All Entities are immutable.
+    return this;
   }
 }

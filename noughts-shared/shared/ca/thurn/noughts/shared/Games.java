@@ -1,9 +1,14 @@
 package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import ca.thurn.noughts.shared.entities.Action;
+import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameListEntry;
 import ca.thurn.noughts.shared.entities.GameStatus;
@@ -334,10 +339,93 @@ public class Games {
     return timeAgoString(game, viewerId, number, "second");
   }
   
-  static boolean differentStatus(Game g1, Game g2) {
-    return (g1.hasIsGameOver() && g2.hasIsGameOver() && g1.isGameOver() != g2.isGameOver()) ||
-        (g1.hasCurrentPlayerNumber() && g2.hasCurrentPlayerNumber() &&
-            g1.getCurrentPlayerNumber() != g2.getCurrentPlayerNumber());
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return True if the two game states have different "status" (different
+   *     player's turn, game is over, etc).
+   */
+  static boolean differentStatus(Game old, Game next) {
+    return (old.hasIsGameOver() && next.hasIsGameOver() && old.isGameOver() != next.isGameOver()) ||
+        (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
+            old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
+  }
+  
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return A map of all the commands that have been submitted in the new
+   *     game state.
+   */
+  static Map<Command, Action> commandsSubmitted(Game old, Game next) {
+    Map<Command, Action> result = new HashMap<Command, Action>();
+    int numOldActions = old.getSubmittedActionCount();
+    int numNewActions = next.getSubmittedActionCount();
+    while (numNewActions > numOldActions) {
+      Action action = next.getSubmittedAction(numNewActions - 1);
+      for (Command command : action.getCommandList()) {
+        result.put(command, action);
+      }
+      numNewActions--;
+    }    
+    return result;
+  }
+  
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return A map of all commands that have been added to the current action
+   *     in the new game state.
+   */
+  static Map<Command, Action> commandsAdded(Game old, Game next) {
+    Map<Command, Action> result = new HashMap<Command, Action>();
+    if (old.getSubmittedActionCount() != next.getSubmittedActionCount()) {
+      return Collections.emptyMap();
+    }
+    if (old.hasCurrentAction() && next.hasCurrentAction()) {
+      int numOldCommands = old.getCurrentAction().getCommandCount();
+      int numNewCommands = next.getCurrentAction().getCommandCount();
+      while (numNewCommands > numOldCommands) {
+        result.put(next.getCurrentAction().getCommand(numNewCommands - 1),
+            next.getCurrentAction());
+        numNewCommands--;
+      }
+    } else if (next.hasCurrentAction()) {
+      for (Command command : next.getCurrentAction().getCommandList()) {
+        result.put(command, next.getCurrentAction());
+      }
+    }
+    return result;
+  }
+  
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return A map of all commands that have changed in the current action of
+   *     the new game state.
+   */
+  static Map<Command, Action> commandsChanged(Game old, Game next) {
+    if (!old.hasCurrentAction() || !next.hasCurrentAction() ||
+        old.getCurrentAction().getCommandCount() != next.getCurrentAction().getCommandCount()) {
+      return Collections.emptyMap();
+    }
+    Map<Command, Action> result = new HashMap<Command, Action>();
+    for (int i = 0 ; i < next.getCurrentAction().getCommandCount(); ++i) {
+      if (!old.getCurrentAction().getCommand(i).equals(next.getCurrentAction().getCommand(i))) {
+        result.put(next.getCurrentAction().getCommand(i), next.getCurrentAction());
+      }
+    }
+    return result;
+  }
+  
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return A map of all commands that have been removed from the current
+   *     action in the new game state.
+   */  
+  static Map<Command, Action> commandsRemoved(Game old, Game next) {
+    return commandsAdded(next, old);
   }
 
   // Visible for testing

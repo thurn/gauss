@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Entity;
-
 /**
  * Represents a game entry in the game list.
  */

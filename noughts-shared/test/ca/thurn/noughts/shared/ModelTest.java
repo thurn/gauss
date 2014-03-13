@@ -22,10 +22,16 @@ public class ModelTest extends SharedTestCase {
   private String userId;
   private Firebase firebase;
 
-  private static abstract class NoStatusGameUpdateListener implements GameUpdateListener {
+  private static abstract class OnGameUpdateListener implements GameUpdateListener {
     @Override
     public void onGameStatusChanged(GameStatus status) {
     }
+  }
+  
+  private static abstract class GameStatusUpdateListener implements GameUpdateListener {
+    @Override
+    public void onGameUpdate(Game game) {
+    }   
   }
   
   @Override
@@ -78,7 +84,7 @@ public class ModelTest extends SharedTestCase {
     profile.setPronoun(Pronoun.NEUTRAL);
     profiles.put(userId, profile.build());
     String id = model.newGame(profiles);
-    model.setGameUpdateListener(id, new NoStatusGameUpdateListener() {
+    model.setGameUpdateListener(id, new OnGameUpdateListener() {
       @Override
       public void onGameUpdate(Game game) {
         assertTrue(game.getPlayerList().contains(userId));
@@ -96,9 +102,7 @@ public class ModelTest extends SharedTestCase {
   
   public void testAddCommandToExistingAction() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame();
-    game.addPlayer(userId);
-    game.setCurrentPlayerNumber(0);
+    final Game.Builder game = newGameWithTwoPlayers();
     Action.Builder action = Action.newBuilder();
     action.setPlayerNumber(0);
     action.setIsSubmitted(false);
@@ -110,7 +114,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertNotNull(game);
@@ -129,6 +133,34 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
   
+  public void testUpdateLastCommand() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithCurrentCommand().build();
+    final Command command = Command.newBuilder().setColumn(0).setRow(0).build();
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertEquals(list(command), game.getCurrentAction().getCommandList());
+            finished();
+          }
+        });
+        model.updateLastCommand(game, command);
+      }
+    });
+    endAsyncTestBlock();
+  }
+  
+  public void testCouldUpdateLastCommand() {
+    Game game = newGameWithCurrentCommand().build();
+    Command command = Command.newBuilder().setRow(0).setColumn(0).build();
+    assertTrue(model.couldUpdateLastCommand(game, command));
+    assertFalse(model.couldUpdateLastCommand(
+        game.toBuilder().clearCurrentAction().build(), command));
+  }
+  
   public void testAddCommandNotCurrentPlayer() {
     assertDies(new Runnable() {
       @Override public void run() {
@@ -142,12 +174,12 @@ public class ModelTest extends SharedTestCase {
   
   public void testAddCommandToNewAction() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame(map("playerList", list(userId), "currentPlayerNumber", 0));
+    final Game.Builder game = newGameWithTwoPlayers();
     final Command command = newCommand(1, 1);
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertTrue(game.getLastModified() > 0);
@@ -168,24 +200,12 @@ public class ModelTest extends SharedTestCase {
   
   public void testAddCommandAndSubmit() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame(map(
-        "playerList", list(userId, "opponentId"),
-        "currentPlayerNumber", 0,
-        "lastModified", 123L,
-        "profileList", map(
-          userId, map(
-            "name", "Player 1"
-          ),
-          "opponentId", map(
-            "name", "Player 2"
-          )
-         )
-        ));
+    final Game.Builder game = newGameWithTwoPlayers();
     final Command command = newCommand(1, 1);
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertFalse(game.hasCurrentAction());
@@ -226,11 +246,11 @@ public class ModelTest extends SharedTestCase {
   
   public void testGameUpdateListener() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame();
-    withTestData(game.build(), new Runnable() {
+    final Game game = newGameWithTwoPlayers().build();
+    withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(123L, (long)game.getLastModified());
@@ -241,6 +261,14 @@ public class ModelTest extends SharedTestCase {
       }
     });
     endAsyncTestBlock();
+  }
+  
+  public void testAttachCommandListener() {
+    // TODO: this
+  }
+  
+  public void testCommandListenerCommandAdded() {
+    // TODO: this
   }
   
   public void testCouldSubmitCommand() {
@@ -345,11 +373,11 @@ public class ModelTest extends SharedTestCase {
   
   public void testSubmitCurrentAction() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGameWithCurrentCommand();
-    withTestData(game.build(), new Runnable() {
+    final Game game = newGameWithCurrentCommand().build();
+    withTestData(game, new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(1, (int)game.getCurrentPlayerNumber());
@@ -357,20 +385,38 @@ public class ModelTest extends SharedTestCase {
             finished();
           }
         });
-        model.submitCurrentAction(game.build());
+        model.submitCurrentAction(game);
       }
     });
     endAsyncTestBlock();
   }
   
   public void testSubmitCurrentActionUpdatesGameStatus() {
-    // TODO: this.
+    beginAsyncTestBlock();
+    final Game game = newGameWithCurrentCommand().build();
+    withTestData(game, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new GameStatusUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {}
+
+          @Override
+          public void onGameStatusChanged(GameStatus status) {
+            assertEquals(status.getStatusPlayer(), 1);
+            finished();
+          }
+        });
+        model.submitCurrentAction(game);
+      }
+    });
+    endAsyncTestBlock();
   }
   
   public void testSubmitCurrentActionGameList() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGameWithCurrentCommand();
-    withTestData(game.build(), new Runnable() {
+    final Game game = newGameWithCurrentCommand().build();
+    withTestData(game, new Runnable() {
       @Override
       public void run() {
         model.setGameListListener(new AbstractGameListListener() {
@@ -382,7 +428,7 @@ public class ModelTest extends SharedTestCase {
             finished();            
           }
         });
-        model.submitCurrentAction(game.build());
+        model.submitCurrentAction(game);
       }
     });
     endAsyncTestBlock();
@@ -398,7 +444,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertEquals(userId, Games.currentPlayerId(game));
@@ -440,7 +486,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertFalse(game.hasCurrentPlayerNumber());
@@ -463,7 +509,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(), game.getCurrentAction().getCommandList());
@@ -489,7 +535,7 @@ public class ModelTest extends SharedTestCase {
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(command), game.getCurrentAction().getCommandList());
@@ -530,16 +576,12 @@ public class ModelTest extends SharedTestCase {
   
   public void testResignLocalMultiplayer() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame(map(
-        "currentPlayerNumber", 1,
-        "playerList", list(userId, userId),
-        "localMultiplayer", true,
-        "lastModified", 123L
-        ));
+    final Game.Builder game = newLocalMultiplayerGameWithTwoPlayers();
+    game.setCurrentPlayerNumber(1);
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(new Integer(1)), game.getResignedPlayerList());
@@ -559,15 +601,11 @@ public class ModelTest extends SharedTestCase {
   
   public void testResignGame() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGame(map(
-        "currentPlayerNumber", 0,
-        "playerList", list(userId, "foobar"),
-        "lastModified", 123L
-        ));
+    final Game.Builder game = newGameWithTwoPlayers();
     withTestData(game.build(), new Runnable() {
       @Override
       public void run() {
-        model.setGameUpdateListener(game.getId(), new NoStatusGameUpdateListener() {
+        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
             assertDeepEquals(list(new Integer(0)), game.getResignedPlayerList());
@@ -697,15 +735,14 @@ public class ModelTest extends SharedTestCase {
     return Game.newDeserializer().deserialize(map).toBuilder();
   }
   
-  @SuppressWarnings("unchecked")
-  private Game.Builder newGameWithCurrentCommand() {
+  private Game.Builder newGameWithTwoPlayers() {
     return newGame(map(
-        "currentPlayerNumber", 0,
-        "playerList", list(userId, "opponentId"),
-        "gameOver", false,
-        "localMultiplayer", false,
-        "getIsMinimal", false,
-        "profileMap", map(
+      "currentPlayerNumber", 0,
+      "playerList", list(userId, "opponentId"),
+      "gameOver", false,
+      "localMultiplayer", false,
+      "minimal", false,
+      "profileMap", map(
           userId, map(
             "name", "User",
             "pronoun", "MALE"
@@ -715,15 +752,41 @@ public class ModelTest extends SharedTestCase {
             "pronoun", "FEMALE"
           )
         ),
-        "lastModified", 123L,
-        "currentAction", map(
-            "playerNumber", 0,
-            "commandList", list(map(
-              "column", 2,
-              "row", 1
-            ))
-          )
-        ));
+      "lastModified", 123L
+    ));
+  }
+  
+  @SuppressWarnings("unchecked")
+  private Game.Builder newLocalMultiplayerGameWithTwoPlayers() {
+    return newGame(map(
+      "currentPlayerNumber", 0,
+      "playerList", list(userId, userId),
+      "gameOver", false,
+      "localMultiplayer", true,
+      "minimal", false,
+      "localProfileList", list(
+        map(
+          "name", "User",
+          "pronoun", "MALE"
+        ),
+        map(
+            "name", "User 2",
+            "pronoun", "MALE"
+        )        
+      ),
+      "lastModified", 123L
+    ));
+  }  
+  
+  private Game.Builder newGameWithCurrentCommand() {
+    Game.Builder game = newGameWithTwoPlayers();
+    game.setCurrentAction(Action.newBuilder()
+        .setPlayerNumber(0)
+        .setIsSubmitted(false)
+        .addCommand(Command.newBuilder()
+            .setColumn(2)
+            .setRow(1)));
+    return game;
   }
   
   private void assertDies(Runnable testFn) {

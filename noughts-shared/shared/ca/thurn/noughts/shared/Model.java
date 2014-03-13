@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -115,16 +116,17 @@ public class Model implements ChildEventListener {
   private final String userId;
   private final Firebase firebase;
   private final Map<String, ValueEventListener> valueEventListeners;
-  private final Map<String, GameUpdateListener> gameUpdateListeners;
+  private final Map<String, CommandUpdateListener> commandUpdateListeners;
   private final Map<String, Game> userGameList;
   private final Map<String, Game> games;
   private GameListListener gameListListener;
+  private boolean isComputerThinking = false;
   
   public Model(String userId, Firebase firebase) {
     this.userId = userId;
     this.firebase = firebase;
     valueEventListeners = new HashMap<String, ValueEventListener>();
-    gameUpdateListeners = new HashMap<String, GameUpdateListener>();
+    commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
     userGameList = new HashMap<String, Game>();
     games = new HashMap<String, Game>();
     firebase.child("users").child(userId).child("games").addChildEventListener(this);    
@@ -180,15 +182,52 @@ public class Model implements ChildEventListener {
           if (oldGame == null || !game.equals(oldGame)) {
             listener.onGameUpdate(game);
           }
-          if (oldGame != null && Games.differentStatus(game, oldGame)) {
+          if (oldGame == null || Games.differentStatus(game, oldGame)) {
             listener.onGameStatusChanged(Games.gameStatus(game));              
-          }          
+          }
+          if (commandUpdateListeners.containsKey(gameId)) {
+            CommandUpdateListener listener = commandUpdateListeners.get(gameId);
+            if (oldGame == null) {
+              listener.onRegistered(game);
+            } else {
+              Map<Command, Action> added = Games.commandsAdded(oldGame, game);
+              for (Entry<Command, Action> entry : added.entrySet()) {
+                listener.onCommandAdded(entry.getValue(), entry.getKey());
+              }
+              Map<Command, Action> removed = Games.commandsRemoved(oldGame, game);
+              for (Entry<Command, Action> entry : removed.entrySet()) {
+                listener.onCommandRemoved(entry.getValue(), entry.getKey());
+              }
+              Map<Command, Action> changed = Games.commandsChanged(oldGame, game);
+              for (Entry<Command, Action> entry : changed.entrySet()) {
+                listener.onCommandChanged(entry.getValue(), entry.getKey());
+              }              
+              Map<Command, Action> submitted = Games.commandsSubmitted(oldGame, game);
+              for (Entry<Command, Action> entry : submitted.entrySet()) {
+                listener.onCommandSubmitted(entry.getValue(), entry.getKey());
+              }
+              if (game.isGameOver() && !oldGame.isGameOver()) {
+                listener.onGameOver(game);
+              }
+            }
+          }
           games.put(game.getId(), game);
         }
       }
     });
-    valueEventListeners.put(gameId, valueListener);
-    gameUpdateListeners.put(gameId, listener);
+    if (games.containsKey(gameId)) {
+      Game game = games.get(gameId);
+      listener.onGameUpdate(game);
+      listener.onGameStatusChanged(Games.gameStatus(game));
+      if (commandUpdateListeners.containsKey(gameId)) {
+        commandUpdateListeners.get(gameId).onRegistered(game);
+      }      
+    }
+    valueEventListeners.put(gameId, valueListener);   
+  }
+  
+  public void setCommandUpdateListener(String gameId, CommandUpdateListener listener) {
+    commandUpdateListeners.put(gameId, listener);
   }
 
   
@@ -379,11 +418,52 @@ public class Model implements ChildEventListener {
       }
     };
     mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
-    mutateGameLists(game, new GameMutation() {
+    mutateGameLists(game, updateTimestampGameMutation(timestamp));
+  }
+
+  /**
+   * Replaces the last command of the current action of the provided game with
+   * the provided command. The current action must exist and already have one
+   * or more commands.
+   * 
+   * @param game Game to modify the last command of.
+   * @param command New value to use as the game's last command.
+   */
+  public void updateLastCommand(Game game, final Command command) {
+    ensureIsCurrentPlayer(game);
+    ensureIsNotMinimal(game);
+    if (!couldUpdateLastCommand(game, command)) die("Illegal Command: " + command);   
+    final long timestamp = Clock.getInstance().currentTimeMillis();
+    GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        game.setLastModified(timestamp);        
+        game.setLastModified(timestamp);
+        Action.Builder currentAction = game.getCurrentAction().toBuilder();
+        currentAction.getCommandList().remove(currentAction.getCommandCount() - 1);
+        currentAction.addCommand(command);
+        game.setCurrentAction(currentAction);
       }
-    });
+    };
+    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGameLists(game, updateTimestampGameMutation(timestamp));
+  }
+  
+  /**
+   * Checks if the game's last command could be legally updated to a new value.
+   * 
+   * @param game The game to check.
+   * @param command The proposed new value for the game's last command.
+   * @return True if updating the game's last command by
+   *     {@link Model#updateLastCommand(Game, Command)} would produce a legal
+   *     game state.
+   */
+  public boolean couldUpdateLastCommand(Game game, Command command) {
+    if (!isCurrentPlayer(game)) return false;
+    if (!game.hasCurrentAction() || game.getCurrentAction().getCommandCount() == 0) return false;
+    Action.Builder currentAction = game.getCurrentAction().toBuilder();
+    currentAction.getCommandList().remove(currentAction.getCommandCount() - 1);
+    currentAction.addCommand(command);
+    Game newGame = game.toBuilder().setCurrentAction(currentAction).build();
+    return isLegalCommand(newGame, command);
   }
 
   /**
@@ -397,8 +477,7 @@ public class Model implements ChildEventListener {
   public boolean couldSubmitCommand(Game game, Command command) {
     if (!isCurrentPlayer(game)) return false;
     if (game.hasCurrentAction() && game.getCurrentAction().getCommandCount() > 0) return false;
-    boolean res = isLegalCommand(game, command);
-    return res;
+    return isLegalCommand(game, command);
   }
   
   /**
@@ -493,9 +572,10 @@ public class Model implements ChildEventListener {
    * @param game Game to check.
    */
   public void handleComputerAction(final Game game) {
-    if (game.isGameOver()) return;
+    if (game.isGameOver() || isComputerThinking) return;
     Profile currentProfile = Games.playerProfile(game, game.getCurrentPlayerNumber());
     if (currentProfile.isComputerPlayer()) {
+      isComputerThinking = true;
       final ComputerState computerState = new ComputerState();
       computerState.initializeFrom(new ComputerState.GameInitializer(game));
       int numSimulations;
@@ -530,6 +610,7 @@ public class Model implements ChildEventListener {
           long action = agent.getAsynchronousSearchResult().getAction();
           Command command = computerState.longToCommand(action);
           addCommandAndSubmit(game, command);
+          isComputerThinking = false;
         }
       }, 4000L);
     }
@@ -700,6 +781,19 @@ public class Model implements ChildEventListener {
     }
     return result;
   }
+
+  /**
+   * @param timestamp New timestamp
+   * @return A game mutation which sets the game's last modified timestamp to
+   *     the provided value.
+   */
+  private GameMutation updateTimestampGameMutation(final long timestamp) {
+    return new GameMutation() {
+      @Override public void mutate(Game.Builder game) {
+        game.setLastModified(timestamp);        
+      }
+    };
+  }  
   
   /**
    * Runs a transaction to mutate the provided game via the provided function

@@ -12,7 +12,7 @@
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
 
-@interface GameView () <GameCanvasDelegate>
+@interface GameView ()
 @property(strong,nonatomic) UIImage *logo;
 @property(strong,nonatomic) UIImage *x;
 @property(strong,nonatomic) UIImage *o;
@@ -57,7 +57,6 @@
     
     _gameCanvas = [GameCanvas new];
     _gameCanvas.translatesAutoresizingMaskIntoConstraints = NO;
-    _gameCanvas.delegate = self;
     [self addSubview:_gameCanvas];
     
     _activityView = [[UIActivityIndicatorView alloc]
@@ -163,6 +162,10 @@
   [_activityView autoSetDimension:ALDimensionWidth toSize:200];
   [_activityView autoSetDimension:ALDimensionHeight toSize:50];
   [_activityView autoCenterInSuperview];
+}
+
+- (id<NTSCommandUpdateListener>)getCommandUpdateListener {
+  return _gameCanvas;
 }
 
 - (void)displayGameStatusWithImage:(UIImage*)image
@@ -277,16 +280,8 @@
   }];
 }
 
-- (void)handleSquareTapAtX:(int)x AtY:(int)y {
-  [_delegate handleSquareTapAtX:x AtY:y];
-}
-
-- (void)handleDragToX:(int)x toY:(int)y {
-  [_delegate handleDragToX:x toY:y];
-}
-
-- (BOOL)allowDragToX:(int)x toY:(int)y {
-  return [_delegate allowDragToX:x toY:y];
+-(void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate {
+  _gameCanvas.delegate = delegate;
 }
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate {

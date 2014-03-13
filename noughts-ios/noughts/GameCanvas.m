@@ -9,6 +9,7 @@
 @property(strong,nonatomic) SVGKImage *xSvg;
 @property(strong,nonatomic) SVGKImage *oSvg;
 @property(nonatomic) CGPoint originalViewCenter;
+@property(strong,nonatomic) NSMutableDictionary* views;
 @end
 
 #define TOP_OFFSET 80
@@ -36,15 +37,39 @@
          inRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)
      addSubview:YES];
   for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
-    [self drawAction:action current:NO];
+    [self drawAction:action animate:NO draggable:NO];
   }
 
   if ([game hasCurrentAction]) {
-    [self drawAction:[game getCurrentAction] current:YES];
+    [self drawAction:[game getCurrentAction] animate:YES draggable:YES];
   }
 }
 
-- (void)drawAction:(NTSAction*)action current:(BOOL)current {
+- (void)onRegisteredWithNTSGame:(NTSGame *)game {
+  NSLog(@"onRegistered %@", game);
+}
+
+- (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"commandAdded with action %@\nwith command %@", action, command);
+}
+
+- (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"commandRemoved with action %@\nwith command %@", action, command);
+}
+
+- (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"commandChanged with action %@\nwith command %@", action, command);
+}
+
+- (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"commandSubmitted with action %@\nwith command %@", action, command);
+}
+
+- (void)onGameOverWithNTSGame:(NTSGame *)game {
+  NSLog(@"onGameOver %@", game);
+}
+
+- (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
   for (NTSCommand* command in (id<NSFastEnumeration>)[action getCommandList]) {
     CGRect rect = CGRectMake([command getColumn] * SQUARE_SIZE,
                              [command getRow] * SQUARE_SIZE + TOP_OFFSET,
@@ -52,7 +77,7 @@
                              SQUARE_SIZE);
     SVGKImage *image = [action getPlayerNumber] == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
     UIView *newView = [self drawSvg:image inRect:rect addSubview:NO];
-    if (current) {
+    if (animate) {
       newView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
       [UIView animateWithDuration:0.2 animations:^{
         newView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1, 1.1);
@@ -65,7 +90,8 @@
           }];
         }];
       }];
-      
+    }
+    if (draggable) {
       UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc]
                                                initWithTarget:self action:@selector(move:)];
       [panRecognizer setMinimumNumberOfTouches:1];
@@ -89,14 +115,14 @@
   if ([recognizer state] == UIGestureRecognizerStateChanged) {
     view.center = translated;
   } else if ([recognizer state] == UIGestureRecognizerStateEnded) {
-    CGPoint newCenter = [self draggingSnapPoint:translated];
+    CGPoint newCenter = [self handleFinalPoint:translated];
     [UIView animateWithDuration:0.1 animations:^{
       view.center = newCenter;
     }];
   }
 }
 
-- (CGPoint)draggingSnapPoint:(CGPoint)final {
+- (CGPoint)handleFinalPoint:(CGPoint)final {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
       CGRect rect = CGRectMake(i * SQUARE_SIZE,
@@ -104,6 +130,7 @@
                                SQUARE_SIZE,
                                SQUARE_SIZE);
       if (CGRectContainsPoint(rect, final) && [_delegate allowDragToX:i toY:j]) {
+        [_delegate handleDragToX:i toY:j];
         return CGPointMake(rect.origin.x + (rect.size.width / 2),
                            rect.origin.y + (rect.size.height / 2));
       }

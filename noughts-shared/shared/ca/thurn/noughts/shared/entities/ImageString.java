@@ -3,8 +3,6 @@ package ca.thurn.noughts.shared.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Entity;
-
 /**
  * A string which represents an image, either a URL or a local resource.
  */

@@ -3,8 +3,6 @@ package ca.thurn.noughts.shared.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-import ca.thurn.noughts.shared.Entity;
-
 public class Command extends Entity<Command> {
   public static class Deserializer extends EntityDeserializer<Command> {
     private Deserializer() {

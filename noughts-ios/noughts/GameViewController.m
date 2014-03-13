@@ -32,6 +32,7 @@
   [super loadView];
   GameView *view = [GameView new];
   view.delegate = self;
+  [view setGameCanvasDelegate:self];
   self.view = view;
   _gameView = view;
 }
@@ -44,12 +45,12 @@
   [super viewWillAppear:animated];
   [_model setGameUpdateListenerWithNSString:_currentGameId
                       withNTSGameUpdateListener:self];
+  [_model setCommandUpdateListenerWithNSString:_currentGameId
+                  withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
   [[self navigationController] setNavigationBarHidden:YES animated:animated];
-  [self displayGameStatus:[NTSGames gameStatusWithNTSGame:_currentGame]];
-  [_model handleComputerActionWithNTSGame:_currentGame];
   if (_tutorialMode) {
     [_gameView showTapSquareCallout];
   }
@@ -190,16 +191,18 @@
 }
 
 - (void)handleDragToX:(int)x toY:(int)y {
-  // [_model updateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
+  NTSCommand *command = [self commandFromX:x fromY:y];
+  [_model updateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
 }
 
 - (BOOL)allowDragToX:(int)x toY:(int)y {
-  // return [_model couldUpdateCommandWithNTSGame:_currentGame withNTSCommand:command];
-  return YES;
+  NTSCommand *command = [self commandFromX:x fromY:y];
+  return [_model couldUpdateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
   _currentGame = game;
+  [_model handleComputerActionWithNTSGame:_currentGame];
   [_gameView drawGame:game];
 }
 

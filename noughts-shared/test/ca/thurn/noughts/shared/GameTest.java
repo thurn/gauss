@@ -274,6 +274,18 @@ public class GameTest extends SharedTestCase {
     // TODO: this
   }
   
+  public void testCommandAdded() {
+    // TODO: this
+  }
+  
+  public void testCommandRemoved() {
+    // TODO: this
+  }
+  
+  public void testCommandChanged() {
+    // TODO: this
+  }
+  
   private ImageString newImageString(String name) {
     return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
   }
