@@ -198,10 +198,12 @@ public class Model implements ChildEventListener {
               for (Entry<Command, Action> entry : removed.entrySet()) {
                 listener.onCommandRemoved(entry.getValue(), entry.getKey());
               }
-              Map<Command, Action> changed = Games.commandsChanged(oldGame, game);
-              for (Entry<Command, Action> entry : changed.entrySet()) {
-                listener.onCommandChanged(entry.getValue(), entry.getKey());
-              }              
+              if (Games.currentCommandChanged(oldGame, game)) {
+                Action oldAction = oldGame.getCurrentAction();
+                Action newAction = game.getCurrentAction();
+                listener.onCommandChanged(newAction, oldAction.getCommand(oldAction.getCommandCount() - 1),
+                    newAction.getCommand(newAction.getCommandCount() - 1));
+              }
               Map<Command, Action> submitted = Games.commandsSubmitted(oldGame, game);
               for (Entry<Command, Action> entry : submitted.entrySet()) {
                 listener.onCommandSubmitted(entry.getValue(), entry.getKey());
@@ -228,6 +230,9 @@ public class Model implements ChildEventListener {
   
   public void setCommandUpdateListener(String gameId, CommandUpdateListener listener) {
     commandUpdateListeners.put(gameId, listener);
+    if (games.containsKey(gameId)) {
+      listener.onRegistered(games.get(gameId));
+    }
   }
 
   

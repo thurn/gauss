@@ -401,21 +401,22 @@ public class Games {
   /**
    * @param old Previous game state.
    * @param next New game state.
-   * @return A map of all commands that have changed in the current action of
-   *     the new game state.
+   * @return True if the most recent command has been modified in the new
+   *     game state.
    */
-  static Map<Command, Action> commandsChanged(Game old, Game next) {
+  static boolean currentCommandChanged(Game old, Game next) {
     if (!old.hasCurrentAction() || !next.hasCurrentAction() ||
         old.getCurrentAction().getCommandCount() != next.getCurrentAction().getCommandCount()) {
-      return Collections.emptyMap();
-    }
-    Map<Command, Action> result = new HashMap<Command, Action>();
-    for (int i = 0 ; i < next.getCurrentAction().getCommandCount(); ++i) {
-      if (!old.getCurrentAction().getCommand(i).equals(next.getCurrentAction().getCommand(i))) {
-        result.put(next.getCurrentAction().getCommand(i), next.getCurrentAction());
+      return false;
+    } else {
+      Action oldAction = old.getCurrentAction();
+      Action newAction = next.getCurrentAction();
+      if (oldAction.getCommandCount() == 0 || newAction.getCommandCount() == 0) {
+        return false;
       }
+      return !oldAction.getCommand(oldAction.getCommandCount() - 1).equals(
+          newAction.getCommand(newAction.getCommandCount() - 1));
     }
-    return result;
   }
   
   /**

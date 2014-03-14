@@ -35,7 +35,7 @@ public interface CommandUpdateListener {
    * @param action The action where the command was changed.
    * @param command The changed command.
    */
-  public void onCommandChanged(Action action, Command command);
+  public void onCommandChanged(Action action, Command oldCommand, Command newCommand);
   
   /**
    * Called whenever commands are submitted.
