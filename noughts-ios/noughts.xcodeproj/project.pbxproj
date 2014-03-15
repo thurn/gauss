@@ -122,6 +122,7 @@
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
 		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
 		7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */; };
+		7CF4F80E18D4B45600FC8F9E /* OnMutationCompleted.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXBuildRule section */
@@ -369,6 +370,7 @@
 		7CEB472B18B276A900CDA9EA /* J2obcUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = J2obcUtils.m; sourceTree = "<group>"; };
 		7CF4F40E18C3CE8000AD3AB0 /* SMCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMCalloutView.h; sourceTree = "<group>"; };
 		7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
+		7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = OnMutationCompleted.java; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -762,6 +764,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */,
 				7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */,
 				7C58BE1D18C24DBF008D2C9D /* GameListListener.java */,
 				7C58BE0818C1BD4D008D2C9D /* entities */,
@@ -943,6 +946,7 @@
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C58BE1B18C1BD4D008D2C9D /* Pronoun.java in Sources */,
+				7CF4F80E18D4B45600FC8F9E /* OnMutationCompleted.java in Sources */,
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
 				7C69776518ADA6D50073BA7D /* Toast+UIView.m in Sources */,
 				7C58BE1A18C1BD4D008D2C9D /* Profile.java in Sources */,

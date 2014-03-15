@@ -32,20 +32,6 @@
   return self;
 }
 
-- (void)drawGame:(NTSGame *)game {
-//  [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-//  [self drawSvg:_backgroundSvg
-//         inRect:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)
-//     addSubview:YES];
-//  for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
-//    [self drawAction:action animate:NO draggable:NO];
-//  }
-//
-//  if ([game hasCurrentAction]) {
-//    [self drawAction:[game getCurrentAction] animate:YES draggable:YES];
-//  }
-}
-
 - (void)onRegisteredWithNTSGame:(NTSGame *)game {
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
   UIView *background = [self drawSvg:_backgroundSvg

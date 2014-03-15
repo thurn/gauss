@@ -181,7 +181,8 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
        inComponent:(NSInteger)component {
   _p2ImageIndex = row;
   UIImage *image = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
-  [_p2Image setImage:image forState:UIControlStateNormal];
+  // Button is disabled for vs. computer
+  [_p2Image setImage:image forState:UIControlStateDisabled];
 }
 
 - (BOOL)isAllWhitespace:(NSString*)string {

@@ -256,8 +256,6 @@
   [self setButtonsEnabledSubmit:[_delegate canSubmit]
                            undo:[_delegate canUndo]
                            redo:[_delegate canRedo]];
-  [_gameCanvas drawGame:game];
-  [self setNeedsDisplay];
 }
 
 - (void)setButtonsEnabledSubmit:(BOOL)submitEnabled undo:(BOOL)undoEnabled redo:(BOOL)redoEnabled {

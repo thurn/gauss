@@ -54,6 +54,9 @@ public class Model implements ChildEventListener {
      * @param game Game to mutate.
      */
     public abstract void mutate(Game.Builder gameBuilder);
+    
+    public void onComplete(Game game) {
+    }
   }
   
   /**
@@ -90,6 +93,9 @@ public class Model implements ChildEventListener {
     
     @Override
     public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
+      if (snapshot.getValue() != null) {
+        this.function.onComplete(Game.newDeserializer().fromDataSnapshot(snapshot));
+      }
     }
 
     @Override
@@ -370,14 +376,17 @@ public class Model implements ChildEventListener {
   
   /**
    * Adds the provided command as in {@link Model#addCommand(Game, Command)}
-   * and also submits the resulting action as in
-   * {@link Model#submitCurrentAction(Game)}.
+   * and also submits the resulting action as in {@link
+   * Model#submitCurrentAction(Game)}. Note that this will fire multiple
+   * game updates for each step, pass a completion function to execute code
+   * when the submit is finished.
    *
    * @param game The game.
    * @param command Command to add.
+   * @param onComplete Optionally, a function to invoke when the command is submitted.
    */
-  public void addCommandAndSubmit(Game game, Command command) {
-    addCommand(game, command, true /* submit */);
+  public void addCommandAndSubmit(Game game, Command command, OnMutationCompleted onComplete) {
+    addCommand(game, command, true /* submit */, onComplete);
   }
 
   /**
@@ -390,13 +399,14 @@ public class Model implements ChildEventListener {
    * @return The game with the command added.
    */  
   public void addCommand(Game game, Command command) {
-    addCommand(game, command, false /* submit */);
+    addCommand(game, command, false /* submit */, null /* onComplete */);
   }
   
   /**
    * Add the provided command to the game, optionally also submitting the command.
    */
-  private void addCommand(final Game game, final Command command, final boolean submit) {
+  private void addCommand(final Game game, final Command command, final boolean submit,
+      final OnMutationCompleted onComplete) {
     ensureIsCurrentPlayer(game);
     ensureIsNotMinimal(game);
     if (!couldSubmitCommand(game, command)) die("Illegal Command: " + command);
@@ -417,13 +427,21 @@ public class Model implements ChildEventListener {
           action.addCommand(command);
           game.setCurrentAction(action);
         }
+      }
+      
+      @Override public void onComplete(Game game) {
         if (submit) {
-          submitActionMutation(game.build()).mutate(game);
+          submitCurrentAction(game, onComplete);
         }
       }
     };
     mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
-    mutateGameLists(game, updateTimestampGameMutation(timestamp));
+    mutateGameLists(game, new GameMutation() {
+      @Override
+      public void mutate(Game.Builder gameBuilder) {
+        updateTimestampGameMutation(timestamp).mutate(gameBuilder);
+      }
+    });
   }
 
   /**
@@ -530,29 +548,34 @@ public class Model implements ChildEventListener {
   }
 
   /**
-  * Submits the provided game's current action, if it is a legal one. If this
-  * ends the game: populates the "victors" array and sets the "gameOver"
-  * bit. Otherwise, updates the current player.
-  * 
-  * @param game The game to submit the current action of.
-  * @return The game with the action submitted.
-  */  
+   * Version of {@link Model#submitCurrentAction(Game, OnMutationCompleted)}
+   * with no completion function.
+   * 
+   * @param game The game to submit the current action of.
+   */
   public void submitCurrentAction(Game game) {
+    submitCurrentAction(game, null);
+  }
+  
+  /**
+   * Submits the provided game's current action, if it is a legal one. If this
+   * ends the game: populates the "victors" array and sets the "gameOver"
+   * bit. Otherwise, updates the current player.
+   * 
+   * @param game The game to submit the current action of.
+   * @param onComplete Optionally, a function to invoke when the action is
+   *     submitted.
+   * @return The game with the action submitted.
+   */  
+  public void submitCurrentAction(Game game, final OnMutationCompleted onComplete) {
     ensureIsCurrentPlayer(game);
     ensureIsNotMinimal(game);
     if (!canSubmit(game)) die("Illegal action!");
-    GameMutation mutation = submitActionMutation(game);
-    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
-    mutateGameLists(game, mutation);
-    handleComputerAction(applyMutation(game, mutation));
-  }
-  
-  private GameMutation submitActionMutation(Game game) {
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER; 
     final List<Integer> victors = computeVictorsIfCurrentActionSubmitted(game);
-    return new GameMutation() {
+    GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         if (!game.isMinimal()) {
           game.addSubmittedAction(game.getCurrentAction().toBuilder().setIsSubmitted(true));
@@ -567,9 +590,19 @@ public class Model implements ChildEventListener {
           game.addAllVictor(victors);
           game.setIsGameOver(true);
         }
-    }};
+      }
+      
+      @Override public void onComplete(Game game) {
+        if (onComplete != null) {
+          onComplete.onMutationCompleted(game);
+        }
+      }
+    };
+    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGameLists(game, mutation);
+    handleComputerAction(applyMutation(game, mutation));
   }
-
+  
   /**
    * Checks if it is the computer's turn in this game, and performs the
    * appropriate computer move if it is.
@@ -614,8 +647,12 @@ public class Model implements ChildEventListener {
         @Override public void run() {
           long action = agent.getAsynchronousSearchResult().getAction();
           Command command = computerState.longToCommand(action);
-          addCommandAndSubmit(game, command);
-          isComputerThinking = false;
+          addCommandAndSubmit(game, command, new OnMutationCompleted() {
+            @Override
+            public void onMutationCompleted(Game game) {
+              isComputerThinking = false;
+            }
+          });
         }
       }, 4000L);
     }

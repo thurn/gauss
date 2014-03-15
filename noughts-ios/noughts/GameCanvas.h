@@ -10,5 +10,4 @@
 
 @interface GameCanvas : UIView <NTSCommandUpdateListener>
 @property(weak,nonatomic) id<GameCanvasDelegate> delegate;
-- (void)drawGame:(NTSGame *)game;
 @end
