@@ -25,7 +25,6 @@
 		7C0444E018B73139006275CA /* ComputerState.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444DF18B73139006275CA /* ComputerState.java */; };
 		7C1F83B518680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C1F83B818680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
-		7C1F83B918680F7D00D66C78 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1F83B718680F7D00D66C78 /* GameView.m */; };
 		7C1F83BB186810F700D66C78 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83BA186810F700D66C78 /* CoreText.framework */; };
 		7C1F83BD186810FC00D66C78 /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83BC186810FC00D66C78 /* CoreImage.framework */; };
 		7C1F83BF1868110400D66C78 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F83BE1868110400D66C78 /* libxml2.dylib */; };
@@ -52,7 +51,6 @@
 		7C2E642518641F3500D34AD0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640118641F3500D34AD0 /* Foundation.framework */; };
 		7C2E642618641F3500D34AD0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640518641F3500D34AD0 /* UIKit.framework */; };
 		7C2E642E18641F3500D34AD0 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E642C18641F3500D34AD0 /* InfoPlist.strings */; };
-		7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E642F18641F3500D34AD0 /* noughtsTests.m */; };
 		7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64871864212F00D34AD0 /* Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64851864212F00D34AD0 /* Firebase.framework */; };
 		7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64881864215B00D34AD0 /* libicucore.dylib */; };
@@ -74,46 +72,29 @@
 		7C58BE1E18C24DBF008D2C9D /* GameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1D18C24DBF008D2C9D /* GameListListener.java */; };
 		7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1F18C24DC9008D2C9D /* GameStatus.java */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
-		7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C6F104618D230C4007A8EA9 /* libSVGKit-iOS.1.2.0pre.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C1F834118680F6600D66C78 /* libSVGKit-iOS.1.2.0pre.a */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
 		7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3318D02B380086CFC5 /* Entity.java */; };
 		7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */; };
 		7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C89B79518CC38FB00878DC1 /* GameCanvas.m */; };
 		7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
-		7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E01866577F0075D0C1 /* AbstractChildEventListener.java */; };
 		7C8EF5F61866577F0075D0C1 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */; };
 		7C8EF5F71866577F0075D0C1 /* Shared.gwt.xml in Resources */ = {isa = PBXBuildFile; fileRef = 7C8EF5E71866577F0075D0C1 /* Shared.gwt.xml */; };
 		7C8EF6F218668CB40075D0C1 /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */; };
-		7C8EF6F318668CB40075D0C1 /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6EE18668CB40075D0C1 /* AbstractGameListListener.java */; };
 		7C8EF6F818668CB40075D0C1 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F118668CB40075D0C1 /* Model.java */; };
-		7C8EF6F918668CB40075D0C1 /* Model.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF6F118668CB40075D0C1 /* Model.java */; };
 		7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74E18668E120075D0C1 /* ChildEventListener.java */; };
-		7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74E18668E120075D0C1 /* ChildEventListener.java */; };
 		7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74F18668E120075D0C1 /* DataSnapshot.java */; };
-		7C8EF75D18668E120075D0C1 /* DataSnapshot.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF74F18668E120075D0C1 /* DataSnapshot.java */; };
 		7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75018668E120075D0C1 /* Firebase.java */; };
-		7C8EF75F18668E120075D0C1 /* Firebase.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75018668E120075D0C1 /* Firebase.java */; };
 		7C8EF76018668E120075D0C1 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75118668E120075D0C1 /* FirebaseError.java */; };
-		7C8EF76118668E120075D0C1 /* FirebaseError.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75118668E120075D0C1 /* FirebaseError.java */; };
 		7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */; };
-		7C8EF76318668E120075D0C1 /* GenericTypeIndicator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75218668E120075D0C1 /* GenericTypeIndicator.java */; };
 		7C8EF76418668E120075D0C1 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75318668E120075D0C1 /* MutableData.java */; };
-		7C8EF76518668E120075D0C1 /* MutableData.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75318668E120075D0C1 /* MutableData.java */; };
 		7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75418668E120075D0C1 /* OnDisconnect.java */; };
-		7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75418668E120075D0C1 /* OnDisconnect.java */; };
 		7C8EF76818668E120075D0C1 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75518668E120075D0C1 /* Query.java */; };
-		7C8EF76918668E120075D0C1 /* Query.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75518668E120075D0C1 /* Query.java */; };
 		7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75618668E120075D0C1 /* Transaction.java */; };
-		7C8EF76B18668E120075D0C1 /* Transaction.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75618668E120075D0C1 /* Transaction.java */; };
 		7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75718668E120075D0C1 /* ValueEventListener.java */; };
-		7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75718668E120075D0C1 /* ValueEventListener.java */; };
 		7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */; };
-		7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75818668E120075D0C1 /* WrappedChildEventListener.java */; };
 		7C8EF77018668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
-		7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF75918668E120075D0C1 /* WrappedValueEventListener.java */; };
 		7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
-		7C8EF7751866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
 		7C92C02A18920FD800DF8816 /* Clock.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C92C02918920FD800DF8816 /* Clock.java */; };
 		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
@@ -879,7 +860,7 @@
 		7C2E63F618641F3500D34AD0 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Derek Thurn";
 				TargetAttributes = {
 					7C2E642118641F3500D34AD0 = {
@@ -1013,25 +994,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7C8EF5E91866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
-				7C8EF75B18668E120075D0C1 /* ChildEventListener.java in Sources */,
-				7C8EF6F318668CB40075D0C1 /* AbstractGameListListener.java in Sources */,
-				7C8EF76F18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
-				7C8EF76318668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
-				7C2E643018641F3500D34AD0 /* noughtsTests.m in Sources */,
-				7C8EF77118668E120075D0C1 /* WrappedValueEventListener.java in Sources */,
-				7C69CD3A187908BB0040AD75 /* GameListPartitions.java in Sources */,
-				7C8EF76B18668E120075D0C1 /* Transaction.java in Sources */,
-				7C8EF76918668E120075D0C1 /* Query.java in Sources */,
-				7C8EF76D18668E120075D0C1 /* ValueEventListener.java in Sources */,
-				7C8EF6F918668CB40075D0C1 /* Model.java in Sources */,
-				7C1F83B918680F7D00D66C78 /* GameView.m in Sources */,
-				7C8EF7751866B96B0075D0C1 /* GameViewController.m in Sources */,
-				7C8EF76118668E120075D0C1 /* FirebaseError.java in Sources */,
-				7C8EF76718668E120075D0C1 /* OnDisconnect.java in Sources */,
-				7C8EF76518668E120075D0C1 /* MutableData.java in Sources */,
-				7C8EF75D18668E120075D0C1 /* DataSnapshot.java in Sources */,
-				7C8EF75F18668E120075D0C1 /* Firebase.java in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1085,7 +1047,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1128,6 +1089,7 @@
 					"-ljre_emul",
 					"-lz",
 					"-ObjC",
+					"-Wl,-no_compact_unwind",
 				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1138,7 +1100,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -1174,6 +1135,7 @@
 					"-ljre_emul",
 					"-lz",
 					"-ObjC",
+					"-Wl,-no_compact_unwind",
 				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1230,7 +1192,6 @@
 		7C2E643718641F3500D34AD0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/noughts.app/noughts";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -1258,7 +1219,6 @@
 		7C2E643818641F3500D34AD0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/noughts.app/noughts";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",

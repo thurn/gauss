@@ -96,8 +96,6 @@
         [_model archiveGameWithNTSGame:_currentGame];
         [[self navigationController] setNavigationBarHidden:NO animated:YES];
         [self.navigationController popToRootViewControllerAnimated:YES];
-        UIViewController *rootController =
-            [self.navigationController.viewControllers objectAtIndex:0];
       } else {
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Confirm"
