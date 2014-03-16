@@ -1,8 +1,11 @@
+#import <AudioToolbox/AudioToolbox.h>
 #import "GameCanvas.h"
 #import "Action.h"
 #import "SVGKit.h"
 #import "Command.h"
 #import "Model.h"
+#import "Games.h"
+#import "J2obcUtils.h"
 
 @interface GameCanvas ()
 @property(strong,nonatomic) SVGKImage *backgroundSvg;
@@ -10,6 +13,11 @@
 @property(strong,nonatomic) SVGKImage *oSvg;
 @property(nonatomic) CGPoint originalViewCenter;
 @property(strong,nonatomic) NSMutableDictionary* views;
+@property(strong,nonatomic) NSArray *viewerPlayerNumbers;
+@property(nonatomic) SystemSoundID addCommandSound;
+@property(nonatomic) SystemSoundID removeCommandSound;
+@property(nonatomic) SystemSoundID submitCommandSound;
+@property(nonatomic) SystemSoundID gameOverSound;
 @end
 
 #define TOP_OFFSET 80
@@ -24,6 +32,22 @@
     _xSvg = [SVGKImage imageNamed:@"x.svg"];
     _oSvg = [SVGKImage imageNamed:@"o.svg"];
     _views = [NSMutableDictionary new];
+    AudioServicesCreateSystemSoundID(
+        (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"addCommand"
+                                                   withExtension:@"wav"],
+        &_addCommandSound);
+    AudioServicesCreateSystemSoundID(
+        (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"removeCommand"
+                                                   withExtension:@"wav"],
+        &_removeCommandSound);
+    AudioServicesCreateSystemSoundID(
+        (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"commandSubmitted"
+                                                   withExtension:@"wav"],
+        &_submitCommandSound);
+    AudioServicesCreateSystemSoundID(
+        (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"gameOver"
+                                                   withExtension:@"wav"],
+        &_gameOverSound);
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget:self
                                              action:@selector(handleTap:)]];
@@ -32,7 +56,11 @@
   return self;
 }
 
-- (void)onRegisteredWithNTSGame:(NTSGame *)game {
+- (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
+  id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
+                                                                    withNSString:viewerId];
+  _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
+
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
   UIView *background = [self drawSvg:_backgroundSvg
                               inRect:CGRectMake(0, 0, self.frame.size.width,
@@ -43,14 +71,20 @@
   }
   
   if ([game hasCurrentAction]) {
-    // todo: is it the viewer's turn?
-    [self drawAction:[game getCurrentAction] animate:YES draggable:YES];
+    BOOL draggable = [self belongsToViewer:[game getCurrentAction]];
+    [self drawAction:[game getCurrentAction] animate:YES draggable:draggable];
   }
 }
 
+- (BOOL)belongsToViewer:(NTSAction*) action {
+  int playerNumber= [action getPlayerNumber];
+  return [_viewerPlayerNumbers containsObject:[[NSNumber alloc] initWithInt:playerNumber]];
+}
+
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  // TODO: from viewer?
-  [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:YES];
+  BOOL draggable = [self belongsToViewer:action];
+  [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
+  AudioServicesPlaySystemSound(_addCommandSound);
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
@@ -60,18 +94,23 @@
   } completion:^(BOOL finished) {
     [view removeFromSuperview];
   }];
+  AudioServicesPlaySystemSound(_removeCommandSound);
 }
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
   _views[newCommand] = _views[oldCommand];
   [_views removeObjectForKey:oldCommand];
+  AudioServicesPlaySystemSound(_addCommandSound);
 }
 
 - (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  [self removeAllGestureRecognizers:_views[command]];
+  AudioServicesPlaySystemSound(_submitCommandSound);
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {
+  AudioServicesPlaySystemSound(_gameOverSound);
 }
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
@@ -113,6 +152,12 @@
   }
   _views[command] = newView;
   [self addSubview:newView];
+}
+
+- (void)removeAllGestureRecognizers:(UIView*)view {
+  for (UIGestureRecognizer *recognizer in view.gestureRecognizers) {
+    [view removeGestureRecognizer:recognizer];
+  }
 }
 
 - (void)move:(id)sender {
@@ -171,5 +216,11 @@
   }
 }
 
+- (void)dealloc {
+  AudioServicesDisposeSystemSoundID(_addCommandSound);
+  AudioServicesDisposeSystemSoundID(_removeCommandSound);
+  AudioServicesDisposeSystemSoundID(_submitCommandSound);
+  AudioServicesDisposeSystemSoundID(_gameOverSound);
+}
 
 @end

@@ -3,6 +3,8 @@
 #import "java/util/List.h"
 
 @interface J2obcUtils : NSObject
-+(id<JavaUtilMap>)nsDictionaryToJavaUtilMap:(NSDictionary*)dictionary;
-+(id<JavaUtilList>)nsArrayToJavaUtilList:(NSArray*)array;
++ (id<JavaUtilMap>)nsDictionaryToJavaUtilMap:(NSDictionary*)dictionary;
++ (id<JavaUtilList>)nsArrayToJavaUtilList:(NSArray*)array;
++ (NSArray*)javaUtilListToNsArray:(id<JavaUtilList>)list;
++ (NSDictionary*)javaUtilMapToNsDictionary:(id<JavaUtilMap>)map;
 @end

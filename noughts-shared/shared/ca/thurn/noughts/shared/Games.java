@@ -176,8 +176,7 @@ public class Games {
    * @param playerId A player ID
    * @return All player numbers (if any) associated with this player ID
    */
-  // Visible for testing
-  static List<Integer> playerNumbersForPlayerId(Game game, String playerId) {
+  public static  List<Integer> playerNumbersForPlayerId(Game game, String playerId) {
     if (playerId == null) throw new IllegalArgumentException("Null playerId");
     List<Integer> results = new ArrayList<Integer>();
     for (int i = 0; i < game.getPlayerCount(); ++i) {

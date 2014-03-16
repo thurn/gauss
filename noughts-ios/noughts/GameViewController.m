@@ -8,7 +8,6 @@
 #import "Profile.h"
 #import "GameStatus.h"
 #import "Games.H"
-#import "Toast+UIView.h"
 #import "java/lang/Integer.h"
 #import "ImageString.h"
 #import "NewLocalGameViewController.h"
@@ -99,7 +98,6 @@
         [self.navigationController popToRootViewControllerAnimated:YES];
         UIViewController *rootController =
             [self.navigationController.viewControllers objectAtIndex:0];
-        [rootController.view makeToast:@"Archived game."];
       } else {
         UIAlertView *alert = [[UIAlertView alloc]
                               initWithTitle:@"Confirm"
@@ -159,7 +157,6 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
     [_model resignGameWithNTSGame:_currentGame];
-    [self.view makeToast:@"Resigned from game."];
   }
 }
 
@@ -228,6 +225,7 @@
     _tutorialMode = NO;
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     [userDefaults setObject:@YES forKey:kSawTutorialKey];
+    [userDefaults synchronize];
   }
   [_model submitCurrentActionWithNTSGame:_currentGame];
 }

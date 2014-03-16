@@ -9,9 +9,10 @@ public interface CommandUpdateListener {
    * Called with the initial value of the game when the listener is first
    * attached.
    *
+   * @param viewerId The player ID of the viewer
    * @param game The initial game value.
    */
-  public void onRegistered(Game game);
+  public void onRegistered(String viewerId, Game game);
   
   /**
    * Called whenever commands are added to an action.

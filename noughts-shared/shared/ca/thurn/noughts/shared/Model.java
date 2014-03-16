@@ -194,7 +194,7 @@ public class Model implements ChildEventListener {
           if (commandUpdateListeners.containsKey(gameId)) {
             CommandUpdateListener listener = commandUpdateListeners.get(gameId);
             if (oldGame == null) {
-              listener.onRegistered(game);
+              listener.onRegistered(userId, game);
             } else {
               Map<Command, Action> added = Games.commandsAdded(oldGame, game);
               for (Entry<Command, Action> entry : added.entrySet()) {
@@ -228,7 +228,7 @@ public class Model implements ChildEventListener {
       listener.onGameUpdate(game);
       listener.onGameStatusChanged(Games.gameStatus(game));
       if (commandUpdateListeners.containsKey(gameId)) {
-        commandUpdateListeners.get(gameId).onRegistered(game);
+        commandUpdateListeners.get(gameId).onRegistered(userId, game);
       }      
     }
     valueEventListeners.put(gameId, valueListener);   
@@ -237,7 +237,7 @@ public class Model implements ChildEventListener {
   public void setCommandUpdateListener(String gameId, CommandUpdateListener listener) {
     commandUpdateListeners.put(gameId, listener);
     if (games.containsKey(gameId)) {
-      listener.onRegistered(games.get(gameId));
+      listener.onRegistered(userId, games.get(gameId));
     }
   }
 
@@ -372,6 +372,16 @@ public class Model implements ChildEventListener {
     Firebase userRef = userRefForGame(game, userId);
     userRef.setValue(Games.minimalGame(game).serialize());
     return game.getId();
+  }
+  
+  /**
+   * Add and submit the provided command.
+   * 
+   * @param game Game to add and submit command for
+   * @param command Command to add and submit.
+   */
+  public void addCommandAndSubmit(Game game, Command command) {
+    addCommandAndSubmit(game, command, null /* onComplete */);
   }
   
   /**

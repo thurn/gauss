@@ -8,6 +8,7 @@
 NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
 NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
 NSString *const kSawTutorialKey = @"kSawTutorialKey";
+NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -38,8 +39,13 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
 }
 
 - (void)viewDidLoad {
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   if (_playVsComputerMode) {
-    _p2ImageIndex = 0;
+    NSNumber *number = [userDefaults objectForKey:kPreferredDifficulty];
+    if (!number) {
+      number = @0;
+    }
+    _p2ImageIndex = [number intValue];
     [_difficultyPicker selectRow:_p2ImageIndex inComponent:0 animated:YES];
   }
   [[NSNotificationCenter defaultCenter] addObserver:self
@@ -61,7 +67,6 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
   }
   [_p2Image setImage:image2 forState:UIControlStateNormal];
   
-  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   NSString *p1Name = [userDefaults objectForKey:kP1LocalNameKey];
   if (!p1Name) {
     p1Name = @"Player 1";
@@ -211,7 +216,6 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   [userDefaults setObject:p1Name forKey:kP1LocalNameKey];
   [userDefaults setObject:p2Name forKey:kP2LocalNameKey];
-  [userDefaults synchronize];
   
   NTSProfile_Builder *p1Profile = [NTSProfile newBuilder];
   [p1Profile setNameWithNSString:p1Name];
@@ -220,6 +224,8 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
   NTSProfile_Builder *p2Profile = [NTSProfile newBuilder];
   if (_playVsComputerMode) {
     int difficultyLevel = [_difficultyPicker selectedRowInComponent:0];
+    [userDefaults setObject:[[NSNumber alloc] initWithInt:difficultyLevel]
+                     forKey:kPreferredDifficulty];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_computerImages objectAtIndex:difficultyLevel]]];
@@ -230,7 +236,7 @@ NSString *const kSawTutorialKey = @"kSawTutorialKey";
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]]];
   }
-
+  [userDefaults synchronize];
    NSString *gameId = [_model newLocalMultiplayerGameWithJavaUtilList:
                        [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
   [destination setNTSModel:_model];
