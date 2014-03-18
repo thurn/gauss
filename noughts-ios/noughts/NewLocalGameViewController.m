@@ -203,6 +203,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  NSLog(@"PFS");
   GameViewController *destination = segue.destinationViewController;
   NSString *p1Name = _p1TextField.text;
   if (!p1Name || [self isAllWhitespace:p1Name]) {

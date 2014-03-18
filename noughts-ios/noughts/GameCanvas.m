@@ -18,10 +18,9 @@
 @property(nonatomic) SystemSoundID removeCommandSound;
 @property(nonatomic) SystemSoundID submitCommandSound;
 @property(nonatomic) SystemSoundID gameOverSound;
+@property(nonatomic) int topOffset;
+@property(nonatomic) int squareSize;
 @end
-
-#define TOP_OFFSET 80
-#define SQUARE_SIZE 107
 
 @implementation GameCanvas
 
@@ -32,6 +31,7 @@
     _xSvg = [SVGKImage imageNamed:@"x.svg"];
     _oSvg = [SVGKImage imageNamed:@"o.svg"];
     _views = [NSMutableDictionary new];
+    [self setOrientationTransform];
     AudioServicesCreateSystemSoundID(
         (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"addCommand"
                                                    withExtension:@"wav"],
@@ -56,15 +56,32 @@
   return self;
 }
 
+- (void)setOrientationTransform {
+  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+  if (orientation == UIInterfaceOrientationLandscapeLeft) {
+    self.transform = CGAffineTransformRotate(CGAffineTransformIdentity, M_PI / 2);
+  } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+    self.transform = CGAffineTransformRotate(CGAffineTransformIdentity, -(M_PI / 2));
+  }
+}
+
 - (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
+  _squareSize = [self shortEdgeLength] / 3;
+  _topOffset = ([self longEdgeLength] - [self shortEdgeLength]) / 2;
+  
   _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
+  int backgroundWidth = 320;
+  int backgroundHeight = 480;
   UIView *background = [self drawSvg:_backgroundSvg
-                              inRect:CGRectMake(0, 0, self.frame.size.width,
-                                                self.frame.size.height)];
+                              inRect:CGRectMake(0,
+                                                ([self longEdgeLength] - backgroundHeight) / 2,
+                                                backgroundWidth,
+                                                backgroundHeight)];
+
   [self addSubview:background];
   for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
     [self drawAction:action animate:NO draggable:NO];
@@ -124,10 +141,10 @@
 
 - (void)drawCommand:(NTSCommand*)command playerNumber:(int)playerNumber animate:(BOOL)animate
           draggable:(BOOL)draggable {
-  CGRect rect = CGRectMake([command getColumn] * SQUARE_SIZE,
-                           [command getRow] * SQUARE_SIZE + TOP_OFFSET,
-                           SQUARE_SIZE,
-                           SQUARE_SIZE);
+  CGRect rect = CGRectMake([command getColumn] * _squareSize,
+                           [command getRow] * _squareSize + _topOffset,
+                           _squareSize,
+                           _squareSize);
   SVGKImage *image = playerNumber == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
   UIView *newView = [self drawSvg:image inRect:rect];
   if (animate) {
@@ -184,10 +201,10 @@
 - (CGPoint)handleFinalPoint:(CGPoint)final {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      CGRect rect = CGRectMake(i * SQUARE_SIZE,
-                               TOP_OFFSET + (j * SQUARE_SIZE),
-                               SQUARE_SIZE,
-                               SQUARE_SIZE);
+      CGRect rect = CGRectMake(i * _squareSize,
+                               _topOffset + (j * _squareSize),
+                               _squareSize,
+                               _squareSize);
       if (CGRectContainsPoint(rect, final) && [_delegate allowDragToX:i toY:j]) {
         [_delegate handleDragToX:i toY:j];
         return CGPointMake(rect.origin.x + (rect.size.width / 2),
@@ -198,8 +215,28 @@
   return _originalViewCenter;
 }
 
+- (int)longEdgeLength {
+  return self.frame.size.width > self.frame.size.height ?
+      self.frame.size.width : self.frame.size.height;
+}
+
+- (int)shortEdgeLength {
+  return self.frame.size.width > self.frame.size.height ?
+  self.frame.size.height : self.frame.size.width;
+}
+
 - (SVGKImageView*)drawSvg:(SVGKImage*)svg inRect:(CGRect)rect{
+//  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+//  CGRect final;
+//  if (UIInterfaceOrientationIsLandscape(orientation)) {
+////    final = CGRectMake(rect.origin.y, rect.origin.x, rect.size.width, rect.size.height);
+//  } else {
+//    final = rect;
+//  }
   SVGKImageView *view = [[SVGKFastImageView alloc] initWithSVGKImage:svg];
+//  if (UIInterfaceOrientationIsLandscape(orientation)) {
+////    view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, M_PI / 2);
+//  }
   view.frame = rect;
   return view;
 }
@@ -207,12 +244,12 @@
 - (void)handleTap:(UITapGestureRecognizer*)sender {
   if (sender.state == UIGestureRecognizerStateEnded) {
     CGPoint point = [sender locationInView: self];
-    if (point.y < TOP_OFFSET || point.y > TOP_OFFSET + 3 * SQUARE_SIZE ||
-        point.x < 0 || point.x > 3 * SQUARE_SIZE) {
+    if (point.y < _topOffset || point.y > _topOffset + 3 * _squareSize ||
+        point.x < 0 || point.x > 3 * _squareSize) {
       return; // Out of bounds
     }
-    [_delegate handleSquareTapAtX:point.x / SQUARE_SIZE
-                              AtY:(point.y - TOP_OFFSET) / SQUARE_SIZE];
+    [_delegate handleSquareTapAtX:point.x / _squareSize
+                              AtY:(point.y - _topOffset) / _squareSize];
   }
 }
 
