@@ -505,7 +505,7 @@
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
                                     <constraint firstAttribute="centerX" secondItem="xz6-y6-md8" secondAttribute="centerX" id="5j2-Af-lSX"/>
                                     <constraint firstAttribute="height" constant="160" id="BNw-hB-qxL"/>
@@ -522,26 +522,25 @@
                                     <constraint firstAttribute="bottom" secondItem="8Yw-ao-DaT" secondAttribute="bottom" constant="10" id="yGa-2D-2bN"/>
                                 </constraints>
                             </view>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dou-QV-u8d">
-                                <rect key="frame" x="97" y="304" width="126" height="42"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UPg-9a-xW1">
+                                <rect key="frame" x="110" y="522" width="101" height="36"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <state key="normal" title="Start Game">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <segue destination="kaa-M7-0XV" kind="push" id="RaR-Ym-krs"/>
+                                    <segue destination="kaa-M7-0XV" kind="push" id="kOt-q3-VgL"/>
                                 </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="dou-QV-u8d" firstAttribute="top" secondItem="UcP-Nm-7C7" secondAttribute="bottom" constant="30" id="7OF-Wy-BeE"/>
                             <constraint firstAttribute="centerX" secondItem="UcP-Nm-7C7" secondAttribute="centerX" id="99W-t4-Qno"/>
+                            <constraint firstAttribute="centerX" secondItem="UPg-9a-xW1" secondAttribute="centerX" id="Pdg-ZJ-Rw6"/>
                             <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" secondItem="yRQ-UO-LQr" secondAttribute="bottom" priority="900" constant="50" id="STY-Yw-S5a"/>
                             <constraint firstItem="UcP-Nm-7C7" firstAttribute="top" relation="greaterThanOrEqual" secondItem="yRQ-UO-LQr" secondAttribute="bottom" constant="10" id="TuO-wS-WHY"/>
-                            <constraint firstItem="c0t-5Q-3NG" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dou-QV-u8d" secondAttribute="bottom" constant="50" id="ZRU-Dy-RUj"/>
-                            <constraint firstAttribute="centerX" secondItem="dou-QV-u8d" secondAttribute="centerX" id="bFt-cf-dv8"/>
+                            <constraint firstItem="c0t-5Q-3NG" firstAttribute="top" secondItem="UPg-9a-xW1" secondAttribute="bottom" constant="10" id="vr5-zM-35b"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Create" id="nJz-wm-hB1"/>
@@ -607,6 +606,6 @@
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="RaR-Ym-krs"/>
+        <segue reference="kOt-q3-VgL"/>
     </inferredMetricsTieBreakers>
 </document>

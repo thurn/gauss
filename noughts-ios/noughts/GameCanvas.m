@@ -31,7 +31,7 @@
     _xSvg = [SVGKImage imageNamed:@"x.svg"];
     _oSvg = [SVGKImage imageNamed:@"o.svg"];
     _views = [NSMutableDictionary new];
-    [self setOrientationTransform];
+    [self setOrientationTransformAnimated:NO];
     AudioServicesCreateSystemSoundID(
         (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"addCommand"
                                                    withExtension:@"wav"],
@@ -48,6 +48,11 @@
         (__bridge CFURLRef)[[NSBundle mainBundle] URLForResource:@"gameOver"
                                                    withExtension:@"wav"],
         &_gameOverSound);
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(deviceOrientationDidChange:)
+                                                 name:UIDeviceOrientationDidChangeNotification
+                                               object:nil];
     [self addGestureRecognizer:
      [[UITapGestureRecognizer alloc] initWithTarget:self
                                              action:@selector(handleTap:)]];
@@ -56,13 +61,32 @@
   return self;
 }
 
-- (void)setOrientationTransform {
+- (void)setOrientationTransformAnimated:(BOOL)animated {
+  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+  CGFloat rotationAngle = 0;
+  if (orientation == UIInterfaceOrientationLandscapeRight) rotationAngle = -M_PI_2;
+  else if (orientation == UIInterfaceOrientationLandscapeLeft) rotationAngle = M_PI_2;
+  if (animated) {
+    [UIView animateWithDuration:0.2 animations:^{
+      self.transform = CGAffineTransformMakeRotation(rotationAngle);
+    }];
+  } else {
+    self.transform = CGAffineTransformMakeRotation(rotationAngle);
+  }
+}
+
+- (void)invertOrientationTransform:(UIView*)view {
+  return;
   UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
   if (orientation == UIInterfaceOrientationLandscapeLeft) {
-    self.transform = CGAffineTransformRotate(CGAffineTransformIdentity, M_PI / 2);
+    view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, -(M_PI / 2));
   } else if (orientation == UIInterfaceOrientationLandscapeRight) {
-    self.transform = CGAffineTransformRotate(CGAffineTransformIdentity, -(M_PI / 2));
+    view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, M_PI / 2);
   }
+}
+
+- (void)deviceOrientationDidChange:(NSNotification *)notification {
+  [self setOrientationTransformAnimated:YES];
 }
 
 - (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
@@ -80,7 +104,8 @@
                               inRect:CGRectMake(0,
                                                 ([self longEdgeLength] - backgroundHeight) / 2,
                                                 backgroundWidth,
-                                                backgroundHeight)];
+                                                backgroundHeight)
+                         drawRotated:NO];
 
   [self addSubview:background];
   for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
@@ -107,7 +132,7 @@
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
   UIView *view = _views[command];
   [UIView animateWithDuration:0.2 animations:^{
-    view.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
+    view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
   } completion:^(BOOL finished) {
     [view removeFromSuperview];
   }];
@@ -146,17 +171,18 @@
                            _squareSize,
                            _squareSize);
   SVGKImage *image = playerNumber == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
-  UIView *newView = [self drawSvg:image inRect:rect];
+  UIView *newView = [self drawSvg:image inRect:rect drawRotated:YES];
   if (animate) {
-    newView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
+    CGAffineTransform transform = newView.transform;
+    newView.transform = CGAffineTransformScale(transform, 0.1, 0.1);
     [UIView animateWithDuration:0.2 animations:^{
-      newView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.1, 1.1);
+      newView.transform = CGAffineTransformScale(transform, 1.1, 1.1);
     } completion:^(BOOL finished) {
       [UIView animateWithDuration:0.1 animations:^{
-        newView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.9, 0.9);
+        newView.transform = CGAffineTransformScale(transform, 0.9, 0.9);
       } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.1 animations:^{
-          newView.transform = CGAffineTransformIdentity;
+          newView.transform = transform;
         }];
       }];
     }];
@@ -225,19 +251,12 @@
   self.frame.size.height : self.frame.size.width;
 }
 
-- (SVGKImageView*)drawSvg:(SVGKImage*)svg inRect:(CGRect)rect{
-//  UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
-//  CGRect final;
-//  if (UIInterfaceOrientationIsLandscape(orientation)) {
-////    final = CGRectMake(rect.origin.y, rect.origin.x, rect.size.width, rect.size.height);
-//  } else {
-//    final = rect;
-//  }
+- (SVGKImageView*)drawSvg:(SVGKImage*)svg inRect:(CGRect)rect drawRotated:(BOOL)drawRotated{
   SVGKImageView *view = [[SVGKFastImageView alloc] initWithSVGKImage:svg];
-//  if (UIInterfaceOrientationIsLandscape(orientation)) {
-////    view.transform = CGAffineTransformRotate(CGAffineTransformIdentity, M_PI / 2);
-//  }
   view.frame = rect;
+  if (drawRotated) {
+    [self invertOrientationTransform:view];
+  }
   return view;
 }
 
@@ -258,6 +277,8 @@
   AudioServicesDisposeSystemSoundID(_removeCommandSound);
   AudioServicesDisposeSystemSoundID(_submitCommandSound);
   AudioServicesDisposeSystemSoundID(_gameOverSound);
+  [[NSNotificationCenter defaultCenter] removeObserver: self];
+  [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
 }
 
 @end

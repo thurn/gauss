@@ -131,6 +131,20 @@
                                                 action:@selector(handleGameStatusTap:)];
     [_gameStatusView addGestureRecognizer:singleTap];
     [self addSubview:_gameStatusView];
+
+    CGFloat statusBarHeight = [self statusBarHeight];
+    NSLog(@"status bar height %f", statusBarHeight);
+    [_gameCanvas autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero];
+    [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:5];
+    [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
+    [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
+    [_gameStatusView autoSetDimension:ALDimensionHeight toSize:75];
+    [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:0];
+    [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:0];
+    [_activityView autoSetDimension:ALDimensionWidth toSize:200];
+    [_activityView autoSetDimension:ALDimensionHeight toSize:50];
+    [_activityView autoCenterInSuperview];
+    
     _gameStatusConstraint = [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:-75];
     
     int submitInset = 5;
@@ -147,21 +161,9 @@
   return self;
 }
 
-- (void)updateConstraints {
-  [super updateConstraints];
-  CGFloat statusBarHeight = [[NSNumber numberWithFloat:
-                              [UIApplication sharedApplication].statusBarFrame.size.height]
-                             floatValue];
-  [_gameCanvas autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero];
-  [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:5];
-  [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
-  [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
-  [_gameStatusView autoSetDimension:ALDimensionHeight toSize:75];
-  [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:0];
-  [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:0];
-  [_activityView autoSetDimension:ALDimensionWidth toSize:200];
-  [_activityView autoSetDimension:ALDimensionHeight toSize:50];
-  [_activityView autoCenterInSuperview];
+- (CGFloat)statusBarHeight {
+  CGSize statusBarSize = [UIApplication sharedApplication].statusBarFrame.size;
+  return MIN(statusBarSize.width, statusBarSize.height);
 }
 
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener {
