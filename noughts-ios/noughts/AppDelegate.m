@@ -70,7 +70,8 @@
   for (NSDictionary *friend in _friends) {
     NSURL *photoUrl = [NSURL URLWithString:
                        [NSString
-                        stringWithFormat:@"https://graph.facebook.com/%@/picture?width=100&height=100",
+                        stringWithFormat:
+                            @"https://graph.facebook.com/%@/picture?width=100&height=100",
                         friend[@"uid"]]];
     NSData *data = [NSData dataWithContentsOfURL:photoUrl];
     _friendPhotos[friend[@"uid"]] = [[UIImage alloc] initWithData:data];

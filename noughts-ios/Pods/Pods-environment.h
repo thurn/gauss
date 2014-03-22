@@ -48,3 +48,9 @@
 #define COCOAPODS_VERSION_MINOR_AFNetworking_UIKit 2
 #define COCOAPODS_VERSION_PATCH_AFNetworking_UIKit 1
 
+// sendgrid
+#define COCOAPODS_POD_AVAILABLE_sendgrid
+#define COCOAPODS_VERSION_MAJOR_sendgrid 0
+#define COCOAPODS_VERSION_MINOR_sendgrid 1
+#define COCOAPODS_VERSION_PATCH_sendgrid 0
+

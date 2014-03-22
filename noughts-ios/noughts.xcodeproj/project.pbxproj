@@ -100,6 +100,7 @@
 		7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C8EF7731866B96B0075D0C1 /* GameViewController.m */; };
 		7C92C02A18920FD800DF8816 /* Clock.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C92C02918920FD800DF8816 /* Clock.java */; };
 		7CCD446718DC02D00023F1CA /* FacebookInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */; };
+		7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */; };
 		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
@@ -353,6 +354,8 @@
 		7C92C02918920FD800DF8816 /* Clock.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Clock.java; sourceTree = "<group>"; };
 		7CCD446518DC02D00023F1CA /* FacebookInviteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookInviteViewController.h; sourceTree = "<group>"; };
 		7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookInviteViewController.m; sourceTree = "<group>"; };
+		7CCD446818DDF7820023F1CA /* EmailInviteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmailInviteViewController.h; sourceTree = "<group>"; };
+		7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailInviteViewController.m; sourceTree = "<group>"; };
 		7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JBDeviceOwner.framework; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
@@ -687,6 +690,8 @@
 				7C000C4818DB3D9200C52640 /* QueryParsing.m */,
 				7CCD446518DC02D00023F1CA /* FacebookInviteViewController.h */,
 				7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */,
+				7CCD446818DDF7820023F1CA /* EmailInviteViewController.h */,
+				7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -993,6 +998,7 @@
 				7C0444D318B73124006275CA /* UctSearch.java in Sources */,
 				7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */,
 				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
+				7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
 				7C58BE1B18C1BD4D008D2C9D /* Pronoun.java in Sources */,

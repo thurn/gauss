@@ -45,6 +45,14 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>noughts</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>ca.thurn.noughts</string>
+		</dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
 				<string>fb419772734774541</string>
 			</array>
 		</dict>
