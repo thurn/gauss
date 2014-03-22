@@ -4,6 +4,8 @@
 #import "GameListListener.h"
 #import "HasModel.h"
 #import "GameViewController.h"
+#import "AppDelegate.h"
+#import <FacebookSDK/FacebookSDK.h>
 
 @interface RootViewController () <NTSGameListListener>
 @property(weak, nonatomic) IBOutlet UIButton *savedGamesButton;
@@ -15,6 +17,26 @@
 - (void)awakeFromNib {
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
   self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
+  
+  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
+    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+                                       allowLoginUI:NO
+                                  completionHandler:
+     ^(FBSession *session, FBSessionState state, NSError *error) {
+       AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+       [appDelegate sessionStateChanged:session state:state error:error];
+     }];
+  }
+}
+
+- (IBAction)onFacebookLoginClicked {
+  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+                                     allowLoginUI:YES
+                                completionHandler:
+   ^(FBSession *session, FBSessionState state, NSError *error) {
+     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+     [appDelegate sessionStateChanged:session state:state error:error];
+   }];
 }
 
 - (void)viewDidLoad {

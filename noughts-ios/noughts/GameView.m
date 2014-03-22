@@ -13,10 +13,6 @@
 #define SQUARE_SIZE 107
 
 @interface GameView ()
-@property(strong,nonatomic) UIImage *logo;
-@property(strong,nonatomic) UIImage *x;
-@property(strong,nonatomic) UIImage *o;
-@property(strong,nonatomic) UIImage *backgroundImage;
 @property(strong,nonatomic) NTSGame *currentGame;
 @property(strong,nonatomic) UIButton *gameMenuButton;
 @property(strong,nonatomic) UIButton *submitButton;
@@ -42,19 +38,7 @@
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
   if (self) {
-    // Initialization code
     self.backgroundColor = [UIColor whiteColor];
-    SVGKImage *svg = [SVGKImage imageNamed:@"logo.svg"];
-    _logo = svg.UIImage;
-    SVGKImage *xsvg = [SVGKImage imageNamed:@"x.svg"];
-    xsvg.size = CGSizeMake(SQUARE_SIZE, SQUARE_SIZE);
-    _x = xsvg.UIImage;
-    SVGKImage *osvg = [SVGKImage imageNamed:@"o.svg"];
-    osvg.size = CGSizeMake(SQUARE_SIZE, SQUARE_SIZE);
-    _o = osvg.UIImage;
-    SVGKImage *bgsvg = [SVGKImage imageNamed:@"background.svg"];
-    _backgroundImage = bgsvg.UIImage;
-    
     _gameCanvas = [GameCanvas new];
     _gameCanvas.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_gameCanvas];
@@ -133,8 +117,8 @@
     [self addSubview:_gameStatusView];
 
     CGFloat statusBarHeight = [self statusBarHeight];
-    NSLog(@"status bar height %f", statusBarHeight);
     [_gameCanvas autoPinEdgesToSuperviewEdgesWithInsets:UIEdgeInsetsZero];
+    
     [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:5];
     [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
     [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
@@ -150,6 +134,7 @@
     int submitInset = 5;
     int redoInset = 5 + _submitButton.bounds.size.width + submitInset;
     int undoInset = 2 + _redoButton.bounds.size.width + redoInset;
+    
     _submitButtonConstraint = [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTrailing
                                                               withInset:submitInset];
     _redoButtonConstraint = [_redoButton autoPinEdgeToSuperviewEdge:ALEdgeTrailing
@@ -162,8 +147,7 @@
 }
 
 - (CGFloat)statusBarHeight {
-  CGSize statusBarSize = [UIApplication sharedApplication].statusBarFrame.size;
-  return MIN(statusBarSize.width, statusBarSize.height);
+  return [UIApplication sharedApplication].statusBarFrame.size.height;
 }
 
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener {
@@ -255,22 +239,24 @@
 
 - (void)drawGame:(NTSGame*)game {
   _currentGame = game;
-  [self setButtonsEnabledSubmit:[_delegate canSubmit]
-                           undo:[_delegate canUndo]
-                           redo:[_delegate canRedo]];
+  [self updateButtons];
 }
 
-- (void)setButtonsEnabledSubmit:(BOOL)submitEnabled undo:(BOOL)undoEnabled redo:(BOOL)redoEnabled {
+- (void)updateButtons {
+  BOOL submitEnabled = [_delegate canSubmit];
+  BOOL undoEnabled = [_delegate canUndo];
+  BOOL redoEnabled = [_delegate canRedo];
   _submitButton.enabled = submitEnabled;
   _undoButton.enabled = undoEnabled;
   _redoButton.enabled = redoEnabled;
+
   int submitWidth = _submitButton.bounds.size.width;
   int redoWidth = _redoButton.bounds.size.width;
   int undoWidth = _undoButton.bounds.size.width;
   int submitConstant = submitEnabled ? 5 : -submitWidth;
   int redoConstant = redoEnabled ? submitWidth + submitConstant + 5 : -redoWidth;
   int undoConstant = undoEnabled ? submitWidth + submitConstant + 5 : -undoWidth;
-  
+
   [UIView animateWithDuration:0.3 animations:^{
     // Invert constants to convert from insets
     _submitButtonConstraint.constant = -submitConstant;
@@ -282,18 +268,6 @@
 
 -(void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate {
   _gameCanvas.delegate = delegate;
-}
-
-- (void)drawAction:(NTSAction*)action animate:(BOOL)animate {
-  for (NTSCommand* command in (id<NSFastEnumeration>)[action getCommandList]) {
-    CGPoint point = CGPointMake([command getColumn] * SQUARE_SIZE,
-                                [command getRow] * SQUARE_SIZE + TOP_OFFSET);
-    if ([action getPlayerNumber] == [NTSModel X_PLAYER]) {
-      [_x drawAtPoint:point];
-    } else {
-      [_o drawAtPoint:point];
-    }
-  }
 }
 
 - (void)showComputerThinkingIndicator {
