@@ -15,17 +15,20 @@ public class Query {
     this.firebase = firebase;
   }
   
-  public void helloWorld() {
-    System.out.println("Hello, world!");
+  public Object getWrappedFirebase() {
+    return firebase;
   }
   
   public native void addListenerForSingleValueEvent(ValueEventListener listener) /*-[
+    NSLog(@"adding query");
     Firebase *firebase = self->firebase_;
     void (^onDataChange)(FDataSnapshot*) = ^(FDataSnapshot *snapshot) {
+      NSLog(@"on data change");
        FCDataSnapshot *javaSnapshot = [[FCDataSnapshot alloc] initWithId: snapshot];
        [listener onDataChangeWithFCDataSnapshot: javaSnapshot];
     };
     void (^onCancel)() = ^{
+      NSLog(@"on cancel");
       [listener onCancelledWithFCFirebaseError: nil];
     };
     [firebase observeSingleEventOfType: FEventTypeValue

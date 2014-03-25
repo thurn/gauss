@@ -20,27 +20,27 @@
 }
 
 - (IBAction)onFacebookInviteClicked {
-  FBFriendPickerViewController *picker = [FBFriendPickerViewController new];
-  [picker loadData];
-  picker.allowsMultipleSelection = NO;
-  [self presentViewController:picker animated:YES completion:nil];
-  return;
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-
-  [FBWebDialogs
-   presentRequestsDialogModallyWithSession:nil
-   message:@"Invitation to play noughts"
-   title:@"noughts"
-   parameters:@{@"to": @"122610483"}
-   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-     if (result != FBWebDialogResultDialogNotCompleted) {
-       NSLog(@"result url %@", resultURL);
-       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-       NSLog(@"fbid %@", query[@"to[0]"]);
-       NSLog(@"requestid %@", query[@"request"]);
-     }
-   }
-   friendCache:appDelegate.friendCache];
+//  FBFriendPickerViewController *picker = [FBFriendPickerViewController new];
+//  [picker loadData];
+//  picker.allowsMultipleSelection = NO;
+//  [self presentViewController:picker animated:YES completion:nil];
+//  return;
+//  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+//
+//  [FBWebDialogs
+//   presentRequestsDialogModallyWithSession:nil
+//   message:@"Invitation to play noughts"
+//   title:@"noughts"
+//   parameters:@{@"to": @"122610483"}
+//   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
+//     if (result != FBWebDialogResultDialogNotCompleted) {
+//       NSLog(@"result url %@", resultURL);
+//       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
+//       NSLog(@"fbid %@", query[@"to[0]"]);
+//       NSLog(@"requestid %@", query[@"request"]);
+//     }
+//   }
+//   friendCache:appDelegate.friendCache];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

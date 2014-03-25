@@ -41,7 +41,7 @@ public class ModelTest extends SharedTestCase {
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase firebase) {
         userId = "id" + randomInteger();
-        model = new Model(userId, firebase);
+        model = new Model(userId, "anonymous", firebase);
         done.run();        
       }
     });

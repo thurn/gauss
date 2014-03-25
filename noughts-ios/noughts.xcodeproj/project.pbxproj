@@ -101,6 +101,10 @@
 		7C92C02A18920FD800DF8816 /* Clock.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C92C02918920FD800DF8816 /* Clock.java */; };
 		7CCD446718DC02D00023F1CA /* FacebookInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */; };
 		7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */; };
+		7CCD446F18DF41350023F1CA /* LoginHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446E18DF41350023F1CA /* LoginHelper.m */; };
+		7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447018DF41AF0023F1CA /* Accounts.framework */; };
+		7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447218DF41B40023F1CA /* Social.framework */; };
+		7CCD447518DF41DF0023F1CA /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447418DF41DF0023F1CA /* FirebaseSimpleLogin.framework */; };
 		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
@@ -356,6 +360,12 @@
 		7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookInviteViewController.m; sourceTree = "<group>"; };
 		7CCD446818DDF7820023F1CA /* EmailInviteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmailInviteViewController.h; sourceTree = "<group>"; };
 		7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EmailInviteViewController.m; sourceTree = "<group>"; };
+		7CCD446B18DF2EE70023F1CA /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
+		7CCD446D18DF41350023F1CA /* LoginHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginHelper.h; sourceTree = "<group>"; };
+		7CCD446E18DF41350023F1CA /* LoginHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginHelper.m; sourceTree = "<group>"; };
+		7CCD447018DF41AF0023F1CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
+		7CCD447218DF41B40023F1CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		7CCD447418DF41DF0023F1CA /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
 		7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JBDeviceOwner.framework; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
@@ -379,11 +389,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */,
+				7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */,
 				7CF4F81018D576CC00FC8F9E /* AudioToolbox.framework in Frameworks */,
 				7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */,
 				7C2E640618641F3500D34AD0 /* UIKit.framework in Frameworks */,
 				7C2E640418641F3500D34AD0 /* CoreGraphics.framework in Frameworks */,
 				7C1F83C11868110B00D66C78 /* QuartzCore.framework in Frameworks */,
+				7CCD447518DF41DF0023F1CA /* FirebaseSimpleLogin.framework in Frameworks */,
 				7C000C4618DAAD5600C52640 /* FacebookSDK.framework in Frameworks */,
 				7C1F83BF1868110400D66C78 /* libxml2.dylib in Frameworks */,
 				7C1F83BD186810FC00D66C78 /* CoreImage.framework in Frameworks */,
@@ -623,6 +636,10 @@
 		7C2E640018641F3500D34AD0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7CCD447418DF41DF0023F1CA /* FirebaseSimpleLogin.framework */,
+				7CCD447218DF41B40023F1CA /* Social.framework */,
+				7CCD447018DF41AF0023F1CA /* Accounts.framework */,
+				7CCD446B18DF2EE70023F1CA /* libcommonCrypto.dylib */,
 				7C000C4518DAAD5600C52640 /* FacebookSDK.framework */,
 				7CF4F80F18D576CC00FC8F9E /* AudioToolbox.framework */,
 				7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */,
@@ -692,6 +709,8 @@
 				7CCD446618DC02D00023F1CA /* FacebookInviteViewController.m */,
 				7CCD446818DDF7820023F1CA /* EmailInviteViewController.h */,
 				7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */,
+				7CCD446D18DF41350023F1CA /* LoginHelper.h */,
+				7CCD446E18DF41350023F1CA /* LoginHelper.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -1047,6 +1066,7 @@
 				7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */,
 				7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
+				7CCD446F18DF41350023F1CA /* LoginHelper.m in Sources */,
 				7C58BE1918C1BD4D008D2C9D /* ImageType.java in Sources */,
 				7C27F70218BFC59C00ADA495 /* GameUpdateListener.java in Sources */,
 				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
@@ -1202,6 +1222,7 @@
 					"$(inherited)",
 					.,
 					/Users/dthurn/Documents/FacebookSDK,
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
@@ -1216,6 +1237,7 @@
 					"/Users/dthurn/Dropbox/noughts/noughts-ios/SVGKit",
 					"$(PROJECT_DIR)/SVGKit",
 					/usr/local/j2objc/lib,
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
@@ -1247,6 +1269,7 @@
 					"$(inherited)",
 					.,
 					/Users/dthurn/Documents/FacebookSDK,
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "noughts/noughts-Prefix.pch";
@@ -1261,6 +1284,7 @@
 					"/Users/dthurn/Dropbox/noughts/noughts-ios/SVGKit",
 					"$(PROJECT_DIR)/SVGKit",
 					/usr/local/j2objc/lib,
+					"$(SDKROOT)/usr/lib/system",
 				);
 				OTHER_LDFLAGS = (
 					"-ObjC",

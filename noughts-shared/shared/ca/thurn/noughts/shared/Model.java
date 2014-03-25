@@ -3,7 +3,6 @@ package ca.thurn.noughts.shared;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -118,8 +117,9 @@ public class Model implements ChildEventListener {
       return Transaction.success(mutableData);
     }   
   }
-  
+
   private final String userId;
+  private final String accountType;
   private final Firebase firebase;
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
@@ -128,14 +128,16 @@ public class Model implements ChildEventListener {
   private GameListListener gameListListener;
   private boolean isComputerThinking = false;
   
-  public Model(String userId, Firebase firebase) {
+  public Model(String userId, String accountType, Firebase firebase) {
     this.userId = userId;
+    this.accountType = accountType;
     this.firebase = firebase;
     valueEventListeners = new HashMap<String, ValueEventListener>();
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
     userGameList = new HashMap<String, Game>();
     games = new HashMap<String, Game>();
-    firebase.child("users").child(userId).child("games").addChildEventListener(this);    
+    firebase.child("users").child(accountType).child(userId).child("games")
+        .addChildEventListener(this);    
   }
   
   /**
@@ -369,7 +371,7 @@ public class Model implements ChildEventListener {
     builder.addAllLocalProfile(localProfiles);
     Game game = builder.build();
     ref.setValue(game.serialize());
-    Firebase userRef = userRefForGame(game, userId);
+    Firebase userRef = userRefForGame(game);
     userRef.setValue(Games.minimalGame(game).serialize());
     return game.getId();
   }
@@ -746,7 +748,7 @@ public class Model implements ChildEventListener {
   public void archiveGame(Game game) {
     ensureIsPlayer(game);
     if (!game.isGameOver()) die("Can't archive a game which is in progress");
-    userRefForGame(game, userId).removeValue();
+    userRefForGame(game).removeValue();
     userGameList.remove(game.getId());
   }
   
@@ -866,17 +868,15 @@ public class Model implements ChildEventListener {
   }
 
   /**
-   * Runs a transaction to mutate the provided game in the game list for each
-   * player in the game, under /users/<userid>/games/<gameid>/.
+   * Runs a transaction to mutate the provided game /users/<userid> and
+   * under /games/<gameid>/.
    *
    * @param game Game to mutate.
    * @param function Mutation function to employ.
    */
   private void mutateGameLists(Game game, final GameMutation function) {
-    for (String player : new HashSet<String>(game.getPlayerList())) {
-      Firebase userRef = userRefForGame(game, player);
-      userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
-    }
+    Firebase userRef = userRefForGame(game);
+    userRef.runTransaction(new GameMutationHandler(function, true /* useMinimalForm */));
     userGameList.put(game.getId(), Games.minimalGame(applyMutation(game, function)));
   }
   
@@ -890,8 +890,9 @@ public class Model implements ChildEventListener {
    * @param game A game.
    * @return The Firebase reference for this game in the current user's game list.
    */
-  private Firebase userRefForGame(Game game, String userId) {
-    return firebase.child("users").child(userId).child("games").child(game.getId());
+  private Firebase userRefForGame(Game game) {
+    return firebase.child("users").child(accountType).child(userId).child("games")
+        .child(game.getId());
   }
   
   /**

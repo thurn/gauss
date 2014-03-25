@@ -5,11 +5,12 @@
 #import "HasModel.h"
 #import "GameViewController.h"
 #import "AppDelegate.h"
-#import <FacebookSDK/FacebookSDK.h>
+#import "LoginHelper.h"
 
 @interface RootViewController () <NTSGameListListener>
-@property(weak, nonatomic) IBOutlet UIButton *savedGamesButton;
+@property(weak,nonatomic) IBOutlet UIButton *savedGamesButton;
 @property(strong,nonatomic) NTSModel *model;
+@property(strong,nonatomic) LoginHelper *loginHelper;
 @end
 
 @implementation RootViewController
@@ -18,33 +19,51 @@
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
   self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
   
-  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
-    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
-                                       allowLoginUI:NO
-                                  completionHandler:
-     ^(FBSession *session, FBSessionState state, NSError *error) {
-       AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-       [appDelegate sessionStateChanged:session state:state error:error];
-     }];
-  }
+//  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
+//    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+//                                       allowLoginUI:NO
+//                                  completionHandler:
+//     ^(FBSession *session, FBSessionState state, NSError *error) {
+//       NSLog(@"logged in");
+//       AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+//       [appDelegate sessionStateChanged:session state:state error:error];
+//     }];
+//  }
 }
 
 - (IBAction)onFacebookLoginClicked {
-  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
-                                     allowLoginUI:YES
-                                completionHandler:
-   ^(FBSession *session, FBSessionState state, NSError *error) {
-     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-     [appDelegate sessionStateChanged:session state:state error:error];
-   }];
+  [_loginHelper loginViaFacebook:^(NSString *userId) {
+    NSLog(@"callback");
+  }];
+  
+//  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+//                                     allowLoginUI:YES
+//                                completionHandler:
+//   ^(FBSession *session, FBSessionState state, NSError *error) {
+//     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+//     [appDelegate sessionStateChanged:session state:state error:error];
+//   }];
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+//  NSLog(@"facebook? %d", FBSession.activeSession.state == FBSessionStateOpen);
   FCFirebase *firebase = [[FCFirebase alloc]
-                          initWithNSString:@"https://noughts.firebaseio-demo.com"];
-  _model = [[NTSModel alloc] initWithNSString:@"dthurn" withFCFirebase:firebase];
-  [_model setGameListListenerWithNTSGameListListener:self];
+                          initWithNSString:@"https://noughts.firebaseio.com"];
+  _loginHelper = [[LoginHelper alloc] initWithFirebase:firebase];
+//  if (FBSession.activeSession.state == FBSessionStateOpen) {
+//    [_loginHelper loginViaFacebook:^(NSString *userId) {
+//      NSLog(@"view did load - logged in via facebook");
+//    }];
+//  } else {
+//    [_loginHelper loginToFirebase:^(NSString *userId) {
+//      NSLog(@"view did load - anon login %@", userId);
+//      _model = [[NTSModel alloc] initWithNSString:userId
+//                                     withNSString:@"anonymous"
+//                                   withFCFirebase:firebase];
+//      [_model setGameListListenerWithNTSGameListListener:self];
+//    }];
+//  }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -71,19 +90,9 @@
   [self toggleSaveButtonEnabled];
 }
 
-- (void)didReceiveMemoryWarning
-{
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
-}
-
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  [_loginHelper printAuthStatus];
   [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
-  if (((UIView*)sender).tag == 102) {
-    NSLog(@"tutorail");
-    GameViewController *gvc = segue.destinationViewController;
-    gvc.tutorialMode = YES;
-  }
 }
 
 @end

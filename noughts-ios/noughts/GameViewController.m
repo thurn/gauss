@@ -42,10 +42,20 @@
 
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  [_model setGameUpdateListenerWithNSString:_currentGameId
-                      withNTSGameUpdateListener:self];
-  [_model setCommandUpdateListenerWithNSString:_currentGameId
-                  withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
+  if (_model) {
+    [_model setGameUpdateListenerWithNSString:_currentGameId
+                    withNTSGameUpdateListener:self];
+    [_model setCommandUpdateListenerWithNSString:_currentGameId
+                    withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
+  } else {
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"ERROR"
+                          message:@"Not logged in yet!"
+                          delegate:nil
+                          cancelButtonTitle:@"Ok"
+                          otherButtonTitles:nil];
+    [alert show];
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
