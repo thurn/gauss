@@ -204,8 +204,8 @@
 - (CGPoint)handleFinalPoint:(CGPoint)final {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      CGRect rect = CGRectMake(i * _squareSize,
-                               _topOffset + (j * _squareSize),
+      CGRect rect = CGRectMake((i * _squareSize) + _sideMargin,
+                               _topMargin + _topOffset + (j * _squareSize),
                                _squareSize,
                                _squareSize);
       if (CGRectContainsPoint(rect, final) && [_delegate allowDragToX:i toY:j]) {
@@ -227,12 +227,12 @@
 - (void)handleTap:(UITapGestureRecognizer*)sender {
   if (sender.state == UIGestureRecognizerStateEnded) {
     CGPoint point = [sender locationInView: self];
-    if (point.y < _topOffset || point.y > _topOffset + 3 * _squareSize ||
-        point.x < 0 || point.x > 3 * _squareSize) {
+    if (point.y < _topOffset + _topMargin || point.y > _topMargin + _topOffset + (3 * _squareSize) ||
+        point.x < _sideMargin || point.x > (3 * _squareSize) + _sideMargin) {
       return; // Out of bounds
     }
-    [_delegate handleSquareTapAtX:point.x / _squareSize
-                              AtY:(point.y - _topOffset) / _squareSize];
+    [_delegate handleSquareTapAtX:(point.x - _sideMargin) / _squareSize
+                              AtY:(point.y - _topOffset - _topMargin) / _squareSize];
   }
 }
 

@@ -28,6 +28,8 @@ function processImageIOS {
   mkdir -p noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/
   $inkscape -d 326 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}@2x.png $1 >& /dev/null
   $inkscape -d 163 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}.png $1 >& /dev/null
+  $inkscape -d 652 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}_iPad@2x.png $1 >& /dev/null
+  $inkscape -d 326 -e ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/${file/.svg}_iPad.png $1 >& /dev/null
   cp ./assets/Contents.json ./noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/
   perl -p -i -e "s/NAME_OF_FILE_HERE/${file/.svg}/g" noughts-ios/noughts/Images.xcassets/${file/.svg}.imageset/Contents.json
 }

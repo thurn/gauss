@@ -1,14 +1,24 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "1x",
       "filename" : "ic_facebook_invite.png"
     },
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "2x",
       "filename" : "ic_facebook_invite@2x.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "filename" : "ic_facebook_invite_iPad.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "filename" : "ic_facebook_invite_iPad@2x.png"
     }
   ],
   "info" : {

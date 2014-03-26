@@ -13,6 +13,7 @@
 @interface GameListViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
+@property(nonatomic) float scale;
 @end
 
 #define YOUR_GAMES_SECTION 0
@@ -24,7 +25,8 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
-  self.tableView.rowHeight = 50;
+  _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
+  self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -97,9 +99,9 @@
 - (UIImage*)imageForTwoPhotos:(id<JavaUtilList>)photoList {
   UIImage *image1 = [self imageForPhotoList:photoList index:0];
   UIImage *image2 = [self imageForPhotoList:photoList index:1];
-  UIGraphicsBeginImageContextWithOptions(CGSizeMake(40,40), NO, 0);
-  [image1 drawAtPoint:CGPointMake(0, 10)];
-  [image2 drawAtPoint:CGPointMake(20, 10)];
+  UIGraphicsBeginImageContextWithOptions(CGSizeMake(40 * _scale, 40 * _scale), NO, 0);
+  [image1 drawAtPoint:CGPointMake(0, 10 * _scale)];
+  [image2 drawAtPoint:CGPointMake(20 * _scale, 10 * _scale)];
   UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
   return result;

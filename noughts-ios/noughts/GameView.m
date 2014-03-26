@@ -65,6 +65,9 @@
     _submitCallout.subtitle = @"to confirm";
     _submitCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
 
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    }
+    
     _gameMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
     UIImage *gameMenuIcon = [UIImage imageNamed:@"ic_game_menu.png"];
     [_gameMenuButton setImage:gameMenuIcon forState:UIControlStateNormal];
@@ -77,6 +80,9 @@
 
     _submitButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_submitButton setTitle:@"Submit" forState:UIControlStateNormal];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+      _submitButton.titleLabel.font = [UIFont systemFontOfSize:30];
+    }
     [_submitButton addTarget:self
                       action:@selector(submitClicked:)
             forControlEvents:UIControlEventTouchUpInside];
@@ -103,7 +109,7 @@
     [_redoButton sizeToFit];
     _redoButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_redoButton];
-
+    
     NSArray *subviewArray = [[NSBundle mainBundle]
                              loadNibNamed:@"GameStatusView"
                                     owner:self

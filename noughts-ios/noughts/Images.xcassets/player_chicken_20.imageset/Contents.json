@@ -1,14 +1,24 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "1x",
       "filename" : "player_chicken_20.png"
     },
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "2x",
       "filename" : "player_chicken_20@2x.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "filename" : "player_chicken_20_iPad.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "filename" : "player_chicken_20_iPad@2x.png"
     }
   ],
   "info" : {

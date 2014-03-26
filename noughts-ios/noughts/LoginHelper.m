@@ -19,11 +19,13 @@
   NSString *password = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
   NSString *userId = [self sha1:password];
   NSString *email = [userId stringByAppendingString:@"@example.com"];
+  NSLog(@"trying to log in");
   [_login loginWithEmail:email
             andPassword:password
     withCompletionBlock:^(NSError *error, FAUser *user) {
       NSLog(@"LoginHelper: logged in");
       if (error) {
+        NSLog(@"creating user");
         [self createUserWithEmail:email andPassword:password];
       } else {
         onLogin(userId);

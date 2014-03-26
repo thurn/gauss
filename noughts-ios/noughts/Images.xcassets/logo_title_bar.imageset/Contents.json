@@ -1,14 +1,24 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "1x",
       "filename" : "logo_title_bar.png"
     },
     {
-      "idiom" : "universal",
+      "idiom" : "iphone",
       "scale" : "2x",
       "filename" : "logo_title_bar@2x.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "1x",
+      "filename" : "logo_title_bar_iPad.png"
+    },
+    {
+      "idiom" : "ipad",
+      "scale" : "2x",
+      "filename" : "logo_title_bar_iPad@2x.png"
     }
   ],
   "info" : {
