@@ -1,5 +1,4 @@
 #import "EmailInviteViewController.h"
-#import "sendgrid.h"
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(strong,nonatomic) NTSModel *model;
@@ -65,11 +64,6 @@
 }
 
 - (IBAction)onSendClicked {
-  sendgrid *msg = [sendgrid user:@"dthurnmail" andPass:@"_84b9<5B==xB9j2aE*yLcFtYfDe!hdr}"];
-  msg.subject = @"Sendgrid Test";
-  msg.tolist = @[@"dthurn@gmail.com"];
-  msg.text = @"test";
-  [msg sendWithWeb];
 }
 
 @end

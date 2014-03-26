@@ -26,7 +26,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
      inkscape:cx="196.89901"
-     inkscape:cy="476.73104"
+     inkscape:cy="193.88833"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -82,5 +82,13 @@
        d="m -154.50916,865.86217 641.44688,0"
        id="path3866"
        inkscape:connector-curvature="0" />
+    <rect
+       style="opacity:0.3;fill:#000000;fill-opacity:0.11764706;stroke:none"
+       id="rect2988"
+       width="325.26913"
+       height="488.91382"
+       x="-5.0507627"
+       y="-1.8427656"
+       transform="translate(0,572.36217)" />
   </g>
 </svg>

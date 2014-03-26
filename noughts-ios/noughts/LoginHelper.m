@@ -22,6 +22,7 @@
   [_login loginWithEmail:email
             andPassword:password
     withCompletionBlock:^(NSError *error, FAUser *user) {
+      NSLog(@"LoginHelper: logged in");
       if (error) {
         [self createUserWithEmail:email andPassword:password];
       } else {

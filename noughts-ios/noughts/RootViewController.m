@@ -56,13 +56,13 @@
 //      NSLog(@"view did load - logged in via facebook");
 //    }];
 //  } else {
-//    [_loginHelper loginToFirebase:^(NSString *userId) {
-//      NSLog(@"view did load - anon login %@", userId);
-//      _model = [[NTSModel alloc] initWithNSString:userId
-//                                     withNSString:@"anonymous"
-//                                   withFCFirebase:firebase];
-//      [_model setGameListListenerWithNTSGameListListener:self];
-//    }];
+    [_loginHelper loginToFirebase:^(NSString *userId) {
+      NSLog(@"view did load - anon login %@", userId);
+      _model = [[NTSModel alloc] initWithNSString:userId
+                                     withNSString:@"anonymous"
+                                   withFCFirebase:firebase];
+      [_model setGameListListenerWithNTSGameListListener:self];
+    }];
 //  }
 }
 

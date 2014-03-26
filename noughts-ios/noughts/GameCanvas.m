@@ -20,6 +20,8 @@
 @property(nonatomic) SystemSoundID gameOverSound;
 @property(nonatomic) int topOffset;
 @property(nonatomic) int squareSize;
+@property(nonatomic) int sideMargin;
+@property(nonatomic) int topMargin;
 @end
 
 @implementation GameCanvas
@@ -59,17 +61,20 @@
 - (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
-  _squareSize = self.frame.size.width / 3;
-  _topOffset = (self.frame.size.height - self.frame.size.width) / 2;
+  float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
+  int backgroundWidth = 320 * scale;
+  int backgroundHeight = 480 * scale;
+  _squareSize = backgroundWidth / 3;
+  _topOffset = 80 * scale;
+  _sideMargin = (self.frame.size.width - backgroundWidth) / 2;
+  _topMargin = (self.frame.size.height - backgroundHeight) / 2;
   
   _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-  int backgroundWidth = 320;
-  int backgroundHeight = 480;
   UIView *backgroundView = [self drawSvg:_backgroundSvg
-                                  inRect:CGRectMake(0,
-                                                    (self.frame.size.height - backgroundHeight) / 2,
+                                  inRect:CGRectMake(_sideMargin,
+                                                    _topMargin,
                                                     backgroundWidth,
                                                     backgroundHeight)];
 
@@ -82,6 +87,12 @@
     BOOL draggable = [self belongsToViewer:[game getCurrentAction]];
     [self drawAction:[game getCurrentAction] animate:YES draggable:draggable];
   }
+}
+
+- (float)computeScaleFactorWithWidth:(int)width withHeight:(int)height {
+  float widthRatio = self.frame.size.width / width;
+  float heightRatio = self.frame.size.height / height;
+  return MIN(widthRatio, heightRatio);
 }
 
 - (BOOL)belongsToViewer:(NTSAction*) action {
@@ -132,8 +143,8 @@
 
 - (void)drawCommand:(NTSCommand*)command playerNumber:(int)playerNumber animate:(BOOL)animate
           draggable:(BOOL)draggable {
-  CGRect rect = CGRectMake([command getColumn] * _squareSize,
-                           [command getRow] * _squareSize + _topOffset,
+  CGRect rect = CGRectMake(([command getColumn] * _squareSize) + _sideMargin,
+                           ([command getRow] * _squareSize) + _topOffset + _topMargin,
                            _squareSize,
                            _squareSize);
   SVGKImage *image = playerNumber == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
