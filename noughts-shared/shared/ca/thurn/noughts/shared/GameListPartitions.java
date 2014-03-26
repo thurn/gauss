@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ca.thurn.noughts.shared.entities.Game;
+import ca.thurn.noughts.shared.entities.GameListSection;
 
 /**
  * A value object consisting of three game lists: games where it is the
@@ -22,18 +23,31 @@ public class GameListPartitions {
     theirTurn = new ArrayList<Game>();
     gameOver = new ArrayList<Game>();
     for (Game game : games) {
-      if (game.isGameOver()) {
-        gameOver.add(game);
-      } else if (game.isLocalMultiplayer() || Games.currentPlayerId(game).equals(userId)) {
-        // Treat local multiplayer as always "your turn"
-        yourTurn.add(game);
-      } else {
-        theirTurn.add(game);
-      }      
+      switch (getSection(game, userId)) {
+        case GAME_OVER:
+          gameOver.add(game);
+          break;
+        case YOUR_TURN:
+          yourTurn.add(game);
+          break;
+        case THEIR_TURN:
+          theirTurn.add(game);
+          break;
+      }
     }
     Collections.sort(yourTurn, Games.comparator());
     Collections.sort(theirTurn, Games.comparator());
     Collections.sort(gameOver, Games.comparator());
+  }
+  
+  public static GameListSection getSection(Game game, String viewerId) {
+    if (game.isGameOver()) {
+      return GameListSection.GAME_OVER;
+    } else if (game.isLocalMultiplayer() || Games.currentPlayerId(game).equals(viewerId)) {
+      return GameListSection.YOUR_TURN;
+    } else {
+      return GameListSection.THEIR_TURN;
+    }     
   }
   
   /**

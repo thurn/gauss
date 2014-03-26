@@ -109,7 +109,6 @@ public class Games {
   public static Game minimalGame(Game game) {
     return game.toBuilder()
         .clearSubmittedActionList()
-        .setIsMinimal(true)
         .build();
   }
 

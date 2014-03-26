@@ -17,7 +17,7 @@
 
 - (void)loginToFirebase:(void(^)(NSString*))onLogin {
   NSString *password = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-  NSString *userId = [self sha1:password];
+  NSString *userId = [LoginHelper sha1:password];
   NSString *email = [userId stringByAppendingString:@"@example.com"];
   NSLog(@"trying to log in");
   [_login loginWithEmail:email
@@ -72,7 +72,7 @@
   }];
 }
 
-- (NSString*)sha1:(NSString*)input {
++ (NSString*)sha1:(NSString*)input {
   const char *cstr = [input cStringUsingEncoding:NSUTF8StringEncoding];
   NSData *data = [NSData dataWithBytes:cstr length:input.length];
   uint8_t digest[CC_SHA1_DIGEST_LENGTH];

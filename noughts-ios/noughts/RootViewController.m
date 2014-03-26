@@ -1,13 +1,12 @@
 #import "RootViewController.h"
 #import "Model.h"
 #import "Firebase.h"
-#import "GameListListener.h"
 #import "HasModel.h"
 #import "GameViewController.h"
 #import "AppDelegate.h"
 #import "LoginHelper.h"
 
-@interface RootViewController () <NTSGameListListener>
+@interface RootViewController ()
 @property(weak,nonatomic) IBOutlet UIButton *savedGamesButton;
 @property(strong,nonatomic) NTSModel *model;
 @property(strong,nonatomic) LoginHelper *loginHelper;
@@ -50,44 +49,25 @@
 //  NSLog(@"facebook? %d", FBSession.activeSession.state == FBSessionStateOpen);
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio.com"];
-  _loginHelper = [[LoginHelper alloc] initWithFirebase:firebase];
+  NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+  NSString *userId = [LoginHelper sha1:userKey];
+  _model = [[NTSModel alloc] initWithNSString:userId
+                                 withNSString:userKey
+                               withFCFirebase:firebase];
+//  _loginHelper = [[LoginHelper alloc] initWithFirebase:firebase];  
 //  if (FBSession.activeSession.state == FBSessionStateOpen) {
 //    [_loginHelper loginViaFacebook:^(NSString *userId) {
 //      NSLog(@"view did load - logged in via facebook");
 //    }];
 //  } else {
-    [_loginHelper loginToFirebase:^(NSString *userId) {
-      NSLog(@"view did load - anon login %@", userId);
-      _model = [[NTSModel alloc] initWithNSString:userId
-                                     withNSString:@"anonymous"
-                                   withFCFirebase:firebase];
-      [_model setGameListListenerWithNTSGameListListener:self];
-    }];
+//    [_loginHelper loginToFirebase:^(NSString *userId) {
+//      NSLog(@"view did load - anon login %@", userId);
+//      _model = [[NTSModel alloc] initWithNSString:userId
+//                                     withNSString:@"anonymous"
+//                                   withFCFirebase:firebase];
+//      [_model setGameListListenerWithNTSGameListListener:self];
+//    }];
 //  }
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-  [self toggleSaveButtonEnabled];
-}
-
-- (void)toggleSaveButtonEnabled {
-  if ([_model gameCount] == 0) {
-    [_savedGamesButton setEnabled:NO];
-  } else {
-    [_savedGamesButton setEnabled:YES];
-  }
-}
-
-- (void)onGameAddedWithNTSGame:(NTSGame *)game {
-  [self toggleSaveButtonEnabled];
-}
-
-- (void)onGameChangedWithNTSGame:(NTSGame *)game {
-  [self toggleSaveButtonEnabled];
-}
-
-- (void)onGameRemovedWithNTSGame:(NTSGame *)game {
-  [self toggleSaveButtonEnabled];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

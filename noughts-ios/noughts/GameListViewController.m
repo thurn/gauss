@@ -9,8 +9,10 @@
 #import "ImageString.h"
 #import "GameListEntry.h"
 #import "GameListEntryCell.h"
+#import "GameListUpdateListener.h"
+#import "GameListSection.h"
 
-@interface GameListViewController () <UIAlertViewDelegate>
+@interface GameListViewController () <UIAlertViewDelegate, NTSGameListUpdateListener>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
 @property(nonatomic) float scale;
@@ -38,7 +40,22 @@
 
 - (void)setNTSModel:(NTSModel *)model {
   self.model = model;
+  [_model setGameListUpdateListenerWithNTSGameListUpdateListener:self];
   self.gameListPartitions = [self.model getGameListPartitions];
+}
+
+-(void)onGameAddedWithNTSGame:(NTSGame*)game {
+  [self.tableView beginUpdates];
+  int section = [self sectionNumberForGame:game withViewer:[_model getUserId]];
+  NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
+  [self.tableView insertRowsAtIndexPaths:@[path]
+                        withRowAnimation:UITableViewRowAnimationFade];
+  self.gameListPartitions = [self.model getGameListPartitions];
+  [self.tableView endUpdates];
+}
+
+- (void)onGameChangedWithNTSGame:(NTSGame *)game {
+  
 }
 
 #pragma mark - Table view data source
@@ -51,7 +68,7 @@
   return [[self listForSectionNumber:section] size];
 }
 
-- (id<JavaUtilList>)listForSectionNumber:(NSInteger) section {
+- (id<JavaUtilList>)listForSectionNumber:(NSInteger)section {
   switch (section) {
     case YOUR_GAMES_SECTION:
       return [self.gameListPartitions yourTurn];
@@ -61,6 +78,12 @@
       return [self.gameListPartitions gameOver];
   }
   return nil;
+}
+
+- (int)sectionNumberForGame:(NTSGame*)game withViewer:(NSString*)viewer {
+  NTSGameListSectionEnum *section =
+    [NTSGameListPartitions getSectionWithNTSGame:game withNSString:viewer];
+  return [section ordinal];
 }
 
 - (NTSGame *)gameForIndexPath:(NSIndexPath *)indexPath {

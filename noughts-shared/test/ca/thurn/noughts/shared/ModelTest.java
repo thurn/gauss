@@ -41,7 +41,7 @@ public class ModelTest extends SharedTestCase {
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase firebase) {
         userId = "id" + randomInteger();
-        model = new Model(userId, "anonymous", firebase);
+        model = new Model(userId, firebase);
         done.run();        
       }
     });
@@ -50,7 +50,7 @@ public class ModelTest extends SharedTestCase {
   
   @Override
   public void sharedTearDown() {
-    model.removeGameListListener();
+    model.removeAllFirebaseListeners();
   }
   
   public void testNewGame() {

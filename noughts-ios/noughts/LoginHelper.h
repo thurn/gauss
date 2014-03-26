@@ -9,5 +9,6 @@
 - (id)initWithFirebase:(FCFirebase*)firebase;
 - (void)loginToFirebase:(void(^)(NSString*))onLogin;
 - (void)loginViaFacebook:(void(^)(NSString*))onLogin;
++ (NSString*)sha1:(NSString*)input;
 - (void)printAuthStatus;
 @end

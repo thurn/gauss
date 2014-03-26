@@ -361,24 +361,6 @@ public class Game extends Entity<Game> {
       game.localMultiplayer = null;
       return this;
     }
-    
-    public boolean hasIsMinimal() {
-      return game.hasIsMinimal();
-    }
-
-    public boolean isMinimal() {
-      return game.isMinimal();
-    }
-    
-    public Builder setIsMinimal(boolean isMinimal) {
-      game.minimal = isMinimal;
-      return this;
-    }
-    
-    public Builder clearIsMinimal() {
-      game.minimal = null;
-      return this;
-    }
 
     public int getResignedPlayerCount() {
       return game.getResignedPlayerCount();
@@ -495,12 +477,6 @@ public class Game extends Entity<Game> {
    * True if this game is in local multiplayer mode
    */
   private Boolean localMultiplayer;
-  
-  /**
-   * True if this is a minimal game representation, as returned by
-   * {@link Game#minimalGame()}.
-   */
-  private Boolean minimal;
 
   /**
    * An array of player numbers who have resigned the game.
@@ -529,7 +505,6 @@ public class Game extends Entity<Game> {
     this.victorList = new ArrayList<Integer>(game.victorList);
     this.gameOver = game.gameOver;
     this.localMultiplayer = game.localMultiplayer;
-    this.minimal = game.minimal;
     this.resignedPlayerList = new ArrayList<Integer>(game.resignedPlayerList);
   }
 
@@ -547,7 +522,6 @@ public class Game extends Entity<Game> {
     victorList = getIntegerList(getList(gameMap, "victorList"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
-    minimal = getBoolean(gameMap, "minimal");
     resignedPlayerList = getIntegerList(getList(gameMap, "resignedPlayerList"));
   }
   
@@ -571,7 +545,6 @@ public class Game extends Entity<Game> {
     putSerialized(result, "victorList", victorList);
     putSerialized(result, "gameOver", gameOver);
     putSerialized(result, "localMultiplayer", localMultiplayer);
-    putSerialized(result, "minimal", minimal);
     putSerialized(result, "resignedPlayerList", resignedPlayerList);
     return result;
   }
@@ -703,15 +676,6 @@ public class Game extends Entity<Game> {
   public boolean isLocalMultiplayer() {
     checkNotNull(localMultiplayer);
     return localMultiplayer;
-  }
-  
-  public boolean hasIsMinimal() {
-    return minimal != null;
-  }
-  
-  public boolean isMinimal() {
-    checkNotNull(minimal);
-    return minimal;
   }
   
   public int getResignedPlayerCount() {
