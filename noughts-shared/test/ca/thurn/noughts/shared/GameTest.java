@@ -170,13 +170,6 @@ public class GameTest extends SharedTestCase {
     assertEquals("vs. GivenName", Games.vsString(testGame.build(),"one"));
   }
   
-  public void testMinimalGame() {
-    Game.Builder testGame = Game.newBuilder().setId("id");
-    testGame.addSubmittedAction(Action.newBuilder().build());
-    assertEquals("id", Games.minimalGame(testGame.build()).getId());
-    assertEquals(0, Games.minimalGame(testGame.build()).getSubmittedActionCount());
-  }
-  
   public void testHasOpponent() {
     Game.Builder test = Game.newBuilder().setId("id");
     assertFalse(Games.hasOpponent(test.build(),"user"));

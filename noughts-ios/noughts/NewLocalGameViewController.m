@@ -184,7 +184,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 - (void)pickerView:(UIPickerView *)pickerView
       didSelectRow:(NSInteger)row
        inComponent:(NSInteger)component {
-  _p2ImageIndex = row;
+  _p2ImageIndex = (int)row;
   UIImage *image = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
   // Button is disabled for vs. computer
   [_p2Image setImage:image forState:UIControlStateDisabled];
@@ -223,7 +223,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
    [self localImageString:[_playerImages objectAtIndex:_p1ImageIndex]]];
   NTSProfile_Builder *p2Profile = [NTSProfile newBuilder];
   if (_playVsComputerMode) {
-    int difficultyLevel = [_difficultyPicker selectedRowInComponent:0];
+    int difficultyLevel = (int)[_difficultyPicker selectedRowInComponent:0];
     [userDefaults setObject:[[NSNumber alloc] initWithInt:difficultyLevel]
                      forKey:kPreferredDifficulty];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];

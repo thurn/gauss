@@ -103,16 +103,6 @@ public class Games {
   }
 
   /**
-   * @return A representation of this game suitable for inclusion in a user's
-   *     game list, with the game actions omitted.
-   */
-  public static Game minimalGame(Game game) {
-    return game.toBuilder()
-        .clearSubmittedActionList()
-        .build();
-  }
-
-  /**
    * @param viewerId viewer's player ID
    * @return True if there is an opponent in this game who is distinct from
    *     the viewer. False if there's no opponent or the viewer is playing

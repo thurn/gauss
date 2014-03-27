@@ -106,11 +106,11 @@ public class Model extends AbstractChildEventListener {
       return Transaction.success(mutableData);
     }   
   }
-
+  
   private final String userId;
   private final String userKey;
   private final Firebase firebase;
-  private GameListUpdateListener gameListUpdateListener;
+  private GameListListener gameListListener;
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
@@ -146,12 +146,12 @@ public class Model extends AbstractChildEventListener {
   }
 
   /**
-   * Adds a GameListUpdateListener, overriding any previous listener.
+   * Adds a GameListListener, overriding any previous listener.
    *
    * @param listener Listener to add.
    */
-  public void setGameListUpdateListener(GameListUpdateListener listener) {
-    gameListUpdateListener = listener;
+  public void setGameListListener(GameListListener listener) {
+    gameListListener = listener;
   }
   
   /**
@@ -210,6 +210,7 @@ public class Model extends AbstractChildEventListener {
     ValueEventListener valueEventListener = new ValueEventListener() {
       @Override
       public void onCancelled(FirebaseError error) {
+        throw new RuntimeException();
       }
 
       @Override
@@ -229,6 +230,9 @@ public class Model extends AbstractChildEventListener {
   @Override
   public void onChildRemoved(DataSnapshot snapshot) {
     String gameId = snapshot.getName();
+    if (games.containsKey(gameId) && gameListListener != null) {
+      gameListListener.onGameRemoved(games.get(gameId));
+    }
     if (valueEventListeners.containsKey(gameId)) {
       firebase.child("games").child(gameId).removeEventListener(valueEventListeners.get(gameId));
     }
@@ -237,11 +241,11 @@ public class Model extends AbstractChildEventListener {
   private Game fireListeners(DataSnapshot snapshot, Game oldGame) {
     Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
     String gameId = game.getId();
-    if (gameListUpdateListener != null) {
+    if (gameListListener != null) {
       if (oldGame == null) {
-        gameListUpdateListener.onGameAdded(game);
+        gameListListener.onGameAdded(game);
       } else {
-        gameListUpdateListener.onGameChanged(game);
+        gameListListener.onGameChanged(game);
       }
     }
     if (gameUpdateListeners.containsKey(gameId)) {
@@ -420,7 +424,7 @@ public class Model extends AbstractChildEventListener {
         }
       }
     };
-    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGame(game, mutation, true /* abortOnConflict */);
   }
 
   /**
@@ -444,7 +448,7 @@ public class Model extends AbstractChildEventListener {
         game.setCurrentAction(currentAction);
       }
     };
-    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGame(game, mutation, true /* abortOnConflict */);
   }
   
   /**
@@ -569,7 +573,7 @@ public class Model extends AbstractChildEventListener {
         }
       }
     };
-    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGame(game, mutation, true /* abortOnConflict */);
     handleComputerAction(applyMutation(game, mutation));
   }
   
@@ -645,7 +649,7 @@ public class Model extends AbstractChildEventListener {
         action.addFutureCommand(command);
         game.setCurrentAction(action);
     }};
-    mutateCanonicalGame(game, mutation, true /* abortOnConflict */);
+    mutateGame(game, mutation, true /* abortOnConflict */);
   }
   
   /**
@@ -666,7 +670,7 @@ public class Model extends AbstractChildEventListener {
         action.addCommand(command);
         game.setCurrentAction(action);
     }};
-    mutateCanonicalGame(game, mutation, true /* abortOnCoflict */);
+    mutateGame(game, mutation, true /* abortOnCoflict */);
   }
   
   /**
@@ -694,7 +698,7 @@ public class Model extends AbstractChildEventListener {
         game.setLastModified(timestamp);
       }
     };
-    mutateCanonicalGame(game, mutation, false /* abortOnConflict */);
+    mutateGame(game, mutation, false /* abortOnConflict */);
   }
   
   /**
@@ -801,13 +805,12 @@ public class Model extends AbstractChildEventListener {
    * @param abortOnConflict If true, abort the transaction if the current game
    *     at this ID is different from "game".
    */
-  private void mutateCanonicalGame(Game game, final GameMutation function,
+  private void mutateGame(Game game, final GameMutation function,
       boolean abortOnConflict) {
-    Firebase gameRef = firebase.child("games").child(game.getId());
     GameMutationHandler handler = abortOnConflict ? 
         new GameMutationHandler(function, game) :
           new GameMutationHandler(function);
-    gameRef.runTransaction(handler);
+    gameReference(game.getId()).runTransaction(handler);
   }
 
   private static Game applyMutation(Game game, GameMutation mutation) {

@@ -62,8 +62,9 @@
 		7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */; };
 		7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
-		7C3F723318E3593700898E5A /* GameListUpdateListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723218E3593700898E5A /* GameListUpdateListener.java */; };
 		7C3F723518E3658E00898E5A /* GameListSection.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723418E3658E00898E5A /* GameListSection.java */; };
+		7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723618E36D6700898E5A /* AbstractGameListListener.java */; };
+		7C3F723918E36D6700898E5A /* GameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723718E36D6700898E5A /* GameListListener.java */; };
 		7C58BE1318C1BD4D008D2C9D /* Action.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE0918C1BD4D008D2C9D /* Action.java */; };
 		7C58BE1418C1BD4D008D2C9D /* Command.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE0A18C1BD4D008D2C9D /* Command.java */; };
 		7C58BE1518C1BD4D008D2C9D /* Game.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE0B18C1BD4D008D2C9D /* Game.java */; };
@@ -103,7 +104,6 @@
 		7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447018DF41AF0023F1CA /* Accounts.framework */; };
 		7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447218DF41B40023F1CA /* Social.framework */; };
 		7CCD447518DF41DF0023F1CA /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447418DF41DF0023F1CA /* FirebaseSimpleLogin.framework */; };
-		7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
 		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
@@ -204,8 +204,9 @@
 		7C2E648E1864216F00D34AD0 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7C2E64931864223C00D34AD0 /* prefixes.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = prefixes.properties; sourceTree = "<group>"; };
-		7C3F723218E3593700898E5A /* GameListUpdateListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListUpdateListener.java; sourceTree = "<group>"; };
 		7C3F723418E3658E00898E5A /* GameListSection.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListSection.java; sourceTree = "<group>"; };
+		7C3F723618E36D6700898E5A /* AbstractGameListListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractGameListListener.java; sourceTree = "<group>"; };
+		7C3F723718E36D6700898E5A /* GameListListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListListener.java; sourceTree = "<group>"; };
 		7C58BE0918C1BD4D008D2C9D /* Action.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Action.java; sourceTree = "<group>"; };
 		7C58BE0A18C1BD4D008D2C9D /* Command.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Command.java; sourceTree = "<group>"; };
 		7C58BE0B18C1BD4D008D2C9D /* Game.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Game.java; sourceTree = "<group>"; };
@@ -252,7 +253,6 @@
 		7CCD447018DF41AF0023F1CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		7CCD447218DF41B40023F1CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		7CCD447418DF41DF0023F1CA /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
-		7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = JBDeviceOwner.framework; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
 		7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewLocalGameViewController.m; sourceTree = "<group>"; };
@@ -293,7 +293,6 @@
 				7C2E648B1864216200D34AD0 /* libc++.dylib in Frameworks */,
 				7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */,
 				7C2E640218641F3500D34AD0 /* Foundation.framework in Frameworks */,
-				7CEB471E18AF3EDF00CDA9EA /* JBDeviceOwner.framework in Frameworks */,
 				7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */,
 				5894A9E37EA045BA8A4B2CB4 /* libPods.a in Frameworks */,
 			);
@@ -383,7 +382,6 @@
 				7C000C4518DAAD5600C52640 /* FacebookSDK.framework */,
 				7CF4F80F18D576CC00FC8F9E /* AudioToolbox.framework */,
 				7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */,
-				7CEB471D18AF3EDF00CDA9EA /* JBDeviceOwner.framework */,
 				7C1F83C01868110B00D66C78 /* QuartzCore.framework */,
 				7C1F83BE1868110400D66C78 /* libxml2.dylib */,
 				7C1F83BC186810FC00D66C78 /* CoreImage.framework */,
@@ -540,7 +538,8 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
-				7C3F723218E3593700898E5A /* GameListUpdateListener.java */,
+				7C3F723618E36D6700898E5A /* AbstractGameListListener.java */,
+				7C3F723718E36D6700898E5A /* GameListListener.java */,
 				7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */,
 				7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */,
 				7C58BE0818C1BD4D008D2C9D /* entities */,
@@ -764,12 +763,14 @@
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
 				7C58BE1A18C1BD4D008D2C9D /* Profile.java in Sources */,
 				7C0444D218B73124006275CA /* NegamaxSearch.java in Sources */,
+				7C3F723918E36D6700898E5A /* GameListListener.java in Sources */,
 				7C0444DD18B73124006275CA /* State.java in Sources */,
 				7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */,
 				7C27F70818C67A0300ADA495 /* UIView+AutoLayout.m in Sources */,
 				7C0444D418B73124006275CA /* ActionScore.java in Sources */,
 				7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */,
 				7C0444D918B73124006275CA /* Copyable.java in Sources */,
+				7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
@@ -788,7 +789,6 @@
 				7C3F723518E3658E00898E5A /* GameListSection.java in Sources */,
 				7C92C02A18920FD800DF8816 /* Clock.java in Sources */,
 				7C0444D518B73124006275CA /* ActionTree.java in Sources */,
-				7C3F723318E3593700898E5A /* GameListUpdateListener.java in Sources */,
 				7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */,
 				7C8EF76418668E120075D0C1 /* MutableData.java in Sources */,
 				7C8EF76018668E120075D0C1 /* FirebaseError.java in Sources */,

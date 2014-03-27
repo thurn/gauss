@@ -2,8 +2,10 @@ package ca.thurn.noughts.shared;
 
 import ca.thurn.noughts.shared.entities.Game;
 
-public interface GameListUpdateListener {
+public interface GameListListener {
   public void onGameAdded(Game game);
   
   public void onGameChanged(Game game);
+  
+  public void onGameRemoved(Game game);
 }

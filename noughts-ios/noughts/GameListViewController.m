@@ -9,10 +9,10 @@
 #import "ImageString.h"
 #import "GameListEntry.h"
 #import "GameListEntryCell.h"
-#import "GameListUpdateListener.h"
+#import "GameListListener.h"
 #import "GameListSection.h"
 
-@interface GameListViewController () <UIAlertViewDelegate, NTSGameListUpdateListener>
+@interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
 @property(nonatomic) float scale;
@@ -40,7 +40,7 @@
 
 - (void)setNTSModel:(NTSModel *)model {
   self.model = model;
-  [_model setGameListUpdateListenerWithNTSGameListUpdateListener:self];
+  [_model setGameListListenerWithNTSGameListListener:self];
   self.gameListPartitions = [self.model getGameListPartitions];
 }
 
@@ -55,6 +55,10 @@
 }
 
 - (void)onGameChangedWithNTSGame:(NTSGame *)game {
+  
+}
+
+- (void)onGameRemovedWithNTSGame:(NTSGame*)game {
   
 }
 
@@ -88,7 +92,7 @@
 
 - (NTSGame *)gameForIndexPath:(NSIndexPath *)indexPath {
   id<JavaUtilList> games = [self listForSectionNumber:indexPath.section];
-  return [games getWithInt:indexPath.row];
+  return [games getWithInt:(int)indexPath.row];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView
