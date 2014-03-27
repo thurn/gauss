@@ -1,2 +1,3 @@
 platform :ios, '7.0'
 pod 'SVGKit', :git => "https://github.com/SVGKit/SVGKit.git"
+pod 'Facebook-iOS-SDK', '~> 3.13.0'

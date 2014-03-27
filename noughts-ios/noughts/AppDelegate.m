@@ -1,4 +1,5 @@
 #import "AppDelegate.h"
+#import <Parse/Parse.h>
 
 @interface AppDelegate ()
 @property BOOL runningQuery;
@@ -6,11 +7,29 @@
 
 @implementation AppDelegate
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
+- (BOOL)application:(UIApplication *)application
+    didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   _friendPhotos = [NSMutableDictionary new];
+  [Parse setApplicationId:@"mYK2MgBp6q7fjLEyulrqlUkQ8tf3qsSrbtlfh6Je"
+                clientKey:@"7Sne8QqyGnoHm3AAUhI2OxpOVjGYvkBG2bEXKkbi"];
+  [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge |
+      UIRemoteNotificationTypeAlert |
+      UIRemoteNotificationTypeSound];
   return YES;
 }
+
+- (void)application:(UIApplication *)application
+    didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+  [currentInstallation setDeviceTokenFromData:deviceToken];
+  [currentInstallation saveInBackground];
+}
+
+- (void)application:(UIApplication *)application
+    didReceiveRemoteNotification:(NSDictionary *)userInfo {
+  [PFPush handlePush:userInfo];
+}
+
 //
 //- (BOOL)application:(UIApplication *)application
 //            openURL:(NSURL *)url
