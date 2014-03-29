@@ -2,9 +2,10 @@
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(strong,nonatomic) NTSModel *model;
-@property (weak, nonatomic) IBOutlet UITextField *toEmail;
-@property (weak, nonatomic) IBOutlet UITextView *message;
-@property (weak, nonatomic) IBOutlet UIButton *doneEditingButton;
+@property(weak, nonatomic) IBOutlet UITextField *toEmail;
+@property(weak, nonatomic) IBOutlet UITextView *message;
+@property(weak, nonatomic) IBOutlet UIButton *doneEditingButton;
+@property(nonatomic) int viewDeltaY;
 @end
 
 @implementation EmailInviteViewController
@@ -47,38 +48,45 @@
 
 -(void)dismissKeyboard {
   [_message resignFirstResponder];
+  [_toEmail resignFirstResponder];
 }
 
 - (void)keyboardWillBeShown:(NSNotification*)aNotification {
-  if (![_message isFirstResponder]) {
-    return;
+  if ([_message isFirstResponder]) {
+    _viewDeltaY = [self viewAnimationDelta];
+    [self animateViewByDeltaY:-_viewDeltaY];
+    [UIView animateWithDuration:0.3 animations:^{
+      _doneEditingButton.alpha = 1.0;
+    }];
+  } else {
+    _viewDeltaY = 0;
   }
-  [self animateViewByDeltaY:-[self viewAnimationDelta]];
-  [UIView animateWithDuration:0.3 animations:^{
-    _doneEditingButton.alpha = 1.0;
-  }];
 }
 
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification {
-  if (![_message isFirstResponder]) {
-    return;
-  }
-  [self animateViewByDeltaY:[self viewAnimationDelta]];
+  [self animateViewByDeltaY:_viewDeltaY];
   [UIView animateWithDuration:0.1 animations:^{
     _doneEditingButton.alpha = 0.0;
   }];
 }
 
+- (void)textViewDidBeginEditing:(UITextField *)textField {
+  if (_viewDeltaY == 0) {
+    _viewDeltaY = [self viewAnimationDelta];
+    [self animateViewByDeltaY:-_viewDeltaY];
+    [UIView animateWithDuration:0.3 animations:^{
+      _doneEditingButton.alpha = 1.0;
+    }];
+  }
+}
+
 - (int)viewAnimationDelta {
-  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (UIInterfaceOrientationIsLandscape(orientation)) {
+  UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad &&
+      UIInterfaceOrientationIsLandscape(orientation)) {
       return 160;
-    } else {
-      return 0;
-    }
   } else {
-    return 120;
+      return 0;
   }
 }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -505,7 +505,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="jane@example.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zcB-gd-hQ1">
-                                <rect key="frame" x="78" y="93" width="217" height="30"/>
+                                <rect key="frame" x="56" y="93" width="239" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
@@ -513,29 +513,14 @@
                                     <outlet property="delegate" destination="wS2-Rw-cTG" id="a9N-J6-Elq"/>
                                 </connections>
                             </textField>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="your.email@example.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Gpg-jp-hss">
-                                <rect key="frame" x="78" y="139" width="217" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
-                                <connections>
-                                    <outlet property="delegate" destination="wS2-Rw-cTG" id="LbY-gH-qvd"/>
-                                </connections>
-                            </textField>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="From:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="udu-Rf-orI">
-                                <rect key="frame" x="25" y="143" width="45" height="21"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your Message:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="iND-8D-TXY">
-                                <rect key="frame" x="25" y="189" width="114" height="21"/>
+                                <rect key="frame" x="25" y="143" width="114" height="21"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s9a-FU-fNm">
-                                <rect key="frame" x="20" y="220" width="280" height="150"/>
+                                <rect key="frame" x="20" y="174" width="280" height="150"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
@@ -553,7 +538,7 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                                 </connections>
                             </textView>
                             <button opaque="NO" alpha="0.0" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vf8-wc-hFc">
-                                <rect key="frame" x="207" y="185" width="88" height="30"/>
+                                <rect key="frame" x="207" y="139" width="88" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Done Editing">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -565,31 +550,25 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="zcB-gd-hQ1" firstAttribute="leading" secondItem="mVo-g4-esX" secondAttribute="trailing" constant="8" id="0nZ-kc-9ag"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="centerY" secondItem="zcB-gd-hQ1" secondAttribute="centerY" id="4F6-7Q-Unv"/>
                             <constraint firstItem="s9a-FU-fNm" firstAttribute="leading" secondItem="QBc-Dg-1hI" secondAttribute="leading" constant="20" id="6gR-MQ-z2i"/>
-                            <constraint firstAttribute="trailing" secondItem="Gpg-jp-hss" secondAttribute="trailing" constant="25" id="7vT-aM-iJn"/>
-                            <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="udu-Rf-orI" secondAttribute="leading" id="9Fc-ES-0Mb"/>
-                            <constraint firstItem="Vf8-wc-hFc" firstAttribute="trailing" secondItem="Gpg-jp-hss" secondAttribute="trailing" id="MiU-fT-bih"/>
+                            <constraint firstItem="iND-8D-TXY" firstAttribute="top" secondItem="mVo-g4-esX" secondAttribute="bottom" constant="25" id="9uc-md-o4X"/>
                             <constraint firstItem="B2D-Yi-Jus" firstAttribute="top" secondItem="CDq-4B-T4s" secondAttribute="bottom" constant="20" id="Pru-4n-lL1"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="QBc-Dg-1hI" secondAttribute="leading" constant="25" id="RF5-uy-KIm"/>
-                            <constraint firstItem="Gpg-jp-hss" firstAttribute="centerY" secondItem="udu-Rf-orI" secondAttribute="centerY" id="TSU-ct-AVZ"/>
                             <constraint firstAttribute="trailing" secondItem="zcB-gd-hQ1" secondAttribute="trailing" constant="25" id="UK3-cX-YLB"/>
                             <constraint firstAttribute="centerX" secondItem="CDq-4B-T4s" secondAttribute="centerX" id="Uss-Xa-5aA"/>
-                            <constraint firstItem="udu-Rf-orI" firstAttribute="top" secondItem="mVo-g4-esX" secondAttribute="bottom" constant="25" id="cej-AK-mOO"/>
-                            <constraint firstItem="iND-8D-TXY" firstAttribute="top" secondItem="udu-Rf-orI" secondAttribute="bottom" constant="25" id="fFO-4k-3dD"/>
                             <constraint firstItem="Vf8-wc-hFc" firstAttribute="baseline" secondItem="iND-8D-TXY" secondAttribute="baseline" id="h1Z-05-1fD"/>
-                            <constraint firstItem="zcB-gd-hQ1" firstAttribute="leading" secondItem="Gpg-jp-hss" secondAttribute="leading" id="jeE-2a-i33"/>
                             <constraint firstAttribute="trailing" secondItem="s9a-FU-fNm" secondAttribute="trailing" constant="20" id="jwS-yu-VCt"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="iND-8D-TXY" secondAttribute="leading" id="lT6-y2-rBY"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="top" secondItem="hTC-ll-1Xt" secondAttribute="bottom" constant="33" id="nng-2M-moJ"/>
-                            <constraint firstItem="Gpg-jp-hss" firstAttribute="leading" secondItem="udu-Rf-orI" secondAttribute="trailing" constant="8" id="qVK-iv-jc9"/>
+                            <constraint firstItem="Vf8-wc-hFc" firstAttribute="trailing" secondItem="zcB-gd-hQ1" secondAttribute="trailing" id="seL-mv-qSw"/>
                             <constraint firstItem="s9a-FU-fNm" firstAttribute="top" secondItem="iND-8D-TXY" secondAttribute="bottom" constant="10" id="wF7-Dt-tQ2"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Invite" id="LlP-kv-EgY"/>
                     <connections>
                         <outlet property="doneEditingButton" destination="Vf8-wc-hFc" id="Bog-UU-yRC"/>
-                        <outlet property="fromEmail" destination="Gpg-jp-hss" id="SDg-J9-xrZ"/>
                         <outlet property="message" destination="s9a-FU-fNm" id="vgP-MJ-8rr"/>
                         <outlet property="toEmail" destination="zcB-gd-hQ1" id="guW-I8-XNh"/>
                     </connections>
