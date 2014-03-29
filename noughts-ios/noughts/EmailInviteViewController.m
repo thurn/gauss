@@ -3,7 +3,6 @@
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(strong,nonatomic) NTSModel *model;
 @property (weak, nonatomic) IBOutlet UITextField *toEmail;
-@property (weak, nonatomic) IBOutlet UITextField *fromEmail;
 @property (weak, nonatomic) IBOutlet UITextView *message;
 @property (weak, nonatomic) IBOutlet UIButton *doneEditingButton;
 @end
@@ -21,6 +20,15 @@
   UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]
                                         initWithTarget:self
                                         action:@selector(dismissKeyboard)];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(keyboardWillBeShown:)
+                                               name:UIKeyboardWillShowNotification
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(keyboardWillBeHidden:)
+                                               name:UIKeyboardWillHideNotification
+                                             object:nil];
   [self.view addGestureRecognizer:recognizer];
 }
 
@@ -41,18 +49,37 @@
   [_message resignFirstResponder];
 }
 
-- (void)textViewDidBeginEditing:(UITextView *)textView {
-  [self animateViewByDeltaY:-120];
+- (void)keyboardWillBeShown:(NSNotification*)aNotification {
+  if (![_message isFirstResponder]) {
+    return;
+  }
+  [self animateViewByDeltaY:-[self viewAnimationDelta]];
   [UIView animateWithDuration:0.3 animations:^{
     _doneEditingButton.alpha = 1.0;
   }];
 }
 
-- (void)textViewDidEndEditing:(UITextView *)textView {
-  [self animateViewByDeltaY:120];
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification {
+  if (![_message isFirstResponder]) {
+    return;
+  }
+  [self animateViewByDeltaY:[self viewAnimationDelta]];
   [UIView animateWithDuration:0.1 animations:^{
     _doneEditingButton.alpha = 0.0;
   }];
+}
+
+- (int)viewAnimationDelta {
+  if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    if (UIInterfaceOrientationIsLandscape(orientation)) {
+      return 160;
+    } else {
+      return 0;
+    }
+  } else {
+    return 120;
+  }
 }
 
 - (void)animateViewByDeltaY:(int)deltaY {

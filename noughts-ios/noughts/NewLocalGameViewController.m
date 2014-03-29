@@ -90,13 +90,11 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   [UIView commitAnimations];
 }
 
-- (void)keyboardWillBeShown:(NSNotification*)aNotification
-{
+- (void)keyboardWillBeShown:(NSNotification*)aNotification {
   [self animateViewByDeltaY:-100];
 }
 
-- (void)keyboardWillBeHidden:(NSNotification*)aNotification
-{
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification {
   [self animateViewByDeltaY:100];
 }
 
