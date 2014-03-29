@@ -4,6 +4,7 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "QueryParsing.h"
 #import "AppDelegate.h"
+#import "EmailInviteViewController.h"
 
 @interface NewGameViewController ()
 @property(weak,nonatomic) NTSModel* model;
@@ -47,6 +48,12 @@
   UIView *sendingView = sender;
   [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
   switch (sendingView.tag) {
+    case 99: {
+      EmailInviteViewController *controller =
+          (EmailInviteViewController*)segue.destinationViewController;
+      controller.preliminaryGameId = [_model getPreliminaryGameId];
+      break;
+    }
     case 100: {
       NewLocalGameViewController *controller =
           (NewLocalGameViewController*)segue.destinationViewController;

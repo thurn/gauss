@@ -12,12 +12,17 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  self.message.layer.borderColor = [[UIColor colorWithRed:230.0/255.0
+  _message.layer.borderColor = [[UIColor colorWithRed:230.0/255.0
                                                     green:230.0/255.0
                                                      blue:230.0/255.0
                                                     alpha:1.0] CGColor];
-  self.message.layer.borderWidth = 1;
-  self.message.layer.cornerRadius = 5;
+  _message.layer.borderWidth = 1;
+  _message.layer.cornerRadius = 5;
+  
+  _message.text = [NSString stringWithFormat: @"Invitation to play noughts\n\n"
+      @"You've been invited to a game of noughts! To accept this invitation, go here:\n\n"
+      @"http://noughts.thurn.ca/open?id=%@", _preliminaryGameId];
+  
   UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]
                                         initWithTarget:self
                                         action:@selector(dismissKeyboard)];

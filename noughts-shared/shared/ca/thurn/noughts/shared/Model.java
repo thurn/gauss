@@ -304,14 +304,30 @@ public class Model extends AbstractChildEventListener {
   }
   
   /**
+   * @return An ID to use for a game which may be created in the future.
+   */
+  public String getPreliminaryGameId() {
+    return firebase.child("games").push().getName();
+  }
+  
+  /**
+   * Version of {@link Model#newGame(Map, String)} with no game ID specified.
+   */
+  public String newGame(Map<String, Profile> profiles) {
+    return newGame(profiles, null);
+  }
+  
+  /**
    * Partially create a new game with no opponent specified yet, returning the
    * game ID.
    * 
    * @param profiles Map from player IDs in this game to their user profiles.
+   * @param gameId Optionally, the game ID to use.
    * @return The newly created game's ID.
    */
-  public String newGame(Map<String, Profile> profiles) {
-    return newGame(false /* localMultiplayer */, profiles, Collections.<Profile>emptyList());
+  public String newGame(Map<String, Profile> profiles, String gameId) {
+    return newGame(false /* localMultiplayer */, profiles, Collections.<Profile>emptyList(),
+        gameId);
   }
   
   /**
@@ -322,7 +338,7 @@ public class Model extends AbstractChildEventListener {
    */
   public String newLocalMultiplayerGame(List<Profile> localProfiles) {
     return newGame(true /* localMultiplayer */, Collections.<String, Profile>emptyMap(),
-        localProfiles);
+        localProfiles, null /* gameId */);
   }
 
   /**
@@ -331,12 +347,19 @@ public class Model extends AbstractChildEventListener {
    *
    * @param localMultiplayer Sets whether the game is a local multiplayer game.
    * @param userProfile Map from user IDs to profiles.
-   * @param localProfiles List of local profiles for players in this game. 
+   * @param localProfiles List of local profiles for players in this game.
+   * @param gameId Optionally, the game ID to use. 
    * @return The newly created game's ID.
    */  
   private String newGame(boolean localMultiplayer, Map<String, Profile> profiles,
-      List<Profile> localProfiles) {
-    Firebase ref = firebase.child("games").push();
+      List<Profile> localProfiles, String gameId) {    
+    Firebase ref;
+    if (gameId == null) {
+      ref = firebase.child("games").push();
+    } else {
+      ref = gameReference(gameId);
+    }
+
     Game.Builder builder = Game.newBuilder();
     builder.setId(ref.getName());
     builder.addPlayer(userId);
