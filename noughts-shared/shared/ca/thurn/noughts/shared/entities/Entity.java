@@ -93,10 +93,16 @@ public abstract class Entity<T extends Entity<T>> implements Cloneable {
    */
   public abstract EntityBuilder<T> toBuilder();
   
-  public static void checkNotNull(Object object) {
+  /**
+   * @param object Object to check for nullness.
+   * @return The object passed in.
+   * @throws NullPointerException if object is null.
+   */
+  public static <T> T checkNotNull(T object) {
     if (object == null) {
       throw new NullPointerException();
     }
+    return object;
   }
   
   public static void checkListForNull(List<?> list) {

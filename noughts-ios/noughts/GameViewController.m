@@ -211,6 +211,10 @@
   [_gameView drawGame:game];
 }
 
+- (void)onProfileRequiredWithNTSGame:(NTSGame*)game {
+  NSLog(@"onProfileRequired");
+}
+
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {
   [self displayGameStatus:status];
 }

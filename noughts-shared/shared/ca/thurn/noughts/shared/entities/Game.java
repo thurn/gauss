@@ -98,6 +98,10 @@ public class Game extends Entity<Game> {
     public int getProfileCount() {
       return game.getProfileCount();
     }
+    
+    public boolean hasProfile(String key) {
+      return game.hasProfile(key);
+    }
 
     public Profile getProfile(String key) {
       return game.getProfile(key);
@@ -579,9 +583,13 @@ public class Game extends Entity<Game> {
     return profileMap.size();
   }
   
+  public boolean hasProfile(String key) {
+    return profileMap.containsKey(key);
+  }
+  
   public Profile getProfile(String key) {
     checkNotNull(key);
-    return profileMap.get(key);
+    return checkNotNull(profileMap.get(key));
   }
   
   public Map<String, Profile> getProfileMap() {

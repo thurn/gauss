@@ -28,12 +28,20 @@ public class ModelTest extends SharedTestCase {
     @Override
     public void onGameStatusChanged(GameStatus status) {
     }
+    
+    @Override
+    public void onProfileRequired(Game game) {
+    }
   }
   
   private static abstract class GameStatusUpdateListener implements GameUpdateListener {
     @Override
     public void onGameUpdate(Game game) {
-    }   
+    }
+    
+    @Override
+    public void onProfileRequired(Game game) {
+    }    
   }
   
   @Override

@@ -110,9 +110,11 @@
   UIImage *image;
   if ([imageList size] == 2) {
     image = [self imageForTwoPhotos:imageList];
+  } else if ([imageList size] == 1) {
+    NSString *imageName = [[imageList getWithInt:0] getString];
+    image = [UIImage imageNamed:imageName];
   } else {
-    // not implemented;
-    @throw @"remember to do this";
+    @throw @"Can't render image list";
   }
   cell.vsImage.image = image;
   return cell;

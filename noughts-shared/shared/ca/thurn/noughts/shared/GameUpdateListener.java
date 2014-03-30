@@ -21,4 +21,11 @@ public interface GameUpdateListener {
    * @param status Game status object summarizing change.
    */
   public void onGameStatusChanged(GameStatus status);
+  
+  /**
+   * Called when the viewer needs to be prompted to enter a profile.
+   *
+   * @param game The game. 
+   */
+  public void onProfileRequired(Game game);
 }

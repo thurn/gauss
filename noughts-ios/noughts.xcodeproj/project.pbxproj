@@ -65,8 +65,10 @@
 		7C2F3CA618E48446005E64E1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA518E48446005E64E1 /* libz.dylib */; };
 		7C2F3CA818E4844E005E64E1 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */; };
 		7C2F3CAA18E4845D005E64E1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA918E4845D005E64E1 /* StoreKit.framework */; };
-		7C2F3CAE18E52798005E64E1 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CAD18E52798005E64E1 /* Parse.framework */; };
-		7C2F3CB018E527A6005E64E1 /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CAF18E527A6005E64E1 /* FirebaseSimpleLogin.framework */; };
+		7C312D1518E7969600D651A0 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C312D1418E7969600D651A0 /* Parse.framework */; };
+		7C312D1718E796A200D651A0 /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C312D1618E796A200D651A0 /* FirebaseSimpleLogin.framework */; };
+		7C312D1918E7E58C00D651A0 /* ProfilePrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */; };
+		7C312D1D18E7EDAB00D651A0 /* ProfilePromptViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */; };
 		7C3F723518E3658E00898E5A /* GameListSection.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723418E3658E00898E5A /* GameListSection.java */; };
 		7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723618E36D6700898E5A /* AbstractGameListListener.java */; };
 		7C3F723918E36D6700898E5A /* GameListListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723718E36D6700898E5A /* GameListListener.java */; };
@@ -211,8 +213,11 @@
 		7C2F3CA518E48446005E64E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		7C2F3CA918E4845D005E64E1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		7C2F3CAD18E52798005E64E1 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
-		7C2F3CAF18E527A6005E64E1 /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
+		7C312D1418E7969600D651A0 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
+		7C312D1618E796A200D651A0 /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
+		7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfilePrompt.xib; sourceTree = "<group>"; };
+		7C312D1A18E7EDAB00D651A0 /* ProfilePromptViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilePromptViewController.h; sourceTree = "<group>"; };
+		7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfilePromptViewController.m; sourceTree = "<group>"; };
 		7C3F723418E3658E00898E5A /* GameListSection.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListSection.java; sourceTree = "<group>"; };
 		7C3F723618E36D6700898E5A /* AbstractGameListListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractGameListListener.java; sourceTree = "<group>"; };
 		7C3F723718E36D6700898E5A /* GameListListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListListener.java; sourceTree = "<group>"; };
@@ -296,12 +301,12 @@
 				7C1F83C11868110B00D66C78 /* QuartzCore.framework in Frameworks */,
 				7C1F83BF1868110400D66C78 /* libxml2.dylib in Frameworks */,
 				7C1F83BD186810FC00D66C78 /* CoreImage.framework in Frameworks */,
-				7C2F3CB018E527A6005E64E1 /* FirebaseSimpleLogin.framework in Frameworks */,
+				7C312D1718E796A200D651A0 /* FirebaseSimpleLogin.framework in Frameworks */,
 				7C1F83BB186810F700D66C78 /* CoreText.framework in Frameworks */,
 				7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */,
 				7C2E648F1864216F00D34AD0 /* Security.framework in Frameworks */,
-				7C2F3CAE18E52798005E64E1 /* Parse.framework in Frameworks */,
 				7C2E648D1864216900D34AD0 /* CFNetwork.framework in Frameworks */,
+				7C312D1518E7969600D651A0 /* Parse.framework in Frameworks */,
 				7C2E648B1864216200D34AD0 /* libc++.dylib in Frameworks */,
 				7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */,
 				7C2E640218641F3500D34AD0 /* Foundation.framework in Frameworks */,
@@ -387,8 +392,8 @@
 		7C2E640018641F3500D34AD0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7C2F3CAF18E527A6005E64E1 /* FirebaseSimpleLogin.framework */,
-				7C2F3CAD18E52798005E64E1 /* Parse.framework */,
+				7C312D1618E796A200D651A0 /* FirebaseSimpleLogin.framework */,
+				7C312D1418E7969600D651A0 /* Parse.framework */,
 				7C2F3CA918E4845D005E64E1 /* StoreKit.framework */,
 				7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */,
 				7C2F3CA518E48446005E64E1 /* libz.dylib */,
@@ -465,6 +470,9 @@
 				7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */,
 				7CCD446D18DF41350023F1CA /* LoginHelper.h */,
 				7CCD446E18DF41350023F1CA /* LoginHelper.m */,
+				7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */,
+				7C312D1A18E7EDAB00D651A0 /* ProfilePromptViewController.h */,
+				7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -693,6 +701,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7C312D1918E7E58C00D651A0 /* ProfilePrompt.xib in Resources */,
 				7C1F83C71868115E00D66C78 /* x.svg in Resources */,
 				7C2E641818641F3500D34AD0 /* Main_iPad.storyboard in Resources */,
 				7CF4F81818D5775D00FC8F9E /* removeCommand.wav in Resources */,
@@ -804,6 +813,7 @@
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C3F723518E3658E00898E5A /* GameListSection.java in Sources */,
 				7C92C02A18920FD800DF8816 /* Clock.java in Sources */,
+				7C312D1D18E7EDAB00D651A0 /* ProfilePromptViewController.m in Sources */,
 				7C0444D518B73124006275CA /* ActionTree.java in Sources */,
 				7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */,
 				7C8EF76418668E120075D0C1 /* MutableData.java in Sources */,

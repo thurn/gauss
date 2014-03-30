@@ -1,4 +1,7 @@
 #import "EmailInviteViewController.h"
+#import <Parse/Parse.h>
+#import "java/util/HashMap.h"
+#import "GameViewController.h"
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(strong,nonatomic) NTSModel *model;
@@ -6,6 +9,8 @@
 @property(weak, nonatomic) IBOutlet UITextView *message;
 @property(weak, nonatomic) IBOutlet UIButton *doneEditingButton;
 @property(nonatomic) int viewDeltaY;
+@property (weak, nonatomic) IBOutlet UILabel *urlLabel;
+@property(weak, nonatomic) IBOutlet UIButton *sendButton;
 @end
 
 @implementation EmailInviteViewController
@@ -18,10 +23,8 @@
                                                     alpha:1.0] CGColor];
   _message.layer.borderWidth = 1;
   _message.layer.cornerRadius = 5;
-  
-  _message.text = [NSString stringWithFormat: @"Invitation to play noughts\n\n"
-      @"You've been invited to a game of noughts! To accept this invitation, go here:\n\n"
-      @"http://noughts.thurn.ca/open?id=%@", _preliminaryGameId];
+  _urlLabel.text = [NSString stringWithFormat:@"http://noughts.thurn.ca/open?\nid=%@",
+                    _preliminaryGameId];
   
   UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]
                                         initWithTarget:self
@@ -75,7 +78,7 @@
   }];
 }
 
-- (void)textViewDidBeginEditing:(UITextField *)textField {
+- (void)textViewDidBeginEditing:(UITextView *)textView {
   if (_viewDeltaY == 0) {
     _viewDeltaY = [self viewAnimationDelta];
     [self animateViewByDeltaY:-_viewDeltaY];
@@ -83,6 +86,10 @@
       _doneEditingButton.alpha = 1.0;
     }];
   }
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+  _sendButton.enabled = [_toEmail.text rangeOfString:@"@"].location != NSNotFound;
 }
 
 - (int)viewAnimationDelta {
@@ -103,7 +110,27 @@
   [UIView commitAnimations];
 }
 
-- (IBAction)onSendClicked {
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+  NSString *gameId = [_model newGameWithJavaUtilMap:[JavaUtilHashMap new]
+                                       withNSString:_preliminaryGameId];
+  NSDictionary *params = @{@"message": _message.text,
+                           @"email": _toEmail.text,
+                           @"gameId": gameId};
+  [PFCloud callFunctionInBackground:@"emailInvite"
+                     withParameters:params
+                              block:^(id result, NSError *error) {
+                                if (error) {
+                                  [[[UIAlertView alloc]
+                                    initWithTitle:@"Error"
+                                    message:@"Error sending email"
+                                    delegate:nil
+                                    cancelButtonTitle:@"Ok"
+                                    otherButtonTitles:nil] show];
+                                }
+                              }];
+  GameViewController *gameViewController = (GameViewController*)segue.destinationViewController;
+  [gameViewController setNTSModel:_model];
+  gameViewController.currentGameId = gameId;
 }
 
 @end

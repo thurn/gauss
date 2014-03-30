@@ -494,7 +494,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="onSendClicked" destination="wS2-Rw-cTG" eventType="touchUpInside" id="Wfh-FH-QId"/>
+                                    <segue destination="kaa-M7-0XV" kind="push" id="O7D-OE-lDw"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="To:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mVo-g4-esX">
@@ -508,7 +508,7 @@
                                 <rect key="frame" x="144" y="136" width="574" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="28"/>
-                                <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
+                                <textInputTraits key="textInputTraits" keyboardType="emailAddress" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="wS2-Rw-cTG" id="a9N-J6-Elq"/>
                                 </connections>
@@ -520,17 +520,15 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s9a-FU-fNm">
-                                <rect key="frame" x="40" y="282" width="688" height="300"/>
+                                <rect key="frame" x="40" y="282" width="688" height="200"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="300" id="Yhn-ch-0Nm"/>
+                                    <constraint firstAttribute="height" constant="200" id="Yhn-ch-0Nm"/>
                                 </constraints>
-                                <string key="text">Invitation to play noughts
+                                <string key="text">Invitation to play noughts:
 
-You've been invited to a game of noughts! To accept this invitation, go here:
-
-http://noughts.thurn.ca/open?id={gameid}</string>
+You've been invited to a game of noughts! To accept this invitation, go here:</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
@@ -548,6 +546,12 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                                     <action selector="onDoneClicked" destination="wS2-Rw-cTG" eventType="touchUpInside" id="jrs-vY-8Lj"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="http://noughts.thurn.ca/open?id={gameid}" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="688" translatesAutoresizingMaskIntoConstraints="NO" id="NmI-Py-24u">
+                                <rect key="frame" x="40" y="512" width="688" height="36"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
@@ -559,19 +563,25 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="QBc-Dg-1hI" secondAttribute="leading" constant="50" id="RF5-uy-KIm"/>
                             <constraint firstAttribute="trailing" secondItem="zcB-gd-hQ1" secondAttribute="trailing" constant="50" id="UK3-cX-YLB"/>
                             <constraint firstAttribute="centerX" secondItem="CDq-4B-T4s" secondAttribute="centerX" id="Uss-Xa-5aA"/>
+                            <constraint firstItem="NmI-Py-24u" firstAttribute="top" secondItem="s9a-FU-fNm" secondAttribute="bottom" constant="30" id="V5A-ZC-fbO"/>
                             <constraint firstItem="Vf8-wc-hFc" firstAttribute="baseline" secondItem="iND-8D-TXY" secondAttribute="baseline" id="h1Z-05-1fD"/>
                             <constraint firstAttribute="trailing" secondItem="s9a-FU-fNm" secondAttribute="trailing" constant="40" id="jwS-yu-VCt"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="iND-8D-TXY" secondAttribute="leading" id="lT6-y2-rBY"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="top" secondItem="hTC-ll-1Xt" secondAttribute="bottom" constant="66" id="nng-2M-moJ"/>
+                            <constraint firstItem="NmI-Py-24u" firstAttribute="leading" secondItem="s9a-FU-fNm" secondAttribute="leading" id="rTf-pe-MMs"/>
                             <constraint firstItem="s9a-FU-fNm" firstAttribute="top" secondItem="iND-8D-TXY" secondAttribute="bottom" constant="20" id="wF7-Dt-tQ2"/>
                             <constraint firstItem="Vf8-wc-hFc" firstAttribute="trailing" secondItem="zcB-gd-hQ1" secondAttribute="trailing" id="wwU-js-y3Y"/>
+                            <constraint firstItem="NmI-Py-24u" firstAttribute="trailing" secondItem="s9a-FU-fNm" secondAttribute="trailing" id="xXQ-Nx-8mb"/>
+                            <constraint firstAttribute="centerX" secondItem="NmI-Py-24u" secondAttribute="centerX" id="zp2-db-DJs"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Invite" id="LlP-kv-EgY"/>
                     <connections>
                         <outlet property="doneEditingButton" destination="Vf8-wc-hFc" id="Bog-UU-yRC"/>
                         <outlet property="message" destination="s9a-FU-fNm" id="vgP-MJ-8rr"/>
+                        <outlet property="sendButton" destination="CDq-4B-T4s" id="doS-vr-mwL"/>
                         <outlet property="toEmail" destination="zcB-gd-hQ1" id="guW-I8-XNh"/>
+                        <outlet property="urlLabel" destination="NmI-Py-24u" id="q6W-fk-GWc"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9E3-B7-4J8" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -760,6 +770,6 @@ http://noughts.thurn.ca/open?id={gameid}</string>
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="kOt-q3-VgL"/>
+        <segue reference="O7D-OE-lDw"/>
     </inferredMetricsTieBreakers>
 </document>

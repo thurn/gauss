@@ -494,7 +494,7 @@
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="onSendClicked" destination="wS2-Rw-cTG" eventType="touchUpInside" id="Wfh-FH-QId"/>
+                                    <segue destination="kaa-M7-0XV" kind="push" id="Neh-fe-xho"/>
                                 </connections>
                             </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="To:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mVo-g4-esX">
@@ -508,7 +508,7 @@
                                 <rect key="frame" x="56" y="93" width="239" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
+                                <textInputTraits key="textInputTraits" returnKeyType="done" enablesReturnKeyAutomatically="YES"/>
                                 <connections>
                                     <outlet property="delegate" destination="wS2-Rw-cTG" id="a9N-J6-Elq"/>
                                 </connections>
@@ -520,17 +520,15 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s9a-FU-fNm">
-                                <rect key="frame" x="20" y="174" width="280" height="150"/>
+                                <rect key="frame" x="20" y="174" width="280" height="100"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="150" id="Yhn-ch-0Nm"/>
+                                    <constraint firstAttribute="height" constant="100" id="Yhn-ch-0Nm"/>
                                 </constraints>
-                                <string key="text">Invitation to play noughts
+                                <string key="text">Invitation to play noughts:
 
-You've been invited to a game of noughts! To accept this invitation, go here:
-
-http://noughts.thurn.ca/open?id={gameid}</string>
+You've been invited to a game of noughts! To accept this invitation, go here:</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
@@ -547,18 +545,29 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                                     <action selector="onDoneClicked" destination="wS2-Rw-cTG" eventType="touchUpInside" id="jrs-vY-8Lj"/>
                                 </connections>
                             </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="http://noughts.thurn.ca/open?id={gameid}" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="93D-xv-1ry">
+                                <rect key="frame" x="20" y="284" width="280" height="41"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="zcB-gd-hQ1" firstAttribute="leading" secondItem="mVo-g4-esX" secondAttribute="trailing" constant="8" id="0nZ-kc-9ag"/>
+                            <constraint firstItem="93D-xv-1ry" firstAttribute="top" secondItem="s9a-FU-fNm" secondAttribute="bottom" constant="10" id="0rD-ka-wtG"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="centerY" secondItem="zcB-gd-hQ1" secondAttribute="centerY" id="4F6-7Q-Unv"/>
                             <constraint firstItem="s9a-FU-fNm" firstAttribute="leading" secondItem="QBc-Dg-1hI" secondAttribute="leading" constant="20" id="6gR-MQ-z2i"/>
                             <constraint firstItem="iND-8D-TXY" firstAttribute="top" secondItem="mVo-g4-esX" secondAttribute="bottom" constant="25" id="9uc-md-o4X"/>
+                            <constraint firstItem="93D-xv-1ry" firstAttribute="leading" secondItem="s9a-FU-fNm" secondAttribute="leading" id="Egj-j6-oiZ"/>
                             <constraint firstItem="B2D-Yi-Jus" firstAttribute="top" secondItem="CDq-4B-T4s" secondAttribute="bottom" constant="20" id="Pru-4n-lL1"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="QBc-Dg-1hI" secondAttribute="leading" constant="25" id="RF5-uy-KIm"/>
                             <constraint firstAttribute="trailing" secondItem="zcB-gd-hQ1" secondAttribute="trailing" constant="25" id="UK3-cX-YLB"/>
                             <constraint firstAttribute="centerX" secondItem="CDq-4B-T4s" secondAttribute="centerX" id="Uss-Xa-5aA"/>
+                            <constraint firstItem="93D-xv-1ry" firstAttribute="trailing" secondItem="s9a-FU-fNm" secondAttribute="trailing" id="YoS-UK-gFB"/>
                             <constraint firstItem="Vf8-wc-hFc" firstAttribute="baseline" secondItem="iND-8D-TXY" secondAttribute="baseline" id="h1Z-05-1fD"/>
+                            <constraint firstAttribute="centerX" secondItem="93D-xv-1ry" secondAttribute="centerX" id="hGL-PI-7gR"/>
                             <constraint firstAttribute="trailing" secondItem="s9a-FU-fNm" secondAttribute="trailing" constant="20" id="jwS-yu-VCt"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="leading" secondItem="iND-8D-TXY" secondAttribute="leading" id="lT6-y2-rBY"/>
                             <constraint firstItem="mVo-g4-esX" firstAttribute="top" secondItem="hTC-ll-1Xt" secondAttribute="bottom" constant="33" id="nng-2M-moJ"/>
@@ -570,7 +579,9 @@ http://noughts.thurn.ca/open?id={gameid}</string>
                     <connections>
                         <outlet property="doneEditingButton" destination="Vf8-wc-hFc" id="Bog-UU-yRC"/>
                         <outlet property="message" destination="s9a-FU-fNm" id="vgP-MJ-8rr"/>
+                        <outlet property="sendButton" destination="CDq-4B-T4s" id="qIa-te-vbl"/>
                         <outlet property="toEmail" destination="zcB-gd-hQ1" id="guW-I8-XNh"/>
+                        <outlet property="urlLabel" destination="93D-xv-1ry" id="Gbg-Y8-Nqg"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9E3-B7-4J8" userLabel="First Responder" sceneMemberID="firstResponder"/>

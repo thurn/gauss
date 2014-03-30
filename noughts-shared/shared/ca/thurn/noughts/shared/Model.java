@@ -166,7 +166,11 @@ public class Model extends AbstractChildEventListener {
     if (games.containsKey(gameId)) {
       Game game = games.get(gameId);
       listener.onGameUpdate(game);
-      listener.onGameStatusChanged(Games.gameStatus(game));
+      if (Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
+        listener.onGameStatusChanged(Games.gameStatus(game));
+      } else {
+        listener.onProfileRequired(game);
+      }
     }
   }
   
@@ -254,8 +258,12 @@ public class Model extends AbstractChildEventListener {
         gameListener.onGameUpdate(game);
       }
       if (oldGame == null || Games.differentStatus(game, oldGame)) {
-        gameListener.onGameStatusChanged(Games.gameStatus(game));              
-      }      
+        if (Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
+          gameListener.onGameStatusChanged(Games.gameStatus(game));              
+        } else {
+          gameListener.onProfileRequired(game);
+        }
+      }
     }
     if (commandUpdateListeners.containsKey(gameId)) {
       CommandUpdateListener listener = commandUpdateListeners.get(gameId);
@@ -607,7 +615,10 @@ public class Model extends AbstractChildEventListener {
    * @param game Game to check.
    */
   public void handleComputerAction(final Game game) {
-    if (game.isGameOver() || isComputerThinking) return;
+    if (game.isGameOver() || isComputerThinking ||
+        !Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
+      return;
+    }
     Profile currentProfile = Games.playerProfile(game, game.getCurrentPlayerNumber());
     if (currentProfile.isComputerPlayer()) {
       isComputerThinking = true;

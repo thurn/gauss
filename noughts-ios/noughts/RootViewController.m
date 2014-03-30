@@ -5,6 +5,7 @@
 #import "GameViewController.h"
 #import "AppDelegate.h"
 #import "LoginHelper.h"
+#import "ProfilePromptViewController.h"
 
 @interface RootViewController ()
 @property(weak,nonatomic) IBOutlet UIButton *savedGamesButton;
@@ -54,6 +55,9 @@
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
                                withFCFirebase:firebase];
+  
+  ProfilePromptViewController *ppvc = [ProfilePromptViewController new];
+  [self presentViewController:ppvc animated:YES completion:nil];
 //  _loginHelper = [[LoginHelper alloc] initWithFirebase:firebase];  
 //  if (FBSession.activeSession.state == FBSessionStateOpen) {
 //    [_loginHelper loginViaFacebook:^(NSString *userId) {

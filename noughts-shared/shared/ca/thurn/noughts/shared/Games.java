@@ -20,9 +20,7 @@ public class Games {
   public static final ImageString GAME_OVER_IMAGE_STRING = 
       ImageString.newBuilder().setString("game_over").setType(ImageType.LOCAL).build();
   public static final ImageString NO_OPPONENT_IMAGE_STRING = 
-      ImageString.newBuilder().setString("no_opponent").setType(ImageType.LOCAL).build();
-  public static final ImageString ANONYMOUS_OPPONENT_IMAGE_STRING =
-      ImageString.newBuilder().setString("anonymous_opponent").setType(ImageType.LOCAL).build();
+      ImageString.newBuilder().setString("no_opponent_40").setType(ImageType.LOCAL).build();
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
   private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
@@ -61,13 +59,16 @@ public class Games {
    *     number.
    */
   public static GameStatus gameStatus(Game game) {
+    if (!playerHasProfile(game, game.getCurrentPlayerNumber())) {
+      throw new IllegalStateException("Can't get game status, current player has no profile");
+    }
     if (game.isGameOver()) {
       if (game.getVictorCount() == 1) {
         int winnerNumber = game.getVictor(0);
         Profile winnerProfile = playerProfile(game, winnerNumber);
         String winner = winnerProfile.getName();
         ImageString imageString = winnerProfile.hasImageString() ?
-            winnerProfile.getImageString() : ANONYMOUS_OPPONENT_IMAGE_STRING;  
+            winnerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;  
         return GameStatus.newBuilder()
             .setStatusString(winner + " won the game!")
             .setStatusImageString(imageString)
@@ -84,7 +85,7 @@ public class Games {
     } else {
       Profile currentPlayerProfile = playerProfile(game, game.getCurrentPlayerNumber());
       ImageString imageString = currentPlayerProfile.hasImageString() ?
-          currentPlayerProfile.getImageString() : ANONYMOUS_OPPONENT_IMAGE_STRING;
+          currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;
       return GameStatus.newBuilder()
           .setStatusString(currentPlayerProfile.getName() + "'s turn")
           .setStatusImageString(imageString)
@@ -129,22 +130,32 @@ public class Games {
   }
 
   /**
+   * @param game The game.
    * @param playerNumber A player number currently in this game.
    * @return The Profile object for that player, with local profiles taking
    *     precedence over regular profiles.
    * @throws IllegalArgumentException If there is no profile for this player.
    */
   static Profile playerProfile(Game game, int playerNumber) {
-    if (hasLocalProfile(game, playerNumber)) {
-      return game.getLocalProfile(playerNumber);
-    }
-    Profile result = game.getProfile(playerIdFromPlayerNumber(game, playerNumber));
-    if (result != null) {
-      return result;
-    } else {
+    if (!playerHasProfile(game, playerNumber)) {
       throw new IllegalArgumentException("No profile for player " + playerNumber);
     }
-  }  
+    if (hasLocalProfile(game, playerNumber)) {
+      return game.getLocalProfile(playerNumber);
+    } else {
+      return game.getProfile(playerIdFromPlayerNumber(game, playerNumber));
+    }
+  }
+
+  /**
+   * @param game The game.
+   * @param playerNumber A player number current in this game.
+   * @return True if the provided player has a profile in this game.
+   */
+  static boolean playerHasProfile(Game game, int playerNumber) {
+    return hasLocalProfile(game, playerNumber) ||
+        game.hasProfile(playerIdFromPlayerNumber(game, playerNumber));
+  }
 
   /**
    * @param playerNumber A player's player number

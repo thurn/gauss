@@ -64,9 +64,6 @@
     _submitCallout.title = @"Hit submit";
     _submitCallout.subtitle = @"to confirm";
     _submitCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
-
-    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-    }
     
     _gameMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
     UIImage *gameMenuIcon = [UIImage imageNamed:@"ic_game_menu.png"];
