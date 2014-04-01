@@ -142,7 +142,7 @@ public class Model extends AbstractChildEventListener {
    */
   public boolean isCurrentPlayer(Game game) {
     if (game.isGameOver()) return false;
-    return Games.currentPlayerId(game).equals(userId);
+    return Games.currentPlayerId(game) != null && Games.currentPlayerId(game).equals(userId);
   }
 
   /**
@@ -165,12 +165,7 @@ public class Model extends AbstractChildEventListener {
     gameUpdateListeners.put(gameId, listener);
     if (games.containsKey(gameId)) {
       Game game = games.get(gameId);
-      listener.onGameUpdate(game);
-      if (Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
-        listener.onGameStatusChanged(Games.gameStatus(game));
-      } else {
-        listener.onProfileRequired(game);
-      }
+      fireListeners(game, null);
     }
   }
   
@@ -223,7 +218,7 @@ public class Model extends AbstractChildEventListener {
           Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
           Game oldGame = games.get(game.getId());
           games.put(game.getId(), game);
-          fireListeners(snapshot, oldGame);
+          fireListeners(game, oldGame);
         }
       }
     };
@@ -242,8 +237,7 @@ public class Model extends AbstractChildEventListener {
     }
   }
 
-  private Game fireListeners(DataSnapshot snapshot, Game oldGame) {
-    Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+  private Game fireListeners(Game game, Game oldGame) {
     String gameId = game.getId();
     if (gameListListener != null) {
       if (oldGame == null) {
@@ -257,12 +251,11 @@ public class Model extends AbstractChildEventListener {
       if (oldGame == null || !game.equals(oldGame)) {
         gameListener.onGameUpdate(game);
       }
-      if (oldGame == null || Games.differentStatus(game, oldGame)) {
-        if (Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
-          gameListener.onGameStatusChanged(Games.gameStatus(game));              
-        } else {
-          gameListener.onProfileRequired(game);
-        }
+      if (profileRequired(game)) {
+        gameListener.onProfileRequired(game);
+      }
+      if (gameStatusRequired(game, oldGame)) {
+        gameListener.onGameStatusChanged(Games.gameStatus(game));
       }
     }
     if (commandUpdateListeners.containsKey(gameId)) {
@@ -295,6 +288,33 @@ public class Model extends AbstractChildEventListener {
     }
     return game;
   }
+  
+  /**
+   * @param game Current game state.
+   * @param oldGame Previous game state.
+   * @return True if the transition between these two game states should result
+   *     in a game status change notification.
+   */
+  private boolean gameStatusRequired(Game game, Game oldGame) {
+    return (oldGame == null || Games.differentStatus(game, oldGame)) &&
+        (game.isGameOver() || Games.playerHasProfile(game, game.getCurrentPlayerNumber()));
+  }
+  
+  /**
+   * @param game A game.
+   * @return True if the viewer is a player in this game and does not have a
+   *     profile yet.
+   */
+  private boolean profileRequired(Game game) {
+    if (game.isGameOver()) return false;
+    List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
+    for (int i : playerNumbers) {
+      if (!Games.playerHasProfile(game, i)) {
+        return true;
+      }
+    }
+    return false;
+  }  
   
   /**
    * @return The current {@link GameListPartitions} for this model.
@@ -383,6 +403,29 @@ public class Model extends AbstractChildEventListener {
     Firebase userRef = userReference().child("games").child(game.getId());
     userRef.setValue(true);
     return game.getId();
+  }
+  
+  /**
+   * Sets a profile for the current player.
+   *
+   * @param game The game.
+   * @param profile The profile.
+   * @param onComplete Completion callback.
+   * @throws RuntimeException if the user already has a profile.
+   */
+  public void setProfileForViewer(Game game, final Profile profile,
+      final OnMutationCompleted onComplete) {
+    if (game.hasProfile(userId)) die("User already has a profile.");
+    GameMutation mutation = new GameMutation() {
+      @Override public void mutate(Game.Builder game) {
+        game.putProfile(userId, profile);
+      }
+      
+      @Override public void onComplete(Game game) {
+        onComplete.onMutationCompleted(game);
+      }
+    };
+    mutateGame(game, mutation, true /* abortOnConflict */);
   }
   
   /**
@@ -523,7 +566,7 @@ public class Model extends AbstractChildEventListener {
    *     which can be undone.
    */  
   public boolean canUndo(Game game) {
-    if (game == null || !game.hasCurrentAction()) return false;
+    if (game == null || !game.hasCurrentAction() || !isCurrentPlayer(game)) return false;
     return game.getCurrentAction().getCommandCount() > 0;    
   }
   
@@ -535,7 +578,7 @@ public class Model extends AbstractChildEventListener {
    *     current action of "game" and thus can be redone.
    */  
   public boolean canRedo(Game game) {
-    if (game == null || !game.hasCurrentAction()) return false;
+    if (game == null || !game.hasCurrentAction() || !isCurrentPlayer(game)) return false;
     return game.getCurrentAction().getFutureCommandCount() > 0;    
   }
   
@@ -547,7 +590,7 @@ public class Model extends AbstractChildEventListener {
    *     submitted. 
    */
   public boolean canSubmit(Game game) {
-    if (game == null || !game.hasCurrentAction()) return false;
+    if (game == null || !game.hasCurrentAction() || !isCurrentPlayer(game)) return false;
     Action action = game.getCurrentAction();
     if (action.getCommandCount() == 0) return false;
     for (Command command : action.getCommandList()) {
@@ -615,7 +658,7 @@ public class Model extends AbstractChildEventListener {
    * @param game Game to check.
    */
   public void handleComputerAction(final Game game) {
-    if (game.isGameOver() || isComputerThinking ||
+    if (!game.hasCurrentPlayerNumber() || isComputerThinking ||
         !Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
       return;
     }
@@ -745,6 +788,29 @@ public class Model extends AbstractChildEventListener {
     if (!game.isGameOver()) die("Can't archive a game which is in progress");
     userReference().child("games").child(game.getId()).removeValue();
     games.remove(game.getId());
+  }
+  
+  /**
+   * Subscribes the viewer to the provided game ID. This does NOT make them a
+   * player in the game, it merely adds the game to their game list.
+   *
+   * @param gameId Game ID to subscribe to.
+   */
+  public void subscribeViewerToGame(String gameId) {
+    userReference().child("games").child(gameId).setValue(true);
+  }
+  
+  public void joinGameIfPossible(Game game) {
+    if (!(game.isGameOver()) && game.getPlayerCount() < 2 &&
+        !game.getPlayerList().contains(userId)) {
+      GameMutation mutation = new GameMutation() {
+        @Override
+        public void mutate(Game.Builder game) {
+          game.addPlayer(userId);
+        }
+      };
+      mutateGame(game, mutation, true /* abortOnConflict */);
+    }
   }
   
   /**

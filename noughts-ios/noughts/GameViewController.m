@@ -11,6 +11,8 @@
 #import "java/lang/Integer.h"
 #import "ImageString.h"
 #import "NewLocalGameViewController.h"
+#import "ProfilePromptViewController.h"
+#import "AppDelegate.h"
 
 @interface GameViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
@@ -29,6 +31,7 @@
 
 - (void)loadView {
   [super loadView];
+  _model = [AppDelegate getModel];
   GameView *view = [GameView new];
   view.delegate = self;
   [view setGameCanvasDelegate:self];
@@ -36,26 +39,8 @@
   _gameView = view;
 }
 
-- (void)setNTSModel:(NTSModel *)model {
-  _model = model;
-}
-
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
-  if (_model) {
-    [_model setGameUpdateListenerWithNSString:_currentGameId
-                    withNTSGameUpdateListener:self];
-    [_model setCommandUpdateListenerWithNSString:_currentGameId
-                    withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
-  } else {
-    UIAlertView *alert = [[UIAlertView alloc]
-                          initWithTitle:@"ERROR"
-                          message:@"Not logged in yet!"
-                          delegate:nil
-                          cancelButtonTitle:@"Ok"
-                          otherButtonTitles:nil];
-    [alert show];
-  }
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -63,6 +48,10 @@
   if (_tutorialMode) {
     [_gameView showTapSquareCallout];
   }
+  [_model setGameUpdateListenerWithNSString:_currentGameId
+                  withNTSGameUpdateListener:self];
+  [_model setCommandUpdateListenerWithNSString:_currentGameId
+                  withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
 }
 
 - (void)displayGameStatus:(NTSGameStatus*)status {
@@ -130,9 +119,7 @@
         // Add new game controller to back stack
         newGameController =
             [self.storyboard instantiateViewControllerWithIdentifier:@"NewGameViewController"];
-        [newGameController setNTSModel:_model];
-        UIViewController *rootController =
-            [self.navigationController.viewControllers objectAtIndex:0];
+        UIViewController *rootController = self.navigationController.viewControllers[0];
         [self.navigationController setViewControllers:@[rootController, newGameController, self]
                                              animated:NO];
       }
@@ -147,9 +134,7 @@
         // Add saved games controller to back stack
         savedGamesController =
             [self.storyboard instantiateViewControllerWithIdentifier:@"SavedGamesViewController"];
-        [savedGamesController setNTSModel:_model];
-        UIViewController *rootController =
-            [self.navigationController.viewControllers objectAtIndex:0];
+        UIViewController *rootController = self.navigationController.viewControllers[0];
         [self.navigationController setViewControllers:@[rootController, savedGamesController, self]
                                              animated:NO];
       }
@@ -207,12 +192,14 @@
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
   _currentGame = game;
+  [_model joinGameIfPossibleWithNTSGame:game];
   [_model handleComputerActionWithNTSGame:_currentGame];
   [_gameView drawGame:game];
 }
 
 - (void)onProfileRequiredWithNTSGame:(NTSGame*)game {
-  NSLog(@"onProfileRequired");
+  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGame:game];
+  [self presentViewController:ppvc animated:YES completion:nil];
 }
 
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {

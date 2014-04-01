@@ -1,13 +1,11 @@
-//
-//  ProfilePromptViewController.h
-//  noughts
-//
-//  Created by Derek Thurn on 3/29/14.
-//  Copyright (c) 2014 Derek Thurn. All rights reserved.
-//
-
 #import <UIKit/UIKit.h>
+#import "Game.h"
+
+FOUNDATION_EXPORT NSString *const kPlayerLocalNameKey;
+
+@protocol ProfilePromptViewControllerDelegate
+@end
 
 @interface ProfilePromptViewController : UIViewController
-
+- (id)initWithGame:(NTSGame*)game;
 @end

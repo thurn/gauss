@@ -2,9 +2,9 @@
 #import <Parse/Parse.h>
 #import "java/util/HashMap.h"
 #import "GameViewController.h"
+#import "AppDelegate.h"
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
-@property(strong,nonatomic) NTSModel *model;
 @property(weak, nonatomic) IBOutlet UITextField *toEmail;
 @property(weak, nonatomic) IBOutlet UITextView *message;
 @property(weak, nonatomic) IBOutlet UIButton *doneEditingButton;
@@ -39,10 +39,6 @@
                                                name:UIKeyboardWillHideNotification
                                              object:nil];
   [self.view addGestureRecognizer:recognizer];
-}
-
-- (void)setNTSModel:(NTSModel *)model {
-  _model = model;
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -111,7 +107,8 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-  NSString *gameId = [_model newGameWithJavaUtilMap:[JavaUtilHashMap new]
+  NTSModel *model = [AppDelegate getModel];
+  NSString *gameId = [model newGameWithJavaUtilMap:[JavaUtilHashMap new]
                                        withNSString:_preliminaryGameId];
   NSDictionary *params = @{@"message": _message.text,
                            @"email": _toEmail.text,
@@ -129,7 +126,6 @@
                                 }
                               }];
   GameViewController *gameViewController = (GameViewController*)segue.destinationViewController;
-  [gameViewController setNTSModel:_model];
   gameViewController.currentGameId = gameId;
 }
 

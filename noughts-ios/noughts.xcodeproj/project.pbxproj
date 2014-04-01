@@ -232,7 +232,6 @@
 		7C58BE1218C1BD4D008D2C9D /* Games.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Games.java; sourceTree = "<group>"; };
 		7C58BE1F18C24DC9008D2C9D /* GameStatus.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameStatus.java; sourceTree = "<group>"; };
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
-		7C69CD3B18790B600040AD75 /* HasModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HasModel.h; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
 		7C7C6A3318D02B380086CFC5 /* Entity.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Entity.java; sourceTree = "<group>"; };
@@ -448,7 +447,6 @@
 				7C2C3455186A858200AD04F7 /* NewGameViewController.m */,
 				7C72157D186F232500F1188B /* GameListViewController.h */,
 				7C72157E186F232500F1188B /* GameListViewController.m */,
-				7C69CD3B18790B600040AD75 /* HasModel.h */,
 				7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */,
 				7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */,
 				7CEB472A18B276A900CDA9EA /* J2obcUtils.h */,

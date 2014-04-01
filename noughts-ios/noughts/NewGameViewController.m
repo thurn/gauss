@@ -1,20 +1,14 @@
 #import "NewGameViewController.h"
 #import "NewLocalGameViewController.h"
-#import "HasModel.h"
 #import <FacebookSDK/FacebookSDK.h>
 #import "QueryParsing.h"
 #import "AppDelegate.h"
 #import "EmailInviteViewController.h"
 
 @interface NewGameViewController ()
-@property(weak,nonatomic) NTSModel* model;
 @end
 
 @implementation NewGameViewController
-
-- (void)setNTSModel:(NTSModel *)model {
-  _model = model;
-}
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -46,12 +40,12 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   UIView *sendingView = sender;
-  [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
   switch (sendingView.tag) {
     case 99: {
       EmailInviteViewController *controller =
           (EmailInviteViewController*)segue.destinationViewController;
-      controller.preliminaryGameId = [_model getPreliminaryGameId];
+      NTSModel *model = [AppDelegate getModel];
+      controller.preliminaryGameId = [model getPreliminaryGameId];
       break;
     }
     case 100: {

@@ -159,7 +159,7 @@ public abstract class Entity<T extends Entity<T>> implements Cloneable {
   }
   
   public static void putSerialized(Map<String, Object> map, String key, Boolean object) {
-    putSerializedObject(map, key, object);
+    putSerializedObject(map, key, object == null ? null : object.toString());
   }
   
   public static void putSerialized(Map<String, Object> map, String key, List<?> list) {
@@ -240,7 +240,8 @@ public abstract class Entity<T extends Entity<T>> implements Cloneable {
     if (!map.containsKey(key) || map.get(key) == null) {
       return false;
     } else {
-      return ((Boolean)map.get(key));
+      String string = (String)map.get(key);
+      return string.equals("true");
     }
   }
   

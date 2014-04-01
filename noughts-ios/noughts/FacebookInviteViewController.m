@@ -4,7 +4,6 @@
 #import "QueryParsing.h"
 
 @interface FacebookInviteViewController ()
-@property(strong,nonatomic) NTSModel *model;
 @end
 
 @implementation FacebookInviteViewController
@@ -58,10 +57,6 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   return 1;
-}
-
-- (void)setNTSModel:(NTSModel *)model {
-  _model = model;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

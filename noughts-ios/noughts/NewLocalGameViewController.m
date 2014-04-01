@@ -4,6 +4,7 @@
 #import "Profile.h"
 #import "ImageString.h"
 #import "ImageType.h"
+#import "AppDelegate.h"
 
 NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
 NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
@@ -18,7 +19,6 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 @property (weak, nonatomic) IBOutlet UIButton *p1Image;
 @property (weak, nonatomic) IBOutlet UIButton *p2Image;
 @property (weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
-@property (weak, nonatomic) NTSModel *model;
 @property (strong, nonatomic) NSArray *playerImages;
 @property (strong, nonatomic) NSArray *computerImages;
 @property (nonatomic) int p1ImageIndex;
@@ -133,10 +133,6 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   return NO;
 }
 
--(void)setNTSModel:(NTSModel *)model {
-  _model = model;
-}
-
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
   return 1;
 }
@@ -234,10 +230,10 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]]];
   }
+  NTSModel *model = [AppDelegate getModel];
   [userDefaults synchronize];
-   NSString *gameId = [_model newLocalMultiplayerGameWithJavaUtilList:
+   NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
                        [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
-  [destination setNTSModel:_model];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

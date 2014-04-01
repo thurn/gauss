@@ -50,6 +50,7 @@ public class Games {
    */
   public static String currentPlayerId(Game game) {
     if (!game.hasCurrentPlayerNumber()) return null;
+    if (game.getCurrentPlayerNumber() >= game.getPlayerCount()) return null;
     return playerIdFromPlayerNumber(game, game.getCurrentPlayerNumber());
   }
   
@@ -59,9 +60,6 @@ public class Games {
    *     number.
    */
   public static GameStatus gameStatus(Game game) {
-    if (!playerHasProfile(game, game.getCurrentPlayerNumber())) {
-      throw new IllegalStateException("Can't get game status, current player has no profile");
-    }
     if (game.isGameOver()) {
       if (game.getVictorCount() == 1) {
         int winnerNumber = game.getVictor(0);
@@ -75,14 +73,23 @@ public class Games {
             .setStatusPlayer(winnerNumber)
             .setIsComputerThinking(false)
             .build();
-      } else {
+      } else if (game.getVictorCount() == 2) {
         return GameStatus.newBuilder()
             .setStatusString("Game drawn.")
             .setStatusImageString(GAME_OVER_IMAGE_STRING)
             .setIsComputerThinking(false)
             .build();
+      } else {
+        return GameStatus.newBuilder()
+          .setStatusString("Game over.")
+          .setStatusImageString(GAME_OVER_IMAGE_STRING)
+          .setIsComputerThinking(false)
+          .build();        
       }
     } else {
+      if (!playerHasProfile(game, game.getCurrentPlayerNumber())) {
+        throw new IllegalStateException("Can't get game status, current player has no profile");
+      }
       Profile currentPlayerProfile = playerProfile(game, game.getCurrentPlayerNumber());
       ImageString imageString = currentPlayerProfile.hasImageString() ?
           currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;
@@ -153,6 +160,7 @@ public class Games {
    * @return True if the provided player has a profile in this game.
    */
   static boolean playerHasProfile(Game game, int playerNumber) {
+    if (playerNumber >= game.getPlayerCount()) return false;
     return hasLocalProfile(game, playerNumber) ||
         game.hasProfile(playerIdFromPlayerNumber(game, playerNumber));
   }
@@ -252,7 +260,11 @@ public class Games {
     else if (hasOpponentProfile(game, viewerId)) {
       return "vs. " + opponentProfile(game, viewerId).getName();
     } else {
-      return "vs. (No Opponent Yet)";
+      if (game.isGameOver()) {
+        return "vs. (No Opponent)";        
+      } else {
+        return "vs. (No Opponent Yet)";
+      }
     }
   }
   
@@ -278,7 +290,8 @@ public class Games {
         } else if (playerNumbers.size() == 1 &&
             game.getVictorList().contains(playerNumbers.get(0))) {
           statusString = "You won";
-        } else if (game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
+        } else if (hasOpponent(game, viewerId) &&
+            game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
           if (hasOpponentProfile(game, viewerId)) {
             Profile opponentProfile = opponentProfile(game, viewerId);
             statusString = Pronouns.getNominativePronoun(

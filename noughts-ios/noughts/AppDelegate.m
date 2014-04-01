@@ -1,5 +1,9 @@
 #import "AppDelegate.h"
 #import <Parse/Parse.h>
+#import "Firebase.h"
+#import "LoginHelper.h"
+#import "GameViewController.h"
+#import "RootViewController.h"
 
 @interface AppDelegate ()
 @property BOOL runningQuery;
@@ -15,6 +19,14 @@
   [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge |
       UIRemoteNotificationTypeAlert |
       UIRemoteNotificationTypeSound];
+
+  FCFirebase *firebase = [[FCFirebase alloc]
+                          initWithNSString:@"https://noughts.firebaseio.com"];
+  NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+  NSString *userId = [LoginHelper sha1:userKey];
+  _model = [[NTSModel alloc] initWithNSString:userId
+                                 withNSString:userKey
+                               withFCFirebase:firebase];
   return YES;
 }
 
@@ -30,72 +42,97 @@
   [PFPush handlePush:userInfo];
 }
 
-//
-//- (BOOL)application:(UIApplication *)application
-//            openURL:(NSURL *)url
-//  sourceApplication:(NSString *)sourceApplication
-//         annotation:(id)annotation {
-//  [FBSession.activeSession setStateChangeHandler:
-//   ^(FBSession *session, FBSessionState state, NSError *error) {
-//     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-//     [appDelegate sessionStateChanged:session state:state error:error];
-//   }];
-//  return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
-//}
-//
-//- (void)sessionStateChanged:(FBSession*)session state:(FBSessionState)state error:(NSError*)error {
-//  if (!error && state == FBSessionStateOpen) {
-//    [self getFacebookFriends];
-//    if (!_friendCache) {
-//      _friendCache = [FBFrictionlessRecipientCache new];
-//    }
-//    [_friendCache prefetchAndCacheForSession:nil];
-//  }
-//}
-//
-//- (void)getFacebookFriends {
-//  if (_friends || _runningQuery) return;
-//  _runningQuery = YES;
-//  NSString *query = @"SELECT uid,mutual_friend_count,name,first_name,sex,is_app_user "
-//                    @"FROM user WHERE uid IN "
-//                    @"( SELECT uid2 FROM friend WHERE uid1=me() )";
-//  NSDictionary *queryParam = @{ @"q": query };
-//  [FBRequestConnection startWithGraphPath:@"/fql"
-//                               parameters:queryParam
-//                               HTTPMethod:@"GET"
-//                        completionHandler:^(FBRequestConnection *connection,
-//                                            id result,
-//                                            NSError *error) {
-//                          if (!error) {
-//                            [self handleFriendsResult:result[@"data"]];
-//                          }
-//                          _runningQuery = NO;
-//                        }];
-//}
-//
-//- (void)handleFriendsResult:(NSArray*)array {
-//  NSSortDescriptor *appUser = [[NSSortDescriptor alloc] initWithKey:@"is_app_user"
-//                                                          ascending:NO];
-//  NSSortDescriptor *mutalFriends = [[NSSortDescriptor alloc] initWithKey:@"mutual_friend_count"
-//                                                               ascending:NO];
-//  _friends = [array sortedArrayUsingDescriptors:@[appUser, mutalFriends]];
-//  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
-//                                           (unsigned long)NULL), ^(void) {
-//    [self populateFriendPhotos];
-//  });
-//}
-//
-//- (void)populateFriendPhotos {
-//  for (NSDictionary *friend in _friends) {
-//    NSURL *photoUrl = [NSURL URLWithString:
-//                       [NSString
-//                        stringWithFormat:
-//                            @"https://graph.facebook.com/%@/picture?width=100&height=100",
-//                        friend[@"uid"]]];
-//    NSData *data = [NSData dataWithContentsOfURL:photoUrl];
-//    _friendPhotos[friend[@"uid"]] = [[UIImage alloc] initWithData:data];
-//  }
-//}
+
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+  if ([[url scheme] isEqualToString:@"noughts"]) {
+    NSArray *paths = [url pathComponents];
+    NSString *gameId = paths[1];
+    [_model subscribeViewerToGameWithNSString:gameId]; 
+    UINavigationController *root =
+        (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
+    RootViewController *mainMenu =
+    [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
+    [root pushViewController:mainMenu animated:NO];
+    GameViewController *gameViewController =
+        [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"GameViewController"];
+    gameViewController.currentGameId = gameId;
+    [root pushViewController:gameViewController animated:YES];
+  }
+  [FBSession.activeSession setStateChangeHandler:
+   ^(FBSession *session, FBSessionState state, NSError *error) {
+     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+     [appDelegate sessionStateChanged:session state:state error:error];
+   }];
+  return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
+}
+
+- (UIStoryboard*)mainStoryboard {
+  NSString *storyboardName = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ?
+      @"Main_iPad" : @"Main_iPhone";
+  return [UIStoryboard storyboardWithName:storyboardName bundle: nil];
+}
+
+- (void)sessionStateChanged:(FBSession*)session state:(FBSessionState)state error:(NSError*)error {
+  if (!error && state == FBSessionStateOpen) {
+    [self getFacebookFriends];
+    if (!_friendCache) {
+      _friendCache = [FBFrictionlessRecipientCache new];
+    }
+    [_friendCache prefetchAndCacheForSession:nil];
+  }
+}
+
+- (void)getFacebookFriends {
+  if (_friends || _runningQuery) return;
+  _runningQuery = YES;
+  NSString *query = @"SELECT uid,mutual_friend_count,name,first_name,sex,is_app_user "
+                    @"FROM user WHERE uid IN "
+                    @"( SELECT uid2 FROM friend WHERE uid1=me() )";
+  NSDictionary *queryParam = @{ @"q": query };
+  [FBRequestConnection startWithGraphPath:@"/fql"
+                               parameters:queryParam
+                               HTTPMethod:@"GET"
+                        completionHandler:^(FBRequestConnection *connection,
+                                            id result,
+                                            NSError *error) {
+                          if (!error) {
+                            [self handleFriendsResult:result[@"data"]];
+                          }
+                          _runningQuery = NO;
+                        }];
+}
+
+- (void)handleFriendsResult:(NSArray*)array {
+  NSSortDescriptor *appUser = [[NSSortDescriptor alloc] initWithKey:@"is_app_user"
+                                                          ascending:NO];
+  NSSortDescriptor *mutalFriends = [[NSSortDescriptor alloc] initWithKey:@"mutual_friend_count"
+                                                               ascending:NO];
+  _friends = [array sortedArrayUsingDescriptors:@[appUser, mutalFriends]];
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
+                                           (unsigned long)NULL), ^(void) {
+    [self populateFriendPhotos];
+  });
+}
+
+- (void)populateFriendPhotos {
+  for (NSDictionary *friend in _friends) {
+    NSURL *photoUrl = [NSURL URLWithString:
+                       [NSString
+                        stringWithFormat:
+                            @"https://graph.facebook.com/%@/picture?width=100&height=100",
+                        friend[@"uid"]]];
+    NSData *data = [NSData dataWithContentsOfURL:photoUrl];
+    _friendPhotos[friend[@"uid"]] = [[UIImage alloc] initWithData:data];
+  }
+}
+
++ (NTSModel*)getModel {
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  return appDelegate.model;
+}
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {

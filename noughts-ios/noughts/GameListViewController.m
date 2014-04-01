@@ -11,6 +11,7 @@
 #import "GameListEntryCell.h"
 #import "GameListListener.h"
 #import "GameListSection.h"
+#import "AppDelegate.h"
 
 @interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener>
 @property(weak,nonatomic) NTSModel *model;
@@ -26,9 +27,12 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  _model = [AppDelegate getModel];
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
   self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
+  [_model setGameListListenerWithNTSGameListListener:self];
+  self.gameListPartitions = [self.model getGameListPartitions];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -38,20 +42,16 @@
   }
 }
 
-- (void)setNTSModel:(NTSModel *)model {
-  self.model = model;
-  [_model setGameListListenerWithNTSGameListListener:self];
-  self.gameListPartitions = [self.model getGameListPartitions];
-}
-
 -(void)onGameAddedWithNTSGame:(NTSGame*)game {
-  [self.tableView beginUpdates];
-  int section = [self sectionNumberForGame:game withViewer:[_model getUserId]];
-  NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
-  [self.tableView insertRowsAtIndexPaths:@[path]
-                        withRowAnimation:UITableViewRowAnimationFade];
-  self.gameListPartitions = [self.model getGameListPartitions];
-  [self.tableView endUpdates];
+  if (self.isViewLoaded && self.view.window) {
+    [self.tableView beginUpdates];
+    int section = [self sectionNumberForGame:game withViewer:[_model getUserId]];
+    NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
+    [self.tableView insertRowsAtIndexPaths:@[path]
+                          withRowAnimation:UITableViewRowAnimationFade];
+    self.gameListPartitions = [self.model getGameListPartitions];
+    [self.tableView endUpdates];
+  }
 }
 
 - (void)onGameChangedWithNTSGame:(NTSGame *)game {
@@ -158,8 +158,8 @@
   GameViewController *controller =
       [self.storyboard instantiateViewControllerWithIdentifier:@"GameViewController"];
   NTSGame *game = [self gameForIndexPath:indexPath];
-  [controller setNTSModel:self.model];
   controller.currentGameId = [game getId];
+  [_model setGameListListenerWithNTSGameListListener:nil];
   [self.navigationController pushViewController:controller animated:YES];
 }
 
