@@ -87,17 +87,26 @@ public class Games {
           .build();        
       }
     } else {
-      if (!playerHasProfile(game, game.getCurrentPlayerNumber())) {
-        throw new IllegalStateException("Can't get game status, current player has no profile");
+      String name = "Opponent";
+      ImageString imageString = NO_OPPONENT_IMAGE_STRING;
+      boolean isComputerPlayer = false;
+      if (playerHasProfile(game, game.getCurrentPlayerNumber())) {
+        Profile currentPlayerProfile = playerProfile(game, game.getCurrentPlayerNumber());
+        if (currentPlayerProfile.hasImageString()) {
+          imageString = currentPlayerProfile.getImageString();
+        }
+        if (currentPlayerProfile.hasName()) {
+          name = currentPlayerProfile.getName();
+        }
+        if (currentPlayerProfile.hasIsComputerPlayer()) {
+          isComputerPlayer = currentPlayerProfile.isComputerPlayer();
+        }
       }
-      Profile currentPlayerProfile = playerProfile(game, game.getCurrentPlayerNumber());
-      ImageString imageString = currentPlayerProfile.hasImageString() ?
-          currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;
       return GameStatus.newBuilder()
-          .setStatusString(currentPlayerProfile.getName() + "'s turn")
+          .setStatusString(name + "'s turn")
           .setStatusImageString(imageString)
           .setStatusPlayer(game.getCurrentPlayerNumber())
-          .setIsComputerThinking(currentPlayerProfile.isComputerPlayer())
+          .setIsComputerThinking(isComputerPlayer)
           .build();
     }
   }  

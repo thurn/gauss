@@ -251,10 +251,10 @@ public class Model extends AbstractChildEventListener {
       if (oldGame == null || !game.equals(oldGame)) {
         gameListener.onGameUpdate(game);
       }
-      if (profileRequired(game)) {
+      if (game != null && !game.equals(oldGame) && profileRequired(game)) {
         gameListener.onProfileRequired(game);
       }
-      if (gameStatusRequired(game, oldGame)) {
+      if (oldGame == null || Games.differentStatus(game, oldGame)) {
         gameListener.onGameStatusChanged(Games.gameStatus(game));
       }
     }
@@ -287,17 +287,6 @@ public class Model extends AbstractChildEventListener {
       }
     }
     return game;
-  }
-  
-  /**
-   * @param game Current game state.
-   * @param oldGame Previous game state.
-   * @return True if the transition between these two game states should result
-   *     in a game status change notification.
-   */
-  private boolean gameStatusRequired(Game game, Game oldGame) {
-    return (oldGame == null || Games.differentStatus(game, oldGame)) &&
-        (game.isGameOver() || Games.playerHasProfile(game, game.getCurrentPlayerNumber()));
   }
   
   /**
@@ -798,6 +787,12 @@ public class Model extends AbstractChildEventListener {
    */
   public void subscribeViewerToGame(String gameId) {
     userReference().child("games").child(gameId).setValue(true);
+  }
+  
+  public void invalidateCommandListener(String gameId) {
+    if (commandUpdateListeners.containsKey(gameId) && games.containsKey(gameId)) {
+      commandUpdateListeners.get(gameId).onRegistered(userId, games.get(gameId));
+    }
   }
   
   public void joinGameIfPossible(Game game) {

@@ -1,9 +1,9 @@
 #import "AppDelegate.h"
 #import <Parse/Parse.h>
 #import "Firebase.h"
-#import "LoginHelper.h"
 #import "GameViewController.h"
 #import "RootViewController.h"
+#import <CommonCrypto/CommonDigest.h>
 
 @interface AppDelegate ()
 @property BOOL runningQuery;
@@ -23,11 +23,28 @@
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio.com"];
   NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-  NSString *userId = [LoginHelper sha1:userKey];
+#if TARGET_IPHONE_SIMULATOR
+  userKey = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? @"Pad" : @"Phone";
+#endif
+
+  NSString *userId = [self sha1:userKey];
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
                                withFCFirebase:firebase];
   return YES;
+}
+
+- (NSString*)sha1:(NSString*)input {
+  const char *cstr = [input cStringUsingEncoding:NSUTF8StringEncoding];
+  NSData *data = [NSData dataWithBytes:cstr length:input.length];
+  uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+  CC_SHA1(data.bytes, (CC_LONG)data.length, digest);
+  NSMutableString* output = [NSMutableString stringWithCapacity:CC_SHA1_DIGEST_LENGTH * 2];
+  
+  for(int i = 0; i < CC_SHA1_DIGEST_LENGTH; i++) {
+    [output appendFormat:@"%02x", digest[i]];
+  }
+  return output;
 }
 
 - (void)application:(UIApplication *)application
@@ -50,7 +67,7 @@
   if ([[url scheme] isEqualToString:@"noughts"]) {
     NSArray *paths = [url pathComponents];
     NSString *gameId = paths[1];
-    [_model subscribeViewerToGameWithNSString:gameId]; 
+    [_model subscribeViewerToGameWithNSString:gameId];
     UINavigationController *root =
         (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
     RootViewController *mainMenu =

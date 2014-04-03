@@ -162,6 +162,10 @@
   return nil;
 }
 
+- (void)invalidateCommandListener {
+  [_model invalidateCommandListenerWithNSString:_currentGameId];
+}
+
 - (NTSCommand*)commandFromX:(int)x fromY:(int)y {
   return [[[[NTSCommand newBuilder]
             setColumnWithInt:x]

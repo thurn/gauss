@@ -54,8 +54,18 @@
      [[UITapGestureRecognizer alloc] initWithTarget:self
                                              action:@selector(handleTap:)]];
     
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self selector:@selector(orientationChanged:)
+     name:UIDeviceOrientationDidChangeNotification
+     object:[UIDevice currentDevice]];
+    
   }
   return self;
+}
+
+- (void) orientationChanged:(NSNotification *)notification {
+  [_delegate invalidateCommandListener];
 }
 
 - (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
@@ -68,7 +78,7 @@
   _topOffset = 80 * scale;
   _sideMargin = (self.frame.size.width - backgroundWidth) / 2;
   _topMargin = (self.frame.size.height - backgroundHeight) / 2;
-  
+
   _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -93,6 +103,14 @@
   float widthRatio = self.frame.size.width / width;
   float heightRatio = self.frame.size.height / height;
   return MIN(widthRatio, heightRatio);
+}
+
+- (int)longEdgeLength {
+  return MAX(self.frame.size.width, self.frame.size.height);
+}
+
+- (int)shortEdgeLength {
+  return MIN(self.frame.size.width, self.frame.size.height);
 }
 
 - (BOOL)belongsToViewer:(NTSAction*) action {
@@ -241,6 +259,8 @@
   AudioServicesDisposeSystemSoundID(_removeCommandSound);
   AudioServicesDisposeSystemSoundID(_submitCommandSound);
   AudioServicesDisposeSystemSoundID(_gameOverSound);
+  [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

@@ -150,7 +150,8 @@
 }
 
 - (CGFloat)statusBarHeight {
-  return [UIApplication sharedApplication].statusBarFrame.size.height;
+  return MIN([UIApplication sharedApplication].statusBarFrame.size.height,
+             [UIApplication sharedApplication].statusBarFrame.size.width);
 }
 
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener {
