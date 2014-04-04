@@ -46,7 +46,7 @@
 		7C2E641218641F3500D34AD0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641118641F3500D34AD0 /* AppDelegate.m */; };
 		7C2E641518641F3500D34AD0 /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641318641F3500D34AD0 /* Main_iPhone.storyboard */; };
 		7C2E641818641F3500D34AD0 /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641618641F3500D34AD0 /* Main_iPad.storyboard */; };
-		7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641A18641F3500D34AD0 /* RootViewController.m */; };
+		7C2E641B18641F3500D34AD0 /* MainMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E641A18641F3500D34AD0 /* MainMenuViewController.m */; };
 		7C2E641D18641F3500D34AD0 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E641C18641F3500D34AD0 /* Images.xcassets */; };
 		7C2E642418641F3500D34AD0 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E642318641F3500D34AD0 /* XCTest.framework */; };
 		7C2E642518641F3500D34AD0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2E640118641F3500D34AD0 /* Foundation.framework */; };
@@ -82,6 +82,7 @@
 		7C58BE1B18C1BD4D008D2C9D /* Pronoun.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1118C1BD4D008D2C9D /* Pronoun.java */; };
 		7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1218C1BD4D008D2C9D /* Games.java */; };
 		7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1F18C24DC9008D2C9D /* GameStatus.java */; };
+		7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C65892B18EDF23D00359B7C /* PushNotificationListener.java */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
 		7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3318D02B380086CFC5 /* Entity.java */; };
@@ -193,8 +194,8 @@
 		7C2E641118641F3500D34AD0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		7C2E641418641F3500D34AD0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
 		7C2E641718641F3500D34AD0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
-		7C2E641918641F3500D34AD0 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
-		7C2E641A18641F3500D34AD0 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		7C2E641918641F3500D34AD0 /* MainMenuViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MainMenuViewController.h; sourceTree = "<group>"; };
+		7C2E641A18641F3500D34AD0 /* MainMenuViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MainMenuViewController.m; sourceTree = "<group>"; };
 		7C2E641C18641F3500D34AD0 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		7C2E642218641F3500D34AD0 /* noughtsTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = noughtsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C2E642318641F3500D34AD0 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -230,6 +231,7 @@
 		7C58BE1118C1BD4D008D2C9D /* Pronoun.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Pronoun.java; sourceTree = "<group>"; };
 		7C58BE1218C1BD4D008D2C9D /* Games.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Games.java; sourceTree = "<group>"; };
 		7C58BE1F18C24DC9008D2C9D /* GameStatus.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameStatus.java; sourceTree = "<group>"; };
+		7C65892B18EDF23D00359B7C /* PushNotificationListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PushNotificationListener.java; sourceTree = "<group>"; };
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
@@ -432,8 +434,8 @@
 				7C2E641118641F3500D34AD0 /* AppDelegate.m */,
 				7C2E641318641F3500D34AD0 /* Main_iPhone.storyboard */,
 				7C2E641618641F3500D34AD0 /* Main_iPad.storyboard */,
-				7C2E641918641F3500D34AD0 /* RootViewController.h */,
-				7C2E641A18641F3500D34AD0 /* RootViewController.m */,
+				7C2E641918641F3500D34AD0 /* MainMenuViewController.h */,
+				7C2E641A18641F3500D34AD0 /* MainMenuViewController.m */,
 				7C2E641C18641F3500D34AD0 /* Images.xcassets */,
 				7C2E640818641F3500D34AD0 /* Supporting Files */,
 				7C8EF7721866B96B0075D0C1 /* GameViewController.h */,
@@ -555,6 +557,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7C65892B18EDF23D00359B7C /* PushNotificationListener.java */,
 				7C3F723618E36D6700898E5A /* AbstractGameListListener.java */,
 				7C3F723718E36D6700898E5A /* GameListListener.java */,
 				7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */,
@@ -772,7 +775,7 @@
 				7C0444DA18B73124006275CA /* Evaluator.java in Sources */,
 				7C0444D318B73124006275CA /* UctSearch.java in Sources */,
 				7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */,
-				7C2E641B18641F3500D34AD0 /* RootViewController.m in Sources */,
+				7C2E641B18641F3500D34AD0 /* MainMenuViewController.m in Sources */,
 				7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */,
 				7C2C3456186A858200AD04F7 /* NewGameViewController.m in Sources */,
 				7C8EF76C18668E120075D0C1 /* ValueEventListener.java in Sources */,
@@ -791,6 +794,7 @@
 				7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */,
+				7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,

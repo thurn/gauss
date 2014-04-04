@@ -120,6 +120,33 @@ public class Games {
   }
 
   /**
+   * Constructs a list of Parse notification channel IDs for the viewer for
+   * this game.
+   *
+   * @param game game to construct channel ID for.
+   * @param viewerId Viewer to construct the channel for.
+   * @return Channel IDs to use with Parse, one per player number that the
+   *     viewer is acting as in this game. 
+   */
+  public static List<String> channelIdsForViewer(Game game, String viewerId) {
+    List<String> ids = new ArrayList<String>();
+    for (Integer number : playerNumbersForPlayerId(game, viewerId)) {
+      ids.add(channelIdForPlayer(game.getId(), number));
+    }
+    return ids;
+  }
+  
+  /**
+   * @param gameId Game ID
+   * @param playerNumber Player number
+   * @return A Parse Channel ID representing this player number within the game
+   *     with the provided ID.
+   */
+  public static String channelIdForPlayer(String gameId, int playerNumber) {
+    return "G" + gameId + "___" + playerNumber;
+  }
+  
+  /**
    * @param viewerId viewer's player ID
    * @return True if there is an opponent in this game who is distinct from
    *     the viewer. False if there's no opponent or the viewer is playing

@@ -1,12 +1,12 @@
-#import "RootViewController.h"
+#import "MainMenuViewController.h"
 #import "AppDelegate.h"
 #import <FacebookSDK/FacebookSDK.h>
 
-@interface RootViewController ()
+@interface MainMenuViewController ()
 @property(weak,nonatomic) IBOutlet UIButton *savedGamesButton;
 @end
 
-@implementation RootViewController
+@implementation MainMenuViewController
 
 - (void)awakeFromNib {
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];

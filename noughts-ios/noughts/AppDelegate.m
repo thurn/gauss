@@ -2,10 +2,11 @@
 #import <Parse/Parse.h>
 #import "Firebase.h"
 #import "GameViewController.h"
-#import "RootViewController.h"
+#import "MainMenuViewController.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "PushNotificationListener.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <NTSPushNotificationListener>
 @property BOOL runningQuery;
 @end
 
@@ -25,12 +26,13 @@
   NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 #if TARGET_IPHONE_SIMULATOR
   userKey = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? @"Pad" : @"Phone";
-#endif
+  #endif
 
   NSString *userId = [self sha1:userKey];
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
                                withFCFirebase:firebase];
+  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
   return YES;
 }
 
@@ -70,8 +72,8 @@
     [_model subscribeViewerToGameWithNSString:gameId];
     UINavigationController *root =
         (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
-    RootViewController *mainMenu =
-    [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
+    MainMenuViewController *mainMenu =
+        [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
     [root pushViewController:mainMenu animated:NO];
     GameViewController *gameViewController =
         [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"GameViewController"];
@@ -146,35 +148,32 @@
   }
 }
 
+- (void)onJoinedGameWithJavaUtilList:(id<JavaUtilList>)channelIds {
+  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+  for (NSString *channel in (id<NSFastEnumeration>)channelIds) {
+    [currentInstallation addUniqueObject:channel forKey:@"channels"];
+  }
+  [currentInstallation saveInBackground];
+}
+
+- (void)onLeftGameWithJavaUtilList:(id<JavaUtilList>)channelIds {
+  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+  for (NSString *channel in (id<NSFastEnumeration>)channelIds) {
+    [currentInstallation removeObject:channel forKey:@"channels"];
+  }
+  [currentInstallation saveInBackground];
+}
+
+- (void)onPushRequiredWithNSString:(NSString*)channelId withNSString:(NSString *)message {
+  PFPush *push = [PFPush new];
+  [push setChannel:channelId];
+  [push setMessage:message];
+  [push sendPushInBackground];
+}
+
 + (NTSModel*)getModel {
   AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
   return appDelegate.model;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application
-{
-  // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-  // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-}
-
-- (void)applicationDidEnterBackground:(UIApplication *)application
-{
-  // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
-  // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-}
-
-- (void)applicationWillEnterForeground:(UIApplication *)application
-{
-  // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
-}
-
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-//  [FBAppCall handleDidBecomeActive];
-}
-
-- (void)applicationWillTerminate:(UIApplication *)application
-{
-  // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 
 @end

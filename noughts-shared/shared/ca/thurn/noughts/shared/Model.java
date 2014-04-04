@@ -3,9 +3,11 @@ package ca.thurn.noughts.shared;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -111,6 +113,7 @@ public class Model extends AbstractChildEventListener {
   private final String userKey;
   private final Firebase firebase;
   private GameListListener gameListListener;
+  private PushNotificationListener pushNotificationListener;  
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
@@ -180,6 +183,17 @@ public class Model extends AbstractChildEventListener {
     if (games.containsKey(gameId)) {
       listener.onRegistered(userId, games.get(gameId));
     }
+  }
+  
+  /**
+   * Adds a listener to be called when push notification state needs to be
+   * changed.
+   *
+   * @param pushNotificationListener Listener to add.
+   */
+  public void setPushNotificationListener(
+      PushNotificationListener pushNotificationListener) {
+    this.pushNotificationListener = pushNotificationListener;
   }
   
   /**
@@ -391,6 +405,9 @@ public class Model extends AbstractChildEventListener {
     ref.setValue(game.serialize());
     Firebase userRef = userReference().child("games").child(game.getId());
     userRef.setValue(true);
+    if (pushNotificationListener != null) {
+      pushNotificationListener.onJoinedGame(Games.channelIdsForViewer(game, userId));
+    }
     return game.getId();
   }
   
@@ -634,6 +651,21 @@ public class Model extends AbstractChildEventListener {
         if (onComplete != null) {
           onComplete.onMutationCompleted(game);
         }
+        if (pushNotificationListener != null) {
+          if (game.isGameOver()) {
+            List<Integer> viewerPlayerNumbers = Games.playerNumbersForPlayerId(game, userId);
+            for (int i = 0; i < game.getPlayerCount(); ++i) {
+              if (!viewerPlayerNumbers.contains(i)) {
+                pushNotificationListener.onPushRequired(
+                    Games.channelIdForPlayer(game.getId(), i), "Game over");
+              }
+            }
+          } else {
+            String channelId = Games.channelIdForPlayer(game.getId(),
+                game.getCurrentPlayerNumber());
+            pushNotificationListener.onPushRequired(channelId, "It's your turn!");
+          }          
+        }
       }
     };
     mutateGame(game, mutation, true /* abortOnConflict */);
@@ -766,7 +798,7 @@ public class Model extends AbstractChildEventListener {
     };
     mutateGame(game, mutation, false /* abortOnConflict */);
   }
-  
+
   /**
    * Remove a game from a user's game list.
    *
@@ -777,8 +809,11 @@ public class Model extends AbstractChildEventListener {
     if (!game.isGameOver()) die("Can't archive a game which is in progress");
     userReference().child("games").child(game.getId()).removeValue();
     games.remove(game.getId());
+    if (pushNotificationListener != null) {
+      pushNotificationListener.onLeftGame(Games.channelIdsForViewer(game, userId));
+    }
   }
-  
+
   /**
    * Subscribes the viewer to the provided game ID. This does NOT make them a
    * player in the game, it merely adds the game to their game list.
@@ -802,6 +837,13 @@ public class Model extends AbstractChildEventListener {
         @Override
         public void mutate(Game.Builder game) {
           game.addPlayer(userId);
+        }
+        
+        @Override
+        public void onComplete(Game game) {
+          if (pushNotificationListener != null) {
+            pushNotificationListener.onJoinedGame(Games.channelIdsForViewer(game, userId));
+          }
         }
       };
       mutateGame(game, mutation, true /* abortOnConflict */);
