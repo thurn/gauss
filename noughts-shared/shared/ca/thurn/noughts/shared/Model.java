@@ -3,11 +3,9 @@ package ca.thurn.noughts.shared;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -848,6 +846,22 @@ public class Model extends AbstractChildEventListener {
       };
       mutateGame(game, mutation, true /* abortOnConflict */);
     }
+  }
+  
+  /**
+   * Switches the user from an anonymous account to a facebook account. This
+   * one-time process changes their userID in all currently known games and
+   * returns a new Model object for the new account. It is intended to happen
+   * on a best-effort basis, successful migration of all games is not
+   * guaranteed.
+   *
+   * @param facebookId The user's facebook ID.
+   */
+  public Model upgradeAccountToFacebook(String facebookId) {
+    for (Game game : games.values()) {
+      
+    }
+    return new Model(facebookId, facebookId, firebase);
   }
   
   /**

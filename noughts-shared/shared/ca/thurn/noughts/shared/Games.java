@@ -328,7 +328,7 @@ public class Games {
           statusString = "You won";
         } else if (hasOpponent(game, viewerId) &&
             game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
-          if (hasOpponentProfile(game, viewerId)) {
+          if (hasOpponentProfile(game, viewerId) && opponentProfile(game, viewerId).hasPronoun()) {
             Profile opponentProfile = opponentProfile(game, viewerId);
             statusString = Pronouns.getNominativePronoun(
                 opponentProfile.getPronoun(), true /* capitalize */) + " won";

@@ -43,16 +43,31 @@ NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
     }
   }];
   
-  NSDictionary *notification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
-  if (notification && notification[@"gameId"]) {
-    NSLog(@"(on startup) got gameId %@", notification[@"gameId"]);
-    [self pushGameViewWithId:notification[@"gameId"]];
+  NSString *gameId = launchOptions[@"UIApplicationLaunchOptionsRemoteNotificationKey"][@"gameId"];
+  if (gameId) {
+    [self pushGameViewWithId:gameId];
   }
   return YES;
 }
 
 - (void)onModelReady {
   [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
+}
+
+- (void)alert:(NSString*)message {
+  [[[UIAlertView alloc] initWithTitle:@"Error"
+                              message:message
+                             delegate:nil
+                    cancelButtonTitle:@"OK"
+                    otherButtonTitles:nil] show];
+}
+
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+  if (currentInstallation.badge != 0) {
+    currentInstallation.badge = 0;
+    [currentInstallation saveEventually];
+  }
 }
 
 - (BOOL)isFacebookAuthorized {
@@ -102,8 +117,9 @@ NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
 
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
+  NSLog(@"didReceiveNotification %@", userInfo);
   if (userInfo[@"gameId"]) {
-    NSLog(@"(while running) got gameId %@", userInfo[@"gameId"]);
+    [self pushGameViewWithId:userInfo[@"gameId"]];
   } else {
     [PFPush handlePush:userInfo];
   }
@@ -123,8 +139,8 @@ NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
 
 - (void)pushGameViewWithId:(NSString*)gameId {
   [_model subscribeViewerToGameWithNSString:gameId];
-  UINavigationController *root =
-  (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
+  UINavigationController *root = (UINavigationController*)self.window.rootViewController;
+  root.viewControllers = @[];
   MainMenuViewController *mainMenu =
   [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
   [root pushViewController:mainMenu animated:NO];
@@ -217,6 +233,7 @@ NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
                          @"badge": @"Increment",
                          @"gameId": gameId,
                          @"title": @"noughts"};
+  NSLog(@"sending push %@", message);
   PFPush *push = [PFPush new];
   [push setData:data];
   [push setChannel:channelId];
