@@ -2,31 +2,12 @@
 #import "AppDelegate.h"
 #import "Model.h"
 #import "QueryParsing.h"
+#import <SDWebImage/UIImageView+WebCache.h>
 
 @interface FacebookInviteViewController ()
 @end
 
 @implementation FacebookInviteViewController
-
-- (id)initWithStyle:(UITableViewStyle)style
-{
-    self = [super initWithStyle:style];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
-    
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
 //  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
@@ -71,7 +52,12 @@
                                                           forIndexPath:indexPath];
   NSDictionary *friend = [appDelegate.friends objectAtIndex:indexPath.row];
   cell.textLabel.text = friend[@"name"];
-  cell.imageView.image = appDelegate.friendPhotos[friend[@"uid"]];
+  NSString *format = @"https://graph.facebook.com/%@/picture?width=100&height=100";
+  NSURL *photoUrl = [NSURL URLWithString:
+                     [NSString
+                      stringWithFormat:format, friend[@"uid"]]];
+  [cell.imageView setImageWithURL:photoUrl
+                 placeholderImage:[UIImage imageNamed:@"facebook_default"]];
   return cell;
 }
 

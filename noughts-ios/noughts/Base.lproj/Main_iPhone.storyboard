@@ -50,27 +50,16 @@
                                         <rect key="frame" x="15" y="62" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MJh-9N-Fke" userLabel="Log In">
-                                        <rect key="frame" x="67" y="107" width="55" height="36"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
-                                        <state key="normal" title="Log In">
-                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="onFacebookLoginClicked" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Qhp-gE-7ue"/>
-                                        </connections>
-                                    </button>
-                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_facebook_invite" translatesAutoresizingMaskIntoConstraints="NO" id="19X-yC-Dh7" userLabel="ic_how_to_play">
-                                        <rect key="frame" x="15" y="109" width="32" height="32"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    </imageView>
-                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_settings" translatesAutoresizingMaskIntoConstraints="NO" id="AUS-xW-cdv" userLabel="ic_settings">
+                                    <imageView userInteractionEnabled="NO" tag="5" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_facebook_invite" translatesAutoresizingMaskIntoConstraints="NO" id="19X-yC-Dh7" userLabel="ic_how_to_play">
                                         <rect key="frame" x="15" y="156" width="32" height="32"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     </imageView>
+                                    <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_settings" translatesAutoresizingMaskIntoConstraints="NO" id="AUS-xW-cdv" userLabel="ic_settings">
+                                        <rect key="frame" x="15" y="109" width="32" height="32"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    </imageView>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="s3f-7h-aDP" userLabel="Settings">
-                                        <rect key="frame" x="67" y="154" width="73" height="36"/>
+                                        <rect key="frame" x="67" y="107" width="73" height="36"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                         <state key="normal" title="Settings">
@@ -78,6 +67,17 @@
                                         </state>
                                         <connections>
                                             <segue destination="InQ-KL-aAV" kind="push" id="uOe-Ry-jHC"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" tag="6" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MJh-9N-Fke" userLabel="Log In">
+                                        <rect key="frame" x="67" y="154" width="55" height="36"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                        <state key="normal" title="Log In">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onFacebookLoginClicked" destination="vXZ-lx-hvc" eventType="touchUpInside" id="Qhp-gE-7ue"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -90,13 +90,13 @@
                                     <constraint firstItem="fae-cB-Ojc" firstAttribute="centerX" secondItem="1ff-9f-fZe" secondAttribute="centerX" id="4GH-rL-rAg"/>
                                     <constraint firstAttribute="height" constant="200" id="G5F-YL-g8N"/>
                                     <constraint firstItem="1qV-mY-kuB" firstAttribute="leading" secondItem="1ff-9f-fZe" secondAttribute="trailing" constant="20" id="L0a-lL-rI4"/>
+                                    <constraint firstItem="19X-yC-Dh7" firstAttribute="top" secondItem="AUS-xW-cdv" secondAttribute="bottom" constant="15" id="QQL-fZ-Mjw"/>
                                     <constraint firstItem="1qV-mY-kuB" firstAttribute="leading" secondItem="MJh-9N-Fke" secondAttribute="leading" id="R4f-eq-sOo"/>
                                     <constraint firstItem="fae-cB-Ojc" firstAttribute="centerY" secondItem="e4r-SB-bb9" secondAttribute="centerY" id="UZF-LZ-vcK"/>
                                     <constraint firstItem="fae-cB-Ojc" firstAttribute="centerX" secondItem="AUS-xW-cdv" secondAttribute="centerX" id="ZkN-Vj-LDH"/>
+                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="top" secondItem="fae-cB-Ojc" secondAttribute="bottom" constant="15" id="eXJ-3W-XVY"/>
                                     <constraint firstItem="1ff-9f-fZe" firstAttribute="top" secondItem="khQ-qh-q60" secondAttribute="top" constant="15" id="i1B-6O-O6u"/>
-                                    <constraint firstItem="19X-yC-Dh7" firstAttribute="top" secondItem="fae-cB-Ojc" secondAttribute="bottom" constant="15" id="iIe-na-ik3"/>
                                     <constraint firstItem="1qV-mY-kuB" firstAttribute="leading" secondItem="s3f-7h-aDP" secondAttribute="leading" id="j1L-qF-0K2"/>
-                                    <constraint firstItem="AUS-xW-cdv" firstAttribute="top" secondItem="19X-yC-Dh7" secondAttribute="bottom" constant="15" id="ksb-nf-3Wy"/>
                                     <constraint firstItem="fae-cB-Ojc" firstAttribute="centerX" secondItem="19X-yC-Dh7" secondAttribute="centerX" id="rvF-p6-9Ye"/>
                                     <constraint firstItem="1qV-mY-kuB" firstAttribute="centerY" secondItem="1ff-9f-fZe" secondAttribute="centerY" id="vBm-X6-K1j"/>
                                     <constraint firstItem="1ff-9f-fZe" firstAttribute="centerY" secondItem="1qV-mY-kuB" secondAttribute="centerY" id="vzo-Ga-BX1"/>
@@ -144,7 +144,7 @@
                                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                         </state>
                                         <connections>
-                                            <segue destination="XtC-MN-dPX" kind="push" id="reU-x0-6vi"/>
+                                            <action selector="onInviteViaFacebook:" destination="u3P-bq-oez" eventType="touchUpInside" id="hxp-Z1-jvx"/>
                                         </connections>
                                     </button>
                                     <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ic_facebook_invite" translatesAutoresizingMaskIntoConstraints="NO" id="NXM-am-N9o" userLabel="ic_facebook_invite">
@@ -439,14 +439,14 @@
         <!--Facebook Invite View Controller - Invite-->
         <scene sceneID="599-w6-9IO">
             <objects>
-                <tableViewController id="XtC-MN-dPX" customClass="FacebookInviteViewController" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="FacebookInviteViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="XtC-MN-dPX" customClass="FacebookInviteViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="sJj-YC-Ucw">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="blue" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="FacebookCell" textLabel="OVD-bn-guU" style="IBUITableViewCellStyleDefault" id="y3c-lH-YF4">
-                                <rect key="frame" x="0.0" y="86" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="22" width="320" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="y3c-lH-YF4" id="K8y-vS-CdY">
                                     <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>

@@ -5,9 +5,14 @@
 #import "MainMenuViewController.h"
 #import <CommonCrypto/CommonDigest.h>
 #import "PushNotificationListener.h"
+#import <Firebase/Firebase.h>
+#import <FirebaseSimpleLogin/FirebaseSimpleLogin.h>
+
+NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
 
 @interface AppDelegate () <NTSPushNotificationListener>
 @property BOOL runningQuery;
+@property FirebaseSimpleLogin *firebaseLogin;
 @end
 
 @implementation AppDelegate
@@ -23,17 +28,56 @@
 
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio.com"];
+  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
+    [FBSession.activeSession openWithCompletionHandler:nil];
+  }
+  _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
+  [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
+    if (user != nil) {
+      NSLog(@"Facebook User");
+      [self createFacebookModel:firebase withUserId:user.userId];
+      [self onFacebookLogin:user.userId withCallback:nil];
+    } else {
+      NSLog(@"Anonymous User");
+      [self createAnonymousModel:firebase];
+    }
+  }];
+  
+  NSDictionary *notification = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+  if (notification && notification[@"gameId"]) {
+    NSLog(@"(on startup) got gameId %@", notification[@"gameId"]);
+    [self pushGameViewWithId:notification[@"gameId"]];
+  }
+  return YES;
+}
+
+- (void)onModelReady {
+  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
+}
+
+- (BOOL)isFacebookAuthorized {
+  FBSessionState state = FBSession.activeSession.state;
+  return state == FBSessionStateOpen ||
+      state == FBSessionStateCreatedTokenLoaded ||
+      state == FBSessionStateOpenTokenExtended;
+}
+
+- (void)createAnonymousModel:(FCFirebase*)firebase {
   NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 #if TARGET_IPHONE_SIMULATOR
   userKey = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? @"Pad" : @"Phone";
-  #endif
-
+#endif
+  
   NSString *userId = [self sha1:userKey];
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
                                withFCFirebase:firebase];
-  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
-  return YES;
+  [self onModelReady];
+}
+
+- (void)createFacebookModel:(FCFirebase*)firebase withUserId:(NSString*)userId {
+  _model = [[NTSModel alloc] initWithNSString:userId withNSString:userId withFCFirebase:firebase];
+  [self onModelReady];
 }
 
 - (NSString*)sha1:(NSString*)input {
@@ -58,9 +102,12 @@
 
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  [PFPush handlePush:userInfo];
+  if (userInfo[@"gameId"]) {
+    NSLog(@"(while running) got gameId %@", userInfo[@"gameId"]);
+  } else {
+    [PFPush handlePush:userInfo];
+  }
 }
-
 
 - (BOOL)application:(UIApplication *)application
             openURL:(NSURL *)url
@@ -69,23 +116,22 @@
   if ([[url scheme] isEqualToString:@"noughts"]) {
     NSArray *paths = [url pathComponents];
     NSString *gameId = paths[1];
-    [_model subscribeViewerToGameWithNSString:gameId];
-    UINavigationController *root =
-        (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
-    MainMenuViewController *mainMenu =
-        [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
-    [root pushViewController:mainMenu animated:NO];
-    GameViewController *gameViewController =
-        [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"GameViewController"];
-    gameViewController.currentGameId = gameId;
-    [root pushViewController:gameViewController animated:YES];
+    [self pushGameViewWithId:gameId];
   }
-  [FBSession.activeSession setStateChangeHandler:
-   ^(FBSession *session, FBSessionState state, NSError *error) {
-     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-     [appDelegate sessionStateChanged:session state:state error:error];
-   }];
   return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
+}
+
+- (void)pushGameViewWithId:(NSString*)gameId {
+  [_model subscribeViewerToGameWithNSString:gameId];
+  UINavigationController *root =
+  (UINavigationController*)[[[UIApplication sharedApplication] keyWindow ]rootViewController];
+  MainMenuViewController *mainMenu =
+  [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
+  [root pushViewController:mainMenu animated:NO];
+  GameViewController *gameViewController =
+  [[self mainStoryboard] instantiateViewControllerWithIdentifier:@"GameViewController"];
+  gameViewController.currentGameId = gameId;
+  [root pushViewController:gameViewController animated:YES];
 }
 
 - (UIStoryboard*)mainStoryboard {
@@ -94,17 +140,30 @@
   return [UIStoryboard storyboardWithName:storyboardName bundle: nil];
 }
 
-- (void)sessionStateChanged:(FBSession*)session state:(FBSessionState)state error:(NSError*)error {
-  if (!error && state == FBSessionStateOpen) {
-    [self getFacebookFriends];
-    if (!_friendCache) {
-      _friendCache = [FBFrictionlessRecipientCache new];
-    }
-    [_friendCache prefetchAndCacheForSession:nil];
-  }
+- (void)logInToFacebook:(void(^)())callback {
+  [_firebaseLogin loginToFacebookAppWithId:@"419772734774541"
+                           permissions:@[@"basic_info"]
+                              audience:ACFacebookAudienceOnlyMe
+                   withCompletionBlock:^(NSError *error, FAUser *user) {
+                     if (error == nil) {
+                       NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+                       [userDefaults setObject:@YES forKey:kLoggedInToFacebook];
+                       [userDefaults synchronize];
+                       [self onFacebookLogin: user.userId withCallback:callback];
+                       // handle account upgrade
+                     }
+                   }];
 }
 
-- (void)getFacebookFriends {
+- (void)onFacebookLogin:(NSString*)userId withCallback:(void(^)())callback {
+  [self getFacebookFriendsWithCallback:callback];
+  if (!_friendCache) {
+    _friendCache = [FBFrictionlessRecipientCache new];
+  }
+  [_friendCache prefetchAndCacheForSession:nil];
+}
+
+- (void)getFacebookFriendsWithCallback:(void(^)())callback {
   if (_friends || _runningQuery) return;
   _runningQuery = YES;
   NSString *query = @"SELECT uid,mutual_friend_count,name,first_name,sex,is_app_user "
@@ -118,33 +177,20 @@
                                             id result,
                                             NSError *error) {
                           if (!error) {
-                            [self handleFriendsResult:result[@"data"]];
+                            [self handleFriendsResult:result[@"data"] withCallback:callback];
                           }
                           _runningQuery = NO;
                         }];
 }
 
-- (void)handleFriendsResult:(NSArray*)array {
+- (void)handleFriendsResult:(NSArray*)array withCallback:(void(^)())callback {
   NSSortDescriptor *appUser = [[NSSortDescriptor alloc] initWithKey:@"is_app_user"
                                                           ascending:NO];
   NSSortDescriptor *mutalFriends = [[NSSortDescriptor alloc] initWithKey:@"mutual_friend_count"
                                                                ascending:NO];
   _friends = [array sortedArrayUsingDescriptors:@[appUser, mutalFriends]];
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
-                                           (unsigned long)NULL), ^(void) {
-    [self populateFriendPhotos];
-  });
-}
-
-- (void)populateFriendPhotos {
-  for (NSDictionary *friend in _friends) {
-    NSURL *photoUrl = [NSURL URLWithString:
-                       [NSString
-                        stringWithFormat:
-                            @"https://graph.facebook.com/%@/picture?width=100&height=100",
-                        friend[@"uid"]]];
-    NSData *data = [NSData dataWithContentsOfURL:photoUrl];
-    _friendPhotos[friend[@"uid"]] = [[UIImage alloc] initWithData:data];
+  if (callback) {
+    callback();
   }
 }
 
@@ -164,10 +210,16 @@
   [currentInstallation saveInBackground];
 }
 
-- (void)onPushRequiredWithNSString:(NSString*)channelId withNSString:(NSString *)message {
+- (void)onPushRequiredWithNSString:(NSString*)channelId
+                      withNSString:(NSString*)gameId
+                      withNSString:(NSString *)message {
+  NSDictionary* data = @{@"alert": message,
+                         @"badge": @"Increment",
+                         @"gameId": gameId,
+                         @"title": @"noughts"};
   PFPush *push = [PFPush new];
+  [push setData:data];
   [push setChannel:channelId];
-  [push setMessage:message];
   [push sendPushInBackground];
 }
 

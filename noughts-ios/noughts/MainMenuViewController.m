@@ -11,26 +11,42 @@
 - (void)awakeFromNib {
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
   self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
-  if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
-    [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
-                                       allowLoginUI:NO
-                                  completionHandler:
-     ^(FBSession *session, FBSessionState state, NSError *error) {
-       NSLog(@"logged in");
-       AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-       [appDelegate sessionStateChanged:session state:state error:error];
-     }];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  if ([userDefaults valueForKey:kLoggedInToFacebook]) {
+    [self removeLoginLink: NO];
+  }
+}
+
+- (void)removeLoginLink:(BOOL)animated {
+  if (animated) {
+    [UIView animateWithDuration:0.3 animations:^{
+      [self.view viewWithTag:5].alpha = 0.0;
+      [self.view viewWithTag:6].alpha = 0.0;
+    } completion:^(BOOL finished) {
+      [[self.view viewWithTag:5] removeFromSuperview];
+      [[self.view viewWithTag:6] removeFromSuperview];
+    }];
+  } else {
+    [[self.view viewWithTag:5] removeFromSuperview];
+    [[self.view viewWithTag:6] removeFromSuperview];
   }
 }
 
 - (IBAction)onFacebookLoginClicked {
-  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
-                                     allowLoginUI:YES
-                                completionHandler:
-   ^(FBSession *session, FBSessionState state, NSError *error) {
-     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-     [appDelegate sessionStateChanged:session state:state error:error];
-   }];
+//  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
+//                                     allowLoginUI:YES
+//                                completionHandler:
+//   ^(FBSession *session, FBSessionState state, NSError *error) {
+//     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+//     [appDelegate sessionStateChanged:session state:state error:error];
+//   }];
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  [appDelegate logInToFacebook:^{
+    [self removeLoginLink: YES];
+  }];
 }
 
 - (void)viewDidLoad {

@@ -21,7 +21,8 @@ public interface PushNotificationListener {
    * Called when a push notification needs to be sent.
    *
    * @param channeId ID of channel to send the notification out on.
+   * @param gameId Associated game ID.
    * @param message Message to associate with the notification.
    */
-  public void onPushRequired(String channelId, String message);
+  public void onPushRequired(String channelId, String gameId, String message);
 }

@@ -14,7 +14,25 @@
   [super viewDidLoad];
 }
 
-- (IBAction)onFacebookInviteClicked {
+- (IBAction)onInviteViaFacebook:(id)sender {
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  if ([userDefaults valueForKey:kLoggedInToFacebook]) {
+    [self.navigationController
+     pushViewController:[[appDelegate mainStoryboard]
+                         instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
+     animated:YES];
+  } else {
+    [appDelegate logInToFacebook:^{
+      [self.navigationController
+       pushViewController:[[appDelegate mainStoryboard]
+                           instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
+       animated:YES];
+    }];
+  }
+}
+
+- (void)onFacebookInviteClicked {
 //  FBFriendPickerViewController *picker = [FBFriendPickerViewController new];
 //  [picker loadData];
 //  picker.allowsMultipleSelection = NO;

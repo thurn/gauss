@@ -657,13 +657,13 @@ public class Model extends AbstractChildEventListener {
             for (int i = 0; i < game.getPlayerCount(); ++i) {
               if (!viewerPlayerNumbers.contains(i)) {
                 pushNotificationListener.onPushRequired(
-                    Games.channelIdForPlayer(game.getId(), i), "Game over");
+                    Games.channelIdForPlayer(game.getId(), i), game.getId(), "Game over");
               }
             }
           } else {
             String channelId = Games.channelIdForPlayer(game.getId(),
                 game.getCurrentPlayerNumber());
-            pushNotificationListener.onPushRequired(channelId, "It's your turn!");
+            pushNotificationListener.onPushRequired(channelId, game.getId(), "It's your turn!");
           }          
         }
       }
