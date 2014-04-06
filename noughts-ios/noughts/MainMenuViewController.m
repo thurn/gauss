@@ -15,7 +15,7 @@
 
 - (void)viewWillAppear:(BOOL)animated {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  if ([userDefaults valueForKey:kLoggedInToFacebook]) {
+  if ([userDefaults valueForKey:kFacebookId]) {
     [self removeLoginLink: NO];
   }
 }

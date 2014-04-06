@@ -17,7 +17,7 @@
 - (IBAction)onInviteViaFacebook:(id)sender {
   AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  if ([userDefaults valueForKey:kLoggedInToFacebook]) {
+  if ([userDefaults valueForKey:kFacebookId]) {
     [self.navigationController
      pushViewController:[[appDelegate mainStoryboard]
                          instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]

@@ -2,7 +2,7 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "Model.h"
 
-FOUNDATION_EXPORT NSString *const kLoggedInToFacebook;
+FOUNDATION_EXPORT NSString *const kFacebookId;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 @property(strong, nonatomic) UIWindow *window;

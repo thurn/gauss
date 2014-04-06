@@ -8,7 +8,7 @@
 #import <Firebase/Firebase.h>
 #import <FirebaseSimpleLogin/FirebaseSimpleLogin.h>
 
-NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
+NSString *const kFacebookId = @"kFacebookId";
 
 @interface AppDelegate () <NTSPushNotificationListener>
 @property BOOL runningQuery;
@@ -163,7 +163,7 @@ NSString *const kLoggedInToFacebook = @"kLoggedInToFacebook";
                    withCompletionBlock:^(NSError *error, FAUser *user) {
                      if (error == nil) {
                        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                       [userDefaults setObject:@YES forKey:kLoggedInToFacebook];
+                       [userDefaults setObject:user.userId forKey:kFacebookId];
                        [userDefaults synchronize];
                        [self onFacebookLogin: user.userId withCallback:callback];
                        // handle account upgrade

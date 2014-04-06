@@ -232,8 +232,9 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   }
   NTSModel *model = [AppDelegate getModel];
   [userDefaults synchronize];
-   NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
-                       [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
+  NSArray *profiles = @[[p1Profile build], [p2Profile build]];
+  NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
+                      [J2obcUtils nsArrayToJavaUtilList:profiles]];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

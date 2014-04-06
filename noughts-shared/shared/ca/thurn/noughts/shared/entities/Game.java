@@ -98,81 +98,43 @@ public class Game extends Entity<Game> {
     public int getProfileCount() {
       return game.getProfileCount();
     }
-    
-    public boolean hasProfile(String key) {
-      return game.hasProfile(key);
+
+    public Profile getProfile(int index) {
+      return game.getProfile(index);
     }
 
-    public Profile getProfile(String key) {
-      return game.getProfile(key);
-    }
-
-    public Map<String, Profile> getProfileMap() {
-      return game.profileMap;
+    public List<Profile> getProfileList() {
+      return game.profileList;
     }
     
-    public Builder putProfile(String key, EntityBuilder<Profile> profile) {
-      return putProfile(key, profile.build());
+    public Builder setProfile(int index, EntityBuilder<Profile> profile) {
+      return setProfile(index, profile.build());
     }
     
-    public Builder putProfile(String key, Profile profile) {
-      checkNotNull(key);
+    public Builder setProfile(int index, Profile profile) {
       checkNotNull(profile);
-      game.profileMap.put(key, profile);
+      game.profileList.set(index, profile);
       return this;
     }
     
-    public Builder putAllProfile(Map<String, Profile> profileMap) {
-      checkMapForNull(profileMap);
-      game.profileMap.putAll(profileMap);
-      return this;
+    public Builder addProfile(EntityBuilder<Profile> profile) {
+      return addProfile(profile.build());
     }
     
-    public Builder clearProfileMap() {
-      game.profileMap.clear();
-      return this;
-    }
-
-    public int getLocalProfileCount() {
-      return game.getLocalProfileCount();
-    }
-
-    public Profile getLocalProfile(int index) {
-      return game.getLocalProfile(index);
-    }
-
-    public List<Profile> getLocalProfileList() {
-      return game.localProfileList;
-    }
-    
-    public Builder setLocalProfile(int index, EntityBuilder<Profile> profile) {
-      return setLocalProfile(index, profile.build());
-    }
-    
-    public Builder setLocalProfile(int index, Profile profile) {
+    public Builder addProfile(Profile profile) {
       checkNotNull(profile);
-      game.localProfileList.set(index, profile);
+      game.profileList.add(profile);
       return this;
     }
     
-    public Builder addLocalProfile(EntityBuilder<Profile> profile) {
-      return addLocalProfile(profile.build());
-    }
-    
-    public Builder addLocalProfile(Profile localProfile) {
-      checkNotNull(localProfile);
-      game.localProfileList.add(localProfile);
+    public Builder addAllProfile(List<Profile> profileList) {
+      checkListForNull(profileList);
+      game.profileList.addAll(profileList);
       return this;
     }
     
-    public Builder addAllLocalProfile(List<Profile> localProfileList) {
-      checkListForNull(localProfileList);
-      game.localProfileList.addAll(localProfileList);
-      return this;
-    }
-    
-    public Builder clearLocalProfileList() {
-      game.localProfileList.clear();
+    public Builder clearProfileList() {
+      game.profileList.clear();
       return this;
     }
 
@@ -423,18 +385,13 @@ public class Game extends Entity<Game> {
    * their entry in this array replaced with null.
    */
   private final List<String> playerList;
-
-  /**
-   * A mapping from player IDs to profile information about the player.
-   */
-  private final Map<String, Profile> profileMap;
   
   /**
    * List of player profiles in the same order as the player list, these
    * profiles takes precedence over the ID-based profiles above. Null
    * indicates a missing profile.
    */
-  private final List<Profile> localProfileList;
+  private final List<Profile> profileList;
 
   /**
    * The number of the player whose turn it is, that is, their index within
@@ -489,8 +446,7 @@ public class Game extends Entity<Game> {
   
   public Game() {
     playerList = new ArrayList<String>();
-    profileMap = new HashMap<String, Profile>();
-    localProfileList = new ArrayList<Profile>();
+    profileList = new ArrayList<Profile>();
     submittedActionList = new ArrayList<Action>();
     victorList = new ArrayList<Integer>();
     resignedPlayerList = new ArrayList<Integer>();
@@ -499,8 +455,7 @@ public class Game extends Entity<Game> {
   public Game(Game game) {
     this.id = game.id;
     this.playerList = new ArrayList<String>(game.playerList);
-    this.profileMap = new HashMap<String, Profile>(game.profileMap);
-    this.localProfileList = new ArrayList<Profile>(game.localProfileList);
+    this.profileList = new ArrayList<Profile>(game.profileList);
     this.currentPlayerNumber = game.currentPlayerNumber;
     this.submittedActionList = new ArrayList<Action>(game.submittedActionList);
     this.currentAction = game.currentAction;
@@ -516,8 +471,7 @@ public class Game extends Entity<Game> {
     checkExists(gameMap, "id");
     id = getString(gameMap, "id");
     playerList = getList(gameMap, "playerList");
-    profileMap = getEntityMap(gameMap, "profileMap", Profile.newDeserializer());
-    localProfileList = getEntities(gameMap, "localProfileList", Profile.newDeserializer());
+    profileList = getEntities(gameMap, "profileList", Profile.newDeserializer());
     currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
     submittedActionList = getEntities(gameMap, "submittedActionList", Action.newDeserializer());
     currentAction = getEntity(gameMap, "currentAction", Action.newDeserializer());
@@ -539,8 +493,7 @@ public class Game extends Entity<Game> {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "id", id);
     putSerialized(result, "playerList", playerList);
-    putSerialized(result, "profileMap", profileMap);
-    putSerialized(result, "localProfileList", localProfileList);
+    putSerialized(result, "profileList", profileList);
     putSerialized(result, "currentPlayerNumber", currentPlayerNumber);
     putSerialized(result, "submittedActionList", submittedActionList);
     putSerialized(result, "currentAction", currentAction);
@@ -580,32 +533,15 @@ public class Game extends Entity<Game> {
   }
   
   public int getProfileCount() {
-    return profileMap.size();
+    return profileList.size();
   }
   
-  public boolean hasProfile(String key) {
-    return profileMap.containsKey(key);
+  public Profile getProfile(int index) {
+    return profileList.get(index);
   }
   
-  public Profile getProfile(String key) {
-    checkNotNull(key);
-    return checkNotNull(profileMap.get(key));
-  }
-  
-  public Map<String, Profile> getProfileMap() {
-    return Collections.unmodifiableMap(profileMap);
-  }
-  
-  public int getLocalProfileCount() {
-    return localProfileList.size();
-  }
-  
-  public Profile getLocalProfile(int index) {
-    return localProfileList.get(index);
-  }
-  
-  public List<Profile> getLocalProfileList() {
-    return Collections.unmodifiableList(localProfileList);
+  public List<Profile> getProfileList() {
+    return Collections.unmodifiableList(profileList);
   }
   
   public boolean hasCurrentPlayerNumber() {

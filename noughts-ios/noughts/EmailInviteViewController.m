@@ -1,6 +1,6 @@
 #import "EmailInviteViewController.h"
 #import <Parse/Parse.h>
-#import "java/util/HashMap.h"
+#import "java/util/ArrayList.h"
 #import "GameViewController.h"
 #import "AppDelegate.h"
 
@@ -108,7 +108,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   NTSModel *model = [AppDelegate getModel];
-  NSString *gameId = [model newGameWithJavaUtilMap:[JavaUtilHashMap new]
+  NSString *gameId = [model newGameWithJavaUtilList:[JavaUtilArrayList new]
                                        withNSString:_preliminaryGameId];
   NSDictionary *params = @{@"message": _message.text,
                            @"email": _toEmail.text,

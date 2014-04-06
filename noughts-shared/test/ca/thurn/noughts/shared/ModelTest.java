@@ -74,7 +74,7 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.isLocalMultiplayer());
         assertFalse(game.isGameOver());
         assertEquals(0, game.getSubmittedActionCount());
-        assertEquals("John", game.getLocalProfile(0).getName());
+        assertEquals("John", game.getProfile(0).getName());
         finished();
       }
     });
@@ -88,11 +88,11 @@ public class ModelTest extends SharedTestCase {
   
   public void testNewGameGameUpdate() {
     beginAsyncTestBlock();
-    Map<String, Profile> profiles = new HashMap<String, Profile>();
+    List<Profile> profiles = new ArrayList<Profile>();
     Profile.Builder profile = Profile.newBuilder();
     profile.setName("John");
     profile.setPronoun(Pronoun.NEUTRAL);
-    profiles.put(userId, profile.build());
+    profiles.add(profile.build());
     String id = model.newGame(profiles);
     model.setGameUpdateListener(id, new OnGameUpdateListener() {
       @Override
@@ -103,7 +103,7 @@ public class ModelTest extends SharedTestCase {
         assertFalse(game.isLocalMultiplayer());
         assertFalse(game.isGameOver());
         assertEquals(0, game.getSubmittedActionCount());
-        assertEquals("John", game.getProfile(userId).getName());
+        assertEquals("John", game.getProfile(0).getName());
         finished();
       }
     });
@@ -451,14 +451,14 @@ public class ModelTest extends SharedTestCase {
     final Game.Builder game = newGame();
     game.addPlayer(userId);
     game.addPlayer("o");
-    game.putProfile(userId, Profile.newDeserializer().deserialize(map(
+    game.setProfile(0, Profile.newDeserializer().deserialize(map(
         "name", "User",
         "pronoun", "MALE"
         )));
-    game.putProfile("o", Profile.newDeserializer().deserialize(map(
+    game.setProfile(1, Profile.newDeserializer().deserialize(map(
         "name", "Opponent",
         "pronoun", "FEMALE"
-        )));    
+        )));
     game.addAllSubmittedAction(list(
       action(0, 0, 2, true),
       action(1, 1, 1, true),

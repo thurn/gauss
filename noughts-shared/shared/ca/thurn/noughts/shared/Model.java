@@ -1,7 +1,6 @@
 package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -310,12 +309,12 @@ public class Model extends AbstractChildEventListener {
     if (game.isGameOver()) return false;
     List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
     for (int i : playerNumbers) {
-      if (!Games.playerHasProfile(game, i)) {
+      if (!game.getProfile(i).hasName()) {
         return true;
       }
     }
     return false;
-  }  
+  }
   
   /**
    * @return The current {@link GameListPartitions} for this model.
@@ -342,8 +341,8 @@ public class Model extends AbstractChildEventListener {
   /**
    * Version of {@link Model#newGame(Map, String)} with no game ID specified.
    */
-  public String newGame(Map<String, Profile> profiles) {
-    return newGame(profiles, null);
+  public String newGame(List<Profile> profiles) {
+    return newGame(profiles, null /* gameId */);
   }
   
   /**
@@ -354,9 +353,8 @@ public class Model extends AbstractChildEventListener {
    * @param gameId Optionally, the game ID to use.
    * @return The newly created game's ID.
    */
-  public String newGame(Map<String, Profile> profiles, String gameId) {
-    return newGame(false /* localMultiplayer */, profiles, Collections.<Profile>emptyList(),
-        gameId);
+  public String newGame(List<Profile> profiles, String gameId) {
+    return newGame(false /* localMultiplayer */, profiles, gameId);
   }
   
   /**
@@ -365,9 +363,8 @@ public class Model extends AbstractChildEventListener {
    * @param localProfiles List of local profiles for players in this game.
    * @return The newly created game's ID.
    */
-  public String newLocalMultiplayerGame(List<Profile> localProfiles) {
-    return newGame(true /* localMultiplayer */, Collections.<String, Profile>emptyMap(),
-        localProfiles, null /* gameId */);
+  public String newLocalMultiplayerGame(List<Profile> profiles) {
+    return newGame(true /* localMultiplayer */, profiles, null /* gameId */);
   }
 
   /**
@@ -376,12 +373,11 @@ public class Model extends AbstractChildEventListener {
    *
    * @param localMultiplayer Sets whether the game is a local multiplayer game.
    * @param userProfile Map from user IDs to profiles.
-   * @param localProfiles List of local profiles for players in this game.
+   * @param profiles List of local profiles for players in this game.
    * @param gameId Optionally, the game ID to use. 
    * @return The newly created game's ID.
    */  
-  private String newGame(boolean localMultiplayer, Map<String, Profile> profiles,
-      List<Profile> localProfiles, String gameId) {    
+  private String newGame(boolean localMultiplayer, List<Profile> profiles, String gameId) {    
     Firebase ref;
     if (gameId == null) {
       ref = firebase.child("games").push();
@@ -397,8 +393,13 @@ public class Model extends AbstractChildEventListener {
     builder.setCurrentPlayerNumber(X_PLAYER);
     builder.setLastModified(Clock.getInstance().currentTimeMillis());
     builder.setIsGameOver(false);
-    builder.putAllProfile(profiles);
-    builder.addAllLocalProfile(localProfiles);
+    for (int i = 0; i < 2; ++i) {
+      if (i < profiles.size() && profiles.get(i) != null) {
+        builder.addProfile(profiles.get(i));
+      } else {
+        builder.addProfile(Profile.newBuilder().build());
+      }
+    }
     Game game = builder.build();
     ref.setValue(game.serialize());
     Firebase userRef = userReference().child("games").child(game.getId());
@@ -410,7 +411,8 @@ public class Model extends AbstractChildEventListener {
   }
   
   /**
-   * Sets a profile for the current player.
+   * Sets a profile for the current player. Automatically sets them to "not a
+   * computer player".
    *
    * @param game The game.
    * @param profile The profile.
@@ -419,10 +421,11 @@ public class Model extends AbstractChildEventListener {
    */
   public void setProfileForViewer(Game game, final Profile profile,
       final OnMutationCompleted onComplete) {
-    if (game.hasProfile(userId)) die("User already has a profile.");
+    final List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
+    if (playerNumbers.size() != 1) die("Viewer is not a single player");
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        game.putProfile(userId, profile);
+        game.setProfile(playerNumbers.get(0), profile.toBuilder().setIsComputerPlayer(false));
       }
       
       @Override public void onComplete(Game game) {
@@ -678,54 +681,53 @@ public class Model extends AbstractChildEventListener {
    */
   public void handleComputerAction(final Game game) {
     if (!game.hasCurrentPlayerNumber() || isComputerThinking ||
-        !Games.playerHasProfile(game, game.getCurrentPlayerNumber())) {
+        !game.getProfile(game.getCurrentPlayerNumber()).hasIsComputerPlayer() ||
+        !game.getProfile(game.getCurrentPlayerNumber()).isComputerPlayer()) {
       return;
     }
-    Profile currentProfile = Games.playerProfile(game, game.getCurrentPlayerNumber());
-    if (currentProfile.isComputerPlayer()) {
-      isComputerThinking = true;
-      final ComputerState computerState = new ComputerState();
-      computerState.initializeFrom(new ComputerState.GameInitializer(game));
-      int numSimulations;
-      switch (currentProfile.getComputerDifficultyLevel()) {
-        case 0: {
-          // ~70% player win rate
-          numSimulations = 5;
-          break;
-        }
-        case 1: {
-          // ~50% player win rate
-          numSimulations = 100;
-          break;
-        }
-        case 2: {
-          // ~10% player win rate
-          numSimulations = 1000;
-          break;
-        }
-        default: {
-          throw die("Unknown difficulty level");
-        }
+    Profile currentProfile = game.getProfile(game.getCurrentPlayerNumber());
+    isComputerThinking = true;
+    final ComputerState computerState = new ComputerState();
+    computerState.initializeFrom(new ComputerState.GameInitializer(game));
+    int numSimulations;
+    switch (currentProfile.getComputerDifficultyLevel()) {
+      case 0: {
+        // ~70% player win rate
+        numSimulations = 5;
+        break;
       }
-      final MonteCarloSearch agent = MonteCarloSearch.builder(new ComputerState())
-          .setNumSimulations(numSimulations)
-          .build();
-      int player = computerState.convertPlayerNumber(game.getCurrentPlayerNumber());
-      agent.beginAsynchronousSearch(player, computerState);
-      Timer timer = new Timer();
-      timer.schedule(new TimerTask() {
-        @Override public void run() {
-          long action = agent.getAsynchronousSearchResult().getAction();
-          Command command = computerState.longToCommand(action);
-          addCommandAndSubmit(game, command, new OnMutationCompleted() {
-            @Override
-            public void onMutationCompleted(Game game) {
-              isComputerThinking = false;
-            }
-          });
-        }
-      }, 4000L);
+      case 1: {
+        // ~50% player win rate
+        numSimulations = 100;
+        break;
+      }
+      case 2: {
+        // ~10% player win rate
+        numSimulations = 1000;
+        break;
+      }
+      default: {
+        throw die("Unknown difficulty level");
+      }
     }
+    final MonteCarloSearch agent = MonteCarloSearch.builder(new ComputerState())
+        .setNumSimulations(numSimulations)
+        .build();
+    int player = computerState.convertPlayerNumber(game.getCurrentPlayerNumber());
+    agent.beginAsynchronousSearch(player, computerState);
+    Timer timer = new Timer();
+    timer.schedule(new TimerTask() {
+      @Override public void run() {
+        long action = agent.getAsynchronousSearchResult().getAction();
+        Command command = computerState.longToCommand(action);
+        addCommandAndSubmit(game, command, new OnMutationCompleted() {
+          @Override
+          public void onMutationCompleted(Game game) {
+            isComputerThinking = false;
+          }
+        });
+      }
+    }, 4000L);
   }
   
   /**
@@ -822,12 +824,24 @@ public class Model extends AbstractChildEventListener {
     userReference().child("games").child(gameId).setValue(true);
   }
   
+  /**
+   * Causes the command update listener for the provided game ID to invoke
+   * onRegistered() again.
+   *
+   * @param gameId Game's ID.
+   */
   public void invalidateCommandListener(String gameId) {
     if (commandUpdateListeners.containsKey(gameId) && games.containsKey(gameId)) {
       commandUpdateListeners.get(gameId).onRegistered(userId, games.get(gameId));
     }
   }
   
+  /**
+   * Add the viewer to the provided game if there's room and they're not
+   * already a player.
+   *
+   * @param game Game to add the viewer to.
+   */
   public void joinGameIfPossible(Game game) {
     if (!(game.isGameOver()) && game.getPlayerCount() < 2 &&
         !game.getPlayerList().contains(userId)) {
@@ -858,9 +872,6 @@ public class Model extends AbstractChildEventListener {
    * @param facebookId The user's facebook ID.
    */
   public Model upgradeAccountToFacebook(String facebookId) {
-    for (Game game : games.values()) {
-      
-    }
     return new Model(facebookId, facebookId, firebase);
   }
   

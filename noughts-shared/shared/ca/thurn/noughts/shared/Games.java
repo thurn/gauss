@@ -63,7 +63,7 @@ public class Games {
     if (game.isGameOver()) {
       if (game.getVictorCount() == 1) {
         int winnerNumber = game.getVictor(0);
-        Profile winnerProfile = playerProfile(game, winnerNumber);
+        Profile winnerProfile = game.getProfile(winnerNumber);
         String winner = winnerProfile.getName();
         ImageString imageString = winnerProfile.hasImageString() ?
             winnerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;  
@@ -87,26 +87,18 @@ public class Games {
           .build();        
       }
     } else {
-      String name = "Opponent";
-      ImageString imageString = NO_OPPONENT_IMAGE_STRING;
-      boolean isComputerPlayer = false;
-      if (playerHasProfile(game, game.getCurrentPlayerNumber())) {
-        Profile currentPlayerProfile = playerProfile(game, game.getCurrentPlayerNumber());
-        if (currentPlayerProfile.hasImageString()) {
-          imageString = currentPlayerProfile.getImageString();
-        }
-        if (currentPlayerProfile.hasName()) {
-          name = currentPlayerProfile.getName();
-        }
-        if (currentPlayerProfile.hasIsComputerPlayer()) {
-          isComputerPlayer = currentPlayerProfile.isComputerPlayer();
-        }
+      String name = "Player " + (game.getCurrentPlayerNumber() + 1);
+      Profile currentPlayerProfile = game.getProfile(game.getCurrentPlayerNumber());
+      if (currentPlayerProfile.hasName()) {
+        name = currentPlayerProfile.getName();
       }
       return GameStatus.newBuilder()
           .setStatusString(name + "'s turn")
-          .setStatusImageString(imageString)
+          .setStatusImageString(currentPlayerProfile.hasImageString() ?
+              currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING)
           .setStatusPlayer(game.getCurrentPlayerNumber())
-          .setIsComputerThinking(isComputerPlayer)
+          .setIsComputerThinking(currentPlayerProfile.hasIsComputerPlayer() ?
+              currentPlayerProfile.isComputerPlayer() : false)
           .build();
     }
   }  
@@ -173,35 +165,6 @@ public class Games {
   }
 
   /**
-   * @param game The game.
-   * @param playerNumber A player number currently in this game.
-   * @return The Profile object for that player, with local profiles taking
-   *     precedence over regular profiles.
-   * @throws IllegalArgumentException If there is no profile for this player.
-   */
-  static Profile playerProfile(Game game, int playerNumber) {
-    if (!playerHasProfile(game, playerNumber)) {
-      throw new IllegalArgumentException("No profile for player " + playerNumber);
-    }
-    if (hasLocalProfile(game, playerNumber)) {
-      return game.getLocalProfile(playerNumber);
-    } else {
-      return game.getProfile(playerIdFromPlayerNumber(game, playerNumber));
-    }
-  }
-
-  /**
-   * @param game The game.
-   * @param playerNumber A player number current in this game.
-   * @return True if the provided player has a profile in this game.
-   */
-  static boolean playerHasProfile(Game game, int playerNumber) {
-    if (playerNumber >= game.getPlayerCount()) return false;
-    return hasLocalProfile(game, playerNumber) ||
-        game.hasProfile(playerIdFromPlayerNumber(game, playerNumber));
-  }
-
-  /**
    * @param playerNumber A player's player number
    * @return That player's player ID
    * @throws IllegalArgumentException if the player number is not currently in
@@ -229,56 +192,19 @@ public class Games {
       }
     }
     return results;
-  } 
-  
-  /**
-   * @param playerNumber A player number.
-   * @return True if the provided player has a local profile.
-   */
-  // Visible for testing
-  static boolean hasLocalProfile(Game game, int playerNumber) {
-    if (playerNumber < 0 || playerNumber >= game.getLocalProfileCount()) return false;
-    return game.getLocalProfile(playerNumber) != null;
-  }
-  
-  /**
-   *
-   * @param viewerId viewer's player ID
-   * @return True if the game has an opponent who has a profile, false
-   *     otherwise.
-   */
-  // Visible for testing
-  static boolean hasOpponentProfile(Game game, String viewerId) {
-    if (!hasOpponent(game, viewerId)) return false;
-    int opponentNumber = opponentPlayerNumber(game, viewerId);
-    if (hasLocalProfile(game, opponentNumber)) {
-      return true;
-    }
-    String opponentId = playerIdFromPlayerNumber(game, opponentNumber);
-    return game.getProfileMap().containsKey(opponentId);
   }
 
   /**
    * @param viewerId viewer's player ID
-   * @return The profile of your opponent or null if there isn't one. Local
-   *     profiles take precedence over regular profiles.
-   * @throws IllegalStateException If there is no opponent as defined by
-   *     {@link Game#hasOpponent(String)} or there is no opponent profile.
+   * @return The profile of your opponent.
+   * @throws IllegalStateException If there is no opponent 
    */
   // Visible for testing
   static Profile opponentProfile(Game game, String viewerId) {
-    if (!hasOpponentProfile(game, viewerId)) {
-      throw new IllegalStateException("No opponent profile found.");
-    }
     int opponentNumber = opponentPlayerNumber(game, viewerId);
-    if (hasLocalProfile(game, opponentNumber)) {
-      return game.getLocalProfile(opponentNumber);
-    } else {
-      String opponentId = playerIdFromPlayerNumber(game, opponentNumber);
-      return game.getProfile(opponentId);
-    }
+    return game.getProfile(opponentNumber);
   }
-
+  
   /**
    * @param viewerId viewer's player ID
    * @return A string describing the opponent of this game, such as
@@ -287,20 +213,19 @@ public class Games {
   // Visible for testing
   static String vsString(Game game, String viewerId) {
     if (game.isLocalMultiplayer()) {
-      if (game.getLocalProfileCount() == 2) {
-        return game.getLocalProfile(0).getName() + " vs. " + game.getLocalProfile(1).getName();
+      if (game.getProfile(0).hasName() && game.getProfile(1).hasName()) {
+        return game.getProfile(0).getName() + " vs. " + game.getProfile(1).getName();
       } else {
         return "Local Multiplayer Game";
       }
-    }
-    else if (hasOpponentProfile(game, viewerId)) {
-      return "vs. " + opponentProfile(game, viewerId).getName();
+    } else if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasName()) {
+      return "vs. " + opponentProfile(game, viewerId).getName();      
     } else {
       if (game.isGameOver()) {
         return "vs. (No Opponent)";        
       } else {
         return "vs. (No Opponent Yet)";
-      }
+      }      
     }
   }
   
@@ -328,10 +253,10 @@ public class Games {
           statusString = "You won";
         } else if (hasOpponent(game, viewerId) &&
             game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
-          if (hasOpponentProfile(game, viewerId) && opponentProfile(game, viewerId).hasPronoun()) {
+          if (opponentProfile(game, viewerId).hasPronoun()) {
             Profile opponentProfile = opponentProfile(game, viewerId);
             statusString = Pronouns.getNominativePronoun(
-                opponentProfile.getPronoun(), true /* capitalize */) + " won";
+                opponentProfile.getPronoun(), true /* capitalize */) + " won";            
           } else {
             statusString = "They won";
           }
@@ -501,12 +426,16 @@ public class Games {
   static List<ImageString> imageList(Game game, String viewerId) {
     List<ImageString> result = new ArrayList<ImageString>();
     if (game.isLocalMultiplayer()) {
-      for (Profile profile : game.getLocalProfileList()) {
-        result.add(profile.getImageString());
+      for (Profile profile : game.getProfileList()) {
+        if (profile.hasImageString()) {
+          result.add(profile.getImageString());
+        } else {
+          result.add(NO_OPPONENT_IMAGE_STRING);
+        }
       }
     } else {
-      if (hasOpponentProfile(game, viewerId)) {
-        result.add(opponentProfile(game, viewerId).getImageString());      
+      if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasImageString()) {
+        result.add(opponentProfile(game, viewerId).getImageString());          
       } else {
         result.add(NO_OPPONENT_IMAGE_STRING);
       }

@@ -1,8 +1,7 @@
 package ca.thurn.noughts.shared;
 
-import static ca.thurn.noughts.shared.ModelTest.map;
 import static ca.thurn.noughts.shared.ModelTest.list;
-import ca.thurn.noughts.shared.entities.Action;
+import static ca.thurn.noughts.shared.ModelTest.map;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameStatus;
 import ca.thurn.noughts.shared.entities.ImageString;
@@ -74,7 +73,7 @@ public class GameTest extends SharedTestCase {
     Profile.Builder opponentProfile = Profile.newBuilder();
     opponentProfile.setName("Opponent");
     opponentProfile.setPronoun(Pronoun.FEMALE);
-    testGame.putProfile("opponentId", opponentProfile.build());
+    testGame.setProfile(1, opponentProfile.build());
     testGame.setLastModified(currentTime);
     assertEquals("She won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
     
@@ -106,7 +105,7 @@ public class GameTest extends SharedTestCase {
     g1.addPlayer("user");
     g1.addPlayer("user");
     Profile john = Profile.newBuilder().setName("John").build();
-    g1.putProfile("user", john);
+    g1.setProfile(0, john);
     try {
       Games.opponentProfile(g1.build(),("user"));
       fail();
@@ -115,35 +114,21 @@ public class GameTest extends SharedTestCase {
     Game.Builder g2 = Game.newBuilder().setId("g2");
     g2.addPlayer("user1");
     g2.addPlayer("user2");
-    g2.putProfile("user2", john);
-    g2.addLocalProfile(Profile.newBuilder().build());
-    g2.addLocalProfile(Profile.newBuilder().setName("Jane").build());
+    g2.setProfile(1, john);
+    g2.addProfile(Profile.newBuilder().build());
+    g2.addProfile(Profile.newBuilder().setName("Jane").build());
     assertEquals("Jane", Games.opponentProfile(g2.build(), "user1").getName());
     
     Game.Builder g3 = Game.newBuilder().setId("g3");
     g3.addPlayer("user1");
     g3.addPlayer("user2");
-    g3.putProfile("user2", john);
+    g3.setProfile(1, john);
     assertEquals("John", Games.opponentProfile(g3.build(), "user1").getName());
     
     try {
       Games.opponentProfile(g3.build(), "user2");
       fail();
     } catch (IllegalStateException expected) {}
-  }
-  
-  public void testGetPlayerProfile() {
-    Game.Builder g1 = Game.newBuilder().setId("g1");
-    g1.addPlayer("user");
-    g1.addPlayer("opponent");        
-    g1.putProfile("user",  Profile.newBuilder().setName("John").build());
-    assertEquals("John", Games.playerProfile(g1.build(),0).getName());
-    try {
-      Games.playerProfile(g1.build(),1);
-      fail();
-    } catch (IllegalArgumentException expected) {}
-    g1.addLocalProfile(Profile.newBuilder().setName("James").build());
-    assertEquals("James", Games.playerProfile(g1.build(),0).getName());
   }
   
   public void testGetPlayerNumbersForPlayerId() {
@@ -166,7 +151,7 @@ public class GameTest extends SharedTestCase {
     testGame.addPlayer("one");
     testGame.addPlayer("two");
     Profile profile = Profile.newBuilder().setName("GivenName").build();
-    testGame.putProfile("two", profile);
+    testGame.setProfile(1, profile);
     assertEquals("vs. GivenName", Games.vsString(testGame.build(),"one"));
   }
   
@@ -193,10 +178,10 @@ public class GameTest extends SharedTestCase {
     Game.Builder testGame = getTestGame();
     testGame.setIsLocalMultiplayer(true);
     ImageString image1 = newImageString("one");
-    testGame.addLocalProfile(
+    testGame.addProfile(
         Profile.newBuilder().setName("Alpha").setImageString(image1).build());
     ImageString image2 = newImageString("two");
-    testGame.addLocalProfile(
+    testGame.addProfile(
         Profile.newBuilder().setName("Beta").setImageString(image2).build());
     assertDeepEquals(list(image1, image2), Games.imageList(testGame.build(),"userid"));
   }
