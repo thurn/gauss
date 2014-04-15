@@ -14,33 +14,31 @@
 #import "ProfilePromptViewController.h"
 #import "AppDelegate.h"
 
-@interface GameViewController () <UIAlertViewDelegate>
+@interface GameViewController () <UIAlertViewDelegate, OnModelLoaded>
 @property(weak,nonatomic) NTSModel *model;
-@property(weak,nonatomic) GameView *gameView;
-@property(strong,nonatomic) NTSGame *currentGame;
+@property(strong,nonatomic) GameView *gameView;
 @end
 
 @implementation GameViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {
-  }
-  return self;
-}
-
 - (void)loadView {
   [super loadView];
-  _model = [AppDelegate getModel];
-  GameView *view = [GameView new];
-  view.delegate = self;
-  [view setGameCanvasDelegate:self];
-  self.view = view;
-  _gameView = view;
+  _gameView = [GameView new];
+  _gameView.delegate = self;
+  [_gameView updateButtons];
+  [_gameView setGameCanvasDelegate:self];
+  self.view = _gameView;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  [super viewWillAppear:animated];
+  [AppDelegate registerForOnModelLoaded:self];
+}
+
+- (void)onModelLoaded:(NTSModel *)model {
+  _model = [AppDelegate getModel];
+  [_model setCommandUpdateListenerWithNSString:_currentGameId
+                  withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
+  [_model setGameUpdateListenerWithNSString:_currentGameId withNTSGameUpdateListener:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -48,10 +46,6 @@
   if (_tutorialMode) {
     [_gameView showTapSquareCallout];
   }
-  [_model setGameUpdateListenerWithNSString:_currentGameId
-                  withNTSGameUpdateListener:self];
-  [_model setCommandUpdateListenerWithNSString:_currentGameId
-                  withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
 }
 
 - (void)displayGameStatus:(NTSGameStatus*)status {
@@ -91,8 +85,8 @@
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
     case kResignOrArchive: {
-      if ([_currentGame isGameOver]) {
-        [_model archiveGameWithNTSGame:_currentGame];
+      if ([_model isGameOverWithNSString:_currentGameId]) {
+        [_model archiveGameWithNSString:_currentGameId];
         [[self navigationController] setNavigationBarHidden:NO animated:YES];
         [self.navigationController popToRootViewControllerAnimated:YES];
       } else {
@@ -149,7 +143,7 @@
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
   if (buttonIndex == 1) {
-    [_model resignGameWithNTSGame:_currentGame];
+    [_model resignGameWithNSString:_currentGameId];
   }
 }
 
@@ -175,34 +169,36 @@
 
 - (void)handleSquareTapAtX:(int)x AtY:(int)y {
   NTSCommand *command = [self commandFromX:x fromY:y];
-  if ([_model couldSubmitCommandWithNTSGame:_currentGame withNTSCommand:command]) {
+  if ([_model couldAddCommandWithNSString:_currentGameId withNTSCommand:command]) {
     if (_tutorialMode) {
       [_gameView hideTapSquareCallout];
       [_gameView showSubmitCallout];
     }
-    [_model addCommandWithNTSGame:_currentGame withNTSCommand:command];
+    [_model addCommandWithNSString:_currentGameId withNTSCommand:command];
   }
 }
 
 - (void)handleDragToX:(int)x toY:(int)y {
   NTSCommand *command = [self commandFromX:x fromY:y];
-  [_model updateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
+  [_model updateLastCommandWithNSString:_currentGameId withNTSCommand:command];
 }
 
 - (BOOL)allowDragToX:(int)x toY:(int)y {
   NTSCommand *command = [self commandFromX:x fromY:y];
-  return [_model couldUpdateLastCommandWithNTSGame:_currentGame withNTSCommand:command];
+  return [_model couldUpdateLastCommandWithNSString:_currentGameId withNTSCommand:command];
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  _currentGame = game;
-  [_model joinGameIfPossibleWithNTSGame:game];
-  [_model handleComputerActionWithNTSGame:_currentGame];
-  [_gameView drawGame:game];
+  [_model joinGameIfPossibleWithNSString:_currentGameId];
+  [_model handleComputerActionWithNSString:_currentGameId];
 }
 
-- (void)onProfileRequiredWithNTSGame:(NTSGame*)game {
-  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGame:game];
+- (void)onCurrentActionUpdateWithNTSAction:(NTSAction*)currentAction {
+  [_gameView updateButtons];
+}
+
+- (void)onProfileRequiredWithNSString:(NSString*)gameId {
+  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId];
   [self presentViewController:ppvc animated:YES completion:nil];
 }
 
@@ -211,15 +207,15 @@
 }
 
 - (BOOL)canSubmit {
-  return [_model canSubmitWithNTSGame:_currentGame];
+  return [_model canSubmitWithNSString:_currentGameId];
 }
 
 - (BOOL)canUndo {
-  return [_model canUndoWithNTSGame:_currentGame];
+  return [_model canUndoWithNSString:_currentGameId];
 }
 
 - (BOOL)canRedo {
-  return [_model canRedoWithNTSGame:_currentGame];
+  return [_model canRedoWithNSString:_currentGameId];
 }
 
 - (void)handleSubmit {
@@ -230,19 +226,19 @@
     [userDefaults setObject:@YES forKey:kSawTutorialKey];
     [userDefaults synchronize];
   }
-  [_model submitCurrentActionWithNTSGame:_currentGame];
+  [_model submitCurrentActionWithNSString:_currentGameId];
 }
 
 - (void)handleUndo {
-  [_model undoCommandWithNTSGame:_currentGame];
+  [_model undoCommandWithNSString:_currentGameId];
 }
 
 - (void)handleRedo {
-  [_model redoCommandWithNTSGame:_currentGame];
+  [_model redoCommandWithNSString:_currentGameId];
 }
 
 - (BOOL)isGameOver {
-  return [_currentGame isGameOver];
+  return [_model isGameOverWithNSString:_currentGameId];
 }
 
 @end

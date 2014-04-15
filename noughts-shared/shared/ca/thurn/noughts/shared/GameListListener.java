@@ -7,5 +7,5 @@ public interface GameListListener {
   
   public void onGameChanged(Game game);
   
-  public void onGameRemoved(Game game);
+  public void onGameRemoved(String gameId);
 }

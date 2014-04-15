@@ -23,16 +23,16 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 
 @interface GameView : UIView <UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
--(void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
--(id<NTSCommandUpdateListener>)getCommandUpdateListener;
--(void)drawGame:(NTSGame *)game;
--(void)displayGameStatusWithImage:(UIImage*)image
-                       withString:(NSString*)string
-                        withColor:(UIColor*)color;
--(void)showTapSquareCallout;
--(void)hideTapSquareCallout;
--(void)showSubmitCallout;
--(void)hideSubmitCallout;
--(void)showComputerThinkingIndicator;
--(void)hideComputerThinkingIndicator;
+- (void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
+- (id<NTSCommandUpdateListener>)getCommandUpdateListener;
+- (void)updateButtons;
+- (void)displayGameStatusWithImage:(UIImage*)image
+                        withString:(NSString*)string
+                         withColor:(UIColor*)color;
+- (void)showTapSquareCallout;
+- (void)hideTapSquareCallout;
+- (void)showSubmitCallout;
+- (void)hideSubmitCallout;
+- (void)showComputerThinkingIndicator;
+- (void)hideComputerThinkingIndicator;
 @end

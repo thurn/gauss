@@ -11,11 +11,13 @@ public interface CommandUpdateListener {
    *
    * @param viewerId The player ID of the viewer
    * @param game The initial game value.
+   * @param currentAction The viewer's currentAction, or null if there is no
+   *     current action.
    */
-  public void onRegistered(String viewerId, Game game);
-  
+  public void onRegistered(String viewerId, Game game, Action currentAction);
+
   /**
-   * Called whenever commands are added to an action.
+   * Called when a command is added to the current action.
    *
    * @param action The action the command was added to.
    * @param command The newly added command.
@@ -23,7 +25,7 @@ public interface CommandUpdateListener {
   public void onCommandAdded(Action action, Command command);
   
   /**
-   * Called whenever commands are removed from an action.
+   * Called when a command is removed from the current action.
    *
    * @param action The action the command was removed from.
    * @param command The removed command.
@@ -31,20 +33,20 @@ public interface CommandUpdateListener {
   public void onCommandRemoved(Action action, Command command);
 
   /**
-   * Called whenever commands are changed in a current action.
+   * Called when a command in the current action is changed.
    *
    * @param action The action where the command was changed.
-   * @param command The changed command.
+   * @param oldCommand The previous value of the command.
+   * @param newCommand The new value of the command.
    */
   public void onCommandChanged(Action action, Command oldCommand, Command newCommand);
-  
+
   /**
-   * Called whenever commands are submitted.
+   * Called when an action is submitted.
    *
    * @param action The action for the command.
-   * @param command The command that was submitted.
    */
-  public void onCommandSubmitted(Action action, Command command);
+  public void onActionSubmitted(Action action);
   
   /**
    * Called when the game ends.

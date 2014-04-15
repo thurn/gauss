@@ -12,8 +12,9 @@
 #import "GameListListener.h"
 #import "GameListSection.h"
 #import "AppDelegate.h"
+#import "IndexPath.h"
 
-@interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener>
+@interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener, OnModelLoaded>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
 @property(nonatomic) float scale;
@@ -27,39 +28,60 @@
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  _model = [AppDelegate getModel];
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
   self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
-  [_model setGameListListenerWithNTSGameListListener:self];
-  self.gameListPartitions = [self.model getGameListPartitions];
+  [AppDelegate registerForOnModelLoaded:self];
 }
 
-- (void)viewWillAppear:(BOOL)animated {
-  if (self.model) {
-    self.gameListPartitions = [self.model getGameListPartitions];
-    [self.tableView reloadData];
-  }
+- (void)onModelLoaded:(NTSModel *)model {
+  _model = model;
+  [_model setGameListListenerWithNTSGameListListener:self];
+  _gameListPartitions = [_model getGameListPartitions];
+  [self.tableView reloadData];
 }
 
 -(void)onGameAddedWithNTSGame:(NTSGame*)game {
+  NSLog(@"onGameAdded");
   if (self.isViewLoaded && self.view.window) {
     [self.tableView beginUpdates];
-    int section = [self sectionNumberForGame:game withViewer:[_model getUserId]];
+    int section = [[NTSGameListPartitions getSectionWithNTSGame:game
+                                                  withNSString:[_model getUserId]] ordinal];
     NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
     [self.tableView insertRowsAtIndexPaths:@[path]
                           withRowAnimation:UITableViewRowAnimationFade];
-    self.gameListPartitions = [self.model getGameListPartitions];
+    _gameListPartitions = [_model getGameListPartitions];
     [self.tableView endUpdates];
   }
 }
 
 - (void)onGameChangedWithNTSGame:(NTSGame *)game {
-  
+  NSLog(@"onGameChanged");
+  NTSIndexPath *indexPath = [_gameListPartitions getGameIndexPathWithNSString:[game getId]];
+  int newSection = [[NTSGameListPartitions getSectionWithNTSGame:game
+                                                    withNSString:[_model getUserId]] ordinal];
+  if ([indexPath getSection] != newSection && [indexPath getSection] != -1) {
+    NSLog(@"moving from path %@", indexPath);
+    NSLog(@"to section %d", newSection);
+    [self.tableView beginUpdates];
+    [self.tableView moveRowAtIndexPath:[NSIndexPath indexPathForItem:[indexPath getRow]
+                                                           inSection:[indexPath getSection]]
+                           toIndexPath:[NSIndexPath indexPathForItem:0
+                                                           inSection:newSection]];
+    _gameListPartitions = [_model getGameListPartitions];
+    [self.tableView endUpdates];
+  }
 }
 
-- (void)onGameRemovedWithNTSGame:(NTSGame*)game {
-  
+- (void)onGameRemovedWithNSString:(NSString*)gameId {
+  [self.tableView beginUpdates];
+  NTSIndexPath *indexPath = [_gameListPartitions getGameIndexPathWithNSString:gameId];
+  [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath
+                                            indexPathForItem:[indexPath getRow]
+                                                   inSection:[indexPath getSection]]]
+                        withRowAnimation:UITableViewRowAnimationFade];
+  _gameListPartitions = [_model getGameListPartitions];
+  [self.tableView endUpdates];
 }
 
 #pragma mark - Table view data source
@@ -82,12 +104,6 @@
       return [self.gameListPartitions gameOver];
   }
   return nil;
-}
-
-- (int)sectionNumberForGame:(NTSGame*)game withViewer:(NSString*)viewer {
-  NTSGameListSectionEnum *section =
-    [NTSGameListPartitions getSectionWithNTSGame:game withNSString:viewer];
-  return [section ordinal];
 }
 
 - (NTSGame *)gameForIndexPath:(NSIndexPath *)indexPath {
@@ -167,19 +183,16 @@
     commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
      forRowAtIndexPath:(NSIndexPath *)indexPath {
   if (editingStyle == UITableViewCellEditingStyleDelete) {
+
     NTSGame *game = [self gameForIndexPath:indexPath];
     if ([game isGameOver]) {
-      [self.model archiveGameWithNTSGame:game];
-      self.gameListPartitions = [self.model getGameListPartitions];
-      [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+      [_model archiveGameWithNSString:[game getId]];
+      [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                       withRowAnimation:UITableViewRowAnimationLeft];
     } else {
-      [tableView beginUpdates];
-      [self.model resignGameWithNTSGame:game];
-      [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationBottom];
-      NSIndexPath *newPath = [NSIndexPath indexPathForItem:0 inSection:GAME_OVER_SECTION];
-      [tableView insertRowsAtIndexPaths:@[newPath] withRowAnimation:UITableViewRowAnimationTop];
-      self.gameListPartitions = [self.model getGameListPartitions];
-      [tableView endUpdates];
+      [_model resignGameWithNSString:[game getId]];
+      [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObject:indexPath]
+                       withRowAnimation:UITableViewRowAnimationNone];
     }
   }
 }

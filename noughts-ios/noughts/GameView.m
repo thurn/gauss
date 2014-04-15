@@ -1,7 +1,6 @@
 #import "GameView.h"
 #import "SVGKit.h"
 #import "Model.h"
-#import "Game.h"
 #import "Action.h"
 #import "Command.h"
 #include "java/lang/Integer.h"
@@ -13,7 +12,6 @@
 #define SQUARE_SIZE 107
 
 @interface GameView ()
-@property(strong,nonatomic) NTSGame *currentGame;
 @property(strong,nonatomic) UIButton *gameMenuButton;
 @property(strong,nonatomic) UIButton *submitButton;
 @property(strong,nonatomic) UIButton *undoButton;
@@ -239,11 +237,6 @@
   if (selection != kUnknownSelection) {
     [_delegate handleGameMenuSelection:selection];
   }
-}
-
-- (void)drawGame:(NTSGame*)game {
-  _currentGame = game;
-  [self updateButtons];
 }
 
 - (void)updateButtons {

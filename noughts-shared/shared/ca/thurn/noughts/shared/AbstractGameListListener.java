@@ -11,6 +11,6 @@ public class AbstractGameListListener implements GameListListener {
   public void onGameChanged(Game game) {}
 
   @Override
-  public void onGameRemoved(Game game) {}
+  public void onGameRemoved(String gameId) {}
 
 }

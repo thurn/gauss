@@ -7,5 +7,5 @@ FOUNDATION_EXPORT NSString *const kPlayerLocalNameKey;
 @end
 
 @interface ProfilePromptViewController : UIViewController
-- (id)initWithGame:(NTSGame*)game;
+- (id)initWithGameId:(NSString*)gameId;
 @end

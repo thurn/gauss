@@ -12,7 +12,8 @@ NSString *const kFacebookId = @"kFacebookId";
 
 @interface AppDelegate () <NTSPushNotificationListener>
 @property BOOL runningQuery;
-@property FirebaseSimpleLogin *firebaseLogin;
+@property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
+@property(strong, nonatomic) NSMutableArray *onModelReadyListeners;
 @end
 
 @implementation AppDelegate
@@ -32,6 +33,7 @@ NSString *const kFacebookId = @"kFacebookId";
     [FBSession.activeSession openWithCompletionHandler:nil];
   }
   _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
+  _onModelReadyListeners = [NSMutableArray new];
   [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
     if (user != nil) {
       NSLog(@"Facebook User");
@@ -52,6 +54,9 @@ NSString *const kFacebookId = @"kFacebookId";
 
 - (void)onModelReady {
   [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
+  for (id <OnModelLoaded> listener in _onModelReadyListeners) {
+    [listener onModelLoaded:_model];
+  }
 }
 
 - (void)alert:(NSString*)message {
@@ -238,6 +243,15 @@ NSString *const kFacebookId = @"kFacebookId";
   [push setData:data];
   [push setChannel:channelId];
   [push sendPushInBackground];
+}
+
++ (void)registerForOnModelLoaded:(id<OnModelLoaded>)object {
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  if (appDelegate.model) {
+    [object onModelLoaded:appDelegate.model];
+  } else {
+    [appDelegate.onModelReadyListeners addObject:object];
+  }
 }
 
 + (NTSModel*)getModel {

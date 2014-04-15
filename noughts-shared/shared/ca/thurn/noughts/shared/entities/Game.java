@@ -199,29 +199,6 @@ public class Game extends Entity<Game> {
       return this;
     }
 
-    public boolean hasCurrentAction() {
-      return game.hasCurrentAction();
-    }
-
-    public Action getCurrentAction() {
-      return game.getCurrentAction();
-    }
-    
-    public Builder setCurrentAction(EntityBuilder<Action> currentAction) {
-      return setCurrentAction(currentAction.build());
-    }
-    
-    public Builder setCurrentAction(Action currentAction) {
-      checkNotNull(currentAction);
-      game.currentAction = currentAction;
-      return this;
-    }
-    
-    public Builder clearCurrentAction() {
-      game.currentAction = null;
-      return this;
-    }
-
     public boolean hasLastModified() {
       return game.hasLastModified();
     }
@@ -406,12 +383,6 @@ public class Game extends Entity<Game> {
   private final List<Action> submittedActionList;
 
   /**
-   * Action currently being constructed, null when there is no action under
-   * construction.
-   */
-  private Action currentAction;
-
-  /**
    * UNIX timestamp of time when game was last modified.
    */
   private Long lastModified;
@@ -458,7 +429,6 @@ public class Game extends Entity<Game> {
     this.profileList = new ArrayList<Profile>(game.profileList);
     this.currentPlayerNumber = game.currentPlayerNumber;
     this.submittedActionList = new ArrayList<Action>(game.submittedActionList);
-    this.currentAction = game.currentAction;
     this.lastModified = game.lastModified;
     this.requestId = game.requestId;
     this.victorList = new ArrayList<Integer>(game.victorList);
@@ -474,7 +444,6 @@ public class Game extends Entity<Game> {
     profileList = getEntities(gameMap, "profileList", Profile.newDeserializer());
     currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
     submittedActionList = getEntities(gameMap, "submittedActionList", Action.newDeserializer());
-    currentAction = getEntity(gameMap, "currentAction", Action.newDeserializer());
     lastModified = getLong(gameMap, "lastModified");
     requestId = getString(gameMap, "requestId");
     victorList = getIntegerList(getList(gameMap, "victorList"));
@@ -496,7 +465,6 @@ public class Game extends Entity<Game> {
     putSerialized(result, "profileList", profileList);
     putSerialized(result, "currentPlayerNumber", currentPlayerNumber);
     putSerialized(result, "submittedActionList", submittedActionList);
-    putSerialized(result, "currentAction", currentAction);
     putSerialized(result, "lastModified", lastModified);
     putSerialized(result, "requestId", requestId);
     putSerialized(result, "victorList", victorList);
@@ -564,16 +532,7 @@ public class Game extends Entity<Game> {
   public List<Action> getSubmittedActionList() {
     return Collections.unmodifiableList(submittedActionList);
   }
-  
-  public boolean hasCurrentAction() {
-    return currentAction != null;
-  }
-  
-  public Action getCurrentAction() {
-    checkNotNull(currentAction);
-    return currentAction;
-  }
-  
+
   public boolean hasLastModified() {
     return lastModified != null;
   }

@@ -13,15 +13,15 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 @property(nonatomic) int playerImageIndex;
 @property(weak, nonatomic) IBOutlet UIButton *avatarButton;
 @property(weak, nonatomic) IBOutlet UIButton *doneButton;
-@property(strong, nonatomic) NTSGame *game;
+@property(strong, nonatomic) NSString *gameId;
 @end
 
 @implementation ProfilePromptViewController
 
-- (id)initWithGame:(NTSGame*)game {
+- (id)initWithGameId:(NSString*)gameId {
   self = [super initWithNibName:@"ProfilePrompt" bundle:nil];
   if (self) {
-    _game = game;
+    _gameId = gameId;
   }
   return self;
 }
@@ -72,7 +72,7 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
   NTSProfile_Builder *profile = [NTSProfile newBuilder];
   [profile setNameWithNSString:_nameField.text];
   [profile setImageStringWithNTSImageString:[imageString build]];
-  [model setProfileForViewerWithNTSGame:_game
+  [model setProfileForViewerWithNSString:_gameId
                           withNTSProfile:[profile build]
               withNTSOnMutationCompleted:self];
 }

@@ -68,7 +68,9 @@
   [_delegate invalidateCommandListener];
 }
 
-- (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
+- (void)onRegisteredWithNSString:(NSString *)viewerId
+                     withNTSGame:(NTSGame *)game
+                   withNTSAction:(NTSAction *)currentAction {
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
   float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
@@ -92,10 +94,10 @@
   for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
     [self drawAction:action animate:NO draggable:NO];
   }
-  
-  if ([game hasCurrentAction]) {
-    BOOL draggable = [self belongsToViewer:[game getCurrentAction]];
-    [self drawAction:[game getCurrentAction] animate:YES draggable:draggable];
+
+  if (currentAction) {
+    BOOL draggable = [self belongsToViewer:currentAction];
+    [self drawAction:currentAction animate:YES draggable:draggable];
   }
 }
 
@@ -141,9 +143,15 @@
   AudioServicesPlaySystemSound(_addCommandSound);
 }
 
-- (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  [self removeAllGestureRecognizers:_views[command]];
+-(void)onActionSubmittedWithNTSAction:(NTSAction *)action {
+  for (NTSCommand *command in [action getCommandList]) {
+    [self removeAllGestureRecognizers:_views[command]];
+  }
   AudioServicesPlaySystemSound(_submitCommandSound);
+}
+
+- (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {

@@ -110,6 +110,7 @@
 		7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */; };
 		7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447018DF41AF0023F1CA /* Accounts.framework */; };
 		7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447218DF41B40023F1CA /* Social.framework */; };
+		7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CD64E3B18FD8F3200252818 /* IndexPath.java */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
 		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
@@ -264,6 +265,7 @@
 		7CCD446B18DF2EE70023F1CA /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
 		7CCD447018DF41AF0023F1CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		7CCD447218DF41B40023F1CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		7CD64E3B18FD8F3200252818 /* IndexPath.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = IndexPath.java; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
 		7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewLocalGameViewController.m; sourceTree = "<group>"; };
@@ -557,6 +559,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7CD64E3B18FD8F3200252818 /* IndexPath.java */,
 				7C65892B18EDF23D00359B7C /* PushNotificationListener.java */,
 				7C3F723618E36D6700898E5A /* AbstractGameListListener.java */,
 				7C3F723718E36D6700898E5A /* GameListListener.java */,
@@ -824,6 +827,7 @@
 				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C58BE1418C1BD4D008D2C9D /* Command.java in Sources */,
 				7C72157F186F232500F1188B /* GameListViewController.m in Sources */,
+				7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */,
 				7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */,
 				7C58BE1818C1BD4D008D2C9D /* ImageString.java in Sources */,
 				7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */,

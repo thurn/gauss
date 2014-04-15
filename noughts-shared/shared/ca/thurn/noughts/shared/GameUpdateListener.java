@@ -1,5 +1,6 @@
 package ca.thurn.noughts.shared;
 
+import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameStatus;
 
@@ -15,6 +16,13 @@ public interface GameUpdateListener {
   public void onGameUpdate(Game game);
   
   /**
+   * Called with the new value whenever the viewer's current action changes.
+   *
+   * @param currentAction
+   */
+  public void onCurrentActionUpdate(Action currentAction);
+  
+  /**
    * Called when the "status" of the game changes (game ends, new player's
    * turn, etc)
    *
@@ -27,5 +35,5 @@ public interface GameUpdateListener {
    *
    * @param game The game. 
    */
-  public void onProfileRequired(Game game);
+  public void onProfileRequired(String gameId);
 }
