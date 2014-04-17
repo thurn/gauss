@@ -10,22 +10,26 @@
 @implementation FacebookInviteViewController
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-//  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-//  NSNumber *uid = appDelegate.friends[indexPath.row][@"uid"];
-//  [FBWebDialogs
-//   presentRequestsDialogModallyWithSession:nil
-//   message:@"Invitation to play noughts"
-//   title:@"noughts"
-//   parameters:@{@"to": [uid stringValue]}
-//   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-//     if (result != FBWebDialogResultDialogNotCompleted) {
-//       NSLog(@"result url %@", resultURL);
-//       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-//       NSLog(@"fbid %@", query[@"to[0]"]);
-//       NSLog(@"requestid %@", query[@"request"]);
-//     }
-//   }
-//   friendCache:appDelegate.friendCache];
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  NSNumber *uid = appDelegate.friends[indexPath.row][@"uid"];
+  [FBWebDialogs
+   presentRequestsDialogModallyWithSession:nil
+   message:@"Invitation to play noughts"
+   title:@"noughts"
+   parameters:@{@"to": [uid stringValue]}
+   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
+     if (error) {
+       NSLog(@"Error with request: %@", error);
+     } else if (result == FBWebDialogResultDialogNotCompleted) {
+       NSLog(@"Dialog closed");
+     } else {
+       NSLog(@"result url %@", resultURL);
+       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
+       NSLog(@"fbid %@", query[@"to[0]"]);
+       NSLog(@"requestid %@", query[@"request"]);
+     }
+   }
+   friendCache:appDelegate.friendCache];
 }
 
 - (void)didReceiveMemoryWarning

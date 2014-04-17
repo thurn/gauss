@@ -40,11 +40,16 @@ NSString *const kFacebookId = @"kFacebookId";
       [self createFacebookModel:firebase withUserId:user.userId];
       [self onFacebookLogin:user.userId withCallback:nil];
     } else {
-      NSLog(@"Anonymous User");
-      [self createAnonymousModel:firebase];
+      NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+      if ([userDefaults valueForKey:kFacebookId]) {
+        @throw @"Error logging in to facebook";
+      } else {
+        NSLog(@"Anonymous User");
+        [self createAnonymousModel:firebase];
+      }
     }
   }];
-  
+
   NSString *gameId = launchOptions[@"UIApplicationLaunchOptionsRemoteNotificationKey"][@"gameId"];
   if (gameId) {
     [self pushGameViewWithId:gameId];

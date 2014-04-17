@@ -148,14 +148,15 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   UILabel* label = (UILabel*)view;
   if (!label) {
     label = [[UILabel alloc] init];
-    [label setFont:[UIFont systemFontOfSize:14]];
+    int fontSize = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 24 : 14;
+    [label setFont:[UIFont systemFontOfSize:fontSize]];
   }
   label.text = [self nameForDifficultyLevel:row];
   return label;
 }
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
-  return 25.0;
+  return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 40.0 : 25.0;
 }
 
 - (NSString *)nameForDifficultyLevel:(NSInteger)level {

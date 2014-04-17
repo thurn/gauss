@@ -36,13 +36,6 @@
 }
 
 - (IBAction)onFacebookLoginClicked {
-//  [FBSession openActiveSessionWithReadPermissions:@[@"basic_info"]
-//                                     allowLoginUI:YES
-//                                completionHandler:
-//   ^(FBSession *session, FBSessionState state, NSError *error) {
-//     AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-//     [appDelegate sessionStateChanged:session state:state error:error];
-//   }];
   AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
   [appDelegate logInToFacebook:^{
     [self removeLoginLink: YES];

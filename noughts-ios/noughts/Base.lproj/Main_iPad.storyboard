@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13B42" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -325,34 +325,34 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rOm-Yd-ERE">
-                                <rect key="frame" x="244" y="64" width="280" height="225"/>
+                                <rect key="frame" x="104" y="64" width="560" height="450"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="vs." lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6P0-zK-0fY">
-                                        <rect key="frame" x="129" y="102" width="22" height="21"/>
+                                        <rect key="frame" x="259" y="205" width="43" height="41"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="34"/>
                                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Player 1" borderStyle="roundedRect" placeholder="Player 1" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="aa0-iK-ZBb">
-                                        <rect key="frame" x="0.0" y="163" width="120" height="30"/>
+                                        <rect key="frame" x="0.0" y="356" width="240" height="30"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="120" id="7DH-aM-beS"/>
+                                            <constraint firstAttribute="width" constant="240" id="7DH-aM-beS"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="SSR-Lv-DBn" id="39c-N3-TWn"/>
                                         </connections>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5rf-3x-NRr">
-                                        <rect key="frame" x="160" y="10" width="100" height="100"/>
+                                        <rect key="frame" x="320" y="20" width="200" height="200"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="100" id="92H-eV-2OR"/>
-                                            <constraint firstAttribute="width" constant="100" id="lHu-en-Bz3"/>
+                                            <constraint firstAttribute="height" constant="200" id="92H-eV-2OR"/>
+                                            <constraint firstAttribute="width" constant="200" id="lHu-en-Bz3"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <state key="normal">
@@ -360,11 +360,11 @@
                                         </state>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oog-Ol-0Xq">
-                                        <rect key="frame" x="10" y="10" width="100" height="100"/>
+                                        <rect key="frame" x="20" y="20" width="200" height="200"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="100" id="IO7-2E-i8s"/>
-                                            <constraint firstAttribute="height" constant="100" id="q90-EK-bQg"/>
+                                            <constraint firstAttribute="width" constant="200" id="IO7-2E-i8s"/>
+                                            <constraint firstAttribute="height" constant="200" id="q90-EK-bQg"/>
                                         </constraints>
                                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                         <state key="normal">
@@ -375,10 +375,10 @@
                                         </connections>
                                     </button>
                                     <pickerView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dcX-ri-bcr">
-                                        <rect key="frame" x="140" y="70" width="140" height="216"/>
+                                        <rect key="frame" x="280" y="263" width="280" height="216"/>
                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="140" id="hwh-Q6-Mmp"/>
+                                            <constraint firstAttribute="width" constant="280" id="hwh-Q6-Mmp"/>
                                         </constraints>
                                         <connections>
                                             <outlet property="dataSource" destination="SSR-Lv-DBn" id="Rym-Dn-WRv"/>
@@ -392,20 +392,20 @@
                                     <constraint firstAttribute="centerY" secondItem="6P0-zK-0fY" secondAttribute="centerY" id="Ehs-nL-Xrf"/>
                                     <constraint firstItem="dcX-ri-bcr" firstAttribute="centerX" secondItem="5rf-3x-NRr" secondAttribute="centerX" id="Hjv-Wv-O6V"/>
                                     <constraint firstAttribute="centerX" secondItem="6P0-zK-0fY" secondAttribute="centerX" id="Nga-Aa-hnz"/>
-                                    <constraint firstAttribute="bottom" secondItem="aa0-iK-ZBb" secondAttribute="bottom" constant="32" id="YEK-02-FVk"/>
-                                    <constraint firstAttribute="width" constant="280" id="b5R-lt-0sH"/>
+                                    <constraint firstAttribute="bottom" secondItem="aa0-iK-ZBb" secondAttribute="bottom" constant="64" id="YEK-02-FVk"/>
+                                    <constraint firstAttribute="width" constant="560" id="b5R-lt-0sH"/>
                                     <constraint firstItem="dcX-ri-bcr" firstAttribute="centerY" secondItem="aa0-iK-ZBb" secondAttribute="centerY" id="dVi-fL-EBT"/>
                                     <constraint firstAttribute="trailing" secondItem="dcX-ri-bcr" secondAttribute="trailing" id="jNq-Rb-AwR"/>
                                     <constraint firstItem="aa0-iK-ZBb" firstAttribute="leading" secondItem="rOm-Yd-ERE" secondAttribute="leading" id="o6b-pa-hL0"/>
-                                    <constraint firstItem="5rf-3x-NRr" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="10" id="qob-Zv-KeQ"/>
-                                    <constraint firstItem="oog-Ol-0Xq" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="10" id="uCZ-01-2dT"/>
-                                    <constraint firstAttribute="height" constant="225" id="yTf-0g-Z4e"/>
+                                    <constraint firstItem="5rf-3x-NRr" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="20" id="qob-Zv-KeQ"/>
+                                    <constraint firstItem="oog-Ol-0Xq" firstAttribute="top" secondItem="rOm-Yd-ERE" secondAttribute="top" constant="20" id="uCZ-01-2dT"/>
+                                    <constraint firstAttribute="height" constant="450" id="yTf-0g-Z4e"/>
                                 </constraints>
                             </view>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MRa-jw-XQT">
-                                <rect key="frame" x="321" y="882" width="126" height="42"/>
+                                <rect key="frame" x="258" y="852" width="252" height="72"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="50"/>
                                 <state key="normal" title="Start Game">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -416,7 +416,7 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="MRa-jw-XQT" firstAttribute="top" relation="greaterThanOrEqual" secondItem="rOm-Yd-ERE" secondAttribute="bottom" constant="25" id="0ba-mI-9Zf"/>
+                            <constraint firstItem="MRa-jw-XQT" firstAttribute="top" relation="greaterThanOrEqual" secondItem="rOm-Yd-ERE" secondAttribute="bottom" constant="50" id="0ba-mI-9Zf"/>
                             <constraint firstAttribute="centerX" secondItem="MRa-jw-XQT" secondAttribute="centerX" id="CTs-N8-J2W"/>
                             <constraint firstItem="6hd-Cm-y0M" firstAttribute="top" secondItem="MRa-jw-XQT" secondAttribute="bottom" priority="900" constant="100" id="Pri-eT-0sS"/>
                             <constraint firstAttribute="centerX" secondItem="rOm-Yd-ERE" secondAttribute="centerX" id="qa0-Gi-IaF"/>
@@ -617,7 +617,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
                                         <constraints>
                                             <constraint firstAttribute="width" constant="240" id="aw7-E5-z8f"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="28"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="dzj-Dg-VdJ" id="fty-Fe-FAg"/>
@@ -629,7 +629,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
                                         <constraints>
                                             <constraint firstAttribute="width" constant="240" id="Dn9-aK-bX5"/>
                                         </constraints>
-                                        <fontDescription key="fontDescription" type="system" pointSize="28"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="words" autocorrectionType="no" returnKeyType="done"/>
                                         <connections>
                                             <outlet property="delegate" destination="dzj-Dg-VdJ" id="24v-T4-9xo"/>
@@ -770,6 +770,6 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="O7D-OE-lDw"/>
+        <segue reference="43Q-Kf-agi"/>
     </inferredMetricsTieBreakers>
 </document>
