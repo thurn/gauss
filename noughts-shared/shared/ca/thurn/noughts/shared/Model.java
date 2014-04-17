@@ -114,9 +114,9 @@ public class Model extends AbstractChildEventListener {
   public boolean isCurrentPlayer(String gameId) {
     Game game = getGame(gameId);
     if (game.isGameOver()) return false;
-    return Games.currentPlayerId(game) != null && Games.currentPlayerId(game).equals(userId);
+    return Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId);
   }
-  
+
   /**
    * @param gameId A game ID
    * @return True if the game with this ID is over.
@@ -158,9 +158,6 @@ public class Model extends AbstractChildEventListener {
    */
   public void setCommandUpdateListener(String gameId, CommandUpdateListener listener) {
     commandUpdateListeners.put(gameId, listener);
-//    if (games.containsKey(gameId)) {
-//      listener.onRegistered(userId, games.get(gameId), currentActions.get(gameId));
-//    }
   }
 
   /**

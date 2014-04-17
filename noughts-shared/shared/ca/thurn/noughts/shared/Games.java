@@ -30,6 +30,9 @@ public class Games {
   private static final long MONTHS = 12;
   private static final long ONE_YEAR = MONTHS * ONE_MONTH;
   
+  /**
+   * @return A Comparator for Games.
+   */
   public static Comparator<Game> comparator() {
     return new Comparator<Game>() {
       @Override
@@ -40,15 +43,26 @@ public class Games {
   }
 
   /**
+   * @param game A game.
+   * @return True if this game has a current player ID.
+   */
+  public static boolean hasCurrentPlayerId(Game game) {
+    return game.hasCurrentPlayerNumber() &&
+        game.getCurrentPlayerNumber() < game.getPlayerCount();
+  }
+
+  /**
+   * @param game A game.
    * @return The ID of the current player, or null if there is no current
    *     player.
    */
   public static String currentPlayerId(Game game) {
-    if (!game.hasCurrentPlayerNumber()) return null;
-    if (game.getCurrentPlayerNumber() >= game.getPlayerCount()) return null;
-    return playerIdFromPlayerNumber(game, game.getCurrentPlayerNumber());
+    if (!Games.hasCurrentPlayerId(game)) {
+      throw new IllegalArgumentException("Game does not have a current player");
+    }
+    return game.getPlayer(game.getCurrentPlayerNumber());
   }
-  
+
   /**
    * @return A GameStatus object summarizing whose turn it is in the game (or
    *     if the game is over), along with an associated image string and player
@@ -96,8 +110,8 @@ public class Games {
               currentPlayerProfile.isComputerPlayer() : false)
           .build();
     }
-  }  
-  
+  }
+
   public static GameListEntry gameListEntry(Game game, String viewerId) {
     return GameListEntry.newBuilder()
         .setVsString(vsString(game, viewerId))
@@ -160,21 +174,6 @@ public class Games {
   }
 
   /**
-   * @param playerNumber A player's player number
-   * @return That player's player ID
-   * @throws IllegalArgumentException if the player number is not currently in
-   *     the game.
-   */
-  // Visible for testing
-  static String playerIdFromPlayerNumber(Game game, int playerNumber) {
-    try {
-      return game.getPlayer(playerNumber);
-    } catch (IndexOutOfBoundsException exception) {
-      throw new IllegalArgumentException(exception);
-    }
-  }
-  
-  /**
    * @param playerId A player ID
    * @return All player numbers (if any) associated with this player ID
    */
@@ -194,18 +193,16 @@ public class Games {
    * @return The profile of your opponent.
    * @throws IllegalStateException If there is no opponent 
    */
-  // Visible for testing
   static Profile opponentProfile(Game game, String viewerId) {
     int opponentNumber = opponentPlayerNumber(game, viewerId);
     return game.getProfile(opponentNumber);
   }
-  
+
   /**
    * @param viewerId viewer's player ID
    * @return A string describing the opponent of this game, such as
    *     "vs. Frank".
    */
-  // Visible for testing
   static String vsString(Game game, String viewerId) {
     if (game.isLocalMultiplayer()) {
       if (game.getProfile(0).hasName() && game.getProfile(1).hasName()) {
@@ -223,7 +220,43 @@ public class Games {
       }
     }
   }
-  
+
+  /**
+   * @param viewerId viewer's player ID
+   * @return A string describing the last state of the game, such as "Updated 1
+   *     second ago" or "You won 4 years ago". 
+   */
+  static String lastUpdatedString(Game game, String viewerId) {
+    long duration = Math.max(Clock.getInstance().currentTimeMillis() - game.getLastModified(), 0);
+    long number;
+    number = duration / ONE_YEAR;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "year");
+    }
+    number = duration / ONE_MONTH;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "month");
+    }
+    number = duration / ONE_WEEK;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "week");
+    }
+    number = duration / ONE_DAY;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "day");
+    }
+    number = duration / ONE_HOUR;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "hour");
+    }
+    number = duration / ONE_MINUTE;
+    if (number > 0) {
+      return timeAgoString(game, viewerId, number, "minute");
+    }
+    number = duration / ONE_SECOND;
+    return timeAgoString(game, viewerId, number, "second");
+  }
+
   /**
    * @param viewerId Viewer's ID.
    * @param number The number of "unit"s ago the game was last modified.
@@ -233,8 +266,7 @@ public class Games {
    *     along with how long ago the last update was. For example: "He won 3
    *     hours ago".
    */
-  // Visible for testing
-  static String timeAgoString(Game game, String viewerId, long number, String unit) {
+  private static String timeAgoString(Game game, String viewerId, long number, String unit) {
     String statusString;
     if (game.isGameOver()) {
       if (game.isLocalMultiplayer()) {
@@ -271,75 +303,9 @@ public class Games {
   }
 
   /**
-   * @param viewerId viewer's player ID
-   * @return A string describing the last state of the game, such as "Updated 1
-   *     second ago" or "You won 4 years ago". 
-   */
-  // Visible for testing
-  static String lastUpdatedString(Game game, String viewerId) {
-    long duration = Math.max(Clock.getInstance().currentTimeMillis() - game.getLastModified(), 0);
-    long number;
-    number = duration / ONE_YEAR;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "year");
-    }
-    number = duration / ONE_MONTH;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "month");
-    }
-    number = duration / ONE_WEEK;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "week");
-    }
-    number = duration / ONE_DAY;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "day");
-    }
-    number = duration / ONE_HOUR;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "hour");
-    }
-    number = duration / ONE_MINUTE;
-    if (number > 0) {
-      return timeAgoString(game, viewerId, number, "minute");
-    }
-    number = duration / ONE_SECOND;
-    return timeAgoString(game, viewerId, number, "second");
-  }
-  
-  /**
-   * @param old Previous game state.
-   * @param next New game state.
-   * @return True if the two game states have different "status" (different
-   *     player's turn, game is over, etc).
-   */
-  static boolean differentStatus(Game old, Game next) {
-    return (old.hasIsGameOver() && next.hasIsGameOver() && old.isGameOver() != next.isGameOver()) ||
-        (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
-            old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
-  }
-
-  // Visible for testing
-  static int compareGames(Game game, Game other) {
-    if (other == null) {
-      throw new NullPointerException("Null game in compareTo()");
-    } else if (game.equals(other)) {
-      return 0;
-    } else if (game.getLastModified() < other.getLastModified()) {
-      return 1;
-    } else if (game.getLastModified() > other.getLastModified()) {
-      return -1;
-    } else {
-      // Different games, same lastModified, order by hashCode
-      return other.hashCode() - game.hashCode();
-    }
-  }  
-  
-  /**
    * @return A list of image strings to use to represent this game in the game
    *     list.
    */
-  // Visible for testing
   static List<ImageString> imageList(Game game, String viewerId) {
     List<ImageString> result = new ArrayList<ImageString>();
     if (game.isLocalMultiplayer()) {
@@ -358,5 +324,32 @@ public class Games {
       }
     }
     return result;
+  }
+
+  /**
+   * @param old Previous game state.
+   * @param next New game state.
+   * @return True if the two game states have different "status" (different
+   *     player's turn, game is over, etc).
+   */
+  static boolean differentStatus(Game old, Game next) {
+    return (old.hasIsGameOver() && next.hasIsGameOver() && old.isGameOver() != next.isGameOver()) ||
+        (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
+            old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
+  }
+
+  static int compareGames(Game game, Game other) {
+    if (other == null) {
+      throw new NullPointerException("Null game in compareTo()");
+    } else if (game.equals(other)) {
+      return 0;
+    } else if (game.getLastModified() < other.getLastModified()) {
+      return 1;
+    } else if (game.getLastModified() > other.getLastModified()) {
+      return -1;
+    } else {
+      // Different games, same lastModified, order by hashCode
+      return other.hashCode() - game.hashCode();
+    }
   }
 }

@@ -34,9 +34,8 @@ public class GameListPartitions {
     if (game.isGameOver()) {
       return GameListSection.GAME_OVER;
     }
-    String currentPlayerId = Games.currentPlayerId(game);
     if (game.isLocalMultiplayer() ||
-        (currentPlayerId != null && currentPlayerId.equals(viewerId))) {
+        (Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(viewerId))) {
       return GameListSection.YOUR_TURN;
     } else {
       return GameListSection.THEIR_TURN;
