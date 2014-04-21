@@ -17,6 +17,8 @@
 @interface GameViewController () <UIAlertViewDelegate, OnModelLoaded>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) GameView *gameView;
+@property(strong,nonatomic) NTSGame *game;
+@property(strong,nonatomic) NTSAction *action;
 @end
 
 @implementation GameViewController
@@ -85,7 +87,7 @@
 - (void)handleGameMenuSelection:(GameMenuSelection)selection {
   switch (selection) {
     case kResignOrArchive: {
-      if ([_model isGameOverWithNSString:_currentGameId]) {
+      if ([_game isGameOver]) {
         [_model archiveGameWithNSString:_currentGameId];
         [[self navigationController] setNavigationBarHidden:NO animated:YES];
         [self.navigationController popToRootViewControllerAnimated:YES];
@@ -169,7 +171,9 @@
 
 - (void)handleSquareTapAtX:(int)x AtY:(int)y {
   NTSCommand *command = [self commandFromX:x fromY:y];
-  if ([_model couldAddCommandWithNSString:_currentGameId withNTSCommand:command]) {
+  if ([_model couldAddCommandWithNTSGame:_game
+                           withNTSAction:_action
+                           withNTSCommand:command]) {
     if (_tutorialMode) {
       [_gameView hideTapSquareCallout];
       [_gameView showSubmitCallout];
@@ -185,16 +189,20 @@
 
 - (BOOL)allowDragToX:(int)x toY:(int)y {
   NTSCommand *command = [self commandFromX:x fromY:y];
-  return [_model couldUpdateLastCommandWithNSString:_currentGameId withNTSCommand:command];
+  return [_model couldUpdateLastCommandWithNTSGame:_game
+                                     withNTSAction:_action
+                                    withNTSCommand:command];
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
   [_model joinGameIfPossibleWithNSString:_currentGameId];
   [_model handleComputerActionWithNSString:_currentGameId];
+  _game = game;
 }
 
 - (void)onCurrentActionUpdateWithNTSAction:(NTSAction*)currentAction {
   [_gameView updateButtons];
+  _action = currentAction;
 }
 
 - (void)onProfileRequiredWithNSString:(NSString*)gameId {
@@ -207,15 +215,15 @@
 }
 
 - (BOOL)canSubmit {
-  return [_model canSubmitWithNSString:_currentGameId];
+  return [_model canSubmitWithNTSGame:_game withNTSAction:_action];
 }
 
 - (BOOL)canUndo {
-  return [_model canUndoWithNSString:_currentGameId];
+  return [_model canUndoWithNTSGame:_game withNTSAction:_action];
 }
 
 - (BOOL)canRedo {
-  return [_model canRedoWithNSString:_currentGameId];
+  return [_model canRedoWithNTSGame:_game withNTSAction:_action];
 }
 
 - (void)handleSubmit {
@@ -238,7 +246,7 @@
 }
 
 - (BOOL)isGameOver {
-  return [_model isGameOverWithNSString:_currentGameId];
+  return [_game isGameOver];
 }
 
 @end

@@ -15,23 +15,23 @@ public class Game extends Entity<Game> {
     private Deserializer() {
     }
 
-    @Override 
+    @Override
     public Game deserialize(Map<String, Object> gameMap) {
       return new Game(gameMap);
-    }    
-  }  
+    }
+  }
 
   public static class Builder extends EntityBuilder<Game> {
     private final Game game;
-    
+
     private Builder() {
       this.game = new Game();
     }
-    
+
     private Builder(Game game) {
       this.game = new Game(game);
     }
-    
+
     @Override
     public Game build() {
       return new Game(game);
@@ -39,8 +39,8 @@ public class Game extends Entity<Game> {
 
     @Override protected Game getInternalEntity() {
       return game;
-    }    
-    
+    }
+
     public boolean hasId() {
       return game.hasId();
     }
@@ -48,13 +48,13 @@ public class Game extends Entity<Game> {
     public String getId() {
       return game.getId();
     }
-    
+
     public Builder setId(String id) {
       checkNotNull(id);
       game.id = id;
       return this;
     }
-    
+
     public Builder clearId() {
       game.id = null;
       return this;
@@ -71,25 +71,25 @@ public class Game extends Entity<Game> {
     public List<String> getPlayerList() {
       return game.playerList;
     }
-    
+
     public Builder setPlayer(int index, String player) {
       checkNotNull(player);
       game.playerList.set(index, player);
       return this;
     }
-    
+
     public Builder addPlayer(String player) {
       checkNotNull(player);
       game.playerList.add(player);
       return this;
     }
-    
+
     public Builder addAllPlayer(List<String> playerList) {
       checkListForNull(playerList);
       game.playerList.addAll(playerList);
       return this;
     }
-    
+
     public Builder clearPlayerList() {
       game.playerList.clear();
       return this;
@@ -106,33 +106,33 @@ public class Game extends Entity<Game> {
     public List<Profile> getProfileList() {
       return game.profileList;
     }
-    
+
     public Builder setProfile(int index, EntityBuilder<Profile> profile) {
       return setProfile(index, profile.build());
     }
-    
+
     public Builder setProfile(int index, Profile profile) {
       checkNotNull(profile);
       game.profileList.set(index, profile);
       return this;
     }
-    
+
     public Builder addProfile(EntityBuilder<Profile> profile) {
       return addProfile(profile.build());
     }
-    
+
     public Builder addProfile(Profile profile) {
       checkNotNull(profile);
       game.profileList.add(profile);
       return this;
     }
-    
+
     public Builder addAllProfile(List<Profile> profileList) {
       checkListForNull(profileList);
       game.profileList.addAll(profileList);
       return this;
     }
-    
+
     public Builder clearProfileList() {
       game.profileList.clear();
       return this;
@@ -145,12 +145,12 @@ public class Game extends Entity<Game> {
     public int getCurrentPlayerNumber() {
       return game.getCurrentPlayerNumber();
     }
-    
+
     public Builder setCurrentPlayerNumber(int currentPlayerNumber) {
       game.currentPlayerNumber = currentPlayerNumber;
       return this;
     }
-    
+
     public Builder clearCurrentPlayerNumber() {
       game.currentPlayerNumber = null;
       return this;
@@ -167,33 +167,33 @@ public class Game extends Entity<Game> {
     public List<Action> getSubmittedActionList() {
       return game.submittedActionList;
     }
-    
+
     public Builder setSubmittedAction(int index, EntityBuilder<Action> action) {
       return setSubmittedAction(index, action.build());
     }
-    
+
     public Builder setSubmittedAction(int index, Action action) {
       checkNotNull(action);
       game.submittedActionList.set(index, action);
       return this;
     }
-    
+
     public Builder addSubmittedAction(EntityBuilder<Action> action) {
       return addSubmittedAction(action.build());
     }
-    
+
     public Builder addSubmittedAction(Action action) {
       checkNotNull(action);
       game.submittedActionList.add(action);
       return this;
     }
-    
+
     public Builder addAllSubmittedAction(List<Action> actionList) {
       checkListForNull(actionList);
       game.submittedActionList.addAll(actionList);
       return this;
     }
-    
+
     public Builder clearSubmittedActionList() {
       game.submittedActionList.clear();
       return this;
@@ -206,12 +206,12 @@ public class Game extends Entity<Game> {
     public long getLastModified() {
       return game.getLastModified();
     }
-    
+
     public Builder setLastModified(long lastModified) {
       game.lastModified = lastModified;
       return this;
     }
-    
+
     public Builder clearLastModified() {
       game.lastModified = null;
       return this;
@@ -224,13 +224,13 @@ public class Game extends Entity<Game> {
     public String getRequestId() {
       return game.getRequestId();
     }
-    
+
     public Builder setRequestId(String requestId) {
       checkNotNull(requestId);
       game.requestId = requestId;
       return this;
     }
-    
+
     public Builder clearRequestId() {
       game.requestId = null;
       return this;
@@ -247,23 +247,23 @@ public class Game extends Entity<Game> {
     public List<Integer> getVictorList() {
       return game.victorList;
     }
-    
+
     public Builder setVictor(int index, int victor) {
       game.victorList.set(index, victor);
       return this;
     }
-    
+
     public Builder addVictor(int victor) {
       game.victorList.add(victor);
       return this;
     }
-    
+
     public Builder addAllVictor(List<Integer> victorList) {
       checkListForNull(victorList);
       game.victorList.addAll(victorList);
       return this;
     }
-    
+
     public Builder clearVictorList() {
       game.victorList.clear();
       return this;
@@ -276,12 +276,12 @@ public class Game extends Entity<Game> {
     public boolean isGameOver() {
       return game.isGameOver();
     }
-    
+
     public Builder setIsGameOver(boolean gameOver) {
       game.gameOver = gameOver;
       return this;
     }
-    
+
     public Builder clearIsGameOver() {
       game.gameOver = null;
       return this;
@@ -294,12 +294,12 @@ public class Game extends Entity<Game> {
     public boolean isLocalMultiplayer() {
       return game.isLocalMultiplayer();
     }
-    
+
     public Builder setIsLocalMultiplayer(boolean localMultiplayer) {
       game.localMultiplayer = localMultiplayer;
       return this;
     }
-    
+
     public Builder clearIsLocalMultiplayer() {
       game.localMultiplayer = null;
       return this;
@@ -316,41 +316,41 @@ public class Game extends Entity<Game> {
     public List<Integer> getResignedPlayerList() {
       return game.resignedPlayerList;
     }
-    
+
     public Builder setResignedPlayer(int index, int resignedPlayer) {
       game.resignedPlayerList.set(index, resignedPlayer);
       return this;
     }
-    
+
     public Builder addResignedPlayer(int resignedPlayer) {
       game.resignedPlayerList.add(resignedPlayer);
       return this;
     }
-    
+
     public Builder addAllResignedPlayer(List<Integer> resignedPlayer) {
       checkListForNull(resignedPlayer);
       game.resignedPlayerList.addAll(resignedPlayer);
       return this;
     }
-    
+
     public Builder clearResignedPlayerList() {
       game.resignedPlayerList.clear();
       return this;
     }
   }
-  
+
   public static Builder newBuilder() {
     return new Builder();
   }
-  
+
   public static Builder newBuilder(Game game) {
     return new Builder(game);
   }
-  
+
   public static Deserializer newDeserializer() {
     return new Deserializer();
   }
-  
+
   /**
    * The game ID
    */
@@ -362,7 +362,7 @@ public class Game extends Entity<Game> {
    * their entry in this array replaced with null.
    */
   private final List<String> playerList;
-  
+
   /**
    * List of player profiles in the same order as the player list, these
    * profiles takes precedence over the ID-based profiles above. Null
@@ -414,7 +414,7 @@ public class Game extends Entity<Game> {
    * An array of player numbers who have resigned the game.
    */
   private final List<Integer> resignedPlayerList;
-  
+
   public Game() {
     playerList = new ArrayList<String>();
     profileList = new ArrayList<Profile>();
@@ -422,7 +422,7 @@ public class Game extends Entity<Game> {
     victorList = new ArrayList<Integer>();
     resignedPlayerList = new ArrayList<Integer>();
   }
-  
+
   public Game(Game game) {
     this.id = game.id;
     this.playerList = new ArrayList<String>(game.playerList);
@@ -451,12 +451,12 @@ public class Game extends Entity<Game> {
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
     resignedPlayerList = getIntegerList(getList(gameMap, "resignedPlayerList"));
   }
-  
+
   @Override
   public String entityName() {
     return "Game";
-  }  
-  
+  }
+
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
@@ -473,62 +473,62 @@ public class Game extends Entity<Game> {
     putSerialized(result, "resignedPlayerList", resignedPlayerList);
     return result;
   }
-  
+
   @Override
   public Builder toBuilder() {
     return new Builder(this);
   }
-  
+
   public boolean hasId() {
     return id != null;
   }
-  
+
   public String getId() {
     checkNotNull(id);
     return id;
   }
-  
+
   public int getPlayerCount() {
     return playerList.size();
   }
-  
+
   public String getPlayer(int index) {
     return playerList.get(index);
   }
-  
+
   public List<String> getPlayerList() {
     return Collections.unmodifiableList(playerList);
   }
-  
+
   public int getProfileCount() {
     return profileList.size();
   }
-  
+
   public Profile getProfile(int index) {
     return profileList.get(index);
   }
-  
+
   public List<Profile> getProfileList() {
     return Collections.unmodifiableList(profileList);
   }
-  
+
   public boolean hasCurrentPlayerNumber() {
     return currentPlayerNumber != null;
   }
-  
+
   public int getCurrentPlayerNumber() {
     checkNotNull(currentPlayerNumber);
     return currentPlayerNumber;
   }
-  
+
   public int getSubmittedActionCount() {
     return submittedActionList.size();
   }
-  
+
   public Action getSubmittedAction(int index) {
     return submittedActionList.get(index);
   }
-  
+
   public List<Action> getSubmittedActionList() {
     return Collections.unmodifiableList(submittedActionList);
   }
@@ -536,59 +536,59 @@ public class Game extends Entity<Game> {
   public boolean hasLastModified() {
     return lastModified != null;
   }
-  
+
   public long getLastModified() {
     checkNotNull(lastModified);
     return lastModified;
   }
-  
+
   public boolean hasRequestId() {
     return requestId != null;
   }
-  
+
   public String getRequestId() {
     checkNotNull(requestId);
     return requestId;
   }
-  
+
   public int getVictorCount() {
     return victorList.size();
   }
-  
+
   public int getVictor(int index) {
     return victorList.get(index);
   }
-  
+
   public List<Integer> getVictorList() {
     return Collections.unmodifiableList(victorList);
   }
-  
+
   public boolean hasIsGameOver() {
     return gameOver != null;
   }
-  
+
   public boolean isGameOver() {
     checkNotNull(gameOver);
     return gameOver;
   }
-  
+
   public boolean hasIsLocalMultiplayer() {
     return localMultiplayer != null;
   }
-  
+
   public boolean isLocalMultiplayer() {
     checkNotNull(localMultiplayer);
     return localMultiplayer;
   }
-  
+
   public int getResignedPlayerCount() {
     return resignedPlayerList.size();
   }
-  
+
   public int getResignedPlayer(int index) {
     return resignedPlayerList.get(index);
   }
-  
+
   public List<Integer> getResignedPlayerList() {
     return Collections.unmodifiableList(resignedPlayerList);
   }
