@@ -71,6 +71,7 @@
 - (void)onRegisteredWithNSString:(NSString *)viewerId
                      withNTSGame:(NTSGame *)game
                    withNTSAction:(NTSAction *)currentAction {
+  NSLog(@"on registered");
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
   float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
@@ -116,17 +117,20 @@
 }
 
 - (BOOL)belongsToViewer:(NTSAction*) action {
-  int playerNumber= [action getPlayerNumber];
+  if (![action hasPlayerNumber]) return false;
+  int playerNumber = [action getPlayerNumber];
   return [_viewerPlayerNumbers containsObject:[[NSNumber alloc] initWithInt:playerNumber]];
 }
 
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"on command added");
   BOOL draggable = [self belongsToViewer:action];
   [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
   AudioServicesPlaySystemSound(_addCommandSound);
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"on command removed");
   UIView *view = _views[command];
   [UIView animateWithDuration:0.2 animations:^{
     view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
@@ -138,6 +142,7 @@
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
+  NSLog(@"on command changed");  
   _views[newCommand] = _views[oldCommand];
   [_views removeObjectForKey:oldCommand];
   AudioServicesPlaySystemSound(_addCommandSound);
@@ -148,10 +153,6 @@
     [self removeAllGestureRecognizers:_views[command]];
   }
   AudioServicesPlaySystemSound(_submitCommandSound);
-}
-
-- (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {

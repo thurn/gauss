@@ -105,7 +105,7 @@ public class ModelTest extends SharedTestCase {
     final Game.Builder game = newGameWithTwoPlayers();
     final Command command = Command.newDeserializer()
         .deserialize(map("column", 2, "row", 2));
-    withTestData(game.build(), null /* currentAction */, new Runnable() {
+    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
@@ -161,7 +161,7 @@ public class ModelTest extends SharedTestCase {
   public void testCannotUpdateLastCommand() {
     Game game = newGameWithTwoPlayers().build();
     Command command = Command.newBuilder().setRow(1).setColumn(1).build();
-    assertFalse(model.couldUpdateLastCommand(game, null /* currentAction */, command));
+    assertFalse(model.couldUpdateLastCommand(game, newEmptyAction(game.getId()), command));
   }
 
   public void testAddCommandNotCurrentPlayer() {
@@ -171,7 +171,7 @@ public class ModelTest extends SharedTestCase {
         .addPlayer("opponent")
         .addPlayer(userId)
         .build();
-    withTestData(game, null /* currentAction */, new Runnable() {
+    withTestData(game, newEmptyAction(game.getId()), new Runnable() {
       @Override
       public void run() {
         assertDiesAndFinish(new Runnable() {
@@ -188,7 +188,7 @@ public class ModelTest extends SharedTestCase {
     beginAsyncTestBlock(2);
     final Game.Builder game = newGameWithTwoPlayers();
     final Command command = newCommand(1, 1);
-    withTestData(game.build(), null /* currentAction */, new Runnable() {
+    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
@@ -218,7 +218,7 @@ public class ModelTest extends SharedTestCase {
     beginAsyncTestBlock();
     final Game.Builder game = newGameWithTwoPlayers();
     final Command command = newCommand(1, 1);
-    withTestData(game.build(), null /* currentAction */, new Runnable() {
+    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
@@ -247,7 +247,7 @@ public class ModelTest extends SharedTestCase {
     Command command = newCommand(1, 1);
     Game.Builder game = newGameWithTwoPlayers();
     game.setIsGameOver(true);
-    assertFalse(model.couldAddCommand(game.build(), null /* currentAction */, command));
+    assertFalse(model.couldAddCommand(game.build(), newEmptyAction(game.getId()), command));
 
     game = newGameWithTwoPlayers();
     Action action2 = newUnsubmittedActionWithCommand(game.getId()).build();
@@ -256,11 +256,11 @@ public class ModelTest extends SharedTestCase {
     game.addSubmittedAction(Action.newBuilder()
         .setIsSubmitted(true)
         .addCommand(newCommand(2, 1)));
-    assertTrue(model.couldAddCommand(game.build(), null /* currentAction */, command));
+    assertTrue(model.couldAddCommand(game.build(), newEmptyAction(game.getId()), command));
 
     game.clearSubmittedActionList();
     game.addSubmittedAction(Action.newBuilder().setIsSubmitted(true).addCommand(command));
-    assertFalse(model.couldAddCommand(game.build(), null /* currentAction */, command));
+    assertFalse(model.couldAddCommand(game.build(), newEmptyAction(game.getId()), command));
   }
 
 //  public void testCanUndo() {
@@ -701,6 +701,13 @@ public class ModelTest extends SharedTestCase {
         .build();
   }
 
+  private Action newEmptyAction(String gameId) {
+    return Action.newBuilder()
+        .setGameId(gameId)
+        .setIsSubmitted(false)
+        .build();
+  }
+
   private Action.Builder newUnsubmittedActionWithCommand(String gameId) {
     return Action.newBuilder()
         .setPlayerNumber(0)
@@ -711,7 +718,7 @@ public class ModelTest extends SharedTestCase {
 
   private Game.Builder newGameWithTwoPlayers() {
     return Game.newBuilder()
-        .setId("game" + randomInteger())
+        .setId("{gameId" + randomInteger() + "}")
         .setCurrentPlayerNumber(0)
         .addAllPlayer(list(userId, "opponentId"))
         .setIsGameOver(false)
@@ -758,11 +765,7 @@ public class ModelTest extends SharedTestCase {
     });
     firebase.child("games").child(game.getId()).setValue(game.serialize());
     Firebase userGame = firebase.child("users").child(userKey).child("games").child(game.getId());
-    if (currentAction == null) {
-      userGame.setValue(true);
-    } else {
-      userGame.child("currentAction").setValue(currentAction.serialize());
-    }
+    userGame.child("currentAction").setValue(currentAction.serialize());
   }
 
   private Command newCommand(int column, int row) {

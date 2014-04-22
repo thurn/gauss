@@ -146,9 +146,11 @@ public class Model extends AbstractChildEventListener {
     if (immediate) {
       if (games.containsKey(gameId)) {
         Game game = games.get(gameId);
-        fireListeners(game, null);
+        fireListeners(game, null /* oldGame */);
       }
-      listener.onCurrentActionUpdate(currentActions.get(gameId));
+      if (currentActions.containsKey(gameId)) {
+        listener.onCurrentActionUpdate(getCurrentAction(gameId));
+      }
     }
   }
 
@@ -226,18 +228,14 @@ public class Model extends AbstractChildEventListener {
 
   private void processCurrentActionUpdate(DataSnapshot snapshot) {
     String gameId = snapshot.getName();
-    Action action = null;
-    if (snapshot.hasChild("currentAction")) {
-      Map<String, Object> value = snapshot.child("currentAction").getValue(
-          new GenericTypeIndicator<Map<String, Object>>(){});
-      action = Action.newDeserializer().deserialize(value);
-      if (commandUpdateListeners.containsKey(gameId)) {
-        fireCurrentActionListeners(gameId, action, commandUpdateListeners.get(gameId));
-      }
-      currentActions.put(gameId, action);
-    } else {
-      currentActions.remove(gameId);
+    if (!snapshot.hasChild("currentAction")) die("no current action for game " + gameId);
+    Map<String, Object> value = snapshot.child("currentAction").getValue(
+        new GenericTypeIndicator<Map<String, Object>>(){});
+    Action action = Action.newDeserializer().deserialize(value);
+    if (commandUpdateListeners.containsKey(gameId)) {
+      fireCurrentActionListeners(gameId, action, commandUpdateListeners.get(gameId));
     }
+    currentActions.put(gameId, action);
     if (gameUpdateListeners.containsKey(gameId)) {
       gameUpdateListeners.get(gameId).onCurrentActionUpdate(action);
     }
@@ -258,7 +256,8 @@ public class Model extends AbstractChildEventListener {
   private void fireCurrentActionListeners(String gameId, Action action,
       CommandUpdateListener listener) {
     Action old = currentActions.get(gameId);
-    if (old == null) {
+    if (old == null || !action.hasPlayerNumber()) {
+      // No player number indicates a newly created action
       for (Command command : action.getCommandList()) {
         listener.onCommandAdded(action, command);
       }
@@ -300,7 +299,7 @@ public class Model extends AbstractChildEventListener {
     if (commandUpdateListeners.containsKey(gameId)) {
       CommandUpdateListener listener = commandUpdateListeners.get(gameId);
       if (oldGame == null) {
-        listener.onRegistered(userId, game, currentActions.get(gameId));
+        listener.onRegistered(userId, game, getCurrentAction(gameId));
       } else {
         int count = game.getSubmittedActionCount();
         while (count > oldGame.getSubmittedActionCount()) {
@@ -424,8 +423,8 @@ public class Model extends AbstractChildEventListener {
     }
     Game game = builder.build();
     ref.setValue(game.serialize());
-    Firebase userRef = userReferenceForGame(game.getId());
-    userRef.setValue(true);
+    Firebase userRef = actionReferenceForGame(game.getId());
+    userRef.setValue(newEmptyAction(game.getId()).serialize());
     if (pushNotificationListener != null) {
       pushNotificationListener.onJoinedGame(Games.channelIdsForViewer(game, userId));
     }
@@ -504,40 +503,24 @@ public class Model extends AbstractChildEventListener {
   private void addCommand(final String gameId, final Command command, final boolean submit,
       final OnMutationCompleted onComplete) {
     final Game game = getGame(gameId);
-    if (!couldAddCommand(game, currentActions.get(gameId), command)) {
+    if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
       die("Illegal command " + command);
     }
-    if (currentActions.containsKey(gameId)) {
-      mutateCurrentAction(gameId, new ActionMutation() {
-        @Override
-        public void mutate(Action.Builder action) {
-          action.clearFutureCommandList();
-          action.addCommand(command);
-        }
-
-        @Override
-        public void onComplete(Action action) {
-          if (submit) {
-            submitCurrentAction(gameId, onComplete);
-          }
-        }
-      });
-    } else {
-     final Action.Builder action = Action.newBuilder();
-     action.setPlayerNumber(game.getCurrentPlayerNumber());
-     action.setGameId(game.getId());
-     action.setIsSubmitted(false);
-     action.addCommand(command);
-     actionReferenceForGame(gameId).setValue(action.build().serialize(),
-         new Firebase.CompletionListener() {
+    mutateCurrentAction(gameId, new ActionMutation() {
       @Override
-      public void onComplete(FirebaseError error, Firebase ref) {
+      public void mutate(Action.Builder action) {
+        action.clearFutureCommandList();
+        action.addCommand(command);
+        action.setPlayerNumber(game.getCurrentPlayerNumber());
+      }
+
+      @Override
+      public void onComplete(Action action) {
         if (submit) {
           submitCurrentAction(gameId, onComplete);
         }
       }
     });
-    }
     updateLastModified(gameId);
   }
 
@@ -550,7 +533,7 @@ public class Model extends AbstractChildEventListener {
    * @param command New value to use as the game's last command.
    */
   public void updateLastCommand(String gameId, final Command command) {
-    if (!couldUpdateLastCommand(getGame(gameId), currentActions.get(gameId), command)) {
+    if (!couldUpdateLastCommand(getGame(gameId), getCurrentAction(gameId), command)) {
       die("Illegal Command: " + command);
     }
 
@@ -575,7 +558,7 @@ public class Model extends AbstractChildEventListener {
    */
   public boolean couldUpdateLastCommand(Game game, Action currentAction, Command command) {
     if (!isCurrentPlayer(game)) return false;
-    if (currentAction == null || currentAction.getCommandCount() == 0) return false;
+    if (currentAction.getCommandCount() == 0) return false;
     Action.Builder builder = currentAction.toBuilder();
     builder.getCommandList().remove(builder.getCommandCount() - 1);
     return couldAddCommand(game, builder.build(), command);
@@ -591,7 +574,7 @@ public class Model extends AbstractChildEventListener {
    */
   public boolean couldAddCommand(Game game, Action currentAction, Command command) {
     if (!isCurrentPlayer(game)) return false;
-    if (currentAction != null && currentAction.getCommandCount() > 0) return false;
+    if (currentAction.getCommandCount() > 0) return false;
     return isSquareAvailable(game, command);
   }
 
@@ -604,7 +587,7 @@ public class Model extends AbstractChildEventListener {
    *     which can be undone.
    */
   public boolean canUndo(Game game, Action currentAction) {
-    if (currentAction == null || !isCurrentPlayer(game)) return false;
+    if (!isCurrentPlayer(game)) return false;
     return currentAction.getCommandCount() > 0;
   }
 
@@ -616,7 +599,7 @@ public class Model extends AbstractChildEventListener {
    *     current action of "game" and thus can be redone.
    */
   public boolean canRedo(Game game, Action currentAction) {
-    if (currentAction == null || !isCurrentPlayer(game)) return false;
+    if (!isCurrentPlayer(game)) return false;
     return currentAction.getFutureCommandCount() > 0;
   }
 
@@ -628,7 +611,7 @@ public class Model extends AbstractChildEventListener {
    *     submitted.
    */
   public boolean canSubmit(Game game, Action currentAction) {
-    if (currentAction == null || !isCurrentPlayer(game)) return false;
+    if (!isCurrentPlayer(game)) return false;
     if (currentAction.getCommandCount() == 0) return false;
     for (Command command : currentAction.getCommandList()) {
       if (!isSquareAvailable(game, command)) return false;
@@ -660,7 +643,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void submitCurrentAction(String gameId, final OnMutationCompleted onComplete) {
     ensureIsCurrentPlayer(gameId);
-    final Action currentAction = currentActions.get(gameId);
+    final Action currentAction = getCurrentAction(gameId);
     Game game = getGame(gameId);
     if (!canSubmit(game, currentAction)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
@@ -702,7 +685,7 @@ public class Model extends AbstractChildEventListener {
         }
       }
     };
-    userReferenceForGame(gameId).setValue(true);
+    actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, true /* abortOnConflict */);
 //    handleComputerAction(applyMutation(game, mutation));
   }
@@ -775,7 +758,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void undoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
-    if (!canUndo(getGame(gameId), currentActions.get(gameId))) die("Can't undo.");
+    if (!canUndo(getGame(gameId), getCurrentAction(gameId))) die("Can't undo.");
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
       public void mutate(Action.Builder action) {
@@ -795,7 +778,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void redoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
-    if (!canRedo(getGame(gameId), currentActions.get(gameId))) die("Can't redo.");
+    if (!canRedo(getGame(gameId), getCurrentAction(gameId))) die("Can't redo.");
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
       public void mutate(Action.Builder action) {
@@ -831,7 +814,7 @@ public class Model extends AbstractChildEventListener {
         game.setLastModified(timestamp);
       }
     };
-    userReferenceForGame(gameId).setValue(true);
+    actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, false /* abortOnConflict */);
   }
 
@@ -855,7 +838,7 @@ public class Model extends AbstractChildEventListener {
    * @param gameId Game ID to subscribe to.
    */
   public void subscribeViewerToGame(String gameId) {
-    userGamesReference().child(gameId).setValue(true);
+    actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
   }
 
   /**
@@ -865,7 +848,8 @@ public class Model extends AbstractChildEventListener {
    * @param gameId Game's ID.
    */
   public void invalidateCommandListener(String gameId) {
-    if (commandUpdateListeners.containsKey(gameId) && games.containsKey(gameId)) {
+    if (commandUpdateListeners.containsKey(gameId) && games.containsKey(gameId) &&
+        currentActions.containsKey(gameId)) {
       commandUpdateListeners.get(gameId).onRegistered(userId, games.get(gameId),
           currentActions.get(gameId));
     }
@@ -972,6 +956,14 @@ public class Model extends AbstractChildEventListener {
     }
   }
 
+  private Action getCurrentAction(String gameId) {
+    if (currentActions.containsKey(gameId)) {
+      return currentActions.get(gameId);
+    } else {
+      throw die("Can't find current action for game " + gameId);
+    }
+  }
+
   /**
    * Returns true if the square mentioned in this command is available.
    */
@@ -1066,6 +1058,13 @@ public class Model extends AbstractChildEventListener {
         }
       }
     });
+  }
+
+  private Action newEmptyAction(String gameId) {
+    return Action.newBuilder()
+        .setGameId(gameId)
+        .setIsSubmitted(false)
+        .build();
   }
 
   /**

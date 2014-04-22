@@ -201,8 +201,10 @@
 }
 
 - (void)onCurrentActionUpdateWithNTSAction:(NTSAction*)currentAction {
-  [_gameView updateButtons];
   _action = currentAction;
+  if (_game) {
+    [_gameView updateButtons];
+  }
 }
 
 - (void)onProfileRequiredWithNSString:(NSString*)gameId {
