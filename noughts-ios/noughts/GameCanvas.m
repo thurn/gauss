@@ -123,14 +123,12 @@
 }
 
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  NSLog(@"on command added");
   BOOL draggable = [self belongsToViewer:action];
   [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
   AudioServicesPlaySystemSound(_addCommandSound);
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  NSLog(@"on command removed");
   UIView *view = _views[command];
   [UIView animateWithDuration:0.2 animations:^{
     view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
@@ -142,7 +140,6 @@
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
-  NSLog(@"on command changed");  
   _views[newCommand] = _views[oldCommand];
   [_views removeObjectForKey:oldCommand];
   AudioServicesPlaySystemSound(_addCommandSound);

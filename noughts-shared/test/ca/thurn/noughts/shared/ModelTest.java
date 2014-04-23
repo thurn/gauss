@@ -263,90 +263,85 @@ public class ModelTest extends SharedTestCase {
     assertFalse(model.couldAddCommand(game.build(), newEmptyAction(game.getId()), command));
   }
 
-//  public void testCanUndo() {
-//    Game.Builder game = newGameWithCurrentCommand();
-//    assertTrue(model.canUndo(game.build()));
-//    Action.Builder action = game.getCurrentAction().toBuilder();
-//    action.clearCommandList();
-//    game.setCurrentAction(action);
-//    assertFalse(model.canUndo(game.build()));
-//  }
-//
-//  public void testCanRedo() {
-//    Game.Builder game = newGameWithCurrentCommand();
-//    assertFalse(model.canRedo(game.build()));
-//    Action.Builder action = game.getCurrentAction().toBuilder();
-//    Command command = action.getCommandList().remove(0);
-//    action.addFutureCommand(command);
-//    game.setCurrentAction(action);
-//    assertTrue(model.canRedo(game.build()));
-//  }
-//
-//  public void testCanSubmit() {
-//    Game.Builder game = newGameWithCurrentCommand();
-//    assertTrue(model.canSubmit(game.build()));
-//    Action.Builder action = game.getCurrentAction().toBuilder();
-//    action.clearCommandList();
-//    game.setCurrentAction(action);
-//    assertFalse(model.canSubmit(game.build()));
-//    Action.Builder action2 = game.getCurrentAction().toBuilder();
-//    action2.addCommand(newCommand(0, 5));
-//    game.setCurrentAction(action2);
-//    assertFalse(model.canSubmit(game.build()));
-//  }
-//
-//  public void testComputeVictors() {
-//    Game.Builder game = newGame();
-//    game.addAllSubmittedAction(list(
-//      action(0, 0, 0, true),
-//      action(1, 0, 1, true)
-//    ));
-//    game.setCurrentAction(action(0, 0, 2, false));
-//    assertNull(model.computeVictorsIfCurrentActionSubmitted(game.build()));
-//
-//    game = newGame();
-//    game.addAllSubmittedAction(list(
-//      action(0, 0, 0, true),
-//      action(0, 0, 1, true)
-//    ));
-//    game.setCurrentAction(action(0, 0, 2, false));
-//    assertDeepEquals(list(0), model.computeVictorsIfCurrentActionSubmitted(game.build()));
-//
-//    game = newGame();
-//    game.addAllSubmittedAction(list(
-//      action(0, 0, 0, true),
-//      action(0, 1, 1, true)
-//    ));
-//    game.setCurrentAction(action(0, 2, 2, false));
-//    assertDeepEquals(list(0), model.computeVictorsIfCurrentActionSubmitted(game.build()));
-//
-//    game = newGame();
-//    game.addAllSubmittedAction(list(
-//      action(0, 0, 2, true),
-//      action(1, 1, 1, true),
-//      action(0, 1, 2, true),
-//      action(1, 0, 1, true)
-//    ));
-//    game.setCurrentAction(action(0, 2, 2, false));
-//    assertDeepEquals(list(0), model.computeVictorsIfCurrentActionSubmitted(game.build()));
-//
-//    game = newGame();
-//    game.addPlayer("x");
-//    game.addPlayer("o");
-//    game.addAllSubmittedAction(list(
-//      action(1, 0, 0, true),
-//      action(0, 0, 1, true),
-//      action(1, 0, 2, true),
-//      action(1, 1, 0, true),
-//      action(0, 1, 1, true),
-//      action(1, 1, 2, true),
-//      action(0, 2, 0, true),
-//      action(1, 2, 1, true)
-//    ));
-//    game.setCurrentAction(action(0, 2, 2, false));
-//    assertDeepEquals(list(0, 1), model.computeVictorsIfCurrentActionSubmitted(game.build()));
-//  }
-//
+  public void testCanUndo() {
+    Game.Builder game = newGameWithTwoPlayers();
+    Action.Builder action = newUnsubmittedActionWithCommand(game.getId());
+    assertTrue(model.canUndo(game.build(), action.build()));
+    action.clearCommandList();
+    assertFalse(model.canUndo(game.build(), action.build()));
+  }
+
+  public void testCanRedo() {
+    Game.Builder game = newGameWithTwoPlayers();
+    Action.Builder action = newUnsubmittedActionWithCommand(game.getId());
+    assertFalse(model.canRedo(game.build(), action.build()));
+    Command command = action.getCommandList().remove(0);
+    action.addFutureCommand(command);
+    assertTrue(model.canRedo(game.build(), action.build()));
+  }
+
+  public void testCanSubmit() {
+    Game.Builder game = newGameWithTwoPlayers();
+    Action.Builder action = newUnsubmittedActionWithCommand(game.getId());
+    assertTrue(model.canSubmit(game.build(), action.build()));
+    action.clearCommandList();
+    assertFalse(model.canSubmit(game.build(), action.build()));
+    action.addCommand(newCommand(0, 5));
+    assertFalse(model.canSubmit(game.build(), action.build()));
+  }
+
+  public void testComputeVictors() {
+    Game.Builder game = newGameWithTwoPlayers();
+    game.addAllSubmittedAction(list(
+      action(0, 0, 0, true),
+      action(1, 0, 1, true)
+    ));
+    Action currentAction = action(0, 0, 2, false);
+    assertNull(model.computeVictorsIfSubmitted(game.build(), currentAction));
+
+    game = newGameWithTwoPlayers();
+    game.addAllSubmittedAction(list(
+      action(0, 0, 0, true),
+      action(0, 0, 1, true)
+    ));
+    currentAction = action(0, 0, 2, false);
+    assertDeepEquals(list(0), model.computeVictorsIfSubmitted(game.build(), currentAction));
+
+    game = newGameWithTwoPlayers();
+    game.addAllSubmittedAction(list(
+      action(0, 0, 0, true),
+      action(0, 1, 1, true)
+    ));
+    currentAction = action(0, 2, 2, false);
+    assertDeepEquals(list(0), model.computeVictorsIfSubmitted(game.build(), currentAction));
+
+    game = newGameWithTwoPlayers();
+    game.addAllSubmittedAction(list(
+      action(0, 0, 2, true),
+      action(1, 1, 1, true),
+      action(0, 1, 2, true),
+      action(1, 0, 1, true)
+    ));
+    currentAction = action(0, 2, 2, false);
+    assertDeepEquals(list(0), model.computeVictorsIfSubmitted(game.build(), currentAction));
+
+    game = newGameWithTwoPlayers();
+    game.addPlayer("x");
+    game.addPlayer("o");
+    game.addAllSubmittedAction(list(
+      action(1, 0, 0, true),
+      action(0, 0, 1, true),
+      action(1, 0, 2, true),
+      action(1, 1, 0, true),
+      action(0, 1, 1, true),
+      action(1, 1, 2, true),
+      action(0, 2, 0, true),
+      action(1, 2, 1, true)
+    ));
+    currentAction = action(0, 2, 2, false);
+    assertDeepEquals(list(0, 1), model.computeVictorsIfSubmitted(game.build(), currentAction));
+  }
+
 //  public void testSubmitCurrentAction() {
 //    beginAsyncTestBlock();
 //    final Game game = newGameWithCurrentCommand().build();

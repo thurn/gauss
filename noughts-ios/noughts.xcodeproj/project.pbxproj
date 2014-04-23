@@ -9,6 +9,17 @@
 /* Begin PBXBuildFile section */
 		5894A9E37EA045BA8A4B2CB4 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADCAC56044884984874A76CE /* libPods.a */; };
 		7C000C4918DB3D9200C52640 /* QueryParsing.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C000C4818DB3D9200C52640 /* QueryParsing.m */; };
+		7C01FB3D19070FD10049CD35 /* Beta.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3219070FD10049CD35 /* Beta.java */; };
+		7C01FB3E19070FD10049CD35 /* GwtCompatible.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3319070FD10049CD35 /* GwtCompatible.java */; };
+		7C01FB3F19070FD10049CD35 /* VisibleForTesting.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3419070FD10049CD35 /* VisibleForTesting.java */; };
+		7C01FB4019070FD10049CD35 /* Absent.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3619070FD10049CD35 /* Absent.java */; };
+		7C01FB4119070FD10049CD35 /* AbstractIterator.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3719070FD10049CD35 /* AbstractIterator.java */; };
+		7C01FB4219070FD10049CD35 /* Function.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3819070FD10049CD35 /* Function.java */; };
+		7C01FB4319070FD10049CD35 /* Optional.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3919070FD10049CD35 /* Optional.java */; };
+		7C01FB4419070FD10049CD35 /* Preconditions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3A19070FD10049CD35 /* Preconditions.java */; };
+		7C01FB4519070FD10049CD35 /* Present.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3B19070FD10049CD35 /* Present.java */; };
+		7C01FB4619070FD10049CD35 /* Supplier.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB3C19070FD10049CD35 /* Supplier.java */; };
+		7C01FB4A190710210049CD35 /* Nullable.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C01FB49190710210049CD35 /* Nullable.java */; };
 		7C0444BC18B2B101006275CA /* GameStatusView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C0444BB18B2B101006275CA /* GameStatusView.xib */; };
 		7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C218B73124006275CA /* MonteCarloSearch.java */; };
 		7C0444D218B73124006275CA /* NegamaxSearch.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C0444C318B73124006275CA /* NegamaxSearch.java */; };
@@ -150,6 +161,17 @@
 /* Begin PBXFileReference section */
 		7C000C4718DB3D9200C52640 /* QueryParsing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QueryParsing.h; sourceTree = "<group>"; };
 		7C000C4818DB3D9200C52640 /* QueryParsing.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = QueryParsing.m; sourceTree = "<group>"; };
+		7C01FB3219070FD10049CD35 /* Beta.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Beta.java; sourceTree = "<group>"; };
+		7C01FB3319070FD10049CD35 /* GwtCompatible.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GwtCompatible.java; sourceTree = "<group>"; };
+		7C01FB3419070FD10049CD35 /* VisibleForTesting.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = VisibleForTesting.java; sourceTree = "<group>"; };
+		7C01FB3619070FD10049CD35 /* Absent.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Absent.java; sourceTree = "<group>"; };
+		7C01FB3719070FD10049CD35 /* AbstractIterator.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AbstractIterator.java; sourceTree = "<group>"; };
+		7C01FB3819070FD10049CD35 /* Function.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Function.java; sourceTree = "<group>"; };
+		7C01FB3919070FD10049CD35 /* Optional.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Optional.java; sourceTree = "<group>"; };
+		7C01FB3A19070FD10049CD35 /* Preconditions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Preconditions.java; sourceTree = "<group>"; };
+		7C01FB3B19070FD10049CD35 /* Present.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Present.java; sourceTree = "<group>"; };
+		7C01FB3C19070FD10049CD35 /* Supplier.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Supplier.java; sourceTree = "<group>"; };
+		7C01FB49190710210049CD35 /* Nullable.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Nullable.java; sourceTree = "<group>"; };
 		7C0444BB18B2B101006275CA /* GameStatusView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GameStatusView.xib; sourceTree = "<group>"; };
 		7C0444C218B73124006275CA /* MonteCarloSearch.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = MonteCarloSearch.java; sourceTree = "<group>"; };
 		7C0444C318B73124006275CA /* NegamaxSearch.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = NegamaxSearch.java; sourceTree = "<group>"; };
@@ -329,6 +351,72 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7C01FB2E19070FD10049CD35 /* com */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB2F19070FD10049CD35 /* google */,
+				7C8EF5DC1866577F0075D0C1 /* ca */,
+			);
+			path = com;
+			sourceTree = "<group>";
+		};
+		7C01FB2F19070FD10049CD35 /* google */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB3019070FD10049CD35 /* common */,
+			);
+			path = google;
+			sourceTree = "<group>";
+		};
+		7C01FB3019070FD10049CD35 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB3119070FD10049CD35 /* annotations */,
+				7C01FB3519070FD10049CD35 /* base */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		7C01FB3119070FD10049CD35 /* annotations */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB3219070FD10049CD35 /* Beta.java */,
+				7C01FB3319070FD10049CD35 /* GwtCompatible.java */,
+				7C01FB3419070FD10049CD35 /* VisibleForTesting.java */,
+			);
+			path = annotations;
+			sourceTree = "<group>";
+		};
+		7C01FB3519070FD10049CD35 /* base */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB3619070FD10049CD35 /* Absent.java */,
+				7C01FB3719070FD10049CD35 /* AbstractIterator.java */,
+				7C01FB3819070FD10049CD35 /* Function.java */,
+				7C01FB3919070FD10049CD35 /* Optional.java */,
+				7C01FB3A19070FD10049CD35 /* Preconditions.java */,
+				7C01FB3B19070FD10049CD35 /* Present.java */,
+				7C01FB3C19070FD10049CD35 /* Supplier.java */,
+			);
+			path = base;
+			sourceTree = "<group>";
+		};
+		7C01FB47190710210049CD35 /* javax */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB48190710210049CD35 /* annotation */,
+			);
+			path = javax;
+			sourceTree = "<group>";
+		};
+		7C01FB48190710210049CD35 /* annotation */ = {
+			isa = PBXGroup;
+			children = (
+				7C01FB49190710210049CD35 /* Nullable.java */,
+			);
+			path = annotation;
+			sourceTree = "<group>";
+		};
 		7C0444C018B73124006275CA /* uct */ = {
 			isa = PBXGroup;
 			children = (
@@ -524,7 +612,8 @@
 		7C8EF5DB1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
-				7C8EF5DC1866577F0075D0C1 /* ca */,
+				7C01FB47190710210049CD35 /* javax */,
+				7C01FB2E19070FD10049CD35 /* com */,
 			);
 			name = shared;
 			path = "../noughts-shared/shared";
@@ -535,7 +624,8 @@
 			children = (
 				7C8EF5DD1866577F0075D0C1 /* thurn */,
 			);
-			path = ca;
+			name = ca;
+			path = ../ca;
 			sourceTree = "<group>";
 		};
 		7C8EF5DD1866577F0075D0C1 /* thurn */ = {
@@ -776,6 +866,7 @@
 				7C58BE1518C1BD4D008D2C9D /* Game.java in Sources */,
 				7C0444DB18B73124006275CA /* Main.java in Sources */,
 				7C0444DA18B73124006275CA /* Evaluator.java in Sources */,
+				7C01FB4419070FD10049CD35 /* Preconditions.java in Sources */,
 				7C0444D318B73124006275CA /* UctSearch.java in Sources */,
 				7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */,
 				7C2E641B18641F3500D34AD0 /* MainMenuViewController.m in Sources */,
@@ -787,6 +878,7 @@
 				7C1F83B818680F7D00D66C78 /* GameView.m in Sources */,
 				7C58BE1A18C1BD4D008D2C9D /* Profile.java in Sources */,
 				7C0444D218B73124006275CA /* NegamaxSearch.java in Sources */,
+				7C01FB3D19070FD10049CD35 /* Beta.java in Sources */,
 				7C3F723918E36D6700898E5A /* GameListListener.java in Sources */,
 				7C0444DD18B73124006275CA /* State.java in Sources */,
 				7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */,
@@ -801,7 +893,9 @@
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,
+				7C01FB4319070FD10049CD35 /* Optional.java in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
+				7C01FB4219070FD10049CD35 /* Function.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
 				7C58BE1318C1BD4D008D2C9D /* Action.java in Sources */,
 				7C27F70518BFC59C00ADA495 /* Pronouns.java in Sources */,
@@ -809,9 +903,12 @@
 				7C000C4918DB3D9200C52640 /* QueryParsing.m in Sources */,
 				7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */,
 				7C27F71318C8FF2D00ADA495 /* GameListEntryCell.m in Sources */,
+				7C01FB4A190710210049CD35 /* Nullable.java in Sources */,
+				7C01FB4619070FD10049CD35 /* Supplier.java in Sources */,
 				7CCD446718DC02D00023F1CA /* FacebookInviteViewController.m in Sources */,
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C3F723518E3658E00898E5A /* GameListSection.java in Sources */,
+				7C01FB4519070FD10049CD35 /* Present.java in Sources */,
 				7C92C02A18920FD800DF8816 /* Clock.java in Sources */,
 				7C312D1D18E7EDAB00D651A0 /* ProfilePromptViewController.m in Sources */,
 				7C0444D518B73124006275CA /* ActionTree.java in Sources */,
@@ -823,14 +920,18 @@
 				7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */,
 				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
+				7C01FB3F19070FD10049CD35 /* VisibleForTesting.java in Sources */,
 				7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */,
 				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C58BE1418C1BD4D008D2C9D /* Command.java in Sources */,
+				7C01FB4019070FD10049CD35 /* Absent.java in Sources */,
 				7C72157F186F232500F1188B /* GameListViewController.m in Sources */,
 				7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */,
 				7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */,
 				7C58BE1818C1BD4D008D2C9D /* ImageString.java in Sources */,
 				7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */,
+				7C01FB4119070FD10049CD35 /* AbstractIterator.java in Sources */,
+				7C01FB3E19070FD10049CD35 /* GwtCompatible.java in Sources */,
 				7C8EF5E81866577F0075D0C1 /* AbstractChildEventListener.java in Sources */,
 				7C8EF76E18668E120075D0C1 /* WrappedChildEventListener.java in Sources */,
 				7C58BE1918C1BD4D008D2C9D /* ImageType.java in Sources */,

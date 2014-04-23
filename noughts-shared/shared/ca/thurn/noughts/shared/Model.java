@@ -1,5 +1,7 @@
 package ca.thurn.noughts.shared;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +14,7 @@ import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.Profile;
+import ca.thurn.noughts.shared.entities.Pronoun;
 import ca.thurn.uct.algorithm.MonteCarloSearch;
 
 import com.firebase.client.DataSnapshot;
@@ -21,6 +24,7 @@ import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.MutableData;
 import com.firebase.client.Transaction;
 import com.firebase.client.ValueEventListener;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The data model for noughts. Data is denormalized into two distinct
@@ -418,7 +422,7 @@ public class Model extends AbstractChildEventListener {
       if (i < profiles.size() && profiles.get(i) != null) {
         builder.addProfile(profiles.get(i));
       } else {
-        builder.addProfile(Profile.newBuilder().build());
+        builder.addProfile(Profile.newBuilder().setPronoun(Pronoun.NEUTRAL).build());
       }
     }
     Game game = builder.build();
@@ -649,7 +653,7 @@ public class Model extends AbstractChildEventListener {
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
-    final List<Integer> victors = computeVictorsIfCurrentActionSubmitted(game, currentAction);
+    final List<Integer> victors = computeVictorsIfSubmitted(game, currentAction);
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         game.addSubmittedAction(currentAction.toBuilder().setIsSubmitted(true));
@@ -906,13 +910,11 @@ public class Model extends AbstractChildEventListener {
    * @return A list of player numbers of victors or null if the game is not
    *     over.
    */
-  // Visible for testing only
-  List<Integer> computeVictorsIfCurrentActionSubmitted(Game game, Action currentAction) {
-    if (currentAction == null) {
-      die("currentAction is null");
-    }
-    // 1) check for win
+  @VisibleForTesting
+  List<Integer> computeVictorsIfSubmitted(Game game, Action currentAction) {
+    checkNotNull(currentAction);
 
+    // 1) check for win
     Action[][] actionTable = makeActionTable(game, currentAction);
     // All possible winning lines in [column, row] format:
     int[][][] lines =  { {{0,0}, {1,0}, {2,0}}, {{0,1}, {1,1}, {2,1}},
@@ -932,7 +934,6 @@ public class Model extends AbstractChildEventListener {
     }
 
     // 2) check for draw
-
     int submitted = 0;
     for (Action action : game.getSubmittedActionList()) {
       if (action.isSubmitted()) submitted++;
