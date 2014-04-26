@@ -23,7 +23,7 @@ public interface CommandUpdateListener {
    * @param command The newly added command.
    */
   public void onCommandAdded(Action action, Command command);
-  
+
   /**
    * Called when a command is removed from the current action.
    *
@@ -45,9 +45,10 @@ public interface CommandUpdateListener {
    * Called when an action is submitted.
    *
    * @param action The action for the command.
+   * @param byViewer True if the action was owned by the viewer.
    */
-  public void onActionSubmitted(Action action);
-  
+  public void onActionSubmitted(Action action, boolean byViewer);
+
   /**
    * Called when the game ends.
    *

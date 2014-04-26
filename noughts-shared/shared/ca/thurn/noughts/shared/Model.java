@@ -307,7 +307,10 @@ public class Model extends AbstractChildEventListener {
       } else {
         int count = game.getSubmittedActionCount();
         while (count > oldGame.getSubmittedActionCount()) {
-          listener.onActionSubmitted(game.getSubmittedAction(count - 1));
+          Action submitted = game.getSubmittedAction(count - 1);
+          boolean byViewer = Games.playerNumbersForPlayerId(game, userId).contains(
+              submitted.getPlayerNumber());
+          listener.onActionSubmitted(submitted, byViewer);
           count--;
         }
         if (game.isGameOver() && !oldGame.isGameOver()) {
@@ -684,7 +687,8 @@ public class Model extends AbstractChildEventListener {
           } else {
             String channelId = Games.channelIdForPlayer(game.getId(),
                 game.getCurrentPlayerNumber());
-            pushNotificationListener.onPushRequired(channelId, game.getId(), "It's your turn!");
+            String message = "Game " + Games.vsString(game, userId) + ": It's your turn!";
+            pushNotificationListener.onPushRequired(channelId, game.getId(), message);
           }
         }
       }
@@ -842,7 +846,9 @@ public class Model extends AbstractChildEventListener {
    * @param gameId Game ID to subscribe to.
    */
   public void subscribeViewerToGame(String gameId) {
-    actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
+    if (!currentActions.containsKey(gameId)) {
+      actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
+    }
   }
 
   /**
@@ -884,6 +890,30 @@ public class Model extends AbstractChildEventListener {
       };
       mutateGame(gameId, mutation, true /* abortOnConflict */);
     }
+  }
+
+  /**
+   * Associates a game ID with a given Facebook Request ID
+   *
+   * @param requestId The request ID.
+   * @param gameId The game ID.
+   */
+  public void putFacebookRequestId(String requestId, String gameId) {
+    requestReference(requestId).setValue(gameId);
+  }
+
+  public void subscribeToRequestIds(String requestId, final RequestLoadedCallback callback) {
+    requestReference(requestId).addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onCancelled(FirebaseError error) {}
+
+      @Override
+      public void onDataChange(DataSnapshot snapshot) {
+        String gameId = (String)snapshot.getValue();
+        subscribeViewerToGame(gameId);
+        callback.onRequestLoaded(gameId);
+      }
+    });
   }
 
   /**
@@ -1086,6 +1116,10 @@ public class Model extends AbstractChildEventListener {
 
   private Firebase actionReferenceForGame(String gameId) {
     return userReferenceForGame(gameId).child("currentAction");
+  }
+
+  private Firebase requestReference(String requestId) {
+    return firebase.child("requests").child("r" + requestId);
   }
 
   /**

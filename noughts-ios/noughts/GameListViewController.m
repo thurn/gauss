@@ -42,7 +42,6 @@
 }
 
 -(void)onGameAddedWithNTSGame:(NTSGame*)game {
-  NSLog(@"onGameAdded");
   if (self.isViewLoaded && self.view.window) {
     [self.tableView beginUpdates];
     int section = [[NTSGameListPartitions getSectionWithNTSGame:game
@@ -56,13 +55,10 @@
 }
 
 - (void)onGameChangedWithNTSGame:(NTSGame *)game {
-  NSLog(@"onGameChanged");
   NTSIndexPath *indexPath = [_gameListPartitions getGameIndexPathWithNSString:[game getId]];
   int newSection = [[NTSGameListPartitions getSectionWithNTSGame:game
                                                     withNSString:[_model getUserId]] ordinal];
   if ([indexPath getSection] != newSection && [indexPath getSection] != -1) {
-    NSLog(@"moving from path %@", indexPath);
-    NSLog(@"to section %d", newSection);
     [self.tableView beginUpdates];
     [self.tableView moveRowAtIndexPath:[NSIndexPath indexPathForItem:[indexPath getRow]
                                                            inSection:[indexPath getSection]]

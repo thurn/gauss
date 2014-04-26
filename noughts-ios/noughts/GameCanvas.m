@@ -54,18 +54,8 @@
      [[UITapGestureRecognizer alloc] initWithTarget:self
                                              action:@selector(handleTap:)]];
     
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self selector:@selector(orientationChanged:)
-     name:UIDeviceOrientationDidChangeNotification
-     object:[UIDevice currentDevice]];
-    
   }
   return self;
-}
-
-- (void) orientationChanged:(NSNotification *)notification {
-  [_delegate invalidateCommandListener];
 }
 
 - (void)onRegisteredWithNSString:(NSString *)viewerId
@@ -145,11 +135,14 @@
   AudioServicesPlaySystemSound(_addCommandSound);
 }
 
--(void)onActionSubmittedWithNTSAction:(NTSAction *)action {
+-(void)onActionSubmittedWithNTSAction:(NTSAction *)action withBoolean:(BOOL)byViewer {
   for (NTSCommand *command in [action getCommandList]) {
     [self removeAllGestureRecognizers:_views[command]];
   }
   AudioServicesPlaySystemSound(_submitCommandSound);
+  if (!byViewer) {
+    [self drawAction:action animate:YES draggable:NO];
+  }
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {
@@ -265,8 +258,6 @@
   AudioServicesDisposeSystemSoundID(_removeCommandSound);
   AudioServicesDisposeSystemSoundID(_submitCommandSound);
   AudioServicesDisposeSystemSoundID(_gameOverSound);
-  [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
-  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

@@ -121,6 +121,7 @@
 		7CCD446A18DDF7820023F1CA /* EmailInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCD446918DDF7820023F1CA /* EmailInviteViewController.m */; };
 		7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447018DF41AF0023F1CA /* Accounts.framework */; };
 		7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447218DF41B40023F1CA /* Social.framework */; };
+		7CCE4F081908ECED0027150A /* RequestLoadedCallback.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */; };
 		7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CD64E3B18FD8F3200252818 /* IndexPath.java */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
@@ -287,6 +288,7 @@
 		7CCD446B18DF2EE70023F1CA /* libcommonCrypto.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcommonCrypto.dylib; path = usr/lib/system/libcommonCrypto.dylib; sourceTree = SDKROOT; };
 		7CCD447018DF41AF0023F1CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		7CCD447218DF41B40023F1CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
+		7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = RequestLoadedCallback.java; sourceTree = "<group>"; };
 		7CD64E3B18FD8F3200252818 /* IndexPath.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = IndexPath.java; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
@@ -649,6 +651,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */,
 				7CD64E3B18FD8F3200252818 /* IndexPath.java */,
 				7C65892B18EDF23D00359B7C /* PushNotificationListener.java */,
 				7C3F723618E36D6700898E5A /* AbstractGameListListener.java */,
@@ -883,6 +886,7 @@
 				7C0444DD18B73124006275CA /* State.java in Sources */,
 				7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */,
 				7C27F70818C67A0300ADA495 /* UIView+AutoLayout.m in Sources */,
+				7CCE4F081908ECED0027150A /* RequestLoadedCallback.java in Sources */,
 				7C0444D418B73124006275CA /* ActionScore.java in Sources */,
 				7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */,
 				7C0444D918B73124006275CA /* Copyable.java in Sources */,
@@ -1102,6 +1106,7 @@
 					/usr/local/j2objc/include,
 				);
 				INFOPLIST_FILE = "noughts/noughts-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/j2objc/lib,
@@ -1123,6 +1128,7 @@
 					"-Wl,-no_compact_unwind",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1148,6 +1154,7 @@
 					/usr/local/j2objc/include,
 				);
 				INFOPLIST_FILE = "noughts/noughts-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/j2objc/lib,
@@ -1169,6 +1176,7 @@
 					"-Wl,-no_compact_unwind",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

@@ -7,10 +7,14 @@
 #import "PushNotificationListener.h"
 #import <Firebase/Firebase.h>
 #import <FirebaseSimpleLogin/FirebaseSimpleLogin.h>
+#import <FacebookSDK/FacebookSDK.h>
+#import "QueryParsing.h"
+#import "AFNetworking.h"
+#import "RequestLoadedCallback.h"
 
 NSString *const kFacebookId = @"kFacebookId";
 
-@interface AppDelegate () <NTSPushNotificationListener>
+@interface AppDelegate () <NTSPushNotificationListener, NTSRequestLoadedCallback>
 @property BOOL runningQuery;
 @property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
 @property(strong, nonatomic) NSMutableArray *onModelReadyListeners;
@@ -34,11 +38,12 @@ NSString *const kFacebookId = @"kFacebookId";
   }
   _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
   _onModelReadyListeners = [NSMutableArray new];
+  [self createAnonymousModel:firebase];
   [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
     if (user != nil) {
-      NSLog(@"Facebook User");
+      NSLog(@"Facebook User %@", user.userId);
       [self createFacebookModel:firebase withUserId:user.userId];
-      [self onFacebookLogin:user.userId withCallback:nil];
+      [self onFacebookLoginWithCallback:nil];
     } else {
       NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
       if ([userDefaults valueForKey:kFacebookId]) {
@@ -128,11 +133,11 @@ NSString *const kFacebookId = @"kFacebookId";
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
   NSLog(@"didReceiveNotification %@", userInfo);
-  if (userInfo[@"gameId"]) {
-    [self pushGameViewWithId:userInfo[@"gameId"]];
-  } else {
-    [PFPush handlePush:userInfo];
-  }
+//  if (userInfo[@"gameId"]) {
+//    [self pushGameViewWithId:userInfo[@"gameId"]];
+//  } else {
+//    [PFPush handlePush:userInfo];
+//  }
 }
 
 - (BOOL)application:(UIApplication *)application
@@ -144,7 +149,40 @@ NSString *const kFacebookId = @"kFacebookId";
     NSString *gameId = paths[1];
     [self pushGameViewWithId:gameId];
   }
-  return [FBAppCall handleOpenURL:url sourceApplication:sourceApplication];
+  [FBAppCall handleOpenURL:url
+         sourceApplication:sourceApplication
+           fallbackHandler:^(FBAppCall *call) {
+    if (call.appLinkData && call.appLinkData.targetURL) {
+      NSURL *target = call.appLinkData.targetURL;
+      NSString *requestIds = [QueryParsing dictionaryFromQueryComponents:target][@"request_ids"][0];
+      NSArray *idsArray = [requestIds componentsSeparatedByString:@","];
+      for (int i = 0; i < [idsArray count]; ++i) {
+        if (i == [idsArray count] - 1) {
+          // Most recent request -- load it
+          NSLog(@"load game %@", idsArray[i]);
+          [AppDelegate registerForOnModelLoadedWithCallback:^(NTSModel *model) {
+            [model subscribeToRequestIdsWithNSString:idsArray[i]
+                        withNTSRequestLoadedCallback:self];
+          }];
+        } else {
+          // Old request -- delete it
+          NSString *fullId = [idsArray[i] stringByAppendingString:@"_100008083952081"];
+          NSLog(@"delete game %@", fullId);
+          FBRequest *request = [FBRequest requestWithGraphPath:fullId
+                                                    parameters:@{}
+                                                    HTTPMethod:@"DELETE"];
+          [request startWithCompletionHandler:^(FBRequestConnection *connection,
+                                                id result, NSError *error) {
+          }];
+        }
+      }
+    }
+  }];
+  return YES;
+}
+
+- (void)onRequestLoadedWithNSString:(NSString *)gameId {
+  [self pushGameViewWithId:gameId];
 }
 
 - (void)pushGameViewWithId:(NSString*)gameId {
@@ -175,13 +213,13 @@ NSString *const kFacebookId = @"kFacebookId";
                        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                        [userDefaults setObject:user.userId forKey:kFacebookId];
                        [userDefaults synchronize];
-                       [self onFacebookLogin: user.userId withCallback:callback];
+                       [self onFacebookLoginWithCallback:callback];
                        // handle account upgrade
                      }
                    }];
 }
 
-- (void)onFacebookLogin:(NSString*)userId withCallback:(void(^)())callback {
+- (void)onFacebookLoginWithCallback:(void(^)())callback {
   [self getFacebookFriendsWithCallback:callback];
   if (!_friendCache) {
     _friendCache = [FBFrictionlessRecipientCache new];
@@ -190,7 +228,11 @@ NSString *const kFacebookId = @"kFacebookId";
 }
 
 - (void)getFacebookFriendsWithCallback:(void(^)())callback {
-  if (_friends || _runningQuery) return;
+  if (_friends) {
+    callback();
+    return;
+  }
+  if (_runningQuery) return;
   _runningQuery = YES;
   NSString *query = @"SELECT uid,mutual_friend_count,name,first_name,sex,is_app_user "
                     @"FROM user WHERE uid IN "
@@ -256,6 +298,15 @@ NSString *const kFacebookId = @"kFacebookId";
     [object onModelLoaded:appDelegate.model];
   } else {
     [appDelegate.onModelReadyListeners addObject:object];
+  }
+}
+
++ (void)registerForOnModelLoadedWithCallback:(void(^)(NTSModel* model))callback {
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  if (appDelegate.model) {
+    callback(appDelegate.model);
+  } else {
+    callback(appDelegate.model);
   }
 }
 

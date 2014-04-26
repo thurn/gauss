@@ -232,10 +232,6 @@ public class ModelTest extends SharedTestCase {
               finished();
             }
           }
-
-          @Override
-          public void onCurrentActionUpdate(Action currentAction) {
-          }
         }, false /* immediate */);
         model.addCommandAndSubmit(game.getId(), command);
       }
@@ -342,184 +338,182 @@ public class ModelTest extends SharedTestCase {
     assertDeepEquals(list(0, 1), model.computeVictorsIfSubmitted(game.build(), currentAction));
   }
 
-//  public void testSubmitCurrentAction() {
-//    beginAsyncTestBlock();
-//    final Game game = newGameWithCurrentCommand().build();
-//    withTestData(game, new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertEquals(1, (int)game.getCurrentPlayerNumber());
-//            assertFalse(game.hasCurrentAction());
-//            finished();
-//          }
-//        });
-//        model.submitCurrentAction(game);
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testSubmitCurrentActionUpdatesGameStatus() {
-//    beginAsyncTestBlock();
-//    final Game game = newGameWithCurrentCommand().build();
-//    withTestData(game, new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new GameStatusUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {}
-//
-//          @Override
-//          public void onGameStatusChanged(GameStatus status) {
-//            assertEquals(status.getStatusPlayer(), 1);
-//            finished();
-//          }
-//        });
-//        model.submitCurrentAction(game);
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testSubmitCurrentActionGameList() {
-//    beginAsyncTestBlock();
-//    final Game game = newGameWithCurrentCommand().build();
-//    withTestData(game, new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameListListener(new AbstractGameListListener() {
-//          @Override
-//          public void onGameChanged(Game game) {
-//            assertEquals(1, (int)game.getCurrentPlayerNumber());
-//            assertTrue(game.getLastModified() > 150L);
-//            assertFalse(game.hasCurrentAction());
-//            finished();
-//          }
-//        });
-//        model.submitCurrentAction(game);
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testSubmitCurrentActionLocalMultiplayer() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGameWithCurrentCommand();
-//    game.setIsLocalMultiplayer(true);
-//    game.clearPlayerList();
-//    game.addPlayer(userId);
-//    game.addPlayer(userId);
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertEquals(userId, Games.currentPlayerId(game));
-//            finished();
-//          }
-//        });
-//        model.submitCurrentAction(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testSubmitCurrentActionGameOver() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGame();
-//    game.addPlayer(userId);
-//    game.addPlayer("o");
-//    game.setProfile(0, Profile.newDeserializer().deserialize(map(
-//        "name", "User",
-//        "pronoun", "MALE"
-//        )));
-//    game.setProfile(1, Profile.newDeserializer().deserialize(map(
-//        "name", "Opponent",
-//        "pronoun", "FEMALE"
-//        )));
-//    game.addAllSubmittedAction(list(
-//      action(0, 0, 2, true),
-//      action(1, 1, 1, true),
-//      action(0, 1, 2, true),
-//      action(1, 0, 1, true)
-//    ));
-//    Action.Builder action = Action.newBuilder();
-//    action.setPlayerNumber(0);
-//    action.setIsSubmitted(false);
-//    action.addCommand(newCommand(2, 2));
-//    action.setGameId(game.getId());
-//    game.setCurrentAction(action);
-//    game.setCurrentPlayerNumber(0);
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertFalse(game.hasCurrentPlayerNumber());
-//            assertFalse(game.hasCurrentAction());
-//            assertEquals(0, game.getVictor(0));
-//            assertEquals(1, game.getVictorCount());
-//            assertTrue(game.isGameOver());
-//            finished();
-//          }
-//        });
-//        model.submitCurrentAction(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testUndo() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGameWithCurrentCommand();
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertDeepEquals(list(), game.getCurrentAction().getCommandList());
-//            assertDeepEquals(list(newCommand(2, 1)),
-//                game.getCurrentAction().getFutureCommandList());
-//            finished();
-//          }
-//        });
-//        model.undoCommand(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testRedo() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGameWithCurrentCommand();
-//    Action.Builder action = game.getCurrentAction().toBuilder();
-//    action.clearCommandList();
-//    final Command command = newCommand(0, 0);
-//    action.addFutureCommand(command);
-//    game.setCurrentAction(action);
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertDeepEquals(list(command), game.getCurrentAction().getCommandList());
-//            assertDeepEquals(list(), game.getCurrentAction().getFutureCommandList());
-//            finished();
-//          }
-//        });
-//        model.redoCommand(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
+  public void testSubmitCurrentAction() {
+    beginAsyncTestBlock(2);
+    final Game game = newGameWithTwoPlayers().build();
+    final Action action = newUnsubmittedActionWithCommand(game.getId()).build();
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertEquals(1, game.getCurrentPlayerNumber());
+            assertEquals(action.getCommand(0),
+                game.getSubmittedAction(game.getSubmittedActionCount() - 1).getCommand(0));
+            finished();
+          }
+
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(newEmptyAction(game.getId()), currentAction);
+            finished();
+          }
+        }, false /* immediate */);
+        model.submitCurrentAction(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSubmitCurrentActionUpdatesGameStatus() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().build();
+    Action action = newUnsubmittedActionWithCommand(game.getId()).build();
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameStatusChanged(GameStatus status) {
+            assertEquals(1, status.getStatusPlayer());
+            finished();
+          }
+        }, false /* immediate */);
+        model.submitCurrentAction(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSubmitCurrentActionGameList() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().build();
+    Action action = newUnsubmittedActionWithCommand(game.getId()).build();
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameListListener(new AbstractGameListListener() {
+          @Override
+          public void onGameChanged(Game game) {
+            assertEquals(1, game.getCurrentPlayerNumber());
+            assertTrue(game.getLastModified() > 150L);
+            finished();
+          }
+        });
+        model.submitCurrentAction(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSubmitCurrentActionLocalMultiplayer() {
+    beginAsyncTestBlock();
+    final Game.Builder game = newGameWithTwoPlayers();
+    game.setIsLocalMultiplayer(true);
+    game.clearPlayerList();
+    game.addPlayer(userId);
+    game.addPlayer(userId);
+    Action action = newUnsubmittedActionWithCommand(game.getId()).build();
+    withTestData(game.build(), action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertEquals(userId, Games.currentPlayerId(game));
+            finished();
+          }
+        }, false /* immediate */);
+        model.submitCurrentAction(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSubmitCurrentActionGameOver() {
+    beginAsyncTestBlock(2);
+    final Game.Builder game = newGameWithTwoPlayers();
+    game.addAllSubmittedAction(list(
+      action(0, 0, 2, true),
+      action(1, 1, 1, true),
+      action(0, 1, 2, true),
+      action(1, 0, 1, true)
+    ));
+    Action.Builder action = Action.newBuilder();
+    action.setPlayerNumber(0);
+    action.setIsSubmitted(false);
+    action.addCommand(newCommand(2, 2));
+    action.setGameId(game.getId());
+    withTestData(game.build(), action.build(), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertFalse(game.hasCurrentPlayerNumber());
+            assertEquals(0, game.getVictor(0));
+            assertEquals(1, game.getVictorCount());
+            assertTrue(game.isGameOver());
+            finished();
+          }
+
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(newEmptyAction(game.getId()), currentAction);
+            finished();
+          }
+        }, false /* immediate */);
+        model.submitCurrentAction(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testUndo() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().build();
+    final Action action = newUnsubmittedActionWithCommand(game.getId()).build();
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(0, currentAction.getCommandCount());
+            assertEquals(action.getCommand(0), currentAction.getFutureCommand(0));
+            finished();
+          }
+        }, false /* immediate */);
+        model.undoCommand(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testRedo() {
+    beginAsyncTestBlock();
+    final Game.Builder game = newGameWithTwoPlayers();
+    final Action.Builder action = newEmptyAction(game.getId()).toBuilder();
+    final Command command = newCommand(0, 0);
+    action.addFutureCommand(command);
+    withTestData(game.build(), action.build(), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(action.getFutureCommand(0), currentAction.getCommand(0));
+            assertEquals(0, currentAction.getFutureCommandCount());
+            finished();
+          }
+        }, false /* immediate */);
+        model.redoCommand(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
 //  public void testResignNotPlayer() {
 //    assertDies(new Runnable() {
 //      @Override

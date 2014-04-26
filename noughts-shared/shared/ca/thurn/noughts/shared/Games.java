@@ -12,9 +12,9 @@ import ca.thurn.noughts.shared.entities.ImageType;
 import ca.thurn.noughts.shared.entities.Profile;
 
 public class Games {
-  public static final ImageString GAME_OVER_IMAGE_STRING = 
+  public static final ImageString GAME_OVER_IMAGE_STRING =
       ImageString.newBuilder().setString("game_over").setType(ImageType.LOCAL).build();
-  public static final ImageString NO_OPPONENT_IMAGE_STRING = 
+  public static final ImageString NO_OPPONENT_IMAGE_STRING =
       ImageString.newBuilder().setString("no_opponent_40").setType(ImageType.LOCAL).build();
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
@@ -29,7 +29,7 @@ public class Games {
   private static final long ONE_MONTH = (long)WEEKS * ONE_WEEK;
   private static final long MONTHS = 12;
   private static final long ONE_YEAR = MONTHS * ONE_MONTH;
-  
+
   /**
    * @return A Comparator for Games.
    */
@@ -75,7 +75,7 @@ public class Games {
         Profile winnerProfile = game.getProfile(winnerNumber);
         String winner = winnerProfile.getName();
         ImageString imageString = winnerProfile.hasImageString() ?
-            winnerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;  
+            winnerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING;
         return GameStatus.newBuilder()
             .setStatusString(winner + " won the game!")
             .setStatusImageString(imageString)
@@ -93,7 +93,7 @@ public class Games {
           .setStatusString("Game over.")
           .setStatusImageString(GAME_OVER_IMAGE_STRING)
           .setIsComputerThinking(false)
-          .build();        
+          .build();
       }
     } else {
       String name = "Player " + (game.getCurrentPlayerNumber() + 1);
@@ -127,7 +127,7 @@ public class Games {
    * @param game game to construct channel ID for.
    * @param viewerId Viewer to construct the channel for.
    * @return Channel IDs to use with Parse, one per player number that the
-   *     viewer is acting as in this game. 
+   *     viewer is acting as in this game.
    */
   public static List<String> channelIdsForViewer(Game game, String viewerId) {
     List<String> ids = new ArrayList<String>();
@@ -136,7 +136,7 @@ public class Games {
     }
     return ids;
   }
-  
+
   /**
    * @param gameId Game ID
    * @param playerNumber Player number
@@ -146,12 +146,12 @@ public class Games {
   public static String channelIdForPlayer(String gameId, int playerNumber) {
     return "G" + gameId + "___" + playerNumber;
   }
-  
+
   /**
    * @param viewerId viewer's player ID
    * @return True if there is an opponent in this game who is distinct from
    *     the viewer. False if there's no opponent or the viewer is playing
-   *     both sides in this game. 
+   *     both sides in this game.
    */
   static boolean hasOpponent(Game game, String viewerId) {
     return game.getPlayerCount() == 2 && !game.getPlayer(0).equals(game.getPlayer(1));
@@ -191,7 +191,7 @@ public class Games {
   /**
    * @param viewerId viewer's player ID
    * @return The profile of your opponent.
-   * @throws IllegalStateException If there is no opponent 
+   * @throws IllegalStateException If there is no opponent
    */
   static Profile opponentProfile(Game game, String viewerId) {
     int opponentNumber = opponentPlayerNumber(game, viewerId);
@@ -203,7 +203,7 @@ public class Games {
    * @return A string describing the opponent of this game, such as
    *     "vs. Frank".
    */
-  static String vsString(Game game, String viewerId) {
+  public static String vsString(Game game, String viewerId) {
     if (game.isLocalMultiplayer()) {
       if (game.getProfile(0).hasName() && game.getProfile(1).hasName()) {
         return game.getProfile(0).getName() + " vs. " + game.getProfile(1).getName();
@@ -211,7 +211,7 @@ public class Games {
         return "Local Multiplayer Game";
       }
     } else if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasName()) {
-      return "vs. " + opponentProfile(game, viewerId).getName();      
+      return "vs. " + opponentProfile(game, viewerId).getName();
     } else {
       if (game.isGameOver()) {
         return "vs. (No Opponent)";
@@ -224,7 +224,7 @@ public class Games {
   /**
    * @param viewerId viewer's player ID
    * @return A string describing the last state of the game, such as "Updated 1
-   *     second ago" or "You won 4 years ago". 
+   *     second ago" or "You won 4 years ago".
    */
   static String lastUpdatedString(Game game, String viewerId) {
     long duration = Math.max(Clock.getInstance().currentTimeMillis() - game.getLastModified(), 0);
@@ -283,7 +283,7 @@ public class Games {
           if (opponentProfile(game, viewerId).hasPronoun()) {
             Profile opponentProfile = opponentProfile(game, viewerId);
             statusString = Pronouns.getNominativePronoun(
-                opponentProfile.getPronoun(), true /* capitalize */) + " won";            
+                opponentProfile.getPronoun(), true /* capitalize */) + " won";
           } else {
             statusString = "They won";
           }
@@ -318,7 +318,7 @@ public class Games {
       }
     } else {
       if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasImageString()) {
-        result.add(opponentProfile(game, viewerId).getImageString());          
+        result.add(opponentProfile(game, viewerId).getImageString());
       } else {
         result.add(NO_OPPONENT_IMAGE_STRING);
       }

@@ -19,4 +19,5 @@ FOUNDATION_EXPORT NSString *const kFacebookId;
 + (void)registerForOnModelLoaded:(id <OnModelLoaded>)object;
 - (UIStoryboard*)mainStoryboard;
 - (void)logInToFacebook:(void(^)())callback;
+- (void)pushGameViewWithId:(NSString*)gameId;
 @end

@@ -3,6 +3,7 @@
 #import "Model.h"
 #import "QueryParsing.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "java/util/ArrayList.h"
 
 @interface FacebookInviteViewController ()
 @end
@@ -18,22 +19,23 @@
    title:@"noughts"
    parameters:@{@"to": [uid stringValue]}
    handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-     if (error) {
-       NSLog(@"Error with request: %@", error);
-     } else if (result == FBWebDialogResultDialogNotCompleted) {
-       NSLog(@"Dialog closed");
-     } else {
-       NSLog(@"result url %@", resultURL);
+     if (!error && result != FBWebDialogResultDialogNotCompleted) {
        NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-       NSLog(@"fbid %@", query[@"to[0]"]);
-       NSLog(@"requestid %@", query[@"request"]);
+       [self onFacebookInvite:query[@"request"][0]];
      }
    }
-   friendCache:appDelegate.friendCache];
+   friendCache:nil /*appDelegate.friendCache*/];
 }
 
-- (void)didReceiveMemoryWarning
-{
+- (void)onFacebookInvite:(NSString*)requestId {
+  NTSModel *model = [AppDelegate getModel];
+  NSString *gameId = [model newGameWithJavaUtilList:[JavaUtilArrayList new]];
+  [model putFacebookRequestIdWithNSString:requestId withNSString:gameId];
+  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  [appDelegate pushGameViewWithId:gameId];
+}
+
+- (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
@@ -64,17 +66,5 @@
                  placeholderImage:[UIImage imageNamed:@"facebook_default"]];
   return cell;
 }
-
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
-{
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
-}
-*/
 
 @end
