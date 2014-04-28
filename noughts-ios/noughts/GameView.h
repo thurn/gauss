@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "Game.h"
 #import "GameCanvas.h"
+#import "ImageString.h"
 
 typedef NS_ENUM(NSUInteger, GameMenuSelection) {
   kUnknownSelection,
@@ -26,9 +27,9 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 - (void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener;
 - (void)updateButtons;
-- (void)displayGameStatusWithImage:(UIImage*)image
-                        withString:(NSString*)string
-                         withColor:(UIColor*)color;
+- (void)displayGameStatusWithImageString:(NTSImageString*)imageString
+                              withString:(NSString*)string
+                               withColor:(UIColor*)color;
 - (void)showTapSquareCallout;
 - (void)hideTapSquareCallout;
 - (void)showSubmitCallout;

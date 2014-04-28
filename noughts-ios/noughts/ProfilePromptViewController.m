@@ -4,6 +4,7 @@
 #import "ImageString.h"
 #import "OnMutationCompleted.h"
 #import "AppDelegate.h"
+#import "Games.h"
 
 NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 
@@ -67,7 +68,9 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 - (IBAction)onDoneClicked:(id)sender {
   NTSModel *model = [AppDelegate getModel];
   NTSImageString_Builder *imageString = [NTSImageString newBuilder];
-  [imageString setStringWithNSString:[_playerImages objectAtIndex:_playerImageIndex]];
+  [NTSGames
+   setLocalImageStringsWithNTSImageString_Builder:imageString
+                                     withNSString:[_playerImages objectAtIndex:_playerImageIndex]];
   [imageString setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]];
   NTSProfile_Builder *profile = [NTSProfile newBuilder];
   [profile setNameWithNSString:_nameField.text];

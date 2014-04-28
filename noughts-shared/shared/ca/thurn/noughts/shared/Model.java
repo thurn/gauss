@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.annotation.Nullable;
+
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
@@ -687,7 +689,8 @@ public class Model extends AbstractChildEventListener {
           } else {
             String channelId = Games.channelIdForPlayer(game.getId(),
                 game.getCurrentPlayerNumber());
-            String message = "Game " + Games.vsString(game, userId) + ": It's your turn!";
+            String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
+            String message = "Game " + Games.vsString(game, opponentId) + ": It's your turn!";
             pushNotificationListener.onPushRequired(channelId, game.getId(), message);
           }
         }
@@ -814,7 +817,7 @@ public class Model extends AbstractChildEventListener {
         game.setIsGameOver(true);
         if (game.isLocalMultiplayer() && game.getPlayerCount() == 2) {
           game.addVictor(game.getCurrentPlayerNumber() == 0 ? 1 : 0);
-        } else if (Games.hasOpponent(game.build(), userId)) {
+        } else {
           int opponentPlayerNumber = Games.opponentPlayerNumber(game.build(), userId);
           game.addVictor(opponentPlayerNumber);
         }
@@ -870,8 +873,9 @@ public class Model extends AbstractChildEventListener {
    * already a player.
    *
    * @param game Game to add the viewer to.
+   * @param profile Optionally, a profile to add for this player
    */
-  public void joinGameIfPossible(String gameId) {
+  public void joinGameIfPossible(String gameId, final @Nullable Profile profile) {
     Game game = getGame(gameId);
     if (!(game.isGameOver()) && game.getPlayerCount() < 2 &&
         !game.getPlayerList().contains(userId)) {
@@ -879,6 +883,9 @@ public class Model extends AbstractChildEventListener {
         @Override
         public void mutate(Game.Builder game) {
           game.addPlayer(userId);
+          if (profile != null) {
+            game.addProfile(profile);
+          }
         }
 
         @Override

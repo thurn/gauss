@@ -13,9 +13,13 @@ import ca.thurn.noughts.shared.entities.Profile;
 
 public class Games {
   public static final ImageString GAME_OVER_IMAGE_STRING =
-      ImageString.newBuilder().setString("game_over").setType(ImageType.LOCAL).build();
+      ImageString.newBuilder().setLargeString("game_over").setType(ImageType.LOCAL).build();
   public static final ImageString NO_OPPONENT_IMAGE_STRING =
-      ImageString.newBuilder().setString("no_opponent_40").setType(ImageType.LOCAL).build();
+      ImageString.newBuilder()
+      .setSmallString("no_opponent_small")
+      .setMediumString("no_opponent_medium")
+      .setLargeString("no_opponent")
+      .setType(ImageType.LOCAL).build();
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
   private static final long ONE_MINUTE = SECONDS * ONE_SECOND;
@@ -149,23 +153,14 @@ public class Games {
 
   /**
    * @param viewerId viewer's player ID
-   * @return True if there is an opponent in this game who is distinct from
-   *     the viewer. False if there's no opponent or the viewer is playing
-   *     both sides in this game.
-   */
-  static boolean hasOpponent(Game game, String viewerId) {
-    return game.getPlayerCount() == 2 && !game.getPlayer(0).equals(game.getPlayer(1));
-  }
-
-  /**
-   * @param viewerId viewer's player ID
    * @return The player number of your opponent.
-   * @throws IllegalStateException If there is no opponent as defined by
-   *     {@link Game#hasOpponent(String)}.
+   * @throws IllegalStateException If this method is called on a local
+   *     multiplayer game.
    */
   static int opponentPlayerNumber(Game game, String viewerId) {
-    if (!hasOpponent(game, viewerId)) {
-      throw new IllegalStateException("No opponent or viewer is both players.");
+    if (game.isLocalMultiplayer()) {
+      throw new IllegalStateException("Tried to get opponent player number in a local " +
+          "multiplayer game.");
     } else if (game.getPlayer(0).equals(viewerId)) {
       return 1;
     } else {
@@ -191,7 +186,8 @@ public class Games {
   /**
    * @param viewerId viewer's player ID
    * @return The profile of your opponent.
-   * @throws IllegalStateException If there is no opponent
+   * @throws IllegalStateException If this method is called on a local
+   *     multiplayer game.
    */
   static Profile opponentProfile(Game game, String viewerId) {
     int opponentNumber = opponentPlayerNumber(game, viewerId);
@@ -210,7 +206,7 @@ public class Games {
       } else {
         return "Local Multiplayer Game";
       }
-    } else if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasName()) {
+    } else if (opponentProfile(game, viewerId).hasName()) {
       return "vs. " + opponentProfile(game, viewerId).getName();
     } else {
       if (game.isGameOver()) {
@@ -219,6 +215,13 @@ public class Games {
         return "vs. (No Opponent Yet)";
       }
     }
+  }
+
+  public static void setLocalImageStrings(ImageString.Builder builder, String baseString) {
+    builder.setLargeString(baseString)
+        .setMediumString(baseString + "_medium")
+        .setSmallString(baseString + "_small")
+        .setType(ImageType.LOCAL);
   }
 
   /**
@@ -278,8 +281,7 @@ public class Games {
         } else if (playerNumbers.size() == 1 &&
             game.getVictorList().contains(playerNumbers.get(0))) {
           statusString = "You won";
-        } else if (hasOpponent(game, viewerId) &&
-            game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
+        } else if (game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
           if (opponentProfile(game, viewerId).hasPronoun()) {
             Profile opponentProfile = opponentProfile(game, viewerId);
             statusString = Pronouns.getNominativePronoun(
@@ -317,7 +319,7 @@ public class Games {
         }
       }
     } else {
-      if (hasOpponent(game, viewerId) && opponentProfile(game, viewerId).hasImageString()) {
+      if (opponentProfile(game, viewerId).hasImageString()) {
         result.add(opponentProfile(game, viewerId).getImageString());
       } else {
         result.add(NO_OPPONENT_IMAGE_STRING);

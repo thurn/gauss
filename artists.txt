@@ -2,5 +2,8 @@ http://commons.wikimedia.org/wiki/User:LadyofHats
 http://openclipart.org/user-detail/wildchief
 http://openclipart.org/user-detail/qubodup
 http://openclipart.org/user-detail/pauthonic
+http://openclipart.org/user-detail/dear_theophilus
 https://www.freesound.org/people/junggle/
 https://www.freesound.org/people/mad__shad/
+
+FontAwesome

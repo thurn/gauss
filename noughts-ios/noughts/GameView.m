@@ -7,6 +7,7 @@
 #import "SMCalloutView.h"
 #import "UIView+AutoLayout.h"
 #import "GameCanvas.h"
+#import "ImageStringUtils.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
@@ -156,10 +157,10 @@
   return _gameCanvas;
 }
 
-- (void)displayGameStatusWithImage:(UIImage*)image
+- (void)displayGameStatusWithImageString:(NTSImageString*)imageString
                        withString:(NSString*)string
                         withColor:(UIColor*)color {
-  _gameStatusImage.image = image;
+  [ImageStringUtils setLargeImage:_gameStatusImage imageString:imageString];
   _gameStatusLabel.text = string;
   _gameStatusColorView.backgroundColor = color;
   [self layoutIfNeeded];

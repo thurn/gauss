@@ -25,7 +25,7 @@
   _message.layer.cornerRadius = 5;
   _urlLabel.text = [NSString stringWithFormat:@"http://noughts.thurn.ca/open?\nid=%@",
                     _preliminaryGameId];
-  
+
   UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]
                                         initWithTarget:self
                                         action:@selector(dismissKeyboard)];

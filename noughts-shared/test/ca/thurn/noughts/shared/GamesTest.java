@@ -19,9 +19,9 @@ public class GamesTest extends SharedTestCase {
     testGame.clearCurrentPlayerNumber();
     assertFalse(Games.hasCurrentPlayerId(testGame.build()));
     testGame.setCurrentPlayerNumber(100);
-    assertFalse(Games.hasCurrentPlayerId(testGame.build()));    
+    assertFalse(Games.hasCurrentPlayerId(testGame.build()));
   }
-  
+
   public void testCurrentPlayerId() {
     Game.Builder testGame = getTestGame();
     assertEquals("userId", Games.currentPlayerId(testGame.build()));
@@ -49,14 +49,14 @@ public class GamesTest extends SharedTestCase {
     assertEquals(newImageString("opponentIdString"),
         winnerStatus.getStatusImageString());
     assertEquals(1, winnerStatus.getStatusPlayer());
-    
+
     testGame.addVictor(0);
     GameStatus drawStatus = Games.gameStatus(testGame.build());
     assertEquals("Game drawn.", drawStatus.getStatusString());
     assertEquals(Games.GAME_OVER_IMAGE_STRING, drawStatus.getStatusImageString());
     assertFalse(drawStatus.hasStatusPlayer());
   }
-  
+
   public void testGetOpponentPlayerNumber() {
     Game.Builder testGame = Game.newBuilder().setId("one");
     testGame.addPlayer("viewerId");
@@ -68,28 +68,15 @@ public class GamesTest extends SharedTestCase {
       fail();
     } catch (IllegalStateException expected) {}
   }
-  
+
   public void testChannelIdsForViewer() {
     Game.Builder testGame = getTestGame();
     List<String> ids = Games.channelIdsForViewer(testGame.build(), "userId");
     assertDeepEquals(list("GgameId___0"), ids);
   }
-  
+
   public void testChannelIdForPlayer() {
     assertEquals("Ggameid___42", Games.channelIdForPlayer("gameid", 42));
-  }
-
-  public void testHasOpponent() {
-    Game.Builder test = Game.newBuilder().setId("id");
-    assertFalse(Games.hasOpponent(test.build(),"user"));
-    test.addPlayer("user");
-    assertFalse(Games.hasOpponent(test.build(),"user"));
-    test.addPlayer("user");
-    assertFalse(Games.hasOpponent(test.build(),"user"));
-    test.clearPlayerList();
-    test.addPlayer("user");
-    test.addPlayer("other");
-    assertTrue(Games.hasOpponent(test.build(),"user"));
   }
 
   public void testOpponentPlayerNumber() {
@@ -108,7 +95,7 @@ public class GamesTest extends SharedTestCase {
     test.addPlayer("viewerid");
     assertDeepEquals(list(0, 1), Games.playerNumbersForPlayerId(test.build(),"viewerid"));
   }
-  
+
   public void testOpponentProfile() {
     Game.Builder g1 = Game.newBuilder().setId("g1");
     g1.addPlayer("user");
@@ -142,12 +129,12 @@ public class GamesTest extends SharedTestCase {
     testGame.addProfile(Profile.newBuilder());
     assertEquals("Local Multiplayer Game", Games.vsString(testGame.build(),""));
     testGame = Game.newBuilder().setId("two");
-    testGame.setIsGameOver(false);    
+    testGame.setIsGameOver(false);
     testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("one");
     assertEquals("vs. (No Opponent Yet)", Games.vsString(testGame.build(),""));
     testGame = Game.newBuilder().setId("four");
-    testGame.setIsLocalMultiplayer(false);    
+    testGame.setIsLocalMultiplayer(false);
     testGame.addPlayer("one");
     testGame.addPlayer("two");
     Profile profile = Profile.newBuilder().setName("GivenName").build();
@@ -182,7 +169,7 @@ public class GamesTest extends SharedTestCase {
     assertEquals("Updated 3 seconds ago", Games.lastUpdatedString(testGame.build(), ""));
     testGame.setLastModified(currentTime);
     assertEquals("Updated a second ago", Games.lastUpdatedString(testGame.build(), ""));
-    
+
     testGame = Game.newBuilder().setId("test2");
     testGame.setIsGameOver(true);
     testGame.setIsLocalMultiplayer(false);
@@ -191,7 +178,7 @@ public class GamesTest extends SharedTestCase {
     testGame.addVictor(0);
     testGame.setLastModified(currentTime);
     assertEquals("You won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
-    
+
     testGame = Game.newBuilder().setId("test3");
     testGame.setIsGameOver(true);
     testGame.setIsLocalMultiplayer(false);
@@ -216,7 +203,7 @@ public class GamesTest extends SharedTestCase {
     testGame.addProfile(opponentProfile.build());
     testGame.setLastModified(currentTime);
     assertEquals("She won a second ago", Games.lastUpdatedString(testGame.build(), "viewerId"));
-    
+
     testGame = Game.newBuilder().setId("test3");
     testGame.setIsGameOver(true);
     testGame.setIsLocalMultiplayer(false);
@@ -245,7 +232,7 @@ public class GamesTest extends SharedTestCase {
     testGame.addProfile(
         Profile.newBuilder().setName("Beta").setImageString(image2).build());
     assertDeepEquals(list(image1, image2), Games.imageList(testGame.build(),"userId"));
-  }  
+  }
 
   public void testImageListNoOpponent() {
     Game.Builder testGame = Game.newBuilder().setId("id");
@@ -283,18 +270,18 @@ public class GamesTest extends SharedTestCase {
         .addProfile(Profile.newBuilder()
             .setPronoun(Pronoun.FEMALE)
             .setImageString(ImageString.newBuilder()
-                .setString("userIdString")
+                .setLargeString("userIdString")
                 .setType(ImageType.LOCAL))
             .setName("Player 1"))
         .addProfile(Profile.newBuilder()
             .setPronoun(Pronoun.NEUTRAL)
             .setImageString(ImageString.newBuilder()
-                .setString("opponentIdString")
+                .setLargeString("opponentIdString")
                 .setType(ImageType.LOCAL))
             .setName("Player 2"));
   }
 
   private ImageString newImageString(String name) {
-    return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
+    return ImageString.newBuilder().setLargeString(name).setType(ImageType.LOCAL).build();
   }
 }

@@ -13,8 +13,10 @@
 #import "GameListSection.h"
 #import "AppDelegate.h"
 #import "IndexPath.h"
+#import "ImageStringUtils.h"
+#import "J2obcUtils.h"
 
-@interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener, OnModelLoaded>
+@interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
 @property(nonatomic) float scale;
@@ -31,11 +33,10 @@
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
   self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
-  [AppDelegate registerForOnModelLoaded:self];
 }
 
-- (void)onModelLoaded:(NTSModel *)model {
-  _model = model;
+- (void)viewWillAppear:(BOOL)animated {
+  _model = [AppDelegate getModel];
   [_model setGameListListenerWithNTSGameListListener:self];
   _gameListPartitions = [_model getGameListPartitions];
   [self.tableView reloadData];
@@ -118,34 +119,9 @@
   cell.vsLabel.text = [listEntry getVsString];
   cell.modifiedLabel.text = [listEntry getModifiedString];
   
-  id <JavaUtilList> imageList = [listEntry getImageStringList];
-  UIImage *image;
-  if ([imageList size] == 2) {
-    image = [self imageForTwoPhotos:imageList];
-  } else if ([imageList size] == 1) {
-    NSString *imageName = [[imageList getWithInt:0] getString];
-    image = [UIImage imageNamed:imageName];
-  } else {
-    @throw @"Can't render image list";
-  }
-  cell.vsImage.image = image;
+  NSArray *imageList = [J2obcUtils javaUtilListToNsArray:[listEntry getImageStringList]];
+  [ImageStringUtils setImageForList:cell.vsImage imageList:imageList withScale:_scale];
   return cell;
-}
-
-- (UIImage*)imageForPhotoList:(id<JavaUtilList>)photoList index:(int)index {
-  NTSImageString *imageString = [photoList getWithInt:index];
-  return [UIImage imageNamed:[[imageString getString] stringByAppendingString:@"_20"]];
-}
-
-- (UIImage*)imageForTwoPhotos:(id<JavaUtilList>)photoList {
-  UIImage *image1 = [self imageForPhotoList:photoList index:0];
-  UIImage *image2 = [self imageForPhotoList:photoList index:1];
-  UIGraphicsBeginImageContextWithOptions(CGSizeMake(40 * _scale, 40 * _scale), NO, 0);
-  [image1 drawAtPoint:CGPointMake(0, 10 * _scale)];
-  [image2 drawAtPoint:CGPointMake(20 * _scale, 10 * _scale)];
-  UIImage *result = UIGraphicsGetImageFromCurrentImageContext();
-  UIGraphicsEndImageContext();
-  return result;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {

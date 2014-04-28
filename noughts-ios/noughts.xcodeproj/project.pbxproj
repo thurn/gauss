@@ -122,6 +122,10 @@
 		7CCD447118DF41AF0023F1CA /* Accounts.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447018DF41AF0023F1CA /* Accounts.framework */; };
 		7CCD447318DF41B40023F1CA /* Social.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCD447218DF41B40023F1CA /* Social.framework */; };
 		7CCE4F081908ECED0027150A /* RequestLoadedCallback.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */; };
+		7CCE4F0B190DAE350027150A /* Identifiers.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F0A190DAE350027150A /* Identifiers.m */; };
+		7CCE4F0E190EA9810027150A /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F0D190EA9810027150A /* NotificationManager.m */; };
+		7CCE4F11190EFF570027150A /* ImageStringUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F10190EFF570027150A /* ImageStringUtils.m */; };
+		7CCE4F14190F0E9F0027150A /* FacebookUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F13190F0E9F0027150A /* FacebookUtils.m */; };
 		7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CD64E3B18FD8F3200252818 /* IndexPath.java */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
@@ -289,6 +293,14 @@
 		7CCD447018DF41AF0023F1CA /* Accounts.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accounts.framework; path = System/Library/Frameworks/Accounts.framework; sourceTree = SDKROOT; };
 		7CCD447218DF41B40023F1CA /* Social.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Social.framework; path = System/Library/Frameworks/Social.framework; sourceTree = SDKROOT; };
 		7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = RequestLoadedCallback.java; sourceTree = "<group>"; };
+		7CCE4F09190DAE350027150A /* Identifiers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Identifiers.h; sourceTree = "<group>"; };
+		7CCE4F0A190DAE350027150A /* Identifiers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Identifiers.m; sourceTree = "<group>"; };
+		7CCE4F0C190EA9810027150A /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationManager.h; sourceTree = "<group>"; };
+		7CCE4F0D190EA9810027150A /* NotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationManager.m; sourceTree = "<group>"; };
+		7CCE4F0F190EFF570027150A /* ImageStringUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageStringUtils.h; sourceTree = "<group>"; };
+		7CCE4F10190EFF570027150A /* ImageStringUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageStringUtils.m; sourceTree = "<group>"; };
+		7CCE4F12190F0E9F0027150A /* FacebookUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookUtils.h; sourceTree = "<group>"; };
+		7CCE4F13190F0E9F0027150A /* FacebookUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookUtils.m; sourceTree = "<group>"; };
 		7CD64E3B18FD8F3200252818 /* IndexPath.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = IndexPath.java; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
@@ -560,6 +572,14 @@
 				7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */,
 				7C312D1A18E7EDAB00D651A0 /* ProfilePromptViewController.h */,
 				7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */,
+				7CCE4F09190DAE350027150A /* Identifiers.h */,
+				7CCE4F0A190DAE350027150A /* Identifiers.m */,
+				7CCE4F0C190EA9810027150A /* NotificationManager.h */,
+				7CCE4F0D190EA9810027150A /* NotificationManager.m */,
+				7CCE4F0F190EFF570027150A /* ImageStringUtils.h */,
+				7CCE4F10190EFF570027150A /* ImageStringUtils.m */,
+				7CCE4F12190F0E9F0027150A /* FacebookUtils.h */,
+				7CCE4F13190F0E9F0027150A /* FacebookUtils.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -896,6 +916,7 @@
 				7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
+				7CCE4F11190EFF570027150A /* ImageStringUtils.m in Sources */,
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,
 				7C01FB4319070FD10049CD35 /* Optional.java in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
@@ -913,6 +934,7 @@
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,
 				7C3F723518E3658E00898E5A /* GameListSection.java in Sources */,
 				7C01FB4519070FD10049CD35 /* Present.java in Sources */,
+				7CCE4F0E190EA9810027150A /* NotificationManager.m in Sources */,
 				7C92C02A18920FD800DF8816 /* Clock.java in Sources */,
 				7C312D1D18E7EDAB00D651A0 /* ProfilePromptViewController.m in Sources */,
 				7C0444D518B73124006275CA /* ActionTree.java in Sources */,
@@ -924,7 +946,9 @@
 				7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */,
 				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
+				7CCE4F14190F0E9F0027150A /* FacebookUtils.m in Sources */,
 				7C01FB3F19070FD10049CD35 /* VisibleForTesting.java in Sources */,
+				7CCE4F0B190DAE350027150A /* Identifiers.m in Sources */,
 				7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */,
 				7C8EF76618668E120075D0C1 /* OnDisconnect.java in Sources */,
 				7C58BE1418C1BD4D008D2C9D /* Command.java in Sources */,

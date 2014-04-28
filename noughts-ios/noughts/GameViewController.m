@@ -13,8 +13,10 @@
 #import "NewLocalGameViewController.h"
 #import "ProfilePromptViewController.h"
 #import "AppDelegate.h"
+#import "Identifiers.h"
+#import "NotificationManager.h"
 
-@interface GameViewController () <UIAlertViewDelegate, OnModelLoaded>
+@interface GameViewController () <UIAlertViewDelegate>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) GameView *gameView;
 @property(strong,nonatomic) NTSGame *game;
@@ -33,14 +35,14 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  [AppDelegate registerForOnModelLoaded:self];
-}
-
-- (void)onModelLoaded:(NTSModel *)model {
   _model = [AppDelegate getModel];
   [_model setCommandUpdateListenerWithNSString:_currentGameId
                   withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
   [_model setGameUpdateListenerWithNSString:_currentGameId withNTSGameUpdateListener:self];
+}
+
+- (void)viewDidDisappear:(BOOL)animated {
+  [[NotificationManager getInstance] unregisterForAllNotifications:self];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -57,9 +59,7 @@
   } else {
     color = [self colorFromPlayerNumber:[status getStatusPlayer]];
   }
-  UIImage *image;
-  image = [UIImage imageNamed:[[status getStatusImageString] getString]];
-  [_gameView displayGameStatusWithImage:image
+  [_gameView displayGameStatusWithImageString:[status getStatusImageString]
                              withString:[status getStatusString]
                               withColor:color];
   if ([status isComputerThinking]) {
@@ -195,7 +195,10 @@
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  [_model joinGameIfPossibleWithNSString:_currentGameId];
+  NTSProfile *profile = [[NotificationManager getInstance]
+                         getLatestValueForNotification:kFacebookProfileLoadedNotification];
+  [_model joinGameIfPossibleWithNSString:_currentGameId
+                          withNTSProfile:profile];
   [_model handleComputerActionWithNSString:_currentGameId];
   _game = game;
 }

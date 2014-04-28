@@ -11,19 +11,25 @@
 #import "QueryParsing.h"
 #import "AFNetworking.h"
 #import "RequestLoadedCallback.h"
+#import "Identifiers.h"
+#import "NotificationManager.h"
+#import "Profile.h"
+#import "FacebookUtils.h"
 
 NSString *const kFacebookId = @"kFacebookId";
 
 @interface AppDelegate () <NTSPushNotificationListener, NTSRequestLoadedCallback>
 @property BOOL runningQuery;
 @property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
-@property(strong, nonatomic) NSMutableArray *onModelReadyListeners;
+@property(strong, nonatomic) NTSModel *model;
 @end
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
     didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [NotificationManager initializeWithNotifications:@[kFacebookProfileLoadedNotification]];
+
   _friendPhotos = [NSMutableDictionary new];
   [Parse setApplicationId:@"mYK2MgBp6q7fjLEyulrqlUkQ8tf3qsSrbtlfh6Je"
                 clientKey:@"7Sne8QqyGnoHm3AAUhI2OxpOVjGYvkBG2bEXKkbi"];
@@ -36,45 +42,30 @@ NSString *const kFacebookId = @"kFacebookId";
   if (FBSession.activeSession.state == FBSessionStateCreatedTokenLoaded) {
     [FBSession.activeSession openWithCompletionHandler:nil];
   }
-  _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
-  _onModelReadyListeners = [NSMutableArray new];
-  [self createAnonymousModel:firebase];
-  [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
-    if (user != nil) {
-      NSLog(@"Facebook User %@", user.userId);
-      [self createFacebookModel:firebase withUserId:user.userId];
-      [self onFacebookLoginWithCallback:nil];
-    } else {
-      NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-      if ([userDefaults valueForKey:kFacebookId]) {
-        @throw @"Error logging in to facebook";
-      } else {
-        NSLog(@"Anonymous User");
-        [self createAnonymousModel:firebase];
-      }
-    }
-  }];
 
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  NSString *facebookId = [userDefaults valueForKey:kFacebookId];
+  _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
+  
+  if (facebookId) {
+    [self createFacebookModel:firebase withUserId:facebookId];
+    [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
+      if (user != nil) {
+        [self onFacebookLoginWithCallback:nil];
+      } else {
+        @throw @"Error logging in to facebook";
+      }
+    }];
+  } else {
+    [self createAnonymousModel:firebase];
+  }
+
+  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
   NSString *gameId = launchOptions[@"UIApplicationLaunchOptionsRemoteNotificationKey"][@"gameId"];
   if (gameId) {
     [self pushGameViewWithId:gameId];
   }
   return YES;
-}
-
-- (void)onModelReady {
-  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
-  for (id <OnModelLoaded> listener in _onModelReadyListeners) {
-    [listener onModelLoaded:_model];
-  }
-}
-
-- (void)alert:(NSString*)message {
-  [[[UIAlertView alloc] initWithTitle:@"Error"
-                              message:message
-                             delegate:nil
-                    cancelButtonTitle:@"OK"
-                    otherButtonTitles:nil] show];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -83,13 +74,6 @@ NSString *const kFacebookId = @"kFacebookId";
     currentInstallation.badge = 0;
     [currentInstallation saveEventually];
   }
-}
-
-- (BOOL)isFacebookAuthorized {
-  FBSessionState state = FBSession.activeSession.state;
-  return state == FBSessionStateOpen ||
-      state == FBSessionStateCreatedTokenLoaded ||
-      state == FBSessionStateOpenTokenExtended;
 }
 
 - (void)createAnonymousModel:(FCFirebase*)firebase {
@@ -102,12 +86,10 @@ NSString *const kFacebookId = @"kFacebookId";
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
                                withFCFirebase:firebase];
-  [self onModelReady];
 }
 
 - (void)createFacebookModel:(FCFirebase*)firebase withUserId:(NSString*)userId {
   _model = [[NTSModel alloc] initWithNSString:userId withNSString:userId withFCFirebase:firebase];
-  [self onModelReady];
 }
 
 - (NSString*)sha1:(NSString*)input {
@@ -133,11 +115,6 @@ NSString *const kFacebookId = @"kFacebookId";
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
   NSLog(@"didReceiveNotification %@", userInfo);
-//  if (userInfo[@"gameId"]) {
-//    [self pushGameViewWithId:userInfo[@"gameId"]];
-//  } else {
-//    [PFPush handlePush:userInfo];
-//  }
 }
 
 - (BOOL)application:(UIApplication *)application
@@ -160,10 +137,8 @@ NSString *const kFacebookId = @"kFacebookId";
         if (i == [idsArray count] - 1) {
           // Most recent request -- load it
           NSLog(@"load game %@", idsArray[i]);
-          [AppDelegate registerForOnModelLoadedWithCallback:^(NTSModel *model) {
-            [model subscribeToRequestIdsWithNSString:idsArray[i]
-                        withNTSRequestLoadedCallback:self];
-          }];
+          [_model subscribeToRequestIdsWithNSString:idsArray[i]
+                      withNTSRequestLoadedCallback:self];
         } else {
           // Old request -- delete it
           NSString *fullId = [idsArray[i] stringByAppendingString:@"_100008083952081"];
@@ -220,11 +195,27 @@ NSString *const kFacebookId = @"kFacebookId";
 }
 
 - (void)onFacebookLoginWithCallback:(void(^)())callback {
+  [self getUserFacebookProfile];
   [self getFacebookFriendsWithCallback:callback];
   if (!_friendCache) {
     _friendCache = [FBFrictionlessRecipientCache new];
   }
   [_friendCache prefetchAndCacheForSession:nil];
+}
+
+- (void)getUserFacebookProfile {
+  [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection,
+                                                         id result,
+                                                         NSError *error) {
+    if (error) {
+      @throw @"Error loading facebook profile";
+    } else {
+      NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:result];
+      [[NSNotificationCenter defaultCenter] postNotification:
+       [NSNotification notificationWithName:kFacebookProfileLoadedNotification
+                                     object:profile]];
+    }
+  }];
 }
 
 - (void)getFacebookFriendsWithCallback:(void(^)())callback {
@@ -244,7 +235,9 @@ NSString *const kFacebookId = @"kFacebookId";
                         completionHandler:^(FBRequestConnection *connection,
                                             id result,
                                             NSError *error) {
-                          if (!error) {
+                          if (error) {
+                            @throw @"Error loading facebook friends";
+                          } else {
                             [self handleFriendsResult:result[@"data"] withCallback:callback];
                           }
                           _runningQuery = NO;
@@ -292,27 +285,9 @@ NSString *const kFacebookId = @"kFacebookId";
   [push sendPushInBackground];
 }
 
-+ (void)registerForOnModelLoaded:(id<OnModelLoaded>)object {
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-  if (appDelegate.model) {
-    [object onModelLoaded:appDelegate.model];
-  } else {
-    [appDelegate.onModelReadyListeners addObject:object];
-  }
-}
-
-+ (void)registerForOnModelLoadedWithCallback:(void(^)(NTSModel* model))callback {
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-  if (appDelegate.model) {
-    callback(appDelegate.model);
-  } else {
-    callback(appDelegate.model);
-  }
-}
-
 + (NTSModel*)getModel {
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-  return appDelegate.model;
+  AppDelegate *delegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+  return delegate.model;
 }
 
 @end

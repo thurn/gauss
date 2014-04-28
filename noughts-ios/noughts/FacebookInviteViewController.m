@@ -4,6 +4,10 @@
 #import "QueryParsing.h"
 #import <SDWebImage/UIImageView+WebCache.h>
 #import "java/util/ArrayList.h"
+#import "NotificationManager.h"
+#import "Identifiers.h"
+#import "J2obcUtils.h"
+#import "FacebookUtils.h"
 
 @interface FacebookInviteViewController ()
 @end
@@ -21,15 +25,21 @@
    handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
      if (!error && result != FBWebDialogResultDialogNotCompleted) {
        NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-       [self onFacebookInvite:query[@"request"][0]];
+       NTSProfile *profile = [FacebookUtils
+                              profileFromFacebookDictionary:appDelegate.friends[indexPath.row]];
+       [self onFacebookInvite:query[@"request"][0] withProfile:profile];
      }
    }
    friendCache:nil /*appDelegate.friendCache*/];
 }
 
-- (void)onFacebookInvite:(NSString*)requestId {
+- (void)onFacebookInvite:(NSString*)requestId withProfile:(NTSProfile*)profile {
   NTSModel *model = [AppDelegate getModel];
-  NSString *gameId = [model newGameWithJavaUtilList:[JavaUtilArrayList new]];
+  NTSProfile *userProfile = [[NotificationManager getInstance]
+                             getLatestValueForNotification:kFacebookProfileLoadedNotification];
+  NSLog(@"profile %@", profile);
+  NSString *gameId = [model newGameWithJavaUtilList:
+                     [J2obcUtils nsArrayToJavaUtilList:@[userProfile, profile]]];
   [model putFacebookRequestIdWithNSString:requestId withNSString:gameId];
   AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
   [appDelegate pushGameViewWithId:gameId];
@@ -63,7 +73,7 @@
                      [NSString
                       stringWithFormat:format, friend[@"uid"]]];
   [cell.imageView setImageWithURL:photoUrl
-                 placeholderImage:[UIImage imageNamed:@"facebook_default"]];
+                 placeholderImage:[UIImage imageNamed:@"profile_placeholder_medium"]];
   return cell;
 }
 

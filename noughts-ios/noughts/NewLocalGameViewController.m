@@ -5,11 +5,8 @@
 #import "ImageString.h"
 #import "ImageType.h"
 #import "AppDelegate.h"
-
-NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
-NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
-NSString *const kSawTutorialKey = @"kSawTutorialKey";
-NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
+#import "Identifiers.h"
+#import "Games.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -41,7 +38,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 - (void)viewDidLoad {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   if (_playVsComputerMode) {
-    NSNumber *number = [userDefaults objectForKey:kPreferredDifficulty];
+    NSNumber *number = [userDefaults objectForKey:kPreferredDifficultyKey];
     if (!number) {
       number = @0;
     }
@@ -191,10 +188,9 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 }
 
 - (NTSImageString*)localImageString:(NSString*)name {
-  return [[[[NTSImageString newBuilder]
-            setStringWithNSString:name]
-           setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]]
-          build];
+  NTSImageString_Builder *result = [NTSImageString newBuilder];
+  [NTSGames setLocalImageStringsWithNTSImageString_Builder:result withNSString:name];
+  return [result build];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -220,7 +216,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   if (_playVsComputerMode) {
     int difficultyLevel = (int)[_difficultyPicker selectedRowInComponent:0];
     [userDefaults setObject:[[NSNumber alloc] initWithInt:difficultyLevel]
-                     forKey:kPreferredDifficulty];
+                     forKey:kPreferredDifficultyKey];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_computerImages objectAtIndex:difficultyLevel]]];
