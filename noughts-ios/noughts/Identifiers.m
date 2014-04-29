@@ -1,7 +1,7 @@
 #import "Identifiers.h"
 
 // Notification keys
-NSString* const kModelReadyNotification = @"kModelReadyNotification";
+NSString* const kFacebookLoginNotification = @"kFacebookLoginNotification";
 NSString* const kFacebookProfileLoadedNotification = @"kFacebookProfileLoadedNotification";
 NSString* const kFacebookFriendsLoadedNotification = @"kFacebookFriendsLoadedNotification";
 NSString* const kGameRequestedNotification = @"kGameRequestedNotification";

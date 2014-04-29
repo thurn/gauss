@@ -1,8 +1,8 @@
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
 #import "java/util/HashMap.h"
 #import "java/util/ArrayList.h"
 
-@implementation J2obcUtils
+@implementation JavaUtils
 + (id<JavaUtilMap>)nsDictionaryToJavaUtilMap:(NSDictionary*)dictionary {
   id<JavaUtilMap> result = [[JavaUtilHashMap alloc] init];
   for (id key in dictionary) {

@@ -1,12 +1,13 @@
 #import "NewLocalGameViewController.h"
 #import "GameViewController.h"
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
 #import "Profile.h"
 #import "ImageString.h"
 #import "ImageType.h"
 #import "AppDelegate.h"
 #import "Identifiers.h"
 #import "Games.h"
+#import "PushNotificationHandler.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -20,6 +21,7 @@
 @property (strong, nonatomic) NSArray *computerImages;
 @property (nonatomic) int p1ImageIndex;
 @property (nonatomic) int p2ImageIndex;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation NewLocalGameViewController
@@ -77,6 +79,15 @@
   }
   _p2TextField.placeholder = p2Name;
   _p2TextField.text = p2Name;
+  _pushHandler = [PushNotificationHandler new];  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (void)animateViewByDeltaY:(int)deltaY {
@@ -231,7 +242,7 @@
   [userDefaults synchronize];
   NSArray *profiles = @[[p1Profile build], [p2Profile build]];
   NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
-                      [J2obcUtils nsArrayToJavaUtilList:profiles]];
+                      [JavaUtils nsArrayToJavaUtilList:profiles]];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

@@ -4,56 +4,43 @@
 #import "QueryParsing.h"
 #import "AppDelegate.h"
 #import "EmailInviteViewController.h"
+#import "FacebookUtils.h"
+#import "InterfaceUtils.h"
+#import "PushNotificationHandler.h"
 
 @interface NewGameViewController ()
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation NewGameViewController
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  _pushHandler = [PushNotificationHandler new];  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (IBAction)onInviteViaFacebook:(id)sender {
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  if ([userDefaults valueForKey:kFacebookId]) {
+  if ([FacebookUtils isFacebookUser]) {
     [self.navigationController
-     pushViewController:[[appDelegate mainStoryboard]
+     pushViewController:[[InterfaceUtils mainStoryboard]
                          instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
      animated:YES];
   } else {
-    [appDelegate logInToFacebook:^{
+    [FacebookUtils logInToFacebook:^{
       [self.navigationController
-       pushViewController:[[appDelegate mainStoryboard]
+       pushViewController:[[InterfaceUtils mainStoryboard]
                            instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
        animated:YES];
     }];
   }
-}
-
-- (void)onFacebookInviteClicked {
-//  FBFriendPickerViewController *picker = [FBFriendPickerViewController new];
-//  [picker loadData];
-//  picker.allowsMultipleSelection = NO;
-//  [self presentViewController:picker animated:YES completion:nil];
-//  return;
-//  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-//
-//  [FBWebDialogs
-//   presentRequestsDialogModallyWithSession:nil
-//   message:@"Invitation to play noughts"
-//   title:@"noughts"
-//   parameters:@{@"to": @"122610483"}
-//   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-//     if (result != FBWebDialogResultDialogNotCompleted) {
-//       NSLog(@"result url %@", resultURL);
-//       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-//       NSLog(@"fbid %@", query[@"to[0]"]);
-//       NSLog(@"requestid %@", query[@"request"]);
-//     }
-//   }
-//   friendCache:appDelegate.friendCache];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

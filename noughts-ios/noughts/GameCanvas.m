@@ -5,7 +5,7 @@
 #import "Command.h"
 #import "Model.h"
 #import "Games.h"
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
 
 @interface GameCanvas ()
 @property(strong,nonatomic) SVGKImage *backgroundSvg;
@@ -72,7 +72,7 @@
   _sideMargin = (self.frame.size.width - backgroundWidth) / 2;
   _topMargin = (self.frame.size.height - backgroundHeight) / 2;
 
-  _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
+  _viewerPlayerNumbers = [JavaUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
   UIView *backgroundView = [self drawSvg:_backgroundSvg

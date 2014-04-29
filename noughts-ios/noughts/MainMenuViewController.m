@@ -1,9 +1,13 @@
 #import "MainMenuViewController.h"
 #import "AppDelegate.h"
 #import <FacebookSDK/FacebookSDK.h>
+#import "FacebookUtils.h"
+#import "Identifiers.h"
+#import "PushNotificationHandler.h"
 
 @interface MainMenuViewController ()
 @property(weak,nonatomic) IBOutlet UIButton *savedGamesButton;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation MainMenuViewController
@@ -11,13 +15,18 @@
 - (void)awakeFromNib {
   UIImage *logo = [UIImage imageNamed:@"logo_title_bar"];
   self.navigationItem.titleView = [[UIImageView alloc] initWithImage:logo];
+  _pushHandler = [PushNotificationHandler new];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  if ([userDefaults valueForKey:kFacebookId]) {
+  if ([FacebookUtils isFacebookUser]) {
     [self removeLoginLink: NO];
   }
+  [_pushHandler registerHandler];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (void)removeLoginLink:(BOOL)animated {
@@ -36,14 +45,9 @@
 }
 
 - (IBAction)onFacebookLoginClicked {
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
-  [appDelegate logInToFacebook:^{
+  [FacebookUtils logInToFacebook:^{
     [self removeLoginLink: YES];
   }];
-}
-
-- (void)viewDidLoad {
-  [super viewDidLoad];
 }
 
 @end

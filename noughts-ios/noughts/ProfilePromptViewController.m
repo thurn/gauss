@@ -5,6 +5,10 @@
 #import "OnMutationCompleted.h"
 #import "AppDelegate.h"
 #import "Games.h"
+#import "FacebookUtils.h"
+#import "NotificationManager.h"
+#import "Identifiers.h"
+#import "PushNotificationHandler.h"
 
 NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 
@@ -15,14 +19,17 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 @property(weak, nonatomic) IBOutlet UIButton *avatarButton;
 @property(weak, nonatomic) IBOutlet UIButton *doneButton;
 @property(strong, nonatomic) NSString *gameId;
+@property(strong, nonatomic) NSString *proposedName;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation ProfilePromptViewController
 
-- (id)initWithGameId:(NSString*)gameId {
+- (id)initWithGameId:(NSString*)gameId withProposedName:(NSString*)proposedName {
   self = [super initWithNibName:@"ProfilePrompt" bundle:nil];
   if (self) {
     _gameId = gameId;
+    _proposedName = proposedName;
   }
   return self;
 }
@@ -37,12 +44,25 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
   [_avatarButton setImage:avatar forState:UIControlStateNormal];
   _nameField.delegate = self;
   NSString *name = [userDefaults objectForKey:kPlayerLocalNameKey];
+  if (!name) {
+    name = _proposedName;
+  }
   [_nameField addTarget:self
                  action:@selector(textFieldDidChange)
        forControlEvents:UIControlEventEditingChanged];
   if (name) {
     _nameField.text = name;
+    _doneButton.enabled = YES;
   }
+  _pushHandler = [PushNotificationHandler new];  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (BOOL)isAllWhitespace:(NSString*)string {
@@ -85,6 +105,15 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 }
 
 - (IBAction)onSignInClicked:(id)sender {
+  [FacebookUtils logInToFacebook:nil];
+  [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
+                                                    withBlock:
+   ^(NTSProfile *profile) {
+     NTSModel *model = [AppDelegate getModel];
+     [model setProfileForViewerWithNSString:_gameId
+                             withNTSProfile:profile
+                 withNTSOnMutationCompleted:self];
+   }];
 }
 
 @end

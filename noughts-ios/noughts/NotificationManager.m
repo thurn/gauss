@@ -4,7 +4,8 @@
 static NotificationManager* gInstance;
 
 @interface NotificationManager ()
-@property(strong, nonatomic) NSMutableDictionary* values;
+@property(strong, nonatomic) NSMutableDictionary *values;
+@property(strong, nonatomic) NSMutableDictionary *blocks;
 @end
 
 @implementation NotificationManager
@@ -25,52 +26,43 @@ static NotificationManager* gInstance;
   self = [super init];
   if (self) {
     _values = [NSMutableDictionary new];
+    _blocks = [NSMutableDictionary new];
     for (NSString* notification in notifications) {
-      [self registerForNotification:notification
-                          withBlock:^(id notificationObject) {
-        _values[notification] = notificationObject;
-      }];
+      [[NSNotificationCenter defaultCenter]
+       addObserver:self
+       selector:@selector(notificationReceived:)
+       name:notification
+       object:nil];
     }
   }
   return self;
 }
 
-- (void)dealloc {
-  [self unregisterForAllNotifications:self];
-}
-
-- (void)registerForNotification:(NSString*)notificationName
-                      withBlock:(void(^)(id notificationObject))block {
-  [self registerForNotification:notificationName withBlock:block withLoadingBlock:nil];
-}
-
-- (void)registerForNotification:(NSString*)notificationName
-                      withBlock:(void(^)(id notificationObject))block
-               withLoadingBlock:(void(^)())loading {
-  // Future features:
-  // 1) Show a spinner while waiting
-  // 2) Time out intelligently and display an error.
-  id value = _values[notificationName];
-  if (value) {
-    block(value);
-  } else if (loading) {
-    loading();
+- (void)notificationReceived:(NSNotification*)notification {
+  _values[notification.name] = notification.object;
+  if (_blocks[notification.name]) {
+    for(void(^block)(id) in _blocks[notification.name]) {
+      block(notification.object);
+    }
+    [_blocks[notification.name] removeAllObjects];
   }
-  [[NSNotificationCenter defaultCenter]
-   addObserverForName:notificationName
-   object:nil
-   queue:nil
-   usingBlock:^(NSNotification *notification) {
-     block(notification.object);
-   }];
 }
 
-- (id)getLatestValueForNotification:(NSString*)notificationName {
-  return _values[notificationName];
+- (void)loadValueForNotification:(NSString*)notificationName
+                       withBlock:(void(^)(id notificationObject))block {
+  if (_values[notificationName]) {
+    block(_values[notificationName]);
+  } else {
+    if (!_blocks[notificationName]) {
+      _blocks[notificationName] = [NSMutableArray new];
+    }
+    [_blocks[notificationName] addObject:block];
+  }
 }
 
-- (void)unregisterForAllNotifications:(id)observer {
-  [[NSNotificationCenter defaultCenter] removeObserver:observer];
+- (void)unregisterAll {
+  [_blocks removeAllObjects];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

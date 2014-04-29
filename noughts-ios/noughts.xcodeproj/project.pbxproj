@@ -126,10 +126,12 @@
 		7CCE4F0E190EA9810027150A /* NotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F0D190EA9810027150A /* NotificationManager.m */; };
 		7CCE4F11190EFF570027150A /* ImageStringUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F10190EFF570027150A /* ImageStringUtils.m */; };
 		7CCE4F14190F0E9F0027150A /* FacebookUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F13190F0E9F0027150A /* FacebookUtils.m */; };
+		7CCE4F17190F700F0027150A /* InterfaceUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F16190F700F0027150A /* InterfaceUtils.m */; };
+		7CCE4F1A1910069B0027150A /* PushNotificationHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CCE4F191910069B0027150A /* PushNotificationHandler.m */; };
 		7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CD64E3B18FD8F3200252818 /* IndexPath.java */; };
 		7CEB472018AF3F0600CDA9EA /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */; };
 		7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */; };
-		7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* J2obcUtils.m */; };
+		7CEB472C18B276A900CDA9EA /* JavaUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB472B18B276A900CDA9EA /* JavaUtils.m */; };
 		7CF4F41018C3CE8000AD3AB0 /* SMCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */; };
 		7CF4F80E18D4B45600FC8F9E /* OnMutationCompleted.java in Sources */ = {isa = PBXBuildFile; fileRef = 7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */; };
 		7CF4F81018D576CC00FC8F9E /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CF4F80F18D576CC00FC8F9E /* AudioToolbox.framework */; };
@@ -301,12 +303,16 @@
 		7CCE4F10190EFF570027150A /* ImageStringUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageStringUtils.m; sourceTree = "<group>"; };
 		7CCE4F12190F0E9F0027150A /* FacebookUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookUtils.h; sourceTree = "<group>"; };
 		7CCE4F13190F0E9F0027150A /* FacebookUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookUtils.m; sourceTree = "<group>"; };
+		7CCE4F15190F700F0027150A /* InterfaceUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterfaceUtils.h; sourceTree = "<group>"; };
+		7CCE4F16190F700F0027150A /* InterfaceUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterfaceUtils.m; sourceTree = "<group>"; };
+		7CCE4F181910069B0027150A /* PushNotificationHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushNotificationHandler.h; sourceTree = "<group>"; };
+		7CCE4F191910069B0027150A /* PushNotificationHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushNotificationHandler.m; sourceTree = "<group>"; };
 		7CD64E3B18FD8F3200252818 /* IndexPath.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = IndexPath.java; sourceTree = "<group>"; };
 		7CEB471F18AF3F0500CDA9EA /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewLocalGameViewController.h; sourceTree = "<group>"; };
 		7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewLocalGameViewController.m; sourceTree = "<group>"; };
-		7CEB472A18B276A900CDA9EA /* J2obcUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = J2obcUtils.h; sourceTree = "<group>"; };
-		7CEB472B18B276A900CDA9EA /* J2obcUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = J2obcUtils.m; sourceTree = "<group>"; };
+		7CEB472A18B276A900CDA9EA /* JavaUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JavaUtils.h; sourceTree = "<group>"; };
+		7CEB472B18B276A900CDA9EA /* JavaUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JavaUtils.m; sourceTree = "<group>"; };
 		7CF4F40E18C3CE8000AD3AB0 /* SMCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMCalloutView.h; sourceTree = "<group>"; };
 		7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCalloutView.m; sourceTree = "<group>"; };
 		7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = OnMutationCompleted.java; sourceTree = "<group>"; };
@@ -552,8 +558,8 @@
 				7C72157E186F232500F1188B /* GameListViewController.m */,
 				7CEB472118AF42DC00CDA9EA /* NewLocalGameViewController.h */,
 				7CEB472218AF42DC00CDA9EA /* NewLocalGameViewController.m */,
-				7CEB472A18B276A900CDA9EA /* J2obcUtils.h */,
-				7CEB472B18B276A900CDA9EA /* J2obcUtils.m */,
+				7CEB472A18B276A900CDA9EA /* JavaUtils.h */,
+				7CEB472B18B276A900CDA9EA /* JavaUtils.m */,
 				7C0444BB18B2B101006275CA /* GameStatusView.xib */,
 				7CF4F40E18C3CE8000AD3AB0 /* SMCalloutView.h */,
 				7CF4F40F18C3CE8000AD3AB0 /* SMCalloutView.m */,
@@ -580,6 +586,10 @@
 				7CCE4F10190EFF570027150A /* ImageStringUtils.m */,
 				7CCE4F12190F0E9F0027150A /* FacebookUtils.h */,
 				7CCE4F13190F0E9F0027150A /* FacebookUtils.m */,
+				7CCE4F15190F700F0027150A /* InterfaceUtils.h */,
+				7CCE4F16190F700F0027150A /* InterfaceUtils.m */,
+				7CCE4F181910069B0027150A /* PushNotificationHandler.h */,
+				7CCE4F191910069B0027150A /* PushNotificationHandler.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -912,7 +922,7 @@
 				7C0444D918B73124006275CA /* Copyable.java in Sources */,
 				7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
-				7CEB472C18B276A900CDA9EA /* J2obcUtils.m in Sources */,
+				7CEB472C18B276A900CDA9EA /* JavaUtils.m in Sources */,
 				7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
@@ -947,6 +957,7 @@
 				7C8EF7741866B96B0075D0C1 /* GameViewController.m in Sources */,
 				7C8EF75C18668E120075D0C1 /* DataSnapshot.java in Sources */,
 				7CCE4F14190F0E9F0027150A /* FacebookUtils.m in Sources */,
+				7CCE4F1A1910069B0027150A /* PushNotificationHandler.m in Sources */,
 				7C01FB3F19070FD10049CD35 /* VisibleForTesting.java in Sources */,
 				7CCE4F0B190DAE350027150A /* Identifiers.m in Sources */,
 				7C0444DE18B73124006275CA /* WinLossEvaluator.java in Sources */,
@@ -965,6 +976,7 @@
 				7C58BE1918C1BD4D008D2C9D /* ImageType.java in Sources */,
 				7C27F70218BFC59C00ADA495 /* GameUpdateListener.java in Sources */,
 				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
+				7CCE4F17190F700F0027150A /* InterfaceUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

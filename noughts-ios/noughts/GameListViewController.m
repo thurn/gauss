@@ -14,12 +14,14 @@
 #import "AppDelegate.h"
 #import "IndexPath.h"
 #import "ImageStringUtils.h"
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
+#import "PushNotificationHandler.h"
 
 @interface GameListViewController () <UIAlertViewDelegate, NTSGameListListener>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) NTSGameListPartitions *gameListPartitions;
 @property(nonatomic) float scale;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 #define YOUR_GAMES_SECTION 0
@@ -33,6 +35,7 @@
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
   self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
+  _pushHandler = [PushNotificationHandler new];  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -40,18 +43,28 @@
   [_model setGameListListenerWithNTSGameListListener:self];
   _gameListPartitions = [_model getGameListPartitions];
   [self.tableView reloadData];
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 -(void)onGameAddedWithNTSGame:(NTSGame*)game {
   if (self.isViewLoaded && self.view.window) {
-    [self.tableView beginUpdates];
-    int section = [[NTSGameListPartitions getSectionWithNTSGame:game
-                                                  withNSString:[_model getUserId]] ordinal];
-    NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
-    [self.tableView insertRowsAtIndexPaths:@[path]
-                          withRowAnimation:UITableViewRowAnimationFade];
-    _gameListPartitions = [_model getGameListPartitions];
-    [self.tableView endUpdates];
+    NSString *viewerId = [_model getUserId];
+    if ([_gameListPartitions isGameInCorrectSectionWithNTSGame:game withNSString:viewerId]) {
+      _gameListPartitions = [_model getGameListPartitions];
+    } else {
+      [self.tableView beginUpdates];
+      int section = [[NTSGameListPartitions getSectionWithNTSGame:game
+                                                    withNSString:viewerId] ordinal];
+      NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
+      [self.tableView insertRowsAtIndexPaths:@[path]
+                            withRowAnimation:UITableViewRowAnimationFade];
+      _gameListPartitions = [_model getGameListPartitions];
+      [self.tableView endUpdates];
+    }
   }
 }
 
@@ -119,7 +132,7 @@
   cell.vsLabel.text = [listEntry getVsString];
   cell.modifiedLabel.text = [listEntry getModifiedString];
   
-  NSArray *imageList = [J2obcUtils javaUtilListToNsArray:[listEntry getImageStringList]];
+  NSArray *imageList = [JavaUtils javaUtilListToNsArray:[listEntry getImageStringList]];
   [ImageStringUtils setImageForList:cell.vsImage imageList:imageList withScale:_scale];
   return cell;
 }

@@ -3,4 +3,7 @@
 
 @interface FacebookUtils : NSObject
 + (NTSProfile*)profileFromFacebookDictionary:(NSDictionary*)dictionary;
++ (BOOL)isFacebookUser;
++ (NSString*)getFacebookId;
++ (void)logInToFacebook:(void(^)())callback;
 @end

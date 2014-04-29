@@ -39,7 +39,23 @@ public class GameListPartitions {
       return GameListSection.YOUR_TURN;
     } else {
       return GameListSection.THEIR_TURN;
-    }     
+    }
+  }
+
+  /**
+   * @param game A game
+   * @param viewerId The viewer's ID
+   * @return True if a game with the same ID as the provided game exists in the
+   *     correct section.
+   */
+  public boolean isGameInCorrectSection(Game game, String viewerId) {
+    GameListSection section = GameListPartitions.getSection(game, viewerId);
+    for (Game existingGame : listForSection(section)) {
+      if (existingGame.getId().equals(game.getId())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public List<Game> listForSection(GameListSection section) {
@@ -64,7 +80,7 @@ public class GameListPartitions {
     if (index != -1) return new IndexPath(GameListSection.THEIR_TURN.ordinal(), index);
     return IndexPath.NOT_FOUND;
   }
-  
+
   private int getGameIndex(String gameId, GameListSection section) {
     List<Game> list = listForSection(section);
     for (int i = 0; i < list.size(); ++i) {
@@ -81,19 +97,19 @@ public class GameListPartitions {
   public List<Game> yourTurn() {
     return Collections.unmodifiableList(yourTurn);
   }
-  
+
   /**
    * @return An unmodifiable list view of games where it is not your turn.
-   */  
+   */
   public List<Game> theirTurn() {
     return Collections.unmodifiableList(theirTurn);
   }
-  
+
   /**
    * @return An unmodifiable list view of games where the game is over.
-   */  
+   */
   public List<Game> gameOver() {
     return Collections.unmodifiableList(gameOver);
   }
-  
+
 }

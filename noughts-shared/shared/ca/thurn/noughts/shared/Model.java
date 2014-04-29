@@ -296,7 +296,11 @@ public class Model extends AbstractChildEventListener {
         gameListener.onGameUpdate(game);
       }
       if (game != null && !game.equals(oldGame) && profileRequired(game)) {
-        gameListener.onProfileRequired(gameId);
+        String name = null;
+        if (Games.viewerProfile(game, userId).hasName()) {
+          name = Games.viewerProfile(game, userId).getName();
+        }
+        gameListener.onProfileRequired(gameId, name);
       }
       if (oldGame == null || Games.differentStatus(game, oldGame)) {
         gameListener.onGameStatusChanged(Games.gameStatus(game));
@@ -339,7 +343,7 @@ public class Model extends AbstractChildEventListener {
     if (game.isGameOver()) return false;
     List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
     for (int i : playerNumbers) {
-      if (!game.getProfile(i).hasName()) {
+      if (!game.getProfile(i).hasImageString()) {
         return true;
       }
     }
@@ -677,28 +681,38 @@ public class Model extends AbstractChildEventListener {
         if (onComplete != null) {
           onComplete.onMutationCompleted(game);
         }
-        if (pushNotificationListener != null && !game.isLocalMultiplayer()) {
-          if (game.isGameOver()) {
-            List<Integer> viewerPlayerNumbers = Games.playerNumbersForPlayerId(game, userId);
-            for (int i = 0; i < game.getPlayerCount(); ++i) {
-              if (!viewerPlayerNumbers.contains(i)) {
-                pushNotificationListener.onPushRequired(
-                    Games.channelIdForPlayer(game.getId(), i), game.getId(), "Game over");
-              }
-            }
-          } else {
-            String channelId = Games.channelIdForPlayer(game.getId(),
-                game.getCurrentPlayerNumber());
-            String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
-            String message = "Game " + Games.vsString(game, opponentId) + ": It's your turn!";
-            pushNotificationListener.onPushRequired(channelId, game.getId(), message);
-          }
-        }
+        sendPushNotification(game);
       }
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, true /* abortOnConflict */);
 //    handleComputerAction(applyMutation(game, mutation));
+  }
+
+  /**
+   * Sends a push notification to the viewer's opponent with information about
+   * the current game status.
+   * @param game The current game.
+   */
+  private void sendPushNotification(Game game) {
+    if (pushNotificationListener != null && !game.isLocalMultiplayer() && game.getPlayerCount() > 1) {
+      String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
+      if (game.isGameOver()) {
+        List<Integer> viewerPlayerNumbers = Games.playerNumbersForPlayerId(game, userId);
+        for (int i = 0; i < game.getPlayerCount(); ++i) {
+          if (!viewerPlayerNumbers.contains(i)) {
+            String message = "Game " + Games.vsString(game, opponentId) + ": Game over";
+            pushNotificationListener.onPushRequired(
+                Games.channelIdForPlayer(game.getId(), i), game.getId(), message);
+          }
+        }
+      } else {
+        String channelId = Games.channelIdForPlayer(game.getId(),
+            game.getCurrentPlayerNumber());
+        String message = "Game " + Games.vsString(game, opponentId) + ": It's your turn!";
+        pushNotificationListener.onPushRequired(channelId, game.getId(), message);
+      }
+    }
   }
 
   /**
@@ -884,7 +898,11 @@ public class Model extends AbstractChildEventListener {
         public void mutate(Game.Builder game) {
           game.addPlayer(userId);
           if (profile != null) {
-            game.addProfile(profile);
+            if (game.getProfileCount() < 2) {
+              game.addProfile(profile);
+            } else {
+              game.setProfile(1, profile);
+            }
           }
         }
 
@@ -932,8 +950,7 @@ public class Model extends AbstractChildEventListener {
    *
    * @param facebookId The user's facebook ID.
    */
-  public Model upgradeAccountToFacebook(String facebookId) {
-    return new Model(facebookId, facebookId, firebase);
+  public void upgradeAccountToFacebook(String facebookId) {
   }
 
   /**

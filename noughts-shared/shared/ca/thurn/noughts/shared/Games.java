@@ -172,7 +172,7 @@ public class Games {
    * @param playerId A player ID
    * @return All player numbers (if any) associated with this player ID
    */
-  public static  List<Integer> playerNumbersForPlayerId(Game game, String playerId) {
+  public static List<Integer> playerNumbersForPlayerId(Game game, String playerId) {
     if (playerId == null) throw new IllegalArgumentException("Null playerId");
     List<Integer> results = new ArrayList<Integer>();
     for (int i = 0; i < game.getPlayerCount(); ++i) {
@@ -192,6 +192,21 @@ public class Games {
   static Profile opponentProfile(Game game, String viewerId) {
     int opponentNumber = opponentPlayerNumber(game, viewerId);
     return game.getProfile(opponentNumber);
+  }
+
+  /**
+   * @param game A Game.
+   * @param viewerId Viewer's player ID.
+   * @return The viewer's profile.
+   * @throws IllegalArgumentException If the viewer has multiple player numbers.
+   */
+  public static Profile viewerProfile(Game game, String viewerId) {
+    List<Integer> numbers = playerNumbersForPlayerId(game, viewerId);
+    if (numbers.size() != 1) {
+      throw new IllegalArgumentException("Can only invoke viewerProfile() when viewer has a " +
+          "single player number.");
+    }
+    return game.getProfile(numbers.get(0));
   }
 
   /**

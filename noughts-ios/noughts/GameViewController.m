@@ -15,12 +15,15 @@
 #import "AppDelegate.h"
 #import "Identifiers.h"
 #import "NotificationManager.h"
+#import "FacebookUtils.h"
+#import "PushNotificationHandler.h"
 
-@interface GameViewController () <UIAlertViewDelegate>
+@interface GameViewController () <UIAlertViewDelegate, PushNotificationHandlerDelegate>
 @property(weak,nonatomic) NTSModel *model;
 @property(strong,nonatomic) GameView *gameView;
 @property(strong,nonatomic) NTSGame *game;
 @property(strong,nonatomic) NTSAction *action;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation GameViewController
@@ -32,6 +35,7 @@
   [_gameView updateButtons];
   [_gameView setGameCanvasDelegate:self];
   self.view = _gameView;
+  _pushHandler = [PushNotificationHandler new];  
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -39,10 +43,8 @@
   [_model setCommandUpdateListenerWithNSString:_currentGameId
                   withNTSCommandUpdateListener:[_gameView getCommandUpdateListener]];
   [_model setGameUpdateListenerWithNSString:_currentGameId withNTSGameUpdateListener:self];
-}
-
-- (void)viewDidDisappear:(BOOL)animated {
-  [[NotificationManager getInstance] unregisterForAllNotifications:self];
+  [_pushHandler registerHandler];
+  _pushHandler.delegate = self;
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -50,6 +52,14 @@
   if (_tutorialMode) {
     [_gameView showTapSquareCallout];
   }
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
+}
+
+- (BOOL)shouldDisplayNotification:(NSString *)gameId {
+  return ![_currentGameId isEqualToString:gameId];
 }
 
 - (void)displayGameStatus:(NTSGameStatus*)status {
@@ -195,10 +205,17 @@
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  NTSProfile *profile = [[NotificationManager getInstance]
-                         getLatestValueForNotification:kFacebookProfileLoadedNotification];
-  [_model joinGameIfPossibleWithNSString:_currentGameId
-                          withNTSProfile:profile];
+  NSLog(@"on game update");
+  if ([FacebookUtils isFacebookUser]) {
+    [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
+                                                      withBlock:
+     ^(NTSProfile* profile) {
+       [_model joinGameIfPossibleWithNSString:_currentGameId
+                               withNTSProfile:profile];
+     }];
+  } else {
+    [_model joinGameIfPossibleWithNSString:_currentGameId withNTSProfile:nil];
+  }
   [_model handleComputerActionWithNSString:_currentGameId];
   _game = game;
 }
@@ -210,12 +227,15 @@
   }
 }
 
-- (void)onProfileRequiredWithNSString:(NSString*)gameId {
-  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId];
+- (void)onProfileRequiredWithNSString:(NSString*)gameId withNSString:(NSString *)name {
+  NSLog(@"on profile required");
+  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId
+                                                                         withProposedName:name];
   [self presentViewController:ppvc animated:YES completion:nil];
 }
 
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {
+  NSLog(@"on game status changed");
   [self displayGameStatus:status];
 }
 

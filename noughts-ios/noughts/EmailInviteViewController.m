@@ -3,14 +3,22 @@
 #import "java/util/ArrayList.h"
 #import "GameViewController.h"
 #import "AppDelegate.h"
+#import "FacebookUtils.h"
+#import "NotificationManager.h"
+#import "Identifiers.h"
+#import "JavaUtils.h"
+#import "Pronoun.h"
+#import "PushNotificationHandler.h"
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(weak, nonatomic) IBOutlet UITextField *toEmail;
 @property(weak, nonatomic) IBOutlet UITextView *message;
 @property(weak, nonatomic) IBOutlet UIButton *doneEditingButton;
 @property(nonatomic) int viewDeltaY;
-@property (weak, nonatomic) IBOutlet UILabel *urlLabel;
+@property(weak, nonatomic) IBOutlet UILabel *urlLabel;
 @property(weak, nonatomic) IBOutlet UIButton *sendButton;
+@property(strong, nonatomic) NTSProfile *facebookProfile;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation EmailInviteViewController
@@ -39,6 +47,22 @@
                                                name:UIKeyboardWillHideNotification
                                              object:nil];
   [self.view addGestureRecognizer:recognizer];
+  
+  if ([FacebookUtils isFacebookUser]) {
+   [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
+                                                     withBlock:^(id notificationObject) {
+                                                       _facebookProfile = notificationObject;
+                                                     }];
+  }
+  _pushHandler = [PushNotificationHandler new];  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -108,7 +132,14 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   NTSModel *model = [AppDelegate getModel];
-  NSString *gameId = [model newGameWithJavaUtilList:[JavaUtilArrayList new]
+  NSArray *profiles;
+  NTSProfile_Builder *opponentProfile = [NTSProfile newBuilder];
+  NSRange range = [_toEmail.text rangeOfString:@"@"];
+  NSString *opponentName = [_toEmail.text substringToIndex:range.location];
+  [opponentProfile setNameWithNSString:opponentName];
+  [opponentProfile setPronounWithNTSPronounEnum:[NTSPronounEnum NEUTRAL]];
+  profiles = @[_facebookProfile, [opponentProfile build]];
+  NSString *gameId = [model newGameWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:profiles]
                                        withNSString:_preliminaryGameId];
   NSDictionary *params = @{@"message": _message.text,
                            @"email": _toEmail.text,

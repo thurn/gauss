@@ -2,7 +2,7 @@
 #import "java/util/Map.h"
 #import "java/util/List.h"
 
-@interface J2obcUtils : NSObject
+@interface JavaUtils : NSObject
 + (id<JavaUtilMap>)nsDictionaryToJavaUtilMap:(NSDictionary*)dictionary;
 + (id<JavaUtilList>)nsArrayToJavaUtilList:(NSArray*)array;
 + (NSArray*)javaUtilListToNsArray:(id<JavaUtilList>)list;

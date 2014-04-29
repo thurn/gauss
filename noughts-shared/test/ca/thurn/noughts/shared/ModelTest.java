@@ -32,7 +32,7 @@ public class ModelTest extends SharedTestCase {
     @Override
     public void onGameStatusChanged(GameStatus status) {}
     @Override
-    public void onProfileRequired(String gameId) {}
+    public void onProfileRequired(String gameId, String name) {}
   }
 
   @Override
