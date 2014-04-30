@@ -2,19 +2,15 @@ package ca.thurn.noughts.shared;
 
 import ca.thurn.noughts.shared.entities.Game;
 
-
 public class AbstractGameListListener implements GameListListener {
 
   @Override
-  public void onGameAdded(Game game) {
-  }
+  public void onGameAdded(Game game) {}
 
   @Override
-  public void onGameChanged(Game game) {
-  }
+  public void onGameChanged(Game game) {}
 
   @Override
-  public void onGameRemoved(Game game) {
-  }
+  public void onGameRemoved(String gameId) {}
 
 }

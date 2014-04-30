@@ -5,7 +5,8 @@
 #import "Command.h"
 #import "Model.h"
 #import "Games.h"
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
+#import "Identifiers.h"
 
 @interface GameCanvas ()
 @property(strong,nonatomic) SVGKImage *backgroundSvg;
@@ -20,6 +21,9 @@
 @property(nonatomic) SystemSoundID gameOverSound;
 @property(nonatomic) int topOffset;
 @property(nonatomic) int squareSize;
+@property(nonatomic) int sideMargin;
+@property(nonatomic) int topMargin;
+@property(nonatomic) BOOL mute;
 @end
 
 @implementation GameCanvas
@@ -56,20 +60,25 @@
   return self;
 }
 
-- (void)onRegisteredWithNSString:(NSString*)viewerId withNTSGame:(NTSGame *)game {
+- (void)onRegisteredWithNSString:(NSString *)viewerId
+                     withNTSGame:(NTSGame *)game
+                   withNTSAction:(NTSAction *)currentAction {
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
-  _squareSize = self.frame.size.width / 3;
-  _topOffset = (self.frame.size.height - self.frame.size.width) / 2;
-  
-  _viewerPlayerNumbers = [J2obcUtils javaUtilListToNsArray:playerNumbers];
+  float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
+  int backgroundWidth = 320 * scale;
+  int backgroundHeight = 480 * scale;
+  _squareSize = backgroundWidth / 3;
+  _topOffset = 80 * scale;
+  _sideMargin = (self.frame.size.width - backgroundWidth) / 2;
+  _topMargin = (self.frame.size.height - backgroundHeight) / 2;
+
+  _viewerPlayerNumbers = [JavaUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
-  int backgroundWidth = 320;
-  int backgroundHeight = 480;
   UIView *backgroundView = [self drawSvg:_backgroundSvg
-                                  inRect:CGRectMake(0,
-                                                    (self.frame.size.height - backgroundHeight) / 2,
+                                  inRect:CGRectMake(_sideMargin,
+                                                    _topMargin,
                                                     backgroundWidth,
                                                     backgroundHeight)];
 
@@ -77,22 +86,37 @@
   for (NTSAction *action in (id<NSFastEnumeration>)[game getSubmittedActionList]) {
     [self drawAction:action animate:NO draggable:NO];
   }
-  
-  if ([game hasCurrentAction]) {
-    BOOL draggable = [self belongsToViewer:[game getCurrentAction]];
-    [self drawAction:[game getCurrentAction] animate:YES draggable:draggable];
+
+  if (currentAction) {
+    BOOL draggable = [self belongsToViewer:currentAction];
+    [self drawAction:currentAction animate:YES draggable:draggable];
   }
 }
 
+- (float)computeScaleFactorWithWidth:(int)width withHeight:(int)height {
+  float widthRatio = self.frame.size.width / width;
+  float heightRatio = self.frame.size.height / height;
+  return MIN(widthRatio, heightRatio);
+}
+
+- (int)longEdgeLength {
+  return MAX(self.frame.size.width, self.frame.size.height);
+}
+
+- (int)shortEdgeLength {
+  return MIN(self.frame.size.width, self.frame.size.height);
+}
+
 - (BOOL)belongsToViewer:(NTSAction*) action {
-  int playerNumber= [action getPlayerNumber];
+  if (![action hasPlayerNumber]) return false;
+  int playerNumber = [action getPlayerNumber];
   return [_viewerPlayerNumbers containsObject:[[NSNumber alloc] initWithInt:playerNumber]];
 }
 
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
   BOOL draggable = [self belongsToViewer:action];
   [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
-  AudioServicesPlaySystemSound(_addCommandSound);
+  [self playSoundIfEnabled:_addCommandSound];
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
@@ -102,23 +126,28 @@
   } completion:^(BOOL finished) {
     [view removeFromSuperview];
   }];
-  AudioServicesPlaySystemSound(_removeCommandSound);
+  [self playSoundIfEnabled:_removeCommandSound];
 }
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
   _views[newCommand] = _views[oldCommand];
   [_views removeObjectForKey:oldCommand];
-  AudioServicesPlaySystemSound(_addCommandSound);
+  [self playSoundIfEnabled:_addCommandSound];
 }
 
-- (void)onCommandSubmittedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  [self removeAllGestureRecognizers:_views[command]];
-  AudioServicesPlaySystemSound(_submitCommandSound);
+-(void)onActionSubmittedWithNTSAction:(NTSAction *)action withBoolean:(BOOL)byViewer {
+  for (NTSCommand *command in [action getCommandList]) {
+    [self removeAllGestureRecognizers:_views[command]];
+  }
+  [self playSoundIfEnabled:_submitCommandSound];
+  if (!byViewer) {
+    [self drawAction:action animate:YES draggable:NO];
+  }
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {
-  AudioServicesPlaySystemSound(_gameOverSound);
+  [self playSoundIfEnabled:_gameOverSound];
 }
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
@@ -132,8 +161,8 @@
 
 - (void)drawCommand:(NTSCommand*)command playerNumber:(int)playerNumber animate:(BOOL)animate
           draggable:(BOOL)draggable {
-  CGRect rect = CGRectMake([command getColumn] * _squareSize,
-                           [command getRow] * _squareSize + _topOffset,
+  CGRect rect = CGRectMake(([command getColumn] * _squareSize) + _sideMargin,
+                           ([command getRow] * _squareSize) + _topOffset + _topMargin,
                            _squareSize,
                            _squareSize);
   SVGKImage *image = playerNumber == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
@@ -193,8 +222,8 @@
 - (CGPoint)handleFinalPoint:(CGPoint)final {
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      CGRect rect = CGRectMake(i * _squareSize,
-                               _topOffset + (j * _squareSize),
+      CGRect rect = CGRectMake((i * _squareSize) + _sideMargin,
+                               _topMargin + _topOffset + (j * _squareSize),
                                _squareSize,
                                _squareSize);
       if (CGRectContainsPoint(rect, final) && [_delegate allowDragToX:i toY:j]) {
@@ -216,12 +245,25 @@
 - (void)handleTap:(UITapGestureRecognizer*)sender {
   if (sender.state == UIGestureRecognizerStateEnded) {
     CGPoint point = [sender locationInView: self];
-    if (point.y < _topOffset || point.y > _topOffset + 3 * _squareSize ||
-        point.x < 0 || point.x > 3 * _squareSize) {
+    if (point.y < _topOffset + _topMargin || point.y > _topMargin + _topOffset + (3 * _squareSize) ||
+        point.x < _sideMargin || point.x > (3 * _squareSize) + _sideMargin) {
       return; // Out of bounds
     }
-    [_delegate handleSquareTapAtX:point.x / _squareSize
-                              AtY:(point.y - _topOffset) / _squareSize];
+    [_delegate handleSquareTapAtX:(point.x - _sideMargin) / _squareSize
+                              AtY:(point.y - _topOffset - _topMargin) / _squareSize];
+  }
+}
+
+- (void)playSoundIfEnabled:(SystemSoundID)sound {
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  if(![[userDefaults valueForKey:kDisableSoundsKey] boolValue] && !_mute) {
+    AudioServicesPlaySystemSound(sound);
+    // Temporarily mute sounds after playing to prevent stacking sounds on top of each other.
+    _mute = YES;
+    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC);
+    dispatch_after(delay, dispatch_get_main_queue(), ^{
+      _mute = NO;
+    });
   }
 }
 

@@ -1,14 +1,13 @@
 #import "NewLocalGameViewController.h"
 #import "GameViewController.h"
-#import "J2obcUtils.h"
+#import "JavaUtils.h"
 #import "Profile.h"
 #import "ImageString.h"
 #import "ImageType.h"
-
-NSString *const kP1LocalNameKey = @"kP1LocalNameKey";
-NSString *const kP2LocalNameKey = @"kP2LocalNameKey";
-NSString *const kSawTutorialKey = @"kSawTutorialKey";
-NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
+#import "AppDelegate.h"
+#import "Identifiers.h"
+#import "Games.h"
+#import "PushNotificationHandler.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -18,11 +17,11 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 @property (weak, nonatomic) IBOutlet UIButton *p1Image;
 @property (weak, nonatomic) IBOutlet UIButton *p2Image;
 @property (weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
-@property (weak, nonatomic) NTSModel *model;
 @property (strong, nonatomic) NSArray *playerImages;
 @property (strong, nonatomic) NSArray *computerImages;
 @property (nonatomic) int p1ImageIndex;
 @property (nonatomic) int p2ImageIndex;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation NewLocalGameViewController
@@ -41,7 +40,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 - (void)viewDidLoad {
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   if (_playVsComputerMode) {
-    NSNumber *number = [userDefaults objectForKey:kPreferredDifficulty];
+    NSNumber *number = [userDefaults objectForKey:kPreferredDifficultyKey];
     if (!number) {
       number = @0;
     }
@@ -80,6 +79,15 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   }
   _p2TextField.placeholder = p2Name;
   _p2TextField.text = p2Name;
+  _pushHandler = [PushNotificationHandler new];  
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
 }
 
 - (void)animateViewByDeltaY:(int)deltaY {
@@ -90,13 +98,11 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   [UIView commitAnimations];
 }
 
-- (void)keyboardWillBeShown:(NSNotification*)aNotification
-{
+- (void)keyboardWillBeShown:(NSNotification*)aNotification {
   [self animateViewByDeltaY:-100];
 }
 
-- (void)keyboardWillBeHidden:(NSNotification*)aNotification
-{
+- (void)keyboardWillBeHidden:(NSNotification*)aNotification {
   [self animateViewByDeltaY:100];
 }
 
@@ -135,10 +141,6 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   return NO;
 }
 
--(void)setNTSModel:(NTSModel *)model {
-  _model = model;
-}
-
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
   return 1;
 }
@@ -154,14 +156,15 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
   UILabel* label = (UILabel*)view;
   if (!label) {
     label = [[UILabel alloc] init];
-    [label setFont:[UIFont systemFontOfSize:14]];
+    int fontSize = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 24 : 14;
+    [label setFont:[UIFont systemFontOfSize:fontSize]];
   }
   label.text = [self nameForDifficultyLevel:row];
   return label;
 }
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
-  return 25.0;
+  return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 40.0 : 25.0;
 }
 
 - (NSString *)nameForDifficultyLevel:(NSInteger)level {
@@ -184,7 +187,7 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 - (void)pickerView:(UIPickerView *)pickerView
       didSelectRow:(NSInteger)row
        inComponent:(NSInteger)component {
-  _p2ImageIndex = row;
+  _p2ImageIndex = (int)row;
   UIImage *image = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
   // Button is disabled for vs. computer
   [_p2Image setImage:image forState:UIControlStateDisabled];
@@ -196,10 +199,9 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
 }
 
 - (NTSImageString*)localImageString:(NSString*)name {
-  return [[[[NTSImageString newBuilder]
-            setStringWithNSString:name]
-           setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]]
-          build];
+  NTSImageString_Builder *result = [NTSImageString newBuilder];
+  [NTSGames setLocalImageStringsWithNTSImageString_Builder:result withNSString:name];
+  return [result build];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -223,9 +225,9 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
    [self localImageString:[_playerImages objectAtIndex:_p1ImageIndex]]];
   NTSProfile_Builder *p2Profile = [NTSProfile newBuilder];
   if (_playVsComputerMode) {
-    int difficultyLevel = [_difficultyPicker selectedRowInComponent:0];
+    int difficultyLevel = (int)[_difficultyPicker selectedRowInComponent:0];
     [userDefaults setObject:[[NSNumber alloc] initWithInt:difficultyLevel]
-                     forKey:kPreferredDifficulty];
+                     forKey:kPreferredDifficultyKey];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_computerImages objectAtIndex:difficultyLevel]]];
@@ -236,10 +238,11 @@ NSString *const kPreferredDifficulty = @"kPreferredDifficulty";
     [p2Profile setImageStringWithNTSImageString:
      [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]]];
   }
+  NTSModel *model = [AppDelegate getModel];
   [userDefaults synchronize];
-   NSString *gameId = [_model newLocalMultiplayerGameWithJavaUtilList:
-                       [J2obcUtils nsArrayToJavaUtilList:@[[p1Profile build], [p2Profile build]]]];
-  [destination setNTSModel:_model];
+  NSArray *profiles = @[[p1Profile build], [p2Profile build]];
+  NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
+                      [JavaUtils nsArrayToJavaUtilList:profiles]];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

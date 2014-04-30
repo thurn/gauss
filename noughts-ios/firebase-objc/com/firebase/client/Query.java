@@ -15,8 +15,8 @@ public class Query {
     this.firebase = firebase;
   }
   
-  public void helloWorld() {
-    System.out.println("Hello, world!");
+  public Object getWrappedFirebase() {
+    return firebase;
   }
   
   public native void addListenerForSingleValueEvent(ValueEventListener listener) /*-[

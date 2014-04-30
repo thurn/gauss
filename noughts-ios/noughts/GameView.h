@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import "Game.h"
 #import "GameCanvas.h"
+#import "ImageString.h"
 
 typedef NS_ENUM(NSUInteger, GameMenuSelection) {
   kUnknownSelection,
@@ -23,16 +24,16 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 
 @interface GameView : UIView <UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
--(void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
+- (void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener;
--(void)drawGame:(NTSGame *)game;
--(void)displayGameStatusWithImage:(UIImage*)image
-                       withString:(NSString*)string
-                        withColor:(UIColor*)color;
--(void)showTapSquareCallout;
--(void)hideTapSquareCallout;
--(void)showSubmitCallout;
--(void)hideSubmitCallout;
--(void)showComputerThinkingIndicator;
--(void)hideComputerThinkingIndicator;
+- (void)updateButtons;
+- (void)displayGameStatusWithImageString:(NTSImageString*)imageString
+                              withString:(NSString*)string
+                               withColor:(UIColor*)color;
+- (void)showTapSquareCallout;
+- (void)hideTapSquareCallout;
+- (void)showSubmitCallout;
+- (void)hideSubmitCallout;
+- (void)showComputerThinkingIndicator;
+- (void)hideComputerThinkingIndicator;
 @end

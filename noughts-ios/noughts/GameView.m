@@ -1,19 +1,18 @@
 #import "GameView.h"
 #import "SVGKit.h"
 #import "Model.h"
-#import "Game.h"
 #import "Action.h"
 #import "Command.h"
 #include "java/lang/Integer.h"
 #import "SMCalloutView.h"
 #import "UIView+AutoLayout.h"
 #import "GameCanvas.h"
+#import "ImageStringUtils.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
 
 @interface GameView ()
-@property(strong,nonatomic) NTSGame *currentGame;
 @property(strong,nonatomic) UIButton *gameMenuButton;
 @property(strong,nonatomic) UIButton *submitButton;
 @property(strong,nonatomic) UIButton *undoButton;
@@ -64,7 +63,7 @@
     _submitCallout.title = @"Hit submit";
     _submitCallout.subtitle = @"to confirm";
     _submitCallout.permittedArrowDirection = SMCalloutArrowDirectionAny;
-
+    
     _gameMenuButton = [UIButton buttonWithType:UIButtonTypeSystem];
     UIImage *gameMenuIcon = [UIImage imageNamed:@"ic_game_menu.png"];
     [_gameMenuButton setImage:gameMenuIcon forState:UIControlStateNormal];
@@ -77,6 +76,9 @@
 
     _submitButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_submitButton setTitle:@"Submit" forState:UIControlStateNormal];
+    if(UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+      _submitButton.titleLabel.font = [UIFont systemFontOfSize:30];
+    }
     [_submitButton addTarget:self
                       action:@selector(submitClicked:)
             forControlEvents:UIControlEventTouchUpInside];
@@ -103,7 +105,7 @@
     [_redoButton sizeToFit];
     _redoButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_redoButton];
-
+    
     NSArray *subviewArray = [[NSBundle mainBundle]
                              loadNibNamed:@"GameStatusView"
                                     owner:self
@@ -147,17 +149,18 @@
 }
 
 - (CGFloat)statusBarHeight {
-  return [UIApplication sharedApplication].statusBarFrame.size.height;
+  return MIN([UIApplication sharedApplication].statusBarFrame.size.height,
+             [UIApplication sharedApplication].statusBarFrame.size.width);
 }
 
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener {
   return _gameCanvas;
 }
 
-- (void)displayGameStatusWithImage:(UIImage*)image
+- (void)displayGameStatusWithImageString:(NTSImageString*)imageString
                        withString:(NSString*)string
                         withColor:(UIColor*)color {
-  _gameStatusImage.image = image;
+  [ImageStringUtils setLargeImage:_gameStatusImage imageString:imageString];
   _gameStatusLabel.text = string;
   _gameStatusColorView.backgroundColor = color;
   [self layoutIfNeeded];
@@ -235,11 +238,6 @@
   if (selection != kUnknownSelection) {
     [_delegate handleGameMenuSelection:selection];
   }
-}
-
-- (void)drawGame:(NTSGame*)game {
-  _currentGame = game;
-  [self updateButtons];
 }
 
 - (void)updateButtons {

@@ -14,9 +14,9 @@ import java.util.Map;
 ]-*/
 
 public class DataSnapshot {
-  
+
   final Object snapshot;
-  
+
   private static final int TYPE_UNKNOWN = 0;
   private static final int TYPE_NULL = 1;
   private static final int TYPE_LONG = 2;
@@ -25,11 +25,11 @@ public class DataSnapshot {
   private static final int TYPE_STRING = 5;
   private static final int TYPE_LIST = 6;
   private static final int TYPE_MAP = 7;
-  
+
   DataSnapshot(Object snapshot) {
     this.snapshot = snapshot;
   }
-  
+
   native static Map<String, Object> convertNsDictionaryToMap(Object dictionary) /*-[
     id<JavaUtilMap> result = [[JavaUtilHashMap alloc] init];
       for (id key in dictionary) {
@@ -38,7 +38,7 @@ public class DataSnapshot {
       }
     return result;
   ]-*/;
-  
+
   native static List<Object> convertNsArrayToList(Object array) /*-[
     id<JavaUtilList> result = [[JavaUtilArrayList alloc] init];
       for (id value in array) {
@@ -46,7 +46,7 @@ public class DataSnapshot {
       }
     return result;
   ]-*/;
-  
+
   private native static Object convertToJavaObject(Object value) /*-[
     if (value == nil || [value isKindOfClass: [NSNull class]]) {
       return nil;
@@ -69,10 +69,10 @@ public class DataSnapshot {
       @throw [[JavaLangIllegalStateException alloc] initWithNSString:@"Unable to convert to java object"];
     }
   ]-*/;
-  
+
   public native Object getValue() /*-[
     FDataSnapshot *snapshot = self->snapshot_;
-    return [FCDataSnapshot convertToJavaObjectWithId: snapshot.value];  
+    return [FCDataSnapshot convertToJavaObjectWithId: snapshot.value];
   ]-*/;
 
   @SuppressWarnings("unchecked")
@@ -84,17 +84,27 @@ public class DataSnapshot {
   public <T> T getValue(GenericTypeIndicator<T> t) {
     return (T) getValue();
   }
-  
+
+  public native DataSnapshot child(String name) /*-[
+    FDataSnapshot *snapshot = self->snapshot_;
+    return [[FCDataSnapshot alloc] initWithId:[snapshot childSnapshotForPath:name]];
+  ]-*/;
+
+  public native boolean hasChild(String name) /*-[
+    FDataSnapshot *snapshot = self->snapshot_;
+    return [snapshot hasChild: name];
+  ]-*/;
+
   public native Firebase getRef() /*-[
     FDataSnapshot *snapshot = self->snapshot_;
     return [[FCFirebase alloc] initWithId: snapshot];
   ]-*/;
-  
+
   public native Object getPriority() /*-[
     FDataSnapshot *snapshot = self->snapshot_;
     return [FCDataSnapshot convertToJavaObjectWithId: snapshot.priority];
   ]-*/;
-  
+
   public native String getName() /*-[
     FDataSnapshot *snapshot = self->snapshot_;
     return snapshot.name;

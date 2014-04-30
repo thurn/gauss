@@ -1,52 +1,58 @@
 #import "NewGameViewController.h"
 #import "NewLocalGameViewController.h"
-#import "HasModel.h"
 #import <FacebookSDK/FacebookSDK.h>
 #import "QueryParsing.h"
 #import "AppDelegate.h"
+#import "EmailInviteViewController.h"
+#import "FacebookUtils.h"
+#import "InterfaceUtils.h"
+#import "PushNotificationHandler.h"
 
 @interface NewGameViewController ()
-@property(weak,nonatomic) NTSModel* model;
+@property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
 @implementation NewGameViewController
 
-- (void)setNTSModel:(NTSModel *)model {
-  _model = model;
-}
-
 - (void)viewDidLoad {
   [super viewDidLoad];
+  _pushHandler = [PushNotificationHandler new];  
 }
 
-- (IBAction)onFacebookInviteClicked {
-  FBFriendPickerViewController *picker = [FBFriendPickerViewController new];
-  [picker loadData];
-  picker.allowsMultipleSelection = NO;
-  [self presentViewController:picker animated:YES completion:nil];
-  return;
-  AppDelegate* appDelegate = (AppDelegate*)[UIApplication sharedApplication].delegate;
+- (void)viewWillAppear:(BOOL)animated {
+  [_pushHandler registerHandler];  
+}
 
-  [FBWebDialogs
-   presentRequestsDialogModallyWithSession:nil
-   message:@"Invitation to play noughts"
-   title:@"noughts"
-   parameters:@{@"to": @"122610483"}
-   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-     if (result != FBWebDialogResultDialogNotCompleted) {
-       NSLog(@"result url %@", resultURL);
-       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-       NSLog(@"fbid %@", query[@"to[0]"]);
-       NSLog(@"requestid %@", query[@"request"]);
-     }
-   }
-   friendCache:appDelegate.friendCache];
+- (void)viewWillDisappear:(BOOL)animated {
+  [_pushHandler unregisterHandler];
+}
+
+- (IBAction)onInviteViaFacebook:(id)sender {
+  if ([FacebookUtils isFacebookUser]) {
+    [self.navigationController
+     pushViewController:[[InterfaceUtils mainStoryboard]
+                         instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
+     animated:YES];
+  } else {
+    [FacebookUtils logInToFacebook:^{
+      [self.navigationController
+       pushViewController:[[InterfaceUtils mainStoryboard]
+                           instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
+       animated:YES];
+    }];
+  }
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
   UIView *sendingView = sender;
-  [(id <HasModel>)segue.destinationViewController setNTSModel:_model];
   switch (sendingView.tag) {
+    case 99: {
+      EmailInviteViewController *controller =
+          (EmailInviteViewController*)segue.destinationViewController;
+      NTSModel *model = [AppDelegate getModel];
+      controller.preliminaryGameId = [model getPreliminaryGameId];
+      break;
+    }
     case 100: {
       NewLocalGameViewController *controller =
           (NewLocalGameViewController*)segue.destinationViewController;

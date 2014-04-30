@@ -1,6 +1,5 @@
 #import <UIKit/UIKit.h>
-#import "HasModel.h"
 
-@interface EmailInviteViewController : UIViewController <HasModel>
-
+@interface EmailInviteViewController : UIViewController
+@property(strong,nonatomic) NSString *preliminaryGameId;
 @end

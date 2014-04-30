@@ -1,5 +1,8 @@
 package ca.thurn.noughts.shared;
 
+import javax.annotation.Nullable;
+
+import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameStatus;
 
@@ -13,7 +16,14 @@ public interface GameUpdateListener {
    * @param game New game state.
    */
   public void onGameUpdate(Game game);
-  
+
+  /**
+   * Called with the new value whenever the viewer's current action changes.
+   *
+   * @param currentAction
+   */
+  public void onCurrentActionUpdate(Action currentAction);
+
   /**
    * Called when the "status" of the game changes (game ends, new player's
    * turn, etc)
@@ -21,4 +31,12 @@ public interface GameUpdateListener {
    * @param status Game status object summarizing change.
    */
   public void onGameStatusChanged(GameStatus status);
+
+  /**
+   * Called when the viewer needs to be prompted to enter a profile.
+   *
+   * @param game The game.
+   * @param name Optionally, a suggested name for the viewer.
+   */
+  public void onProfileRequired(String gameId, @Nullable String name);
 }
