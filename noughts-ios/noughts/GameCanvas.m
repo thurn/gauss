@@ -6,6 +6,7 @@
 #import "Model.h"
 #import "Games.h"
 #import "JavaUtils.h"
+#import "Identifiers.h"
 
 @interface GameCanvas ()
 @property(strong,nonatomic) SVGKImage *backgroundSvg;
@@ -22,6 +23,7 @@
 @property(nonatomic) int squareSize;
 @property(nonatomic) int sideMargin;
 @property(nonatomic) int topMargin;
+@property(nonatomic) BOOL mute;
 @end
 
 @implementation GameCanvas
@@ -61,7 +63,6 @@
 - (void)onRegisteredWithNSString:(NSString *)viewerId
                      withNTSGame:(NTSGame *)game
                    withNTSAction:(NTSAction *)currentAction {
-  NSLog(@"on registered");
   id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
                                                                     withNSString:viewerId];
   float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
@@ -115,7 +116,7 @@
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
   BOOL draggable = [self belongsToViewer:action];
   [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
-  AudioServicesPlaySystemSound(_addCommandSound);
+  [self playSoundIfEnabled:_addCommandSound];
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
@@ -125,28 +126,28 @@
   } completion:^(BOOL finished) {
     [view removeFromSuperview];
   }];
-  AudioServicesPlaySystemSound(_removeCommandSound);
+  [self playSoundIfEnabled:_removeCommandSound];
 }
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
   _views[newCommand] = _views[oldCommand];
   [_views removeObjectForKey:oldCommand];
-  AudioServicesPlaySystemSound(_addCommandSound);
+  [self playSoundIfEnabled:_addCommandSound];
 }
 
 -(void)onActionSubmittedWithNTSAction:(NTSAction *)action withBoolean:(BOOL)byViewer {
   for (NTSCommand *command in [action getCommandList]) {
     [self removeAllGestureRecognizers:_views[command]];
   }
-  AudioServicesPlaySystemSound(_submitCommandSound);
+  [self playSoundIfEnabled:_submitCommandSound];
   if (!byViewer) {
     [self drawAction:action animate:YES draggable:NO];
   }
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {
-  AudioServicesPlaySystemSound(_gameOverSound);
+  [self playSoundIfEnabled:_gameOverSound];
 }
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
@@ -250,6 +251,19 @@
     }
     [_delegate handleSquareTapAtX:(point.x - _sideMargin) / _squareSize
                               AtY:(point.y - _topOffset - _topMargin) / _squareSize];
+  }
+}
+
+- (void)playSoundIfEnabled:(SystemSoundID)sound {
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  if(![[userDefaults valueForKey:kDisableSoundsKey] boolValue] && !_mute) {
+    AudioServicesPlaySystemSound(sound);
+    // Temporarily mute sounds after playing to prevent stacking sounds on top of each other.
+    _mute = YES;
+    dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC);
+    dispatch_after(delay, dispatch_get_main_queue(), ^{
+      _mute = NO;
+    });
   }
 }
 

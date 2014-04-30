@@ -14,3 +14,5 @@ FOUNDATION_EXPORT NSString* const kP1LocalNameKey;
 FOUNDATION_EXPORT NSString* const kP2LocalNameKey;
 FOUNDATION_EXPORT NSString* const kSawTutorialKey;
 FOUNDATION_EXPORT NSString* const kPreferredDifficultyKey;
+FOUNDATION_EXPORT NSString* const kDisableSoundsKey;
+FOUNDATION_EXPORT NSString* const kEnableAutosubmitKey;

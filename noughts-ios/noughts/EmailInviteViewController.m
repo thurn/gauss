@@ -138,7 +138,13 @@
   NSString *opponentName = [_toEmail.text substringToIndex:range.location];
   [opponentProfile setNameWithNSString:opponentName];
   [opponentProfile setPronounWithNTSPronounEnum:[NTSPronounEnum NEUTRAL]];
-  profiles = @[_facebookProfile, [opponentProfile build]];
+  if (_facebookProfile) {
+    profiles = @[_facebookProfile, [opponentProfile build]];
+  } else {
+    NTSProfile_Builder *viewerProfile = [NTSProfile newBuilder];
+    [viewerProfile setPronounWithNTSPronounEnum:[NTSPronounEnum NEUTRAL]];
+    profiles = @[[viewerProfile build], [opponentProfile build]];
+  }
   NSString *gameId = [model newGameWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:profiles]
                                        withNSString:_preliminaryGameId];
   NSDictionary *params = @{@"message": _message.text,

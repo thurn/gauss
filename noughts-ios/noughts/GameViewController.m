@@ -45,6 +45,10 @@
   [_model setGameUpdateListenerWithNSString:_currentGameId withNTSGameUpdateListener:self];
   [_pushHandler registerHandler];
   _pushHandler.delegate = self;
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(didBecomeActive)
+                                               name:UIApplicationDidBecomeActiveNotification
+                                             object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -54,8 +58,15 @@
   }
 }
 
+- (void)didBecomeActive {
+  [_model requestGameStatusWithNSString:_currentGameId];
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
   [_pushHandler unregisterHandler];
+  [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                  name:UIApplicationDidBecomeActiveNotification
+                                                object:nil];
 }
 
 - (BOOL)shouldDisplayNotification:(NSString *)gameId {
@@ -168,10 +179,6 @@
   return nil;
 }
 
-- (void)invalidateCommandListener {
-  [_model invalidateCommandListenerWithNSString:_currentGameId];
-}
-
 - (NTSCommand*)commandFromX:(int)x fromY:(int)y {
   return [[[[NTSCommand newBuilder]
             setColumnWithInt:x]
@@ -188,7 +195,12 @@
       [_gameView hideTapSquareCallout];
       [_gameView showSubmitCallout];
     }
-    [_model addCommandWithNSString:_currentGameId withNTSCommand:command];
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    if([[userDefaults valueForKey:kEnableAutosubmitKey] boolValue]) {
+      [_model addCommandAndSubmitWithNSString:_currentGameId withNTSCommand:command];
+    } else {
+      [_model addCommandWithNSString:_currentGameId withNTSCommand:command];
+    }
   }
 }
 
@@ -205,7 +217,6 @@
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  NSLog(@"on game update");
   if ([FacebookUtils isFacebookUser]) {
     [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
                                                       withBlock:
@@ -228,14 +239,12 @@
 }
 
 - (void)onProfileRequiredWithNSString:(NSString*)gameId withNSString:(NSString *)name {
-  NSLog(@"on profile required");
   ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId
                                                                          withProposedName:name];
   [self presentViewController:ppvc animated:YES completion:nil];
 }
 
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {
-  NSLog(@"on game status changed");
   [self displayGameStatus:status];
 }
 

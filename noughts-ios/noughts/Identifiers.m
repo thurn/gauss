@@ -14,3 +14,5 @@ NSString* const kP1LocalNameKey = @"kP1LocalNameKey";
 NSString* const kP2LocalNameKey = @"kP2LocalNameKey";
 NSString* const kSawTutorialKey = @"kSawTutorialKey";
 NSString* const kPreferredDifficultyKey = @"kPreferredDifficultyKey";
+NSString* const kDisableSoundsKey = @"kDisableSoundsKey";
+NSString* const kEnableAutosubmitKey = @"kEnableAutosubmitKey";

@@ -868,17 +868,9 @@ public class Model extends AbstractChildEventListener {
     }
   }
 
-  /**
-   * Causes the command update listener for the provided game ID to invoke
-   * onRegistered() again.
-   *
-   * @param gameId Game's ID.
-   */
-  public void invalidateCommandListener(String gameId) {
-    if (commandUpdateListeners.containsKey(gameId) && games.containsKey(gameId) &&
-        currentActions.containsKey(gameId)) {
-      commandUpdateListeners.get(gameId).onRegistered(userId, games.get(gameId),
-          currentActions.get(gameId));
+  public void requestGameStatus(String gameId) {
+    if (gameUpdateListeners.containsKey(gameId) && games.containsKey(gameId)) {
+      gameUpdateListeners.get(gameId).onGameStatusChanged(Games.gameStatus(getGame(gameId)));
     }
   }
 

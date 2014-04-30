@@ -6,7 +6,6 @@
 - (void)handleSquareTapAtX:(int)x AtY:(int)y;
 - (void)handleDragToX:(int)x toY:(int)y;
 - (BOOL)allowDragToX:(int)x toY:(int)y;
-- (void)invalidateCommandListener;
 @end
 
 @interface GameCanvas : UIView <NTSCommandUpdateListener>

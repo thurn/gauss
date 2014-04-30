@@ -96,6 +96,7 @@
 		7C65892E18EF7E9B00359B7C /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C65892D18EF7E9B00359B7C /* FirebaseSimpleLogin.framework */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
+		7C725BAF1910B16A009543F8 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C725BAE1910B16A009543F8 /* SettingsViewController.m */; };
 		7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3318D02B380086CFC5 /* Entity.java */; };
 		7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */; };
 		7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C89B79518CC38FB00878DC1 /* GameCanvas.m */; };
@@ -265,6 +266,8 @@
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
+		7C725BAD1910B16A009543F8 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
+		7C725BAE1910B16A009543F8 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
 		7C7C6A3318D02B380086CFC5 /* Entity.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Entity.java; sourceTree = "<group>"; };
 		7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = CommandUpdateListener.java; sourceTree = "<group>"; };
 		7C89B79418CC38FB00878DC1 /* GameCanvas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCanvas.h; sourceTree = "<group>"; };
@@ -590,6 +593,8 @@
 				7CCE4F16190F700F0027150A /* InterfaceUtils.m */,
 				7CCE4F181910069B0027150A /* PushNotificationHandler.h */,
 				7CCE4F191910069B0027150A /* PushNotificationHandler.m */,
+				7C725BAD1910B16A009543F8 /* SettingsViewController.h */,
+				7C725BAE1910B16A009543F8 /* SettingsViewController.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -930,6 +935,7 @@
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,
 				7C01FB4319070FD10049CD35 /* Optional.java in Sources */,
 				7C8EF6F818668CB40075D0C1 /* Model.java in Sources */,
+				7C725BAF1910B16A009543F8 /* SettingsViewController.m in Sources */,
 				7C01FB4219070FD10049CD35 /* Function.java in Sources */,
 				7C8EF76818668E120075D0C1 /* Query.java in Sources */,
 				7C58BE1318C1BD4D008D2C9D /* Action.java in Sources */,
