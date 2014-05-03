@@ -17,25 +17,27 @@ public class GameListPartitions {
   private final List<Game> yourTurn;
   private final List<Game> theirTurn;
   private final List<Game> gameOver;
+  private final String userId;
 
   GameListPartitions(String userId, Collection<Game> games) {
+    this.userId = userId;
     yourTurn = new ArrayList<Game>();
     theirTurn = new ArrayList<Game>();
     gameOver = new ArrayList<Game>();
     for (Game game : games) {
-      listForSection(getSection(game, userId)).add(game);
+      listForSection(getSection(game)).add(game);
     }
     Collections.sort(yourTurn, Games.comparator());
     Collections.sort(theirTurn, Games.comparator());
     Collections.sort(gameOver, Games.comparator());
   }
 
-  public static GameListSection getSection(Game game, String viewerId) {
+  public GameListSection getSection(Game game) {
     if (game.isGameOver()) {
       return GameListSection.GAME_OVER;
     }
     if (game.isLocalMultiplayer() ||
-        (Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(viewerId))) {
+        (Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId))) {
       return GameListSection.YOUR_TURN;
     } else {
       return GameListSection.THEIR_TURN;
@@ -48,8 +50,8 @@ public class GameListPartitions {
    * @return True if a game with the same ID as the provided game exists in the
    *     correct section.
    */
-  public boolean isGameInCorrectSection(Game game, String viewerId) {
-    GameListSection section = GameListPartitions.getSection(game, viewerId);
+  public boolean isGameInCorrectSection(Game game) {
+    GameListSection section = getSection(game);
     for (Game existingGame : listForSection(section)) {
       if (existingGame.getId().equals(game.getId())) {
         return true;

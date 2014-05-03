@@ -61,7 +61,7 @@
          [NSNotification notificationWithName:kFacebookLoginNotification
                                        object:user.userId]];
       } else {
-        @throw @"Error logging in to facebook";
+        [InterfaceUtils error:@"Error logging in to facebook"];
       }
     }];
   } else {
@@ -125,7 +125,6 @@
 
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  NSLog(@"didReceiveRemoteNotification %@", userInfo);
   [[NSNotificationCenter defaultCenter] postNotification:
    [NSNotification notificationWithName:kPushNotificationReceivedNotification
                                  object:userInfo]];
@@ -221,7 +220,6 @@
                          @"badge": @"Increment",
                          @"gameId": gameId,
                          @"title": @"noughts"};
-  NSLog(@"sending push %@", message);
   PFPush *push = [PFPush new];
   [push setData:data];
   [push setChannel:channelId];
@@ -244,7 +242,7 @@
                                                          id result,
                                                          NSError *error) {
     if (error) {
-      @throw @"Error loading facebook profile";
+      [InterfaceUtils error:@"Error loading facebook profile"];
     } else {
       NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:result];
       [[NSNotificationCenter defaultCenter] postNotification:
@@ -266,7 +264,7 @@
                                             id result,
                                             NSError *error) {
                           if (error) {
-                            @throw @"Error loading facebook friends";
+                            [InterfaceUtils error:@"Error loading facebook friends"];
                           } else {
                             [self handleFriendsResult:result[@"data"]];
                           }

@@ -76,7 +76,6 @@
 		7C2F3CA618E48446005E64E1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA518E48446005E64E1 /* libz.dylib */; };
 		7C2F3CA818E4844E005E64E1 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */; };
 		7C2F3CAA18E4845D005E64E1 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA918E4845D005E64E1 /* StoreKit.framework */; };
-		7C312D1518E7969600D651A0 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C312D1418E7969600D651A0 /* Parse.framework */; };
 		7C312D1918E7E58C00D651A0 /* ProfilePrompt.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */; };
 		7C312D1D18E7EDAB00D651A0 /* ProfilePromptViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */; };
 		7C3F723518E3658E00898E5A /* GameListSection.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C3F723418E3658E00898E5A /* GameListSection.java */; };
@@ -93,10 +92,11 @@
 		7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1218C1BD4D008D2C9D /* Games.java */; };
 		7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1F18C24DC9008D2C9D /* GameStatus.java */; };
 		7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C65892B18EDF23D00359B7C /* PushNotificationListener.java */; };
-		7C65892E18EF7E9B00359B7C /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C65892D18EF7E9B00359B7C /* FirebaseSimpleLogin.framework */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
 		7C725BAF1910B16A009543F8 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C725BAE1910B16A009543F8 /* SettingsViewController.m */; };
+		7C725BB31910CC6E009543F8 /* FirebaseSimpleLogin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C725BB21910CC6E009543F8 /* FirebaseSimpleLogin.framework */; };
+		7C725BB71910CE07009543F8 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C725BB61910CE07009543F8 /* Parse.framework */; };
 		7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3318D02B380086CFC5 /* Entity.java */; };
 		7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */; };
 		7C89B79618CC38FB00878DC1 /* GameCanvas.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C89B79518CC38FB00878DC1 /* GameCanvas.m */; };
@@ -244,7 +244,6 @@
 		7C2F3CA518E48446005E64E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		7C2F3CA918E4845D005E64E1 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		7C312D1418E7969600D651A0 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		7C312D1818E7E58C00D651A0 /* ProfilePrompt.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfilePrompt.xib; sourceTree = "<group>"; };
 		7C312D1A18E7EDAB00D651A0 /* ProfilePromptViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfilePromptViewController.h; sourceTree = "<group>"; };
 		7C312D1B18E7EDAB00D651A0 /* ProfilePromptViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfilePromptViewController.m; sourceTree = "<group>"; };
@@ -262,12 +261,13 @@
 		7C58BE1218C1BD4D008D2C9D /* Games.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Games.java; sourceTree = "<group>"; };
 		7C58BE1F18C24DC9008D2C9D /* GameStatus.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameStatus.java; sourceTree = "<group>"; };
 		7C65892B18EDF23D00359B7C /* PushNotificationListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PushNotificationListener.java; sourceTree = "<group>"; };
-		7C65892D18EF7E9B00359B7C /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
 		7C725BAD1910B16A009543F8 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		7C725BAE1910B16A009543F8 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
+		7C725BB21910CC6E009543F8 /* FirebaseSimpleLogin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FirebaseSimpleLogin.framework; sourceTree = "<group>"; };
+		7C725BB61910CE07009543F8 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		7C7C6A3318D02B380086CFC5 /* Entity.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Entity.java; sourceTree = "<group>"; };
 		7C7C6A3518D0B2CA0086CFC5 /* CommandUpdateListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = CommandUpdateListener.java; sourceTree = "<group>"; };
 		7C89B79418CC38FB00878DC1 /* GameCanvas.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCanvas.h; sourceTree = "<group>"; };
@@ -346,16 +346,16 @@
 				7C1F83C11868110B00D66C78 /* QuartzCore.framework in Frameworks */,
 				7C1F83BF1868110400D66C78 /* libxml2.dylib in Frameworks */,
 				7C1F83BD186810FC00D66C78 /* CoreImage.framework in Frameworks */,
-				7C65892E18EF7E9B00359B7C /* FirebaseSimpleLogin.framework in Frameworks */,
 				7C1F83BB186810F700D66C78 /* CoreText.framework in Frameworks */,
 				7C2E64911864217C00D34AD0 /* SystemConfiguration.framework in Frameworks */,
 				7C2E648F1864216F00D34AD0 /* Security.framework in Frameworks */,
 				7C2E648D1864216900D34AD0 /* CFNetwork.framework in Frameworks */,
-				7C312D1518E7969600D651A0 /* Parse.framework in Frameworks */,
 				7C2E648B1864216200D34AD0 /* libc++.dylib in Frameworks */,
 				7C2E64891864215B00D34AD0 /* libicucore.dylib in Frameworks */,
 				7C2E640218641F3500D34AD0 /* Foundation.framework in Frameworks */,
+				7C725BB31910CC6E009543F8 /* FirebaseSimpleLogin.framework in Frameworks */,
 				7C2E64861864212F00D34AD0 /* Firebase.framework in Frameworks */,
+				7C725BB71910CE07009543F8 /* Parse.framework in Frameworks */,
 				5894A9E37EA045BA8A4B2CB4 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -503,8 +503,8 @@
 		7C2E640018641F3500D34AD0 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				7C65892D18EF7E9B00359B7C /* FirebaseSimpleLogin.framework */,
-				7C312D1418E7969600D651A0 /* Parse.framework */,
+				7C725BB61910CE07009543F8 /* Parse.framework */,
+				7C725BB21910CC6E009543F8 /* FirebaseSimpleLogin.framework */,
 				7C2F3CA918E4845D005E64E1 /* StoreKit.framework */,
 				7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */,
 				7C2F3CA518E48446005E64E1 /* libz.dylib */,

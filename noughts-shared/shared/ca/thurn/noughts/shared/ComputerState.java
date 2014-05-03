@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 
 import ca.thurn.noughts.shared.entities.Action;
@@ -30,14 +29,14 @@ public class ComputerState implements State {
       WINNING_O_LINES[i] = WINNING_X_LINES[i] << 12;
     }
   }
-  
+
   static class GameInitializer implements Copyable {
     private final Game game;
-    
+
     GameInitializer(Game game) {
       this.game = game;
     }
-    
+
     public Game getGame() {
       return game;
     }
@@ -47,7 +46,7 @@ public class ComputerState implements State {
       return new GameInitializer(game);
     }
   }
-  
+
   // Bit structure:
   // 0000A AAAA AAAA 000B BBBB BBBB
   // 00000 1234 5678 0000 1234 5678
@@ -55,25 +54,25 @@ public class ComputerState implements State {
   // B is set if there is an X in board positions 0 through 8
   // 0  1  2
   // 3  4  5
-  // 6  7  8  
+  // 6  7  8
   private int board;
   // X is always PLAYER_ONE, O is always PLAYER_TWO.
   private int currentPlayer;
   private List<Long> actions;
-  private Random random = new Random();
-  
+  private final Random random = new Random();
+
   /**
    * Null-initializing constructor.
    */
   public ComputerState() {
   }
-  
+
   private ComputerState(int board, int currentPlayer, List<Long> actions) {
     this.board = board;
     this.currentPlayer = currentPlayer;
     this.actions = actions;
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -142,7 +141,7 @@ public class ComputerState implements State {
       ComputerState copy = (ComputerState)state.copy();
       this.board = copy.board;
       this.currentPlayer = copy.currentPlayer;
-      this.actions = copy.actions;        
+      this.actions = copy.actions;
     } else if (state instanceof GameInitializer) {
       Game game = ((GameInitializer)state).getGame();
       setToStartingConditions();
@@ -160,7 +159,7 @@ public class ComputerState implements State {
   int convertPlayerNumber(int playerNumber) {
     return playerNumber == Model.X_PLAYER ? Player.PLAYER_ONE : Player.PLAYER_TWO;
   }
-  
+
   private Map<Command, Long> commandToLongMap() {
     Map<Command, Long> commandToLong = new HashMap<Command, Long>();
     commandToLong.put(newCommand(0, 0), 0x0100L);
@@ -174,7 +173,7 @@ public class ComputerState implements State {
     commandToLong.put(newCommand(2, 2), 0x0001L);
     return commandToLong;
   }
-  
+
   private Command newCommand(int column, int row) {
     return Command
         .newBuilder()
@@ -182,15 +181,16 @@ public class ComputerState implements State {
         .setRow(row)
         .build();
   }
-  
+
   private Map<Long, Command> longToCommandMap() {
     Map<Long, Command> result = new HashMap<Long, Command>();
-    for (Entry<Command, Long> entry : commandToLongMap().entrySet()) {
-      result.put(entry.getValue(), entry.getKey());
+    Map<Command, Long> map = commandToLongMap();
+    for (Command command : map.keySet()) {
+      result.put(map.get(command), command);
     }
     return result;
   }
-  
+
   private long commandToLong(int player, Command command) {
     long result = commandToLongMap().get(command);
     if (player == Player.PLAYER_TWO) {
@@ -198,12 +198,12 @@ public class ComputerState implements State {
     }
     return result;
   }
-  
+
   Command longToCommand(long action) {
     if (longToCommandMap().containsKey(action)) {
       return longToCommandMap().get(action);
     } else {
-     return longToCommandMap().get(action >> 12); 
+     return longToCommandMap().get(action >> 12);
     }
   }
 
@@ -260,7 +260,7 @@ public class ComputerState implements State {
   public int playerBefore(int player) {
     return playerAfter(player);
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -277,7 +277,7 @@ public class ComputerState implements State {
     }
     return "[" + result + "]";
   }
-  
+
   /**
    * @return All actions currently possible in the game.
    */
@@ -291,10 +291,11 @@ public class ComputerState implements State {
       }
       action <<= 1;
       other <<= 1;
-    }    
+    }
     return result;
   }
-  
+
+  @Override
   public String toString() {
     int xIterator = 0x100;
     int oIterator = 0x100000;

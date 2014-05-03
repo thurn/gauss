@@ -1,6 +1,7 @@
 #import "ImageStringUtils.h"
 #import "ImageType.h"
 #import <SDWebImage/UIImageView+WebCache.h>
+#import "InterfaceUtils.h"
 
 @implementation ImageStringUtils
 + (void)setLargeImage:(UIImageView*)imageView imageString:(NTSImageString*)imageString {
@@ -26,7 +27,7 @@
                 placeholderImage:[UIImage imageNamed:@"profile_placeholder_medium"]];
     }
   } else {
-    @throw @"Can't render image list";
+    [InterfaceUtils error:@"Can't render image list"];
   }
 }
 

@@ -8,6 +8,7 @@
 #import "Identifiers.h"
 #import "Games.h"
 #import "PushNotificationHandler.h"
+#import "InterfaceUtils.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -179,7 +180,8 @@
       return @"Difficult Computer";
     }
     default: {
-      @throw @"Unknown difficulty level";
+      [InterfaceUtils error:@"Unknown difficulty level"];
+      return @"";
     }
   }
 }

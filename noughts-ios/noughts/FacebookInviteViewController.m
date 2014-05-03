@@ -11,6 +11,7 @@
 #import <FacebookSDK/FacebookSDK.h>
 #import "PushNotificationHandler.h"
 #import "MBProgressHUD.h"
+#import "InterfaceUtils.h"
 
 @interface FacebookInviteViewController () <UISearchBarDelegate, UISearchDisplayDelegate>
 @property(strong,nonatomic) NSArray *friends;
@@ -63,7 +64,7 @@
    parameters:@{@"to": [uid stringValue]}
    handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
      if (error) {
-       @throw @"Error sending facebook request!";
+       [InterfaceUtils error:@"Error sending facebook request!"];
      }
      else if (result != FBWebDialogResultDialogNotCompleted) {
        NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];

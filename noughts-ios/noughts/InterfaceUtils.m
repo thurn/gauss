@@ -6,4 +6,18 @@
   @"Main_iPad" : @"Main_iPhone";
   return [UIStoryboard storyboardWithName:storyboardName bundle: nil];
 }
+
++ (void)error:(NSString*)message {
+#ifdef DEBUG
+  @throw message;
+#else
+  UIAlertView *alert = [[UIAlertView alloc]
+                        initWithTitle:@"Error"
+                        message:message
+                        delegate:self
+                        cancelButtonTitle:@"Ok"
+                        otherButtonTitles:nil];
+  [alert show];
+#endif
+}
 @end

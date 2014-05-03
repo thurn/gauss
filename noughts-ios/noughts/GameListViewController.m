@@ -35,7 +35,7 @@
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
   self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
-  _pushHandler = [PushNotificationHandler new];  
+  _pushHandler = [PushNotificationHandler new];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -52,13 +52,11 @@
 
 -(void)onGameAddedWithNTSGame:(NTSGame*)game {
   if (self.isViewLoaded && self.view.window) {
-    NSString *viewerId = [_model getUserId];
-    if ([_gameListPartitions isGameInCorrectSectionWithNTSGame:game withNSString:viewerId]) {
+    if ([_gameListPartitions isGameInCorrectSectionWithNTSGame:game]) {
       _gameListPartitions = [_model getGameListPartitions];
     } else {
       [self.tableView beginUpdates];
-      int section = [[NTSGameListPartitions getSectionWithNTSGame:game
-                                                    withNSString:viewerId] ordinal];
+      int section = [[_gameListPartitions getSectionWithNTSGame:game] ordinal];
       NSIndexPath *path = [NSIndexPath indexPathForItem:0 inSection:section];
       [self.tableView insertRowsAtIndexPaths:@[path]
                             withRowAnimation:UITableViewRowAnimationFade];
@@ -70,8 +68,7 @@
 
 - (void)onGameChangedWithNTSGame:(NTSGame *)game {
   NTSIndexPath *indexPath = [_gameListPartitions getGameIndexPathWithNSString:[game getId]];
-  int newSection = [[NTSGameListPartitions getSectionWithNTSGame:game
-                                                    withNSString:[_model getUserId]] ordinal];
+  int newSection = [[_gameListPartitions getSectionWithNTSGame:game] ordinal];
   if ([indexPath getSection] != newSection && [indexPath getSection] != -1) {
     [self.tableView beginUpdates];
     [self.tableView moveRowAtIndexPath:[NSIndexPath indexPathForItem:[indexPath getRow]
@@ -93,8 +90,6 @@
   _gameListPartitions = [_model getGameListPartitions];
   [self.tableView endUpdates];
 }
-
-#pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   return 3;
