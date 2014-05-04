@@ -217,25 +217,6 @@ public class Game extends Entity<Game> {
       return this;
     }
 
-    public boolean hasRequestId() {
-      return game.hasRequestId();
-    }
-
-    public String getRequestId() {
-      return game.getRequestId();
-    }
-
-    public Builder setRequestId(String requestId) {
-      checkNotNull(requestId);
-      game.requestId = requestId;
-      return this;
-    }
-
-    public Builder clearRequestId() {
-      game.requestId = null;
-      return this;
-    }
-
     public int getVictorCount() {
       return game.getVictorCount();
     }
@@ -304,39 +285,6 @@ public class Game extends Entity<Game> {
       game.localMultiplayer = null;
       return this;
     }
-
-    public int getResignedPlayerCount() {
-      return game.getResignedPlayerCount();
-    }
-
-    public int getResignedPlayer(int index) {
-      return game.getResignedPlayer(index);
-    }
-
-    public List<Integer> getResignedPlayerList() {
-      return game.resignedPlayerList;
-    }
-
-    public Builder setResignedPlayer(int index, int resignedPlayer) {
-      game.resignedPlayerList.set(index, resignedPlayer);
-      return this;
-    }
-
-    public Builder addResignedPlayer(int resignedPlayer) {
-      game.resignedPlayerList.add(resignedPlayer);
-      return this;
-    }
-
-    public Builder addAllResignedPlayer(List<Integer> resignedPlayer) {
-      checkListForNull(resignedPlayer);
-      game.resignedPlayerList.addAll(resignedPlayer);
-      return this;
-    }
-
-    public Builder clearResignedPlayerList() {
-      game.resignedPlayerList.clear();
-      return this;
-    }
   }
 
   public static Builder newBuilder() {
@@ -358,15 +306,12 @@ public class Game extends Entity<Game> {
 
   /**
    * An array of the players in the game, which can be though of as a bimap
-   * from Player Number to Player ID. A player who leaves the game will have
-   * their entry in this array replaced with null.
+   * from Player Number to Player ID.
    */
   private final List<String> playerList;
 
   /**
-   * List of player profiles in the same order as the player list, these
-   * profiles takes precedence over the ID-based profiles above. Null
-   * indicates a missing profile.
+   * List of player profiles in the same order as the player list.
    */
   private final List<Profile> profileList;
 
@@ -377,8 +322,7 @@ public class Game extends Entity<Game> {
   private Integer currentPlayerNumber;
 
   /**
-   * Actions taken in this game, in the order in which they were taken.
-   * Potentially includes an unsubmitted action of the current player.
+   * Actions taken in this game, in the order in which they were submitted.
    */
   private final List<Action> submittedActionList;
 
@@ -386,11 +330,6 @@ public class Game extends Entity<Game> {
    * UNIX timestamp of time when game was last modified.
    */
   private Long lastModified;
-
-  /**
-   * Facebook request ID associated with this game.
-   */
-  private String requestId;
 
   /**
    * List of player numbers of the players who won this game. In the case of a
@@ -410,17 +349,11 @@ public class Game extends Entity<Game> {
    */
   private Boolean localMultiplayer;
 
-  /**
-   * An array of player numbers who have resigned the game.
-   */
-  private final List<Integer> resignedPlayerList;
-
   public Game() {
     playerList = new ArrayList<String>();
     profileList = new ArrayList<Profile>();
     submittedActionList = new ArrayList<Action>();
     victorList = new ArrayList<Integer>();
-    resignedPlayerList = new ArrayList<Integer>();
   }
 
   public Game(Game game) {
@@ -430,11 +363,9 @@ public class Game extends Entity<Game> {
     this.currentPlayerNumber = game.currentPlayerNumber;
     this.submittedActionList = new ArrayList<Action>(game.submittedActionList);
     this.lastModified = game.lastModified;
-    this.requestId = game.requestId;
     this.victorList = new ArrayList<Integer>(game.victorList);
     this.gameOver = game.gameOver;
     this.localMultiplayer = game.localMultiplayer;
-    this.resignedPlayerList = new ArrayList<Integer>(game.resignedPlayerList);
   }
 
   private Game(Map<String, Object> gameMap) {
@@ -445,11 +376,9 @@ public class Game extends Entity<Game> {
     currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
     submittedActionList = getEntities(gameMap, "submittedActionList", Action.newDeserializer());
     lastModified = getLong(gameMap, "lastModified");
-    requestId = getString(gameMap, "requestId");
     victorList = getIntegerList(getList(gameMap, "victorList"));
     gameOver = getBoolean(gameMap, "gameOver");
     localMultiplayer = getBoolean(gameMap, "localMultiplayer");
-    resignedPlayerList = getIntegerList(getList(gameMap, "resignedPlayerList"));
   }
 
   @Override
@@ -466,11 +395,9 @@ public class Game extends Entity<Game> {
     putSerialized(result, "currentPlayerNumber", currentPlayerNumber);
     putSerialized(result, "submittedActionList", submittedActionList);
     putSerialized(result, "lastModified", lastModified);
-    putSerialized(result, "requestId", requestId);
     putSerialized(result, "victorList", victorList);
     putSerialized(result, "gameOver", gameOver);
     putSerialized(result, "localMultiplayer", localMultiplayer);
-    putSerialized(result, "resignedPlayerList", resignedPlayerList);
     return result;
   }
 
@@ -542,15 +469,6 @@ public class Game extends Entity<Game> {
     return lastModified;
   }
 
-  public boolean hasRequestId() {
-    return requestId != null;
-  }
-
-  public String getRequestId() {
-    checkNotNull(requestId);
-    return requestId;
-  }
-
   public int getVictorCount() {
     return victorList.size();
   }
@@ -579,17 +497,5 @@ public class Game extends Entity<Game> {
   public boolean isLocalMultiplayer() {
     checkNotNull(localMultiplayer);
     return localMultiplayer;
-  }
-
-  public int getResignedPlayerCount() {
-    return resignedPlayerList.size();
-  }
-
-  public int getResignedPlayer(int index) {
-    return resignedPlayerList.get(index);
-  }
-
-  public List<Integer> getResignedPlayerList() {
-    return Collections.unmodifiableList(resignedPlayerList);
   }
 }

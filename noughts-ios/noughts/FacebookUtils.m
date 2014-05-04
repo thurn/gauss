@@ -5,17 +5,42 @@
 #import "Identifiers.h"
 #import <FirebaseSimpleLogin/FirebaseSimpleLogin.h>
 #import "AppDelegate.h"
+#import "MBProgressHUD.h"
+#import "Model.h"
+#import "OnUpgradeCompleted.h"
+#import "InterfaceUtils.h"
+
+@interface UpgradeCallback : NSObject <NTSOnUpgradeCompleted>
+@property (nonatomic, copy) void (^completionBlock)();
+- (void)onUpgradeCompleted;
+@end
+
+@implementation UpgradeCallback
+- (void)onUpgradeCompleted {
+  if (_completionBlock) {
+    _completionBlock();
+  }
+}
+@end
 
 @implementation FacebookUtils
 
-+ (void)logInToFacebook:(void(^)())callback {
++ (void)logInToFacebook:(UIView*)view withCallback:(void(^)())callback {
   FirebaseSimpleLogin *firebaseLogin = [AppDelegate getFirebaseSimpleLogin];
+  [MBProgressHUD showHUDAddedTo:view animated:YES];
+  UpgradeCallback *onUpgrade = [UpgradeCallback new];
+  onUpgrade.completionBlock = ^{
+    [MBProgressHUD hideHUDForView:view animated:YES];
+    if (callback) {
+      callback();
+    }
+  };
   [firebaseLogin loginToFacebookAppWithId:@"419772734774541"
                                permissions:@[@"basic_info"]
                                   audience:ACFacebookAudienceOnlyMe
                        withCompletionBlock:^(NSError *error, FAUser *user) {
                          if (error) {
-                           @throw @"Error logging in to Facebook!";
+                           [InterfaceUtils error:@"Error logging in to Facebook!"];
                          } else {
                            NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
                            [userDefaults setObject:user.userId forKey:kFacebookIdKey];
@@ -23,10 +48,9 @@
                            [[NSNotificationCenter defaultCenter] postNotification:
                             [NSNotification notificationWithName:kFacebookLoginNotification
                                                           object:user.userId]];
-                           // handle account upgrade
-                           if (callback) {
-                             callback();
-                           }
+                           NTSModel *model = [AppDelegate getModel];
+                           [model upgradeAccountToFacebookWithNSString:user.userId
+                                             withNTSOnUpgradeCompleted:onUpgrade];
                          }
                        }];
 }

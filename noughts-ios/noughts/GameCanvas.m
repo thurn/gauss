@@ -14,7 +14,6 @@
 @property(strong,nonatomic) SVGKImage *oSvg;
 @property(nonatomic) CGPoint originalViewCenter;
 @property(strong,nonatomic) NSMutableDictionary* views;
-@property(strong,nonatomic) NSArray *viewerPlayerNumbers;
 @property(nonatomic) SystemSoundID addCommandSound;
 @property(nonatomic) SystemSoundID removeCommandSound;
 @property(nonatomic) SystemSoundID submitCommandSound;
@@ -63,8 +62,6 @@
 - (void)onRegisteredWithNSString:(NSString *)viewerId
                      withNTSGame:(NTSGame *)game
                    withNTSAction:(NTSAction *)currentAction {
-  id<JavaUtilList> playerNumbers = [NTSGames playerNumbersForPlayerIdWithNTSGame:game
-                                                                    withNSString:viewerId];
   float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
   int backgroundWidth = 320 * scale;
   int backgroundHeight = 480 * scale;
@@ -72,8 +69,6 @@
   _topOffset = 80 * scale;
   _sideMargin = (self.frame.size.width - backgroundWidth) / 2;
   _topMargin = (self.frame.size.height - backgroundHeight) / 2;
-
-  _viewerPlayerNumbers = [JavaUtils javaUtilListToNsArray:playerNumbers];
 
   [[self subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
   UIView *backgroundView = [self drawSvg:_backgroundSvg
@@ -88,8 +83,7 @@
   }
 
   if (currentAction) {
-    BOOL draggable = [self belongsToViewer:currentAction];
-    [self drawAction:currentAction animate:YES draggable:draggable];
+    [self drawAction:currentAction animate:YES draggable:YES];
   }
 }
 
@@ -107,15 +101,8 @@
   return MIN(self.frame.size.width, self.frame.size.height);
 }
 
-- (BOOL)belongsToViewer:(NTSAction*) action {
-  if (![action hasPlayerNumber]) return false;
-  int playerNumber = [action getPlayerNumber];
-  return [_viewerPlayerNumbers containsObject:[[NSNumber alloc] initWithInt:playerNumber]];
-}
-
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  BOOL draggable = [self belongsToViewer:action];
-  [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:draggable];
+  [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:YES];
   [self playSoundIfEnabled:_addCommandSound];
 }
 

@@ -44,6 +44,7 @@
 		7C1F83C61868115E00D66C78 /* o.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83C31868115E00D66C78 /* o.svg */; };
 		7C1F83C71868115E00D66C78 /* x.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83C41868115E00D66C78 /* x.svg */; };
 		7C1F83CB1868167F00D66C78 /* background.svg in Resources */ = {isa = PBXBuildFile; fileRef = 7C1F83CA1868167F00D66C78 /* background.svg */; };
+		7C2266811915B6C800C323A3 /* OnUpgradeCompleted.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2266801915B6C800C323A3 /* OnUpgradeCompleted.java */; };
 		7C27F70218BFC59C00ADA495 /* GameUpdateListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C27F6FB18BFC59C00ADA495 /* GameUpdateListener.java */; };
 		7C27F70518BFC59C00ADA495 /* Pronouns.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C27F6FE18BFC59C00ADA495 /* Pronouns.java */; };
 		7C27F70818C67A0300ADA495 /* UIView+AutoLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C27F70718C67A0300ADA495 /* UIView+AutoLayout.m */; };
@@ -205,6 +206,7 @@
 		7C1F83C31868115E00D66C78 /* o.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = o.svg; sourceTree = "<group>"; };
 		7C1F83C41868115E00D66C78 /* x.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = x.svg; sourceTree = "<group>"; };
 		7C1F83CA1868167F00D66C78 /* background.svg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = background.svg; sourceTree = "<group>"; };
+		7C2266801915B6C800C323A3 /* OnUpgradeCompleted.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = OnUpgradeCompleted.java; sourceTree = "<group>"; };
 		7C27F6FB18BFC59C00ADA495 /* GameUpdateListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameUpdateListener.java; sourceTree = "<group>"; };
 		7C27F6FE18BFC59C00ADA495 /* Pronouns.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Pronouns.java; sourceTree = "<group>"; };
 		7C27F70618C679C600ADA495 /* UIView+AutoLayout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIView+AutoLayout.h"; sourceTree = "<group>"; };
@@ -686,6 +688,7 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7C2266801915B6C800C323A3 /* OnUpgradeCompleted.java */,
 				7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */,
 				7CD64E3B18FD8F3200252818 /* IndexPath.java */,
 				7C65892B18EDF23D00359B7C /* PushNotificationListener.java */,
@@ -945,6 +948,7 @@
 				7CEB472318AF42DC00CDA9EA /* NewLocalGameViewController.m in Sources */,
 				7C27F71318C8FF2D00ADA495 /* GameListEntryCell.m in Sources */,
 				7C01FB4A190710210049CD35 /* Nullable.java in Sources */,
+				7C2266811915B6C800C323A3 /* OnUpgradeCompleted.java in Sources */,
 				7C01FB4619070FD10049CD35 /* Supplier.java in Sources */,
 				7CCD446718DC02D00023F1CA /* FacebookInviteViewController.m in Sources */,
 				7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */,

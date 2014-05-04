@@ -34,7 +34,7 @@
                          instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
      animated:YES];
   } else {
-    [FacebookUtils logInToFacebook:^{
+    [FacebookUtils logInToFacebook:self.view withCallback:^{
       [self.navigationController
        pushViewController:[[InterfaceUtils mainStoryboard]
                            instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]

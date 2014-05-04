@@ -105,7 +105,7 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 }
 
 - (IBAction)onSignInClicked:(id)sender {
-  [FacebookUtils logInToFacebook:nil];
+  [FacebookUtils logInToFacebook:self.view withCallback:nil];
   [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
                                                     withBlock:
    ^(NTSProfile *profile) {

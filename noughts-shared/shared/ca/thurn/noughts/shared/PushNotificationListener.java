@@ -1,22 +1,21 @@
 package ca.thurn.noughts.shared;
 
-import java.util.List;
 
 public interface PushNotificationListener {
   /**
    * Called when the viewer joins a new game.
    *
-   * @param channelIds IDs of the channels to add.
+   * @param channelId ID of the channel to add.
    */
-  public void onJoinedGame(List<String> channelIds);
-  
+  public void onJoinedGame(String channelId);
+
   /**
    * Called when the viewer leaves a game.
    *
-   * @param channelIds IDs of the channels to remove.
+   * @param channelId ID of the channel to remove.
    */
-  public void onLeftGame(List<String> channelIds);
-  
+  public void onLeftGame(String channelId);
+
   /**
    * Called when a push notification needs to be sent.
    *

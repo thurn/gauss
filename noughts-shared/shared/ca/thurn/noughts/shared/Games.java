@@ -125,20 +125,15 @@ public class Games {
   }
 
   /**
-   * Constructs a list of Parse notification channel IDs for the viewer for
-   * this game.
+   * Gets the Parse channel ID for this viewer. Cannot be called on a local
+   * multiplayer game.
    *
    * @param game game to construct channel ID for.
    * @param viewerId Viewer to construct the channel for.
-   * @return Channel IDs to use with Parse, one per player number that the
-   *     viewer is acting as in this game.
+   * @return Channel ID to use with Parse for this player.
    */
-  public static List<String> channelIdsForViewer(Game game, String viewerId) {
-    List<String> ids = new ArrayList<String>();
-    for (Integer number : playerNumbersForPlayerId(game, viewerId)) {
-      ids.add(channelIdForPlayer(game.getId(), number));
-    }
-    return ids;
+  public static String channelIdForViewer(Game game, String viewerId) {
+    return channelIdForPlayer(game.getId(), playerNumberForPlayerId(game, viewerId));
   }
 
   /**
@@ -161,6 +156,9 @@ public class Games {
     if (game.isLocalMultiplayer()) {
       throw new IllegalStateException("Tried to get opponent player number in a local " +
           "multiplayer game.");
+    } else if (game.getPlayerCount() == 0) {
+      throw new IllegalStateException("Tried to get opponent player number in a game with no " +
+          "players");
     } else if (game.getPlayer(0).equals(viewerId)) {
       return 1;
     } else {
@@ -168,19 +166,18 @@ public class Games {
     }
   }
 
-  /**
-   * @param playerId A player ID
-   * @return All player numbers (if any) associated with this player ID
-   */
-  public static List<Integer> playerNumbersForPlayerId(Game game, String playerId) {
-    if (playerId == null) throw new IllegalArgumentException("Null playerId");
-    List<Integer> results = new ArrayList<Integer>();
-    for (int i = 0; i < game.getPlayerCount(); ++i) {
-      if (game.getPlayer(i).equals(playerId)) {
-        results.add(i);
-      }
+  public static int playerNumberForPlayerId(Game game, String playerId) {
+    if (game.isLocalMultiplayer()) {
+      throw new IllegalArgumentException("Can't call playerNumberForPlayerId on a local " +
+          "multiplayer game.");
     }
-    return results;
+    int index = game.getPlayerList().indexOf(playerId);
+    if (index == -1) {
+      throw new IllegalArgumentException("Player '" + playerId +
+          "' is not a player in this game.");
+    } else {
+      return index;
+    }
   }
 
   /**
@@ -201,12 +198,7 @@ public class Games {
    * @throws IllegalArgumentException If the viewer has multiple player numbers.
    */
   public static Profile viewerProfile(Game game, String viewerId) {
-    List<Integer> numbers = playerNumbersForPlayerId(game, viewerId);
-    if (numbers.size() != 1) {
-      throw new IllegalArgumentException("Can only invoke viewerProfile() when viewer has a " +
-          "single player number.");
-    }
-    return game.getProfile(numbers.get(0));
+    return game.getProfile(playerNumberForPlayerId(game, viewerId));
   }
 
   /**
@@ -290,11 +282,9 @@ public class Games {
       if (game.isLocalMultiplayer()) {
         statusString = "Game ended";
       } else {
-        List<Integer> playerNumbers = playerNumbersForPlayerId(game, viewerId);
         if (game.getVictorCount() == 2) {
           statusString = "Game tied";
-        } else if (playerNumbers.size() == 1 &&
-            game.getVictorList().contains(playerNumbers.get(0))) {
+        } else if (game.getVictorList().contains(playerNumberForPlayerId(game, viewerId))) {
           statusString = "You won";
         } else if (game.getVictorList().contains(opponentPlayerNumber(game, viewerId))) {
           if (opponentProfile(game, viewerId).hasPronoun()) {

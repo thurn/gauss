@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
@@ -19,6 +20,7 @@ import ca.thurn.noughts.shared.entities.Profile;
 import ca.thurn.noughts.shared.entities.Pronoun;
 import ca.thurn.uct.algorithm.MonteCarloSearch;
 
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -81,11 +83,12 @@ public class Model extends AbstractChildEventListener {
     }
   }
 
-  private final String userId;
-  private final String userKey;
+  private String userId;
+  private String userKey;
   private final Firebase firebase;
   private GameListListener gameListListener;
   private PushNotificationListener pushNotificationListener;
+  private ChildEventListener gameChildEventListener;
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
@@ -102,7 +105,7 @@ public class Model extends AbstractChildEventListener {
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
     currentActions = new HashMap<String, Action>();
     games = new HashMap<String, Game>();
-    userGamesReference().addChildEventListener(this);
+    gameChildEventListener = userGamesReference().addChildEventListener(this);
   }
 
   /**
@@ -309,13 +312,15 @@ public class Model extends AbstractChildEventListener {
     if (commandUpdateListeners.containsKey(gameId)) {
       CommandUpdateListener listener = commandUpdateListeners.get(gameId);
       if (oldGame == null) {
-        listener.onRegistered(userId, game, getCurrentAction(gameId));
+        if (currentActions.containsKey(gameId)) {
+          listener.onRegistered(userId, game, getCurrentAction(gameId));
+        }
       } else {
         int count = game.getSubmittedActionCount();
         while (count > oldGame.getSubmittedActionCount()) {
           Action submitted = game.getSubmittedAction(count - 1);
-          boolean byViewer = Games.playerNumbersForPlayerId(game, userId).contains(
-              submitted.getPlayerNumber());
+          boolean byViewer = game.isLocalMultiplayer() ||
+              Games.playerNumberForPlayerId(game, userId) == submitted.getPlayerNumber();
           listener.onActionSubmitted(submitted, byViewer);
           count--;
         }
@@ -340,14 +345,8 @@ public class Model extends AbstractChildEventListener {
    *     profile yet.
    */
   private boolean profileRequired(Game game) {
-    if (game.isGameOver()) return false;
-    List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
-    for (int i : playerNumbers) {
-      if (!game.getProfile(i).hasImageString()) {
-        return true;
-      }
-    }
-    return false;
+    if (game.isGameOver() || game.isLocalMultiplayer()) return false;
+    return !game.getProfile(Games.playerNumberForPlayerId(game, userId)).hasImageString();
   }
 
   /**
@@ -438,8 +437,8 @@ public class Model extends AbstractChildEventListener {
     ref.setValue(game.serialize());
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
-    if (pushNotificationListener != null) {
-      pushNotificationListener.onJoinedGame(Games.channelIdsForViewer(game, userId));
+    if (pushNotificationListener != null && !game.isLocalMultiplayer()) {
+      pushNotificationListener.onJoinedGame(Games.channelIdForViewer(game, userId));
     }
     return game.getId();
   }
@@ -456,11 +455,10 @@ public class Model extends AbstractChildEventListener {
   public void setProfileForViewer(String gameId, final Profile profile,
       final OnMutationCompleted onComplete) {
     Game game = getGame(gameId);
-    final List<Integer> playerNumbers = Games.playerNumbersForPlayerId(game, userId);
-    if (playerNumbers.size() != 1) die("Viewer is not a single player");
+    final int playerNumber = Games.playerNumberForPlayerId(game, userId);
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        game.setProfile(playerNumbers.get(0), profile.toBuilder().setIsComputerPlayer(false));
+        game.setProfile(playerNumber, profile.toBuilder().setIsComputerPlayer(false));
       }
 
       @Override public void onComplete(Game game) {
@@ -698,9 +696,9 @@ public class Model extends AbstractChildEventListener {
     if (pushNotificationListener != null && !game.isLocalMultiplayer() && game.getPlayerCount() > 1) {
       String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
       if (game.isGameOver()) {
-        List<Integer> viewerPlayerNumbers = Games.playerNumbersForPlayerId(game, userId);
+        int viewerPlayerNumber = Games.playerNumberForPlayerId(game, userId);
         for (int i = 0; i < game.getPlayerCount(); ++i) {
-          if (!viewerPlayerNumbers.contains(i)) {
+          if (i != viewerPlayerNumber) {
             String message = "Game " + Games.vsString(game, opponentId) + ": Game over";
             pushNotificationListener.onPushRequired(
                 Games.channelIdForPlayer(game.getId(), i), game.getId(), message);
@@ -827,7 +825,6 @@ public class Model extends AbstractChildEventListener {
     final long timestamp = Clock.getInstance().currentTimeMillis();
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        game.addResignedPlayer(game.getCurrentPlayerNumber());
         game.setIsGameOver(true);
         if (game.isLocalMultiplayer() && game.getPlayerCount() == 2) {
           game.addVictor(game.getCurrentPlayerNumber() == 0 ? 1 : 0);
@@ -852,7 +849,7 @@ public class Model extends AbstractChildEventListener {
     userReferenceForGame(gameId).removeValue();
     Game game = games.remove(gameId);
     if (pushNotificationListener != null && game != null && !game.isLocalMultiplayer()) {
-      pushNotificationListener.onLeftGame(Games.channelIdsForViewer(getGame(gameId), userId));
+      pushNotificationListener.onLeftGame(Games.channelIdForViewer(getGame(gameId), userId));
     }
   }
 
@@ -901,7 +898,7 @@ public class Model extends AbstractChildEventListener {
         @Override
         public void onComplete(Game game) {
           if (pushNotificationListener != null && !game.isLocalMultiplayer()) {
-            pushNotificationListener.onJoinedGame(Games.channelIdsForViewer(game, userId));
+            pushNotificationListener.onJoinedGame(Games.channelIdForViewer(game, userId));
           }
         }
       };
@@ -941,8 +938,71 @@ public class Model extends AbstractChildEventListener {
    * guaranteed.
    *
    * @param facebookId The user's facebook ID.
+   * @param callback Callback to invoke once the user's current actions have
+   *     been moved.
    */
-  public void upgradeAccountToFacebook(String facebookId) {
+  public void upgradeAccountToFacebook(String facebookId, final OnUpgradeCompleted callback) {
+    final String oldId = userId;
+    final String oldKey = userKey;
+    final GameListListener listListener = gameListListener;
+    final ChildEventListener childListener = this;
+    gameListListener = null;
+    userId = facebookId;
+    userKey = facebookId;
+    final AtomicInteger callbacksExpected =
+        new AtomicInteger(games.size() + currentActions.size());
+
+    final OnUpgradeCompleted internalCallback = new OnUpgradeCompleted() {
+      @Override
+      public void onUpgradeCompleted() {
+        firebase.child("users").child(oldKey).removeValue(new Firebase.CompletionListener() {
+          @Override
+          public void onComplete(FirebaseError error, Firebase reference) {
+            gameListListener = listListener;
+            firebase.child("users").child(oldKey).child("games")
+                .removeEventListener(gameChildEventListener);
+            gameChildEventListener = userGamesReference().addChildEventListener(childListener);
+            callback.onUpgradeCompleted();
+          }
+        });
+      }
+    };
+
+    if (callbacksExpected.get() == 0) {
+      internalCallback.onUpgradeCompleted();
+      return;
+    }
+
+    for (String gameId : games.keySet()) {
+      mutateGame(gameId, new GameMutation() {
+        @Override
+        public void mutate(Game.Builder gameBuilder) {
+          for (int i = 0; i < gameBuilder.getPlayerCount(); ++i) {
+            if (gameBuilder.getPlayer(i).equals(oldId)) {
+              gameBuilder.setPlayer(i, userId);
+            }
+          }
+        }
+        @Override
+        public void onComplete(Game game) {
+          if (callbacksExpected.decrementAndGet() == 0) {
+            internalCallback.onUpgradeCompleted();
+          }
+        }
+      }, false /* abortOnConflict */);
+    }
+
+    for (String gameId : currentActions.keySet()) {
+      actionReferenceForGame(gameId).setValue(currentActions.get(gameId).serialize(),
+          new Firebase.CompletionListener() {
+        @Override
+        public void onComplete(FirebaseError error, Firebase reference) {
+          if (callbacksExpected.decrementAndGet() == 0) {
+            internalCallback.onUpgradeCompleted();
+          }
+        }
+      });
+    }
   }
 
   /**
@@ -1078,7 +1138,7 @@ public class Model extends AbstractChildEventListener {
 
       @Override
       public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
-        if (snapshot.getValue() != null) {
+        if (snapshot != null && snapshot.getValue() != null) {
           mutation.onComplete(Game.newDeserializer().fromDataSnapshot(snapshot));
         }
       }

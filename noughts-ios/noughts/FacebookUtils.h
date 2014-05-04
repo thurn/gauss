@@ -5,5 +5,5 @@
 + (NTSProfile*)profileFromFacebookDictionary:(NSDictionary*)dictionary;
 + (BOOL)isFacebookUser;
 + (NSString*)getFacebookId;
-+ (void)logInToFacebook:(void(^)())callback;
++ (void)logInToFacebook:(UIView*)view withCallback:(void(^)())callback;
 @end

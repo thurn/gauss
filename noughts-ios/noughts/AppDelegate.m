@@ -197,19 +197,15 @@
   [root pushViewController:gameViewController animated:YES];
 }
 
-- (void)onJoinedGameWithJavaUtilList:(id<JavaUtilList>)channelIds {
+- (void)onJoinedGameWithNSString:(NSString *)channelId {
   PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-  for (NSString *channel in (id<NSFastEnumeration>)channelIds) {
-    [currentInstallation addUniqueObject:channel forKey:@"channels"];
-  }
+  [currentInstallation addUniqueObject:channelId forKey:@"channels"];
   [currentInstallation saveInBackground];
 }
 
-- (void)onLeftGameWithJavaUtilList:(id<JavaUtilList>)channelIds {
+- (void)onLeftGameWithNSString:(NSString *)channelId {
   PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-  for (NSString *channel in (id<NSFastEnumeration>)channelIds) {
-    [currentInstallation removeObject:channel forKey:@"channels"];
-  }
+  [currentInstallation removeObject:channelId forKey:@"channels"];
   [currentInstallation saveInBackground];
 }
 

@@ -679,7 +679,6 @@ public class ModelTest extends SharedTestCase {
 //    });
 //  }
 
-  @SuppressWarnings("unchecked")
   private Action action(int player, int column, int row, boolean submitted) {
     return Action.newBuilder()
         .setPlayerNumber(player)
@@ -720,22 +719,23 @@ public class ModelTest extends SharedTestCase {
             .setPronoun(Pronoun.FEMALE))
         .setLastModified(123);
   }
+//
+//  private Game.Builder newLocalMultiplayerGameWithTwoPlayers() {
+//    return Game.newBuilder()
+//        .setId("game" + randomInteger())
+//        .setCurrentPlayerNumber(0)
+//        .addAllPlayer(list(userId, userId))
+//        .setIsGameOver(false)
+//        .setIsLocalMultiplayer(true)
+//        .addProfile(Profile.newBuilder()
+//            .setName("User")
+//            .setPronoun(Pronoun.MALE))
+//        .addProfile(Profile.newBuilder()
+//            .setName("User 2")
+//            .setPronoun(Pronoun.FEMALE))
+//        .setLastModified(123);
+//  }
 
-  private Game.Builder newLocalMultiplayerGameWithTwoPlayers() {
-    return Game.newBuilder()
-        .setId("game" + randomInteger())
-        .setCurrentPlayerNumber(0)
-        .addAllPlayer(list(userId, userId))
-        .setIsGameOver(false)
-        .setIsLocalMultiplayer(true)
-        .addProfile(Profile.newBuilder()
-            .setName("User")
-            .setPronoun(Pronoun.MALE))
-        .addProfile(Profile.newBuilder()
-            .setName("User 2")
-            .setPronoun(Pronoun.FEMALE))
-        .setLastModified(123);
-  }
   private void assertDiesAndFinish(Runnable testFn) {
     try {
       testFn.run();
