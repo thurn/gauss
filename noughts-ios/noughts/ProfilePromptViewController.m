@@ -88,9 +88,7 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 - (IBAction)onDoneClicked:(id)sender {
   NTSModel *model = [AppDelegate getModel];
   NTSImageString_Builder *imageString = [NTSImageString newBuilder];
-  [NTSGames
-   setLocalImageStringsWithNTSImageString_Builder:imageString
-                                     withNSString:[_playerImages objectAtIndex:_playerImageIndex]];
+  [imageString setStringWithNSString:[_playerImages objectAtIndex:_playerImageIndex]];
   [imageString setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]];
   NTSProfile_Builder *profile = [NTSProfile newBuilder];
   [profile setNameWithNSString:_nameField.text];

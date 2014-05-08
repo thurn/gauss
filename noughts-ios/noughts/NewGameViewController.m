@@ -30,13 +30,13 @@
 - (IBAction)onInviteViaFacebook:(id)sender {
   if ([FacebookUtils isFacebookUser]) {
     [self.navigationController
-     pushViewController:[[InterfaceUtils mainStoryboard]
+     pushViewController:[self.storyboard
                          instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
      animated:YES];
   } else {
     [FacebookUtils logInToFacebook:self.view withCallback:^{
       [self.navigationController
-       pushViewController:[[InterfaceUtils mainStoryboard]
+       pushViewController:[self.storyboard
                            instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
        animated:YES];
     }];

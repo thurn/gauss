@@ -87,6 +87,14 @@
   }
 }
 
+- (BOOL)application:(UIApplication *)application shouldSaveApplicationState:(NSCoder *)coder {
+  return YES;
+}
+
+- (BOOL)application:(UIApplication *)application shouldRestoreApplicationState:(NSCoder *)coder {
+  return YES;
+}
+
 - (void)createAnonymousModel:(FCFirebase*)firebase {
   NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
 #if TARGET_IPHONE_SIMULATOR

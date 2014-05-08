@@ -94,7 +94,6 @@
 
 - (BOOL)searchDisplayController:(UISearchDisplayController *)controller
     shouldReloadTableForSearchString:(NSString *)searchString {
-  NSLog(@"searching for %@", searchString);
   NSPredicate *predicate =
       [NSPredicate predicateWithBlock:^BOOL(NSDictionary *friend, NSDictionary *bindings) {
         NSString *name = [friend[@"name"] lowercaseString];

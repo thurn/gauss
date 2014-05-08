@@ -9,6 +9,7 @@
 #import "Games.h"
 #import "PushNotificationHandler.h"
 #import "InterfaceUtils.h"
+#import "ImageStringUtils.h"
 
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
@@ -57,13 +58,16 @@
                                            selector:@selector(keyboardWillBeHidden:)
                                                name:UIKeyboardWillHideNotification
                                              object:nil];
-  UIImage *image1 = [UIImage imageNamed:[_playerImages objectAtIndex:_p1ImageIndex]];
+  UIImage *image1 = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p1ImageIndex]
+                                               size:100];
   [_p1Image setImage:image1 forState:UIControlStateNormal];
   UIImage *image2;
   if (_playVsComputerMode) {
-    image2 = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
+    image2 = [ImageStringUtils getLocalImage:[_computerImages objectAtIndex:_p2ImageIndex]
+                                        size:100];
   } else {
-    image2 = [UIImage imageNamed:[_playerImages objectAtIndex:_p2ImageIndex]];
+    image2 = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p2ImageIndex]
+                                        size:100];
   }
   [_p2Image setImage:image2 forState:UIControlStateNormal];
   
@@ -124,7 +128,8 @@
   if (_p1ImageIndex == _p2ImageIndex) {
     _p1ImageIndex = (_p1ImageIndex + 1) % [_playerImages count];
   }
-  UIImage *image = [UIImage imageNamed:[_playerImages objectAtIndex:_p1ImageIndex]];
+  UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p1ImageIndex]
+                                              size:100];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -133,7 +138,8 @@
   if (_p1ImageIndex == _p2ImageIndex) {
     _p2ImageIndex = (_p2ImageIndex + 1) % [_playerImages count];
   }
-  UIImage *image = [UIImage imageNamed:[_playerImages objectAtIndex:_p2ImageIndex]];
+  UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p2ImageIndex]
+                                              size:100];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -190,7 +196,8 @@
       didSelectRow:(NSInteger)row
        inComponent:(NSInteger)component {
   _p2ImageIndex = (int)row;
-  UIImage *image = [UIImage imageNamed:[_computerImages objectAtIndex:_p2ImageIndex]];
+  UIImage *image = [ImageStringUtils getLocalImage:[_computerImages objectAtIndex:_p2ImageIndex]
+                                              size:100];
   // Button is disabled for vs. computer
   [_p2Image setImage:image forState:UIControlStateDisabled];
 }
@@ -202,7 +209,8 @@
 
 - (NTSImageString*)localImageString:(NSString*)name {
   NTSImageString_Builder *result = [NTSImageString newBuilder];
-  [NTSGames setLocalImageStringsWithNTSImageString_Builder:result withNSString:name];
+  [result setStringWithNSString:name];
+  [result setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum LOCAL]];
   return [result build];
 }
 

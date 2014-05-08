@@ -37,60 +37,22 @@ public class ImageString extends Entity<ImageString> {
       return imageString;
     }
 
-    public boolean hasSmallString() {
-      return imageString.hasSmallString();
+    public boolean hasString() {
+      return imageString.hasString();
     }
 
-    public String getSmallString() {
-      return imageString.getSmallString();
+    public String getString() {
+      return imageString.getString();
     }
 
-    public Builder setSmallString(String smallString) {
-      checkNotNull(smallString);
-      imageString.smallString = smallString;
-      return this;
-    }
-
-    public Builder clearSmallString() {
-      imageString.smallString = null;
-      return this;
-    }
-
-    public boolean hasMediumString() {
-      return imageString.hasMediumString();
-    }
-
-    public String getMediumString() {
-      return imageString.getMediumString();
-    }
-
-    public Builder setMediumString(String string) {
+    public Builder setString(String string) {
       checkNotNull(string);
-      imageString.mediumString = string;
+      imageString.string = string;
       return this;
     }
 
-    public Builder clearMediumString() {
-      imageString.mediumString = null;
-      return this;
-    }
-
-    public boolean hasLargeString() {
-      return imageString.hasLargeString();
-    }
-
-    public String getLargeString() {
-      return imageString.getLargeString();
-    }
-
-    public Builder setLargeString(String string) {
-      checkNotNull(string);
-      imageString.largeString = string;
-      return this;
-    }
-
-    public Builder clearLargeString() {
-      imageString.largeString = null;
+    public Builder clearString() {
+      imageString.string = null;
       return this;
     }
 
@@ -126,14 +88,8 @@ public class ImageString extends Entity<ImageString> {
     return new Deserializer();
   }
 
-  // Small version of the image, 20x20
-  private String smallString;
-
-  // Medium version of the image, 40x40
-  private String mediumString;
-
-  // Large version of the image, 100x100
-  private String largeString;
+  // Identifies the image
+  private String string;
 
   // Type of image
   private ImageType type;
@@ -142,16 +98,12 @@ public class ImageString extends Entity<ImageString> {
   }
 
   private ImageString(ImageString imageString) {
-    this.smallString = imageString.smallString;
-    this.mediumString = imageString.mediumString;
-    this.largeString = imageString.largeString;
+    this.string = imageString.string;
     this.type = imageString.type;
   }
 
   private ImageString(Map<String, Object> map) {
-    this.smallString = getString(map, "smallString");
-    this.mediumString = getString(map, "mediumString");
-    this.largeString = getString(map, "largeString");
+    this.string = getString(map, "string");
     this.type = getEnum(map, "type", ImageType.class);
   }
 
@@ -163,9 +115,7 @@ public class ImageString extends Entity<ImageString> {
   @Override
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
-    putSerialized(result, "smallString", smallString);
-    putSerialized(result, "mediumString", mediumString);
-    putSerialized(result, "largeString", largeString);
+    putSerialized(result, "string", string);
     putSerialized(result, "type", type);
     return result;
   }
@@ -175,31 +125,13 @@ public class ImageString extends Entity<ImageString> {
     return new Builder(this);
   }
 
-  public boolean hasSmallString() {
-    return smallString != null;
+  public boolean hasString() {
+    return string != null;
   }
 
-  public String getSmallString() {
-    checkNotNull(smallString);
-    return smallString;
-  }
-
-  public boolean hasMediumString() {
-    return mediumString != null;
-  }
-
-  public String getMediumString() {
-    checkNotNull(mediumString);
-    return mediumString;
-  }
-
-  public boolean hasLargeString() {
-    return largeString != null;
-  }
-
-  public String getLargeString() {
-    checkNotNull(largeString);
-    return largeString;
+  public String getString() {
+    checkNotNull(string);
+    return string;
   }
 
   public boolean hasType() {

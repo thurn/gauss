@@ -12,13 +12,12 @@ import ca.thurn.noughts.shared.entities.ImageType;
 import ca.thurn.noughts.shared.entities.Profile;
 
 public class Games {
-  public static final ImageString GAME_OVER_IMAGE_STRING =
-      ImageString.newBuilder().setLargeString("game_over").setType(ImageType.LOCAL).build();
-  public static final ImageString NO_OPPONENT_IMAGE_STRING =
-      ImageString.newBuilder()
-      .setSmallString("no_opponent_small")
-      .setMediumString("no_opponent_medium")
-      .setLargeString("no_opponent")
+  public static final ImageString GAME_OVER_IMAGE_STRING = ImageString.newBuilder()
+      .setString("game_over")
+      .setType(ImageType.LOCAL)
+      .build();
+  public static final ImageString NO_OPPONENT_IMAGE_STRING = ImageString.newBuilder()
+      .setString("no_opponent")
       .setType(ImageType.LOCAL).build();
   private static final long ONE_SECOND = 1000;
   private static final long SECONDS = 60;
@@ -222,13 +221,6 @@ public class Games {
         return "vs. (No Opponent Yet)";
       }
     }
-  }
-
-  public static void setLocalImageStrings(ImageString.Builder builder, String baseString) {
-    builder.setLargeString(baseString)
-        .setMediumString(baseString + "_medium")
-        .setSmallString(baseString + "_small")
-        .setType(ImageType.LOCAL);
   }
 
   /**

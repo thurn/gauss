@@ -128,7 +128,7 @@
   cell.modifiedLabel.text = [listEntry getModifiedString];
   
   NSArray *imageList = [JavaUtils javaUtilListToNsArray:[listEntry getImageStringList]];
-  [ImageStringUtils setImageForList:cell.vsImage imageList:imageList withScale:_scale];
+  [ImageStringUtils setImageForList:cell.vsImage imageList:imageList];
   return cell;
 }
 

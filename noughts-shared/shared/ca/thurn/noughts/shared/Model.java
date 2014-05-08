@@ -450,7 +450,6 @@ public class Model extends AbstractChildEventListener {
    * @param game The game.
    * @param profile The profile.
    * @param onComplete Completion callback.
-   * @throws RuntimeException if the user already has a profile.
    */
   public void setProfileForViewer(String gameId, final Profile profile,
       final OnMutationCompleted onComplete) {
@@ -835,6 +834,12 @@ public class Model extends AbstractChildEventListener {
         game.clearCurrentPlayerNumber();
         game.setLastModified(timestamp);
       }
+
+      @Override public void onComplete(Game game) {
+        if (pushNotificationListener != null && game != null && !game.isLocalMultiplayer()) {
+          pushNotificationListener.onLeftGame(Games.channelIdForViewer(game, userId));
+        }
+      }
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, false /* abortOnConflict */);
@@ -848,9 +853,6 @@ public class Model extends AbstractChildEventListener {
   public void archiveGame(String gameId) {
     userReferenceForGame(gameId).removeValue();
     Game game = games.remove(gameId);
-    if (pushNotificationListener != null && game != null && !game.isLocalMultiplayer()) {
-      pushNotificationListener.onLeftGame(Games.channelIdForViewer(getGame(gameId), userId));
-    }
   }
 
   /**

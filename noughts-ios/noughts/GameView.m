@@ -29,6 +29,7 @@
 @property(strong, nonatomic) SMCalloutView *squareTapCallout;
 @property(strong, nonatomic) SMCalloutView *submitCallout;
 @property(strong, nonatomic) GameCanvas *gameCanvas;
+@property(nonatomic) float scale;
 @property double taskId;
 @end
 
@@ -38,6 +39,7 @@
   self = [super initWithFrame:frame];
   if (self) {
     self.backgroundColor = [UIColor whiteColor];
+    _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
     _gameCanvas = [GameCanvas new];
     _gameCanvas.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_gameCanvas];
@@ -124,14 +126,15 @@
     [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:5];
     [_gameMenuButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
     [_submitButton autoPinEdgeToSuperviewEdge:ALEdgeTop withInset:statusBarHeight];
-    [_gameStatusView autoSetDimension:ALDimensionHeight toSize:75];
+    [_gameStatusView autoSetDimension:ALDimensionHeight toSize:75*_scale];
     [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeLeading withInset:0];
     [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeTrailing withInset:0];
-    [_activityView autoSetDimension:ALDimensionWidth toSize:200];
-    [_activityView autoSetDimension:ALDimensionHeight toSize:50];
+    [_activityView autoSetDimension:ALDimensionWidth toSize:200*_scale];
+    [_activityView autoSetDimension:ALDimensionHeight toSize:50*_scale];
     [_activityView autoCenterInSuperview];
     
-    _gameStatusConstraint = [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeBottom withInset:-75];
+    _gameStatusConstraint = [_gameStatusView autoPinEdgeToSuperviewEdge:ALEdgeBottom
+                                                              withInset:-75*_scale];
     
     int submitInset = 5;
     int redoInset = 5 + _submitButton.bounds.size.width + submitInset;
@@ -160,7 +163,7 @@
 - (void)displayGameStatusWithImageString:(NTSImageString*)imageString
                        withString:(NSString*)string
                         withColor:(UIColor*)color {
-  [ImageStringUtils setLargeImage:_gameStatusImage imageString:imageString];
+  [ImageStringUtils setImage:_gameStatusImage imageString:imageString size:75];
   _gameStatusLabel.text = string;
   _gameStatusColorView.backgroundColor = color;
   [self layoutIfNeeded];
@@ -177,7 +180,7 @@
   dispatch_after(delay, dispatch_get_main_queue(), ^{
     if (taskId == _taskId) {
     [UIView animateWithDuration:0.3 animations:^{
-      _gameStatusConstraint.constant = 75;
+      _gameStatusConstraint.constant = 75*_scale;
       [self layoutIfNeeded];
     }];
     }
@@ -187,7 +190,7 @@
 - (void)handleGameStatusTap:(UITapGestureRecognizer *)recognizer {
   // Tap game status to dismiss.
   [UIView animateWithDuration:0.3 animations:^{
-    _gameStatusConstraint.constant = 75;
+    _gameStatusConstraint.constant = 75*_scale;
     [self layoutIfNeeded];
   }];
 }

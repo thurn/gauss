@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="twN-X8-1YP">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -315,7 +315,7 @@
         <!--GameVsComputer-->
         <scene sceneID="1jR-al-Llp">
             <objects>
-                <viewController id="SSR-Lv-DBn" userLabel="GameVsComputer" customClass="NewLocalGameViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="GameVsComputer" useStoryboardIdentifierAsRestorationIdentifier="YES" id="SSR-Lv-DBn" userLabel="GameVsComputer" customClass="NewLocalGameViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="mVd-zD-bHd"/>
                         <viewControllerLayoutGuide type="bottom" id="6hd-Cm-y0M"/>
@@ -498,7 +498,7 @@
         <!--EmailInviteViewController-->
         <scene sceneID="Tyt-02-gig">
             <objects>
-                <viewController id="wS2-Rw-cTG" userLabel="EmailInviteViewController" customClass="EmailInviteViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="EmailInviteViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="wS2-Rw-cTG" userLabel="EmailInviteViewController" customClass="EmailInviteViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hTC-ll-1Xt"/>
                         <viewControllerLayoutGuide type="bottom" id="B2D-Yi-Jus"/>
@@ -741,7 +741,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
         <!--Settings View Controller - Settings-->
         <scene sceneID="P4Q-tO-Gy1">
             <objects>
-                <tableViewController id="lHh-AD-RPG" customClass="SettingsViewController" sceneMemberID="viewController">
+                <tableViewController restorationIdentifier="SettingsViewController" storyboardIdentifier="SettingsViewController" id="lHh-AD-RPG" customClass="SettingsViewController" sceneMemberID="viewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="7NY-3z-p3S">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -837,7 +837,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
         <!--RootNavigationController-->
         <scene sceneID="RxD-8g-r7h">
             <objects>
-                <navigationController restorationIdentifier="RootNavigationController" storyboardIdentifier="RootNavigationController" definesPresentationContext="YES" id="twN-X8-1YP" userLabel="RootNavigationController" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="RootNavigationController" definesPresentationContext="YES" useStoryboardIdentifierAsRestorationIdentifier="YES" id="twN-X8-1YP" userLabel="RootNavigationController" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="TBD-ru-0sB">
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -865,6 +865,6 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
         <simulatedScreenMetrics key="destination" type="retina4"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="Neh-fe-xho"/>
+        <segue reference="kOt-q3-VgL"/>
     </inferredMetricsTieBreakers>
 </document>

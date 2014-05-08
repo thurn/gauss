@@ -53,6 +53,24 @@ public class ModelTest extends SharedTestCase {
     model.removeAllFirebaseListeners();
   }
 
+  public void testIsCurrentPlayer() {
+    Game g1 = newGameWithTwoPlayers().setIsGameOver(true).build();
+    assertFalse(model.isCurrentPlayer(g1));
+
+    Game g2 = newGameWithTwoPlayers().setPlayer(0, "foo").build();
+    assertFalse(model.isCurrentPlayer(g2));
+
+    Game g3 = newGameWithTwoPlayers().build();
+    assertTrue(model.isCurrentPlayer(g3));
+
+    Game g4 = newGameWithTwoPlayers().setCurrentPlayerNumber(1).build();
+    assertFalse(model.isCurrentPlayer(g4));
+  }
+
+  public void testGetPreliminaryGameId() {
+    assertNotNull(model.getPreliminaryGameId());
+  }
+
   public void testNewGame() {
     beginAsyncTestBlock();
     model.setGameListListener(new AbstractGameListListener() {
@@ -95,6 +113,36 @@ public class ModelTest extends SharedTestCase {
         assertEquals(0, game.getSubmittedActionCount());
         assertEquals("John", game.getProfile(0).getName());
         finished();
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSetProfileForViewer() {
+    beginAsyncTestBlock(2);
+    final Game game = newGameWithTwoPlayers().build();
+    Action action = newEmptyAction(game.getId());
+    final Profile profile = Profile.newBuilder()
+        .setName("name")
+        .setIsComputerPlayer(false)
+        .build();
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertEquals(profile, game.getProfile(0));
+            finished();
+          }
+        }, false /* immediate */);
+        model.setProfileForViewer(game.getId(), profile, new OnMutationCompleted() {
+          @Override
+          public void onMutationCompleted(Game game) {
+            assertEquals(profile, game.getProfile(0));
+            finished();
+          }
+        });
       }
     });
     endAsyncTestBlock();
@@ -151,14 +199,14 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
 
-  public void testCanUpdateLastCommand() {
+  public void testCouldUpdateLastCommand() {
     Game game = newGameWithTwoPlayers().build();
     Action action = newUnsubmittedActionWithCommand(game.getId()).build();
     Command command = Command.newBuilder().setRow(1).setColumn(1).build();
     assertTrue(model.couldUpdateLastCommand(game, action, command));
   }
 
-  public void testCannotUpdateLastCommand() {
+  public void testCouldNotUpdateLastCommand() {
     Game game = newGameWithTwoPlayers().build();
     Command command = Command.newBuilder().setRow(1).setColumn(1).build();
     assertFalse(model.couldUpdateLastCommand(game, newEmptyAction(game.getId()), command));
@@ -514,170 +562,225 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
 
-//  public void testResignNotPlayer() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.resignGame(newGame(map(
-//            "playerList", list("foo"),
-//            "currentPlayerNumber", 0
-//        )).build());
-//      }
-//    });
-//  }
-//
-//  public void testResignGameOver() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.resignGame(newGame(map(
-//            "playerList", list(userId, "foo"),
-//            "currentPlayerNumber", 0,
-//            "gameOver", true
-//        )).build());
-//      }
-//    });
-//  }
-//
-//  public void testResignLocalMultiplayer() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newLocalMultiplayerGameWithTwoPlayers();
-//    game.setCurrentPlayerNumber(1);
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertDeepEquals(list(new Integer(1)), game.getResignedPlayerList());
-//            assertTrue(game.isGameOver());
-//            assertFalse(game.hasCurrentAction());
-//            assertFalse(game.hasCurrentPlayerNumber());
-//            assertTrue(game.getVictorList().contains(0));
-//            assertTrue(game.getLastModified() > 150L);
-//            finished();
-//          }
-//        });
-//        model.resignGame(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testResignGame() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGameWithTwoPlayers();
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameUpdateListener(game.getId(), new OnGameUpdateListener() {
-//          @Override
-//          public void onGameUpdate(Game game) {
-//            assertDeepEquals(list(new Integer(0)), game.getResignedPlayerList());
-//            assertTrue(game.isGameOver());
-//            assertFalse(game.hasCurrentAction());
-//            assertFalse(game.hasCurrentPlayerNumber());
-//            assertTrue(game.getVictorList().contains(1));
-//            assertTrue(game.getLastModified() > 150L);
-//            finished();
-//          }
-//        });
-//        model.resignGame(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testArchiveNotPlayer() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.archiveGame(newGame(map(
-//            "playerList", list("foo"),
-//            "currentPlayerNumber", 0
-//        )).build());
-//      }
-//    });
-//  }
-//
-//  public void testArchiveGameNotOver() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.archiveGame(newGame(map(
-//            "playerList", list(userId, "foo"),
-//            "currentPlayerNumber", 0,
-//            "gameOver", false
-//        )).build());
-//      }
-//    });
-//  }
-//
-//  public void testArchiveListGame() {
-//    beginAsyncTestBlock();
-//    final Game.Builder game = newGame(map(
-//        "currentPlayerNumber", 0,
-//        "playerList", list(userId, "foobar"),
-//        "gameOver", true
-//        ));
-//    withTestData(game.build(), new Runnable() {
-//      @Override
-//      public void run() {
-//        model.setGameListListener(new AbstractGameListListener() {
-//          @Override
-//          public void onGameRemoved(Game newGame) {
-//            assertEquals(game.build(), newGame);
-//            finished();
-//          }
-//        });
-//        model.archiveGame(game.build());
-//      }
-//    });
-//    endAsyncTestBlock();
-//  }
-//
-//  public void testIsCurrentPlayer() {
-//    Map<String, Object> map = map("gameOver", true);
-//    Game g1 = newGame(map).build();
-//    assertFalse(model.isCurrentPlayer(g1));
-//
-//    Game g2 = newGame(map("currentPlayerNumber", 0, "playerList", list("fooId"))).build();
-//    assertFalse(model.isCurrentPlayer(g2));
-//
-//    Game g3 = newGame(map(
-//      "currentPlayerNumber", 1,
-//      "playerList", list("fooId", userId))).build();
-//    assertTrue(model.isCurrentPlayer(g3));
-//
-//    Game g4 = newGame(map(
-//      "currentPlayerNumber", 0,
-//      "playerList", list("fooId", userId))).build();
-//    assertFalse(model.isCurrentPlayer(g4));
-//  }
-//
-//  public void testEnsureIsCurrentPlayer() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.ensureIsCurrentPlayer(newGame(map(
-//          "playerList", list("foo", userId),
-//          "currentPlayerNumber", 0
-//        )).build());
-//      }
-//    });
-//  }
-//
-//  public void testEnsureIsPlayer() {
-//    assertDies(new Runnable() {
-//      @Override
-//      public void run() {
-//        model.ensureIsPlayer(newGame(map(
-//          "playerList", list("foo"),
-//          "currentPlayerNumber", 0
-//        )).build());
-//      }
-//    });
-//  }
+  public void testResignNotPlayer() {
+    beginAsyncTestBlock();
+    Game test = Game.newBuilder()
+        .setId("gameid")
+        .addPlayer("foo")
+        .setIsGameOver(false)
+        .setCurrentPlayerNumber(0)
+        .build();
+    withTestData(test, newEmptyAction("gameid"), new Runnable() {
+      @Override
+      public void run() {
+        assertDiesAndFinish(new Runnable() {
+          @Override
+          public void run() {
+            model.resignGame("gameid");
+          }
+        });
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testResignGameOver() {
+    beginAsyncTestBlock();
+    Game test = Game.newBuilder()
+        .setId("gameid")
+        .addPlayer(userId)
+        .setIsGameOver(true)
+        .setCurrentPlayerNumber(0)
+        .build();
+    withTestData(test, newEmptyAction("gameid"), new Runnable() {
+      @Override
+      public void run() {
+        assertDiesAndFinish(new Runnable() {
+          @Override
+          public void run() {
+            model.resignGame("gameid");
+          }
+        });
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testResignLocalMultiplayer() {
+    beginAsyncTestBlock(2);
+    final Game.Builder game = newGameWithTwoPlayers();
+    game.setIsLocalMultiplayer(true);
+    game.setPlayer(1, userId);
+    Action.Builder action = newUnsubmittedActionWithCommand(game.getId());
+    withTestData(game.build(), action.build(), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertTrue(game.isGameOver());
+            assertFalse(game.hasCurrentPlayerNumber());
+            assertTrue(game.getVictorList().contains(1));
+            assertTrue(game.getLastModified() > 150L);
+            finished();
+          }
+
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(newEmptyAction(game.getId()), currentAction);
+            finished();
+          }
+        }, false /* immediate */);
+        model.resignGame(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testResignGame() {
+    beginAsyncTestBlock(2);
+    final Game.Builder game = newGameWithTwoPlayers();
+    Action.Builder action = newUnsubmittedActionWithCommand(game.getId());
+    withTestData(game.build(), action.build(), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game game) {
+            assertTrue(game.isGameOver());
+            assertFalse(game.hasCurrentPlayerNumber());
+            assertTrue(game.getVictorList().contains(1));
+            assertTrue(game.getLastModified() > 150L);
+            finished();
+          }
+
+          @Override
+          public void onCurrentActionUpdate(Action currentAction) {
+            assertEquals(newEmptyAction(game.getId()), currentAction);
+            finished();
+          }
+        }, false /* immediate */);
+        model.resignGame(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testArchiveGame() {
+    beginAsyncTestBlock();
+    final Game.Builder game = newGameWithTwoPlayers();
+    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameListListener(new AbstractGameListListener() {
+          @Override
+          public void onGameRemoved(String gameId) {
+            assertEquals(game.getId(), gameId);
+            finished();
+          }
+        });
+        model.archiveGame(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testSubscribeViewerToGame() {
+    beginAsyncTestBlock();
+    model.setGameUpdateListener("gameId", new TestGameUpdateListener() {
+      @Override
+      public void onCurrentActionUpdate(Action currentAction) {
+        assertEquals(newEmptyAction("gameId"), currentAction);
+        finished();
+      }
+    });
+    model.subscribeViewerToGame("gameId");
+    endAsyncTestBlock();
+  }
+
+  public void testRequestGameStatus() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().build();
+    Action action = newEmptyAction(game.getId());
+    withTestData(game, action, new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameStatusChanged(GameStatus status) {
+            assertEquals(0, status.getStatusPlayer());
+            assertEquals(false, status.isComputerThinking());
+            assertEquals("User's turn", status.getStatusString());
+            finished();
+          }
+        }, false /* immediate */);
+        model.requestGameStatus(game.getId());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testJoinGameIfPossible() {
+    // TODO: implement
+  }
+
+  public void testJoinGameGameOver() {
+    // TODO: implement
+  }
+
+  public void testJoinGameGameFull() {
+    // TODO: implement
+  }
+
+  public void testJoinGameAlreadyPlayer() {
+    // TODO: implement
+  }
+
+  public void testPutFacebookRequestId() {
+    // TODO: implement
+  }
+
+  public void testSubscribeToRequestIds() {
+    // TODO: implement
+  }
+
+  public void testUpgradeAccountToFacebook() {
+    // TODO: implement
+  }
+
+  public void testEnsureIsCurrentPlayer() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().setCurrentPlayerNumber(1).build();
+    withTestData(game, newEmptyAction(game.getId()), new Runnable() {
+      @Override
+      public void run() {
+        assertDiesAndFinish(new Runnable() {
+          @Override
+          public void run() {
+            model.ensureIsCurrentPlayer(game.getId());
+          }
+        });
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  public void testEnsureIsPlayer() {
+    beginAsyncTestBlock();
+    final Game game = newGameWithTwoPlayers().setPlayer(0, "foo").build();
+    withTestData(game, newEmptyAction(game.getId()), new Runnable() {
+      @Override
+      public void run() {
+        assertDiesAndFinish(new Runnable() {
+          @Override
+          public void run() {
+            model.ensureIsPlayer(game.getId());
+          }
+        });
+      }
+    });
+    endAsyncTestBlock();
+  }
 
   private Action action(int player, int column, int row, boolean submitted) {
     return Action.newBuilder()
@@ -719,22 +822,6 @@ public class ModelTest extends SharedTestCase {
             .setPronoun(Pronoun.FEMALE))
         .setLastModified(123);
   }
-//
-//  private Game.Builder newLocalMultiplayerGameWithTwoPlayers() {
-//    return Game.newBuilder()
-//        .setId("game" + randomInteger())
-//        .setCurrentPlayerNumber(0)
-//        .addAllPlayer(list(userId, userId))
-//        .setIsGameOver(false)
-//        .setIsLocalMultiplayer(true)
-//        .addProfile(Profile.newBuilder()
-//            .setName("User")
-//            .setPronoun(Pronoun.MALE))
-//        .addProfile(Profile.newBuilder()
-//            .setName("User 2")
-//            .setPronoun(Pronoun.FEMALE))
-//        .setLastModified(123);
-//  }
 
   private void assertDiesAndFinish(Runnable testFn) {
     try {

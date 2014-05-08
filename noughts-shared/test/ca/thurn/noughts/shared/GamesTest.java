@@ -54,20 +54,6 @@ public class GamesTest extends SharedTestCase {
     assertFalse(drawStatus.hasStatusPlayer());
   }
 
-  public void testGetOpponentPlayerNumber() {
-    Game.Builder testGame = Game.newBuilder().setId("one");
-    testGame.addPlayer("viewerId");
-    testGame.addPlayer("opponentId");
-    testGame.setIsLocalMultiplayer(false);
-    assertEquals(1, Games.opponentPlayerNumber(testGame.build(), ("viewerId")));
-    testGame = Game.newBuilder().setId("two");
-    testGame.setIsLocalMultiplayer(true);
-    try {
-      Games.opponentPlayerNumber(testGame.build(), "viewerId");
-      fail();
-    } catch (IllegalStateException expected) {}
-  }
-
   public void testChannelIdForViewer() {
     Game.Builder testGame = getTestGame();
     String id = Games.channelIdForViewer(testGame.build(), "userId");
@@ -278,18 +264,18 @@ public class GamesTest extends SharedTestCase {
         .addProfile(Profile.newBuilder()
             .setPronoun(Pronoun.FEMALE)
             .setImageString(ImageString.newBuilder()
-                .setLargeString("userIdString")
+                .setString("userIdString")
                 .setType(ImageType.LOCAL))
             .setName("Player 1"))
         .addProfile(Profile.newBuilder()
             .setPronoun(Pronoun.NEUTRAL)
             .setImageString(ImageString.newBuilder()
-                .setLargeString("opponentIdString")
+                .setString("opponentIdString")
                 .setType(ImageType.LOCAL))
             .setName("Player 2"));
   }
 
   private ImageString newImageString(String name) {
-    return ImageString.newBuilder().setLargeString(name).setType(ImageType.LOCAL).build();
+    return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
   }
 }

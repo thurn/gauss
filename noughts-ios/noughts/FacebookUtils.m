@@ -68,21 +68,14 @@
     [builder setPronounWithNTSPronounEnum:[NTSPronounEnum NEUTRAL]];
   }
   NTSImageString_Builder *imageBuilder = [NTSImageString newBuilder];
-  [imageBuilder setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum URL]];
+  [imageBuilder setTypeWithNTSImageTypeEnum:[NTSImageTypeEnum FACEBOOK]];
   NSString *facebookId = dictionary[@"id"];
   if (!facebookId) {
     // FQL calls this field something different just to be annoying
     facebookId = dictionary[@"uid"];
   }
-  [imageBuilder setLargeStringWithNSString:
-   [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?width=362&height=362",
-    facebookId]];
-  [imageBuilder setMediumStringWithNSString:
-   [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?width=80&height=80",
-    facebookId]];
-  [imageBuilder setSmallStringWithNSString:
-   [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture?width=40&height=40",
-    facebookId]];
+  [imageBuilder setStringWithNSString:
+   [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture", facebookId]];
   [builder setImageStringWithNTSImageString:[imageBuilder build]];
   return [builder build];
 }

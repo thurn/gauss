@@ -2,9 +2,9 @@
 #import "ImageString.h"
 
 @interface ImageStringUtils : NSObject
-+ (void)setLargeImage:(UIImageView*)imageView imageString:(NTSImageString*)imageString;
-
-+ (void)setImageForList:(UIImageView*)imageView
-              imageList:(NSArray*)imageList
-              withScale:(float)scale;
++ (void)setImage:(UIImageView*)imageView
+     imageString:(NTSImageString*)imageString
+            size:(int)size;
++ (UIImage*)getLocalImage:(NSString*)name size:(int)size;
++ (void)setImageForList:(UIImageView*)imageView imageList:(NSArray*)imageList;
 @end
