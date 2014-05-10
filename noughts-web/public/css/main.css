@@ -1,0 +1,36 @@
+html {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow:hidden;
+}
+
+.header {
+  background-color: #f0f0f0;
+  height: 4rem;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+}
+
+.logo {
+  margin-left: 2rem;
+}
+
+.body {
+  height: 100%;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  -webkit-justify-content: center;
+  align-items: center;
+  -webkit-align-items: center;
+}
+
+.message {
+  width: 20rem;
+  height: 30rem;
+}
