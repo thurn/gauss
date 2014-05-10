@@ -37,7 +37,4 @@
   [userDefaults synchronize];
 }
 
-- (IBAction)aboutClicked {
-}
-
 @end

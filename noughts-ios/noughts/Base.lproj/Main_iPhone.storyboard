@@ -795,11 +795,11 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="mwZ-7J-JgJ">
+                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" accessoryType="disclosureIndicator" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" id="mwZ-7J-JgJ">
                                         <rect key="frame" x="0.0" y="152" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mwZ-7J-JgJ" id="viB-Qo-UfI">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="287" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Fj8-Qn-r4a">
@@ -810,7 +810,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
                                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                                     </state>
                                                     <connections>
-                                                        <action selector="aboutClicked" destination="lHh-AD-RPG" eventType="touchUpInside" id="5RU-Ho-0ZU"/>
+                                                        <segue destination="fDB-y6-7OX" kind="push" id="BRF-VU-xE2"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -833,6 +833,41 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ivi-O5-dM0" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="750" y="1474"/>
+        </scene>
+        <!--About View Controller - About-->
+        <scene sceneID="hKq-4S-jhw">
+            <objects>
+                <viewController storyboardIdentifier="AboutViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="fDB-y6-7OX" customClass="AboutViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="WN1-4p-8ir"/>
+                        <viewControllerLayoutGuide type="bottom" id="gdM-EN-2Vs"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="xKZ-wd-zky">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PTk-Oj-cos">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            </webView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="PTk-Oj-cos" firstAttribute="leading" secondItem="xKZ-wd-zky" secondAttribute="leading" id="4Za-Cc-AfV"/>
+                            <constraint firstAttribute="trailing" secondItem="PTk-Oj-cos" secondAttribute="trailing" id="4gs-1L-mxW"/>
+                            <constraint firstItem="gdM-EN-2Vs" firstAttribute="top" secondItem="PTk-Oj-cos" secondAttribute="bottom" id="dZp-eP-VsJ"/>
+                            <constraint firstItem="PTk-Oj-cos" firstAttribute="top" secondItem="xKZ-wd-zky" secondAttribute="top" id="kB1-jm-9Km"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="About" id="6oV-gp-0Yh"/>
+                    <connections>
+                        <outlet property="webView" destination="PTk-Oj-cos" id="JoF-g5-L3n"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Zpv-Ab-VSM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1297" y="1474"/>
         </scene>
         <!--RootNavigationController-->
         <scene sceneID="RxD-8g-r7h">

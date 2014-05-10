@@ -74,6 +74,7 @@
 		7C2E64941864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2EF11D191B4C52008EDF1B /* GameStatusView~ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C2EF11C191B4C52008EDF1B /* GameStatusView~ipad.xib */; };
+		7C2EF120191E8137008EDF1B /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF11F191E8137008EDF1B /* AboutViewController.m */; };
 		7C2F3CA418E4843D005E64E1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA318E4843D005E64E1 /* CoreLocation.framework */; };
 		7C2F3CA618E48446005E64E1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA518E48446005E64E1 /* libz.dylib */; };
 		7C2F3CA818E4844E005E64E1 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */; };
@@ -244,6 +245,8 @@
 		7C2E64901864217C00D34AD0 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		7C2E64931864223C00D34AD0 /* prefixes.properties */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = prefixes.properties; sourceTree = "<group>"; };
 		7C2EF11C191B4C52008EDF1B /* GameStatusView~ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "GameStatusView~ipad.xib"; sourceTree = "<group>"; };
+		7C2EF11E191E8137008EDF1B /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
+		7C2EF11F191E8137008EDF1B /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		7C2F3CA318E4843D005E64E1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		7C2F3CA518E48446005E64E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -600,6 +603,8 @@
 				7CCE4F191910069B0027150A /* PushNotificationHandler.m */,
 				7C725BAD1910B16A009543F8 /* SettingsViewController.h */,
 				7C725BAE1910B16A009543F8 /* SettingsViewController.m */,
+				7C2EF11E191E8137008EDF1B /* AboutViewController.h */,
+				7C2EF11F191E8137008EDF1B /* AboutViewController.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -937,6 +942,7 @@
 				7CEB472C18B276A900CDA9EA /* JavaUtils.m in Sources */,
 				7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
+				7C2EF120191E8137008EDF1B /* AboutViewController.m in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
 				7CCE4F11190EFF570027150A /* ImageStringUtils.m in Sources */,
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,
