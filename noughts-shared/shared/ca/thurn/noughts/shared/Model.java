@@ -852,7 +852,6 @@ public class Model extends AbstractChildEventListener {
    */
   public void archiveGame(String gameId) {
     userReferenceForGame(gameId).removeValue();
-    Game game = games.remove(gameId);
   }
 
   /**

@@ -725,7 +725,24 @@ public class ModelTest extends SharedTestCase {
   }
 
   public void testJoinGameGameOver() {
-    // TODO: implement
+    beginAsyncTestBlock();
+    final Game.Builder game = newGameWithOnePlayer();
+    final Profile myProfile = Profile.newBuilder().setName("myName").build();
+    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
+      @Override
+      public void run() {
+        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+          @Override
+          public void onGameUpdate(Game updated) {
+            assertTrue(updated.getPlayerList().contains(userId));
+            assertEquals(myProfile, updated.getProfile(1));
+            finished();
+          }
+        }, false /* immediate */);
+        model.joinGameIfPossible(game.getId(), myProfile);
+      }
+    });
+    endAsyncTestBlock();
   }
 
   public void testJoinGameGameFull() {
@@ -806,6 +823,19 @@ public class ModelTest extends SharedTestCase {
         .setGameId(gameId)
         .addCommand(Command.newBuilder().setColumn(0).setRow(0));
   }
+
+private Game.Builder newGameWithOnePlayer() {
+  return Game.newBuilder()
+      .setId("{gameId" + randomInteger() + "}")
+      .setCurrentPlayerNumber(0)
+      .setIsGameOver(false)
+      .setIsLocalMultiplayer(false)
+      .addPlayer("opponentId")
+      .addProfile(Profile.newBuilder()
+          .setName("Opponent")
+          .setPronoun(Pronoun.NEUTRAL))
+      .setLastModified(123);
+}
 
   private Game.Builder newGameWithTwoPlayers() {
     return Game.newBuilder()

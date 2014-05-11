@@ -1,29 +1,36 @@
 require 'fileutils'
 
 $inkscape = "/Applications/Inkscape.app/Contents/Resources/bin/inkscape"
-$contents = File.open("Contents.json").read()
+$contents = File.open("ios/Contents.json").read()
 
-def inkscape_convert(svg, output, dpi, size)
-  if size != 0
-    system "#{$inkscape} -w #{size} -h #{size} -e '#{output}' '#{svg}' &> /dev/null"
-  else
-    system "#{$inkscape} -d #{dpi} -e '#{output}' '#{svg}' &> /dev/null"
-  end
+def inkscape_convert_to_size(svg, output, size)
+  system "#{$inkscape} -w #{size} -h #{size} -e '#{output}' '#{svg}' &> /dev/null"
 end
 
-def create_imageset(imageset_dir, svg, size = 0)
+def inkscape_convert_to_dpi(svg, output, dpi)
+  system "#{$inkscape} -d #{dpi} -e '#{output}' '#{svg}' &> /dev/null"
+end
+
+def create_imageset(imageset_dir, svg, size = nil)
   name = File.basename(svg, ".svg")
   FileUtils.mkdir(imageset_dir)
-  base_dpi = 163
-  inkscape_convert(svg, "#{imageset_dir}/#{name}.png", base_dpi, size)
-  inkscape_convert(svg, "#{imageset_dir}/#{name}@2x.png", base_dpi * 2, size * 2)
-  inkscape_convert(svg, "#{imageset_dir}/#{name}_iPad.png", base_dpi * 2, size * 2)
-  inkscape_convert(svg, "#{imageset_dir}/#{name}_iPad@2x.png", base_dpi * 4, size * 4)
+  if size
+    inkscape_convert_to_size(svg, "#{imageset_dir}/#{name}.png", size)
+    inkscape_convert_to_size(svg, "#{imageset_dir}/#{name}@2x.png", size * 2)
+    inkscape_convert_to_size(svg, "#{imageset_dir}/#{name}_iPad.png", size * 2)
+    inkscape_convert_to_size(svg, "#{imageset_dir}/#{name}_iPad@2x.png", size * 4)
+  else
+    base_dpi = 163
+    inkscape_convert_to_dpi(svg, "#{imageset_dir}/#{name}.png", base_dpi)
+    inkscape_convert_to_dpi(svg, "#{imageset_dir}/#{name}@2x.png", base_dpi * 2)
+    inkscape_convert_to_dpi(svg, "#{imageset_dir}/#{name}_iPad.png", base_dpi * 2)
+    inkscape_convert_to_dpi(svg, "#{imageset_dir}/#{name}_iPad@2x.png", base_dpi * 4)
+  end
   contents_file = File.open("#{imageset_dir}/Contents.json", "w")
   contents_file.write($contents.gsub("NAME_OF_FILE_HERE", name))
 end
 
-ios_svgs = Dir.glob("ios/*.svg")
+ios_svgs = Dir.glob("ios/general/*.svg")
 ios_outputs = []
 ios_svgs.each do |svg|
   name = File.basename(svg, ".svg")
@@ -39,12 +46,25 @@ ios_avatar_outputs = []
 ios_avatar_svgs.each do |avatar|
   name = File.basename(avatar, ".svg")
   [20, 40, 75, 100].each do |size|
-    imageset_dir = "../noughts-ios/noughts/Images.xcassets/#{name}_#{size}.imageset/"
+    imageset_dir = "../noughts-ios/noughts/Images.xcassets/#{name}_#{size}.imageset"
     file imageset_dir => [avatar] do
-      create_imageset(imageset_dir, avatar, size) 
+      create_imageset(imageset_dir, avatar, size)
     end
     ios_avatar_outputs << imageset_dir
   end
+end
+
+icon_imageset = "../noughts-ios/noughts/Images.xcassets/AppIcon.appiconset"
+file icon_imageset => ["ios/icon.svg"] do
+  FileUtils.mkdir(icon_imageset)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_29.png", 29)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_29@2x.png", 58)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_40.png", 40)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_40@2x.png", 80)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_60@2x.png", 120)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_76.png", 76)
+  inkscape_convert_to_size("ios/icon.svg", "#{icon_imageset}/icon_76@2x.png", 152)
+  FileUtils.cp("ios/IconContents.json", "#{icon_imageset}/Contents.json")
 end
 
 task :clean do
@@ -52,6 +72,7 @@ task :clean do
   ios_image_sets.each do |file|
     FileUtils.rm_r file
   end
+  FileUtils.rm_r icon_imageset
 end
 
-task :default => [*ios_outputs, *ios_avatar_outputs]
+task :default => [*ios_outputs, *ios_avatar_outputs, icon_imageset]
