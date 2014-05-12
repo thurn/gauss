@@ -35,6 +35,23 @@ public class ModelTest extends SharedTestCase {
     public void onProfileRequired(String gameId, String name) {}
   }
 
+  private static class TestPushNotificationService implements PushNotificationService {
+    @Override
+    public void addChannel(String channelId) {}
+    @Override
+    public void removeChannel(String channelId) {}
+    @Override
+    public void sendPushNotification(String channelId, Map<String, String> data) {}
+  }
+
+  private static class TestAnalyticsService implements AnalyticsService {
+    @Override
+    public void trackEvent(String name) {}
+
+    @Override
+    public void trackEvent(String name, Map<String, String> dimensions) {}
+  }
+
   @Override
   public void sharedSetUp(final Runnable done) {
     firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
@@ -42,7 +59,8 @@ public class ModelTest extends SharedTestCase {
       @Override public void onComplete(FirebaseError error, Firebase firebase) {
         userId = "id" + randomInteger();
         userKey = "K" + userId;
-        model = new Model(userId, userKey, firebase);
+        model = new Model(userId, userKey, firebase, new TestPushNotificationService(),
+            new TestAnalyticsService());
         done.run();
       }
     });
@@ -720,14 +738,13 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
 
-  public void testJoinGameIfPossible() {
-    // TODO: implement
-  }
-
-  public void testJoinGameGameOver() {
+  public void testJoinGame() {
     beginAsyncTestBlock();
     final Game.Builder game = newGameWithOnePlayer();
-    final Profile myProfile = Profile.newBuilder().setName("myName").build();
+    final Profile myProfile = Profile.newBuilder()
+        .setName("myName")
+        .setIsComputerPlayer(false)
+        .build();
     withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
       @Override
       public void run() {
@@ -743,6 +760,10 @@ public class ModelTest extends SharedTestCase {
       }
     });
     endAsyncTestBlock();
+  }
+
+  public void testJoinGameGameOver() {
+    // TODO: implement
   }
 
   public void testJoinGameGameFull() {

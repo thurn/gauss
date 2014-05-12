@@ -87,7 +87,8 @@ public class Model extends AbstractChildEventListener {
   private String userKey;
   private final Firebase firebase;
   private GameListListener gameListListener;
-  private PushNotificationListener pushNotificationListener;
+  private final PushNotificationService pushNotificationService;
+  private final AnalyticsService analyticsListener;
   private ChildEventListener gameChildEventListener;
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
@@ -96,10 +97,13 @@ public class Model extends AbstractChildEventListener {
   private final Map<String, Game> games;
   private boolean isComputerThinking = false;
 
-  public Model(String userId, String userKey, Firebase firebase) {
+  public Model(String userId, String userKey, Firebase firebase,
+      PushNotificationService pushNotificationListener, AnalyticsService analyticsListener) {
     this.userId = userId;
     this.userKey = userKey;
     this.firebase = firebase;
+    this.pushNotificationService = pushNotificationListener;
+    this.analyticsListener = analyticsListener;
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
@@ -174,17 +178,6 @@ public class Model extends AbstractChildEventListener {
   }
 
   /**
-   * Adds a listener to be called when push notification state needs to be
-   * changed.
-   *
-   * @param pushNotificationListener Listener to add.
-   */
-  public void setPushNotificationListener(
-      PushNotificationListener pushNotificationListener) {
-    this.pushNotificationListener = pushNotificationListener;
-  }
-
-  /**
    * Removes the GameUpdateListener associated with this Game ID.
    *
    * @param gameId ID of game to remove listener for.
@@ -237,7 +230,7 @@ public class Model extends AbstractChildEventListener {
 
   private void processCurrentActionUpdate(DataSnapshot snapshot) {
     String gameId = snapshot.getName();
-    if (!snapshot.hasChild("currentAction")) die("no current action for game " + gameId);
+    if (!snapshot.hasChild("currentAction")) die("No current action for game %s", gameId);
     Map<String, Object> value = snapshot.child("currentAction").getValue(
         new GenericTypeIndicator<Map<String, Object>>(){});
     Action action = Action.newDeserializer().deserialize(value);
@@ -437,9 +430,13 @@ public class Model extends AbstractChildEventListener {
     ref.setValue(game.serialize());
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
-    if (pushNotificationListener != null && !game.isLocalMultiplayer()) {
-      pushNotificationListener.onJoinedGame(Games.channelIdForViewer(game, userId));
+    if (!game.isLocalMultiplayer()) {
+      pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
     }
+    Map<String, String> dimensions = new HashMap<String, String>();
+    dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
+    dimensions.put("profileCount", profiles.size() + "");
+    analyticsListener.trackEvent("newGame", dimensions);
     return game.getId();
   }
 
@@ -464,6 +461,7 @@ public class Model extends AbstractChildEventListener {
         onComplete.onMutationCompleted(game);
       }
     };
+    analyticsListener.trackEvent("setProfileForViewer");
     mutateGame(gameId, mutation, true /* abortOnConflict */);
   }
 
@@ -514,7 +512,7 @@ public class Model extends AbstractChildEventListener {
       final OnMutationCompleted onComplete) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
-      die("Illegal command " + command);
+      die("Illegal command: %s", command);
     }
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
@@ -531,6 +529,9 @@ public class Model extends AbstractChildEventListener {
         }
       }
     });
+    Map<String, String> dimensions = new HashMap<String, String>();
+    dimensions.put("submit", submit + "");
+    analyticsListener.trackEvent("addCommand", dimensions);
     updateLastModified(gameId);
   }
 
@@ -544,7 +545,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void updateLastCommand(String gameId, final Command command) {
     if (!couldUpdateLastCommand(getGame(gameId), getCurrentAction(gameId), command)) {
-      die("Illegal Command: " + command);
+      die("Illegal Command: %s", command);
     }
 
     mutateCurrentAction(gameId, new ActionMutation() {
@@ -554,6 +555,7 @@ public class Model extends AbstractChildEventListener {
         action.addCommand(command);
       }
     });
+    analyticsListener.trackEvent("updateLastCommand");
     updateLastModified(gameId);
   }
 
@@ -683,7 +685,7 @@ public class Model extends AbstractChildEventListener {
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, true /* abortOnConflict */);
-//    handleComputerAction(applyMutation(game, mutation));
+    analyticsListener.trackEvent("submitCurrentAction");
   }
 
   /**
@@ -692,24 +694,31 @@ public class Model extends AbstractChildEventListener {
    * @param game The current game.
    */
   private void sendPushNotification(Game game) {
-    if (pushNotificationListener != null && !game.isLocalMultiplayer() && game.getPlayerCount() > 1) {
+    if (!game.isLocalMultiplayer() && game.getPlayerCount() > 1) {
       String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
       if (game.isGameOver()) {
         int viewerPlayerNumber = Games.playerNumberForPlayerId(game, userId);
         for (int i = 0; i < game.getPlayerCount(); ++i) {
           if (i != viewerPlayerNumber) {
             String message = "Game " + Games.vsString(game, opponentId) + ": Game over";
-            pushNotificationListener.onPushRequired(
-                Games.channelIdForPlayer(game.getId(), i), game.getId(), message);
+            sendPush(game.getId(), i, message);
           }
         }
       } else {
-        String channelId = Games.channelIdForPlayer(game.getId(),
-            game.getCurrentPlayerNumber());
         String message = "Game " + Games.vsString(game, opponentId) + ": It's your turn!";
-        pushNotificationListener.onPushRequired(channelId, game.getId(), message);
+        sendPush(game.getId(), game.getCurrentPlayerNumber(), message);
       }
     }
+  }
+
+  private void sendPush(String gameId, int playerNumber, String message) {
+    Map<String, String> data = new HashMap<String, String>();
+    data.put("alert", message);
+    data.put("gameId", gameId);
+    data.put("title", "noughts");
+    data.put("badge", "Increment");
+    String channelId = Games.channelIdForPlayer(gameId, playerNumber);
+    pushNotificationService.sendPushNotification(channelId, data);
   }
 
   /**
@@ -725,6 +734,7 @@ public class Model extends AbstractChildEventListener {
         !game.getProfile(game.getCurrentPlayerNumber()).isComputerPlayer()) {
       return;
     }
+    analyticsListener.trackEvent("handleComputerAction");
     Profile currentProfile = game.getProfile(game.getCurrentPlayerNumber());
     isComputerThinking = true;
     final ComputerState computerState = new ComputerState();
@@ -789,6 +799,7 @@ public class Model extends AbstractChildEventListener {
       }
     });
     updateLastModified(gameId);
+    analyticsListener.trackEvent("undoCommand");
   }
 
   /**
@@ -810,6 +821,7 @@ public class Model extends AbstractChildEventListener {
       }
     });
     updateLastModified(gameId);
+    analyticsListener.trackEvent("redoCommand");
   }
 
   /**
@@ -836,13 +848,14 @@ public class Model extends AbstractChildEventListener {
       }
 
       @Override public void onComplete(Game game) {
-        if (pushNotificationListener != null && game != null && !game.isLocalMultiplayer()) {
-          pushNotificationListener.onLeftGame(Games.channelIdForViewer(game, userId));
+        if (game != null && !game.isLocalMultiplayer()) {
+          pushNotificationService.removeChannel(Games.channelIdForViewer(game, userId));
         }
       }
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, false /* abortOnConflict */);
+    analyticsListener.trackEvent("resignGame");
   }
 
   /**
@@ -852,6 +865,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void archiveGame(String gameId) {
     userReferenceForGame(gameId).removeValue();
+    analyticsListener.trackEvent("archiveGame");
   }
 
   /**
@@ -863,6 +877,7 @@ public class Model extends AbstractChildEventListener {
   public void subscribeViewerToGame(String gameId) {
     if (!currentActions.containsKey(gameId)) {
       actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
+      analyticsListener.trackEvent("subscribeViewerToGame");
     }
   }
 
@@ -898,12 +913,13 @@ public class Model extends AbstractChildEventListener {
 
         @Override
         public void onComplete(Game game) {
-          if (pushNotificationListener != null && !game.isLocalMultiplayer()) {
-            pushNotificationListener.onJoinedGame(Games.channelIdForViewer(game, userId));
+          if (!game.isLocalMultiplayer()) {
+            pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
           }
         }
       };
       mutateGame(gameId, mutation, true /* abortOnConflict */);
+      analyticsListener.trackEvent("joinGameIfPossible");
     }
   }
 
@@ -915,6 +931,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void putFacebookRequestId(String requestId, String gameId) {
     requestReference(requestId).setValue(gameId);
+    analyticsListener.trackEvent("putFacebookRequestId");
   }
 
   public void subscribeToRequestIds(String requestId, final RequestLoadedCallback callback) {
@@ -952,6 +969,9 @@ public class Model extends AbstractChildEventListener {
     userKey = facebookId;
     final AtomicInteger callbacksExpected =
         new AtomicInteger(games.size() + currentActions.size());
+    Map<String, String> dimensions = new HashMap<String, String>();
+    dimensions.put("callbacksExpected", callbacksExpected.get() + "");
+    analyticsListener.trackEvent("upgradeAccountToFacebook", dimensions);
 
     final OnUpgradeCompleted internalCallback = new OnUpgradeCompleted() {
       @Override
@@ -1060,7 +1080,7 @@ public class Model extends AbstractChildEventListener {
     if (games.containsKey(gameId)) {
       return games.get(gameId);
     } else {
-      throw die("Unknown game " + gameId);
+      throw die("Unknown game %s", gameId);
     }
   }
 
@@ -1068,7 +1088,7 @@ public class Model extends AbstractChildEventListener {
     if (currentActions.containsKey(gameId)) {
       return currentActions.get(gameId);
     } else {
-      throw die("Can't find current action for game " + gameId);
+      throw die("Can't find current action for game %s", gameId);
     }
   }
 
@@ -1202,22 +1222,25 @@ public class Model extends AbstractChildEventListener {
   /**
    * Throws an exception.
    */
-  private RuntimeException die(String message) {
-    throw new RuntimeException(message);
+  private RuntimeException die(String message, Object... args) {
+    Map<String, String> dimensions = new HashMap<String, String>();
+    dimensions.put("message", message);
+    analyticsListener.trackEvent("die", dimensions);
+    throw new RuntimeException(String.format(message, args));
   }
 
   /**
    * Ensures the current user is the current player in the provided game.
    */
   void ensureIsCurrentPlayer(String gameId) {
-    if (!isCurrentPlayer(getGame(gameId))) die("Unauthorized user: " + userId);
+    if (!isCurrentPlayer(getGame(gameId))) die("Not current player: %s", userId);
   }
 
   /**
    * Ensures the current user is a player in the provided game.
    */
   void ensureIsPlayer(String gameId) {
-    if (!getGame(gameId).getPlayerList().contains(userId)) die("Unauthorized user: " + userId);
+    if (!getGame(gameId).getPlayerList().contains(userId)) die("Not player: %s", userId);
   }
 
   void ensureGameIsNotOver(String gameId) {

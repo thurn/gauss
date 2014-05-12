@@ -14,11 +14,15 @@
 #import "Profile.h"
 #import "FacebookUtils.h"
 #import "InterfaceUtils.h"
+#import "PermissionsManager.h"
+#import "PushNotificationsServiceImpl.h"
+#import "AnalyticsServiceImpl.h"
 
-@interface AppDelegate () <NTSPushNotificationListener, NTSRequestLoadedCallback>
+@interface AppDelegate () <NTSRequestLoadedCallback>
 @property BOOL runningQuery;
 @property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
 @property(strong, nonatomic) NTSModel *model;
+@property(strong, nonatomic) PermissionsManager *permissionsManager;
 @end
 
 @implementation AppDelegate
@@ -31,9 +35,9 @@
 
   [Parse setApplicationId:@"mYK2MgBp6q7fjLEyulrqlUkQ8tf3qsSrbtlfh6Je"
                 clientKey:@"7Sne8QqyGnoHm3AAUhI2OxpOVjGYvkBG2bEXKkbi"];
-  [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge |
-      UIRemoteNotificationTypeAlert |
-      UIRemoteNotificationTypeSound];
+  [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
+  
+  _permissionsManager = [PermissionsManager new];
 
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio.com"];
@@ -68,8 +72,6 @@
     [self createAnonymousModel:firebase];
   }
 
-  [_model setPushNotificationListenerWithNTSPushNotificationListener:self];
-
   NSString *gameId = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"gameId"];
   if (gameId) {
     [[NSNotificationCenter defaultCenter] postNotification:
@@ -97,18 +99,20 @@
 
 - (void)createAnonymousModel:(FCFirebase*)firebase {
   NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-#if TARGET_IPHONE_SIMULATOR
-  userKey = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? @"Pad" : @"Phone";
-#endif
-  
   NSString *userId = [self sha1:userKey];
   _model = [[NTSModel alloc] initWithNSString:userId
                                  withNSString:userKey
-                               withFCFirebase:firebase];
+                               withFCFirebase:firebase
+            withNTSPushNotificationService:[PushNotificationsServiceImpl new]
+                      withNTSAnalyticsService:[AnalyticsServiceImpl new]];
 }
 
 - (void)createFacebookModel:(FCFirebase*)firebase withUserId:(NSString*)userId {
-  _model = [[NTSModel alloc] initWithNSString:userId withNSString:userId withFCFirebase:firebase];
+  _model = [[NTSModel alloc] initWithNSString:userId
+                                 withNSString:userId
+                               withFCFirebase:firebase
+               withNTSPushNotificationService:[PushNotificationsServiceImpl new]
+                      withNTSAnalyticsService:[AnalyticsServiceImpl new]];
 }
 
 - (NSString*)sha1:(NSString*)input {
@@ -203,31 +207,6 @@
    instantiateViewControllerWithIdentifier:@"GameViewController"];
   gameViewController.currentGameId = gameId;
   [root pushViewController:gameViewController animated:YES];
-}
-
-- (void)onJoinedGameWithNSString:(NSString *)channelId {
-  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-  [currentInstallation addUniqueObject:channelId forKey:@"channels"];
-  [currentInstallation saveInBackground];
-}
-
-- (void)onLeftGameWithNSString:(NSString *)channelId {
-  PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-  [currentInstallation removeObject:channelId forKey:@"channels"];
-  [currentInstallation saveInBackground];
-}
-
-- (void)onPushRequiredWithNSString:(NSString*)channelId
-                      withNSString:(NSString*)gameId
-                      withNSString:(NSString *)message {
-  NSDictionary* data = @{@"alert": message,
-                         @"badge": @"Increment",
-                         @"gameId": gameId,
-                         @"title": @"noughts"};
-  PFPush *push = [PFPush new];
-  [push setData:data];
-  [push setChannel:channelId];
-  [push sendPushInBackground];
 }
 
 - (void)onFacebookLogin:(NSNotification*)notification {

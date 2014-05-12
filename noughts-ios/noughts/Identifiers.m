@@ -7,6 +7,7 @@ NSString* const kFacebookFriendsLoadedNotification = @"kFacebookFriendsLoadedNot
 NSString* const kGameRequestedNotification = @"kGameRequestedNotification";
 NSString* const kRecipientCacheLoadedNotification = @"kRecipientCacheLoadedNotification";
 NSString* const kPushNotificationReceivedNotification = @"kPushNotificationReceivedNotification";
+NSString* const kRequestEnablePushNotification = @"kRequestEnablePushNotification";
 
 // UserDefaults keys
 NSString* const kFacebookIdKey = @"kFacebookIdKey";
@@ -16,3 +17,5 @@ NSString* const kSawTutorialKey = @"kSawTutorialKey";
 NSString* const kPreferredDifficultyKey = @"kPreferredDifficultyKey";
 NSString* const kDisableSoundsKey = @"kDisableSoundsKey";
 NSString* const kEnableAutosubmitKey = @"kEnableAutosubmitKey";
+NSString* const kEnabledNotificationsKey = @"kEnabledNotificationsKey";
+NSString* const kDeclinedPushDateKey = @"kDeclinedPushDateKey";

@@ -17,6 +17,7 @@
 #import "NotificationManager.h"
 #import "FacebookUtils.h"
 #import "PushNotificationHandler.h"
+#import "PermissionsManager.h"
 
 @interface GameViewController () <UIAlertViewDelegate, PushNotificationHandlerDelegate>
 @property(weak,nonatomic) NTSModel *model;
@@ -269,6 +270,9 @@
     [userDefaults synchronize];
   }
   [_model submitCurrentActionWithNSString:_currentGameId];
+  if (![_game isLocalMultiplayer]) {
+    [PermissionsManager requestToEnablePushNotifications];
+  }
 }
 
 - (void)handleUndo {

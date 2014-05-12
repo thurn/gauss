@@ -75,6 +75,11 @@
 		7C2E64951864223C00D34AD0 /* prefixes.properties in Resources */ = {isa = PBXBuildFile; fileRef = 7C2E64931864223C00D34AD0 /* prefixes.properties */; };
 		7C2EF11D191B4C52008EDF1B /* GameStatusView~ipad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C2EF11C191B4C52008EDF1B /* GameStatusView~ipad.xib */; };
 		7C2EF120191E8137008EDF1B /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF11F191E8137008EDF1B /* AboutViewController.m */; };
+		7C2EF12319204A95008EDF1B /* PermissionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF12219204A95008EDF1B /* PermissionsManager.m */; };
+		7C2EF126192119E0008EDF1B /* PushNotificationsServiceImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF125192119E0008EDF1B /* PushNotificationsServiceImpl.m */; };
+		7C2EF12919211A05008EDF1B /* AnalyticsService.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF12719211A05008EDF1B /* AnalyticsService.java */; };
+		7C2EF12A19211A05008EDF1B /* PushNotificationService.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF12819211A05008EDF1B /* PushNotificationService.java */; };
+		7C2EF12D19211ADA008EDF1B /* AnalyticsServiceImpl.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2EF12C19211ADA008EDF1B /* AnalyticsServiceImpl.m */; };
 		7C2F3CA418E4843D005E64E1 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA318E4843D005E64E1 /* CoreLocation.framework */; };
 		7C2F3CA618E48446005E64E1 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA518E48446005E64E1 /* libz.dylib */; };
 		7C2F3CA818E4844E005E64E1 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */; };
@@ -94,7 +99,6 @@
 		7C58BE1B18C1BD4D008D2C9D /* Pronoun.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1118C1BD4D008D2C9D /* Pronoun.java */; };
 		7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1218C1BD4D008D2C9D /* Games.java */; };
 		7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C58BE1F18C24DC9008D2C9D /* GameStatus.java */; };
-		7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C65892B18EDF23D00359B7C /* PushNotificationListener.java */; };
 		7C69CD39187908BB0040AD75 /* GameListPartitions.java in Sources */ = {isa = PBXBuildFile; fileRef = 7C69CD38187908BB0040AD75 /* GameListPartitions.java */; };
 		7C72157F186F232500F1188B /* GameListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C72157E186F232500F1188B /* GameListViewController.m */; };
 		7C725BAF1910B16A009543F8 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C725BAE1910B16A009543F8 /* SettingsViewController.m */; };
@@ -247,6 +251,14 @@
 		7C2EF11C191B4C52008EDF1B /* GameStatusView~ipad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "GameStatusView~ipad.xib"; sourceTree = "<group>"; };
 		7C2EF11E191E8137008EDF1B /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
 		7C2EF11F191E8137008EDF1B /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		7C2EF12119204A95008EDF1B /* PermissionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PermissionsManager.h; sourceTree = "<group>"; };
+		7C2EF12219204A95008EDF1B /* PermissionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PermissionsManager.m; sourceTree = "<group>"; };
+		7C2EF124192119E0008EDF1B /* PushNotificationsServiceImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PushNotificationsServiceImpl.h; sourceTree = "<group>"; };
+		7C2EF125192119E0008EDF1B /* PushNotificationsServiceImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PushNotificationsServiceImpl.m; sourceTree = "<group>"; };
+		7C2EF12719211A05008EDF1B /* AnalyticsService.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = AnalyticsService.java; sourceTree = "<group>"; };
+		7C2EF12819211A05008EDF1B /* PushNotificationService.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PushNotificationService.java; sourceTree = "<group>"; };
+		7C2EF12B19211ADA008EDF1B /* AnalyticsServiceImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AnalyticsServiceImpl.h; sourceTree = "<group>"; };
+		7C2EF12C19211ADA008EDF1B /* AnalyticsServiceImpl.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AnalyticsServiceImpl.m; sourceTree = "<group>"; };
 		7C2F3CA318E4843D005E64E1 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		7C2F3CA518E48446005E64E1 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		7C2F3CA718E4844E005E64E1 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
@@ -267,7 +279,6 @@
 		7C58BE1118C1BD4D008D2C9D /* Pronoun.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Pronoun.java; sourceTree = "<group>"; };
 		7C58BE1218C1BD4D008D2C9D /* Games.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = Games.java; sourceTree = "<group>"; };
 		7C58BE1F18C24DC9008D2C9D /* GameStatus.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameStatus.java; sourceTree = "<group>"; };
-		7C65892B18EDF23D00359B7C /* PushNotificationListener.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = PushNotificationListener.java; sourceTree = "<group>"; };
 		7C69CD38187908BB0040AD75 /* GameListPartitions.java */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.java; path = GameListPartitions.java; sourceTree = "<group>"; };
 		7C72157D186F232500F1188B /* GameListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameListViewController.h; sourceTree = "<group>"; };
 		7C72157E186F232500F1188B /* GameListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameListViewController.m; sourceTree = "<group>"; };
@@ -605,6 +616,12 @@
 				7C725BAE1910B16A009543F8 /* SettingsViewController.m */,
 				7C2EF11E191E8137008EDF1B /* AboutViewController.h */,
 				7C2EF11F191E8137008EDF1B /* AboutViewController.m */,
+				7C2EF12119204A95008EDF1B /* PermissionsManager.h */,
+				7C2EF12219204A95008EDF1B /* PermissionsManager.m */,
+				7C2EF124192119E0008EDF1B /* PushNotificationsServiceImpl.h */,
+				7C2EF12B19211ADA008EDF1B /* AnalyticsServiceImpl.h */,
+				7C2EF12C19211ADA008EDF1B /* AnalyticsServiceImpl.m */,
+				7C2EF125192119E0008EDF1B /* PushNotificationsServiceImpl.m */,
 			);
 			path = noughts;
 			sourceTree = "<group>";
@@ -696,10 +713,11 @@
 		7C8EF5DF1866577F0075D0C1 /* shared */ = {
 			isa = PBXGroup;
 			children = (
+				7C2EF12719211A05008EDF1B /* AnalyticsService.java */,
+				7C2EF12819211A05008EDF1B /* PushNotificationService.java */,
 				7C2266801915B6C800C323A3 /* OnUpgradeCompleted.java */,
 				7CCE4F071908ECED0027150A /* RequestLoadedCallback.java */,
 				7CD64E3B18FD8F3200252818 /* IndexPath.java */,
-				7C65892B18EDF23D00359B7C /* PushNotificationListener.java */,
 				7C3F723618E36D6700898E5A /* AbstractGameListListener.java */,
 				7C3F723718E36D6700898E5A /* GameListListener.java */,
 				7CF4F80D18D4B45600FC8F9E /* OnMutationCompleted.java */,
@@ -912,6 +930,7 @@
 				7C0444DC18B73124006275CA /* Player.java in Sources */,
 				7C8EF76218668E120075D0C1 /* GenericTypeIndicator.java in Sources */,
 				7C0444D818B73124006275CA /* AsynchronousAgent.java in Sources */,
+				7C2EF12A19211A05008EDF1B /* PushNotificationService.java in Sources */,
 				7C8EF76A18668E120075D0C1 /* Transaction.java in Sources */,
 				7C58BE1518C1BD4D008D2C9D /* Game.java in Sources */,
 				7C0444DB18B73124006275CA /* Main.java in Sources */,
@@ -933,6 +952,7 @@
 				7C0444DD18B73124006275CA /* State.java in Sources */,
 				7C0444D118B73124006275CA /* MonteCarloSearch.java in Sources */,
 				7C27F70818C67A0300ADA495 /* UIView+AutoLayout.m in Sources */,
+				7C2EF12D19211ADA008EDF1B /* AnalyticsServiceImpl.m in Sources */,
 				7CCE4F081908ECED0027150A /* RequestLoadedCallback.java in Sources */,
 				7C0444D418B73124006275CA /* ActionScore.java in Sources */,
 				7C58BE2018C24DC9008D2C9D /* GameStatus.java in Sources */,
@@ -940,10 +960,10 @@
 				7C3F723818E36D6700898E5A /* AbstractGameListListener.java in Sources */,
 				7C8EF75A18668E120075D0C1 /* ChildEventListener.java in Sources */,
 				7CEB472C18B276A900CDA9EA /* JavaUtils.m in Sources */,
-				7C65892C18EDF23D00359B7C /* PushNotificationListener.java in Sources */,
 				7C0444D618B73124006275CA /* Agent.java in Sources */,
 				7C2EF120191E8137008EDF1B /* AboutViewController.m in Sources */,
 				7C7C6A3418D02B380086CFC5 /* Entity.java in Sources */,
+				7C2EF12319204A95008EDF1B /* PermissionsManager.m in Sources */,
 				7CCE4F11190EFF570027150A /* ImageStringUtils.m in Sources */,
 				7C58BE1C18C1BD4D008D2C9D /* Games.java in Sources */,
 				7C01FB4319070FD10049CD35 /* Optional.java in Sources */,
@@ -988,6 +1008,7 @@
 				7CD64E3C18FD8F3200252818 /* IndexPath.java in Sources */,
 				7C7C6A3618D0B2CA0086CFC5 /* CommandUpdateListener.java in Sources */,
 				7C58BE1818C1BD4D008D2C9D /* ImageString.java in Sources */,
+				7C2EF12919211A05008EDF1B /* AnalyticsService.java in Sources */,
 				7C0444D718B73124006275CA /* AgentEvaluator.java in Sources */,
 				7C01FB4119070FD10049CD35 /* AbstractIterator.java in Sources */,
 				7C01FB3E19070FD10049CD35 /* GwtCompatible.java in Sources */,
@@ -996,6 +1017,7 @@
 				7C58BE1918C1BD4D008D2C9D /* ImageType.java in Sources */,
 				7C27F70218BFC59C00ADA495 /* GameUpdateListener.java in Sources */,
 				7C8EF75E18668E120075D0C1 /* Firebase.java in Sources */,
+				7C2EF126192119E0008EDF1B /* PushNotificationsServiceImpl.m in Sources */,
 				7CCE4F17190F700F0027150A /* InterfaceUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,6 +9,7 @@
 #import "NotificationManager.h"
 #import "Identifiers.h"
 #import "PushNotificationHandler.h"
+#import "ImageStringUtils.h"
 
 NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 
@@ -40,7 +41,8 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
                     @"player_goat", @"player_goose", @"player_chicken", @"player_sheep"];
   _playerImageIndex = arc4random() % [_playerImages count];
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-  UIImage *avatar = [UIImage imageNamed:[_playerImages objectAtIndex:_playerImageIndex]];
+  UIImage *avatar = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_playerImageIndex]
+                                               size:100];
   [_avatarButton setImage:avatar forState:UIControlStateNormal];
   _nameField.delegate = self;
   NSString *name = [userDefaults objectForKey:kPlayerLocalNameKey];
@@ -81,7 +83,8 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 
 - (IBAction)onAvatarClicked:(id)sender {
   _playerImageIndex = (_playerImageIndex + 1) % [_playerImages count];
-  UIImage *image = [UIImage imageNamed:[_playerImages objectAtIndex:_playerImageIndex]];
+  UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_playerImageIndex]
+                                              size:100];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
