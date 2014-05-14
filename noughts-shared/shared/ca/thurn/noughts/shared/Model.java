@@ -31,20 +31,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.common.annotations.VisibleForTesting;
 
 /**
- * The data model for noughts. Data is denormalized into two distinct
- * locations:
- *
- * /users/<userid>/games/<gameid>/
- * - This path contains all of the metadata needed to render a user's game
- *   list, such as whose turn it is, when the game was last modified, etc.
- * - It does not contain enough information to actually render the state of the
- *   game, such as previous actions in the game.
- *
- * /games/<gameid>/
- * - This path contains all of the above, plus information on the actual state
- *   of the game, such as a history of actions.
- * - When you load a game for rendering, you need to subscribe here to get the
- *   actual state of the game.
+ * The data model for noughts.
  */
 public class Model extends AbstractChildEventListener {
   public static final int X_PLAYER = 0;
@@ -85,10 +72,11 @@ public class Model extends AbstractChildEventListener {
 
   private String userId;
   private String userKey;
+  private boolean isFacebookUser;
   private final Firebase firebase;
   private GameListListener gameListListener;
   private final PushNotificationService pushNotificationService;
-  private final AnalyticsService analyticsListener;
+  private final AnalyticsService analyticsService;
   private ChildEventListener gameChildEventListener;
   private final Map<String, ValueEventListener> valueEventListeners;
   private final Map<String, GameUpdateListener> gameUpdateListeners;
@@ -97,13 +85,26 @@ public class Model extends AbstractChildEventListener {
   private final Map<String, Game> games;
   private boolean isComputerThinking = false;
 
-  public Model(String userId, String userKey, Firebase firebase,
-      PushNotificationService pushNotificationListener, AnalyticsService analyticsListener) {
+  public static Model anonymousModel(String userId, String userKey, Firebase firebase,
+      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
+    return new Model(userId, userKey, false /* isFacebookUser */, firebase,
+        pushNotificationService, analyticsService);
+  }
+
+  public static Model facebookModel(String facebookId, Firebase firebase,
+      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
+    return new Model(facebookId, facebookId, true /* isFacebookuser */, firebase,
+        pushNotificationService, analyticsService);
+  }
+
+  private Model(String userId, String userKey, boolean isFacebookUser, Firebase firebase,
+      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
     this.userId = userId;
     this.userKey = userKey;
+    this.isFacebookUser = isFacebookUser;
     this.firebase = firebase;
-    this.pushNotificationService = pushNotificationListener;
-    this.analyticsListener = analyticsListener;
+    this.pushNotificationService = pushNotificationService;
+    this.analyticsService = analyticsService;
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
@@ -436,7 +437,7 @@ public class Model extends AbstractChildEventListener {
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
     dimensions.put("profileCount", profiles.size() + "");
-    analyticsListener.trackEvent("newGame", dimensions);
+    analyticsService.trackEvent("newGame", dimensions);
     return game.getId();
   }
 
@@ -461,7 +462,7 @@ public class Model extends AbstractChildEventListener {
         onComplete.onMutationCompleted(game);
       }
     };
-    analyticsListener.trackEvent("setProfileForViewer");
+    analyticsService.trackEvent("setProfileForViewer");
     mutateGame(gameId, mutation, true /* abortOnConflict */);
   }
 
@@ -531,7 +532,7 @@ public class Model extends AbstractChildEventListener {
     });
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("submit", submit + "");
-    analyticsListener.trackEvent("addCommand", dimensions);
+    analyticsService.trackEvent("addCommand", dimensions);
     updateLastModified(gameId);
   }
 
@@ -555,7 +556,7 @@ public class Model extends AbstractChildEventListener {
         action.addCommand(command);
       }
     });
-    analyticsListener.trackEvent("updateLastCommand");
+    analyticsService.trackEvent("updateLastCommand");
     updateLastModified(gameId);
   }
 
@@ -685,7 +686,7 @@ public class Model extends AbstractChildEventListener {
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, true /* abortOnConflict */);
-    analyticsListener.trackEvent("submitCurrentAction");
+    analyticsService.trackEvent("submitCurrentAction");
   }
 
   /**
@@ -734,7 +735,7 @@ public class Model extends AbstractChildEventListener {
         !game.getProfile(game.getCurrentPlayerNumber()).isComputerPlayer()) {
       return;
     }
-    analyticsListener.trackEvent("handleComputerAction");
+    analyticsService.trackEvent("handleComputerAction");
     Profile currentProfile = game.getProfile(game.getCurrentPlayerNumber());
     isComputerThinking = true;
     final ComputerState computerState = new ComputerState();
@@ -799,7 +800,7 @@ public class Model extends AbstractChildEventListener {
       }
     });
     updateLastModified(gameId);
-    analyticsListener.trackEvent("undoCommand");
+    analyticsService.trackEvent("undoCommand");
   }
 
   /**
@@ -821,7 +822,7 @@ public class Model extends AbstractChildEventListener {
       }
     });
     updateLastModified(gameId);
-    analyticsListener.trackEvent("redoCommand");
+    analyticsService.trackEvent("redoCommand");
   }
 
   /**
@@ -855,7 +856,7 @@ public class Model extends AbstractChildEventListener {
     };
     actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
     mutateGame(gameId, mutation, false /* abortOnConflict */);
-    analyticsListener.trackEvent("resignGame");
+    analyticsService.trackEvent("resignGame");
   }
 
   /**
@@ -865,7 +866,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void archiveGame(String gameId) {
     userReferenceForGame(gameId).removeValue();
-    analyticsListener.trackEvent("archiveGame");
+    analyticsService.trackEvent("archiveGame");
   }
 
   /**
@@ -877,7 +878,7 @@ public class Model extends AbstractChildEventListener {
   public void subscribeViewerToGame(String gameId) {
     if (!currentActions.containsKey(gameId)) {
       actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
-      analyticsListener.trackEvent("subscribeViewerToGame");
+      analyticsService.trackEvent("subscribeViewerToGame");
     }
   }
 
@@ -919,7 +920,7 @@ public class Model extends AbstractChildEventListener {
         }
       };
       mutateGame(gameId, mutation, true /* abortOnConflict */);
-      analyticsListener.trackEvent("joinGameIfPossible");
+      analyticsService.trackEvent("joinGameIfPossible");
     }
   }
 
@@ -931,7 +932,7 @@ public class Model extends AbstractChildEventListener {
    */
   public void putFacebookRequestId(String requestId, String gameId) {
     requestReference(requestId).setValue(gameId);
-    analyticsListener.trackEvent("putFacebookRequestId");
+    analyticsService.trackEvent("putFacebookRequestId");
   }
 
   public void subscribeToRequestIds(String requestId, final RequestLoadedCallback callback) {
@@ -967,11 +968,12 @@ public class Model extends AbstractChildEventListener {
     gameListListener = null;
     userId = facebookId;
     userKey = facebookId;
+    isFacebookUser = true;
     final AtomicInteger callbacksExpected =
         new AtomicInteger(games.size() + currentActions.size());
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("callbacksExpected", callbacksExpected.get() + "");
-    analyticsListener.trackEvent("upgradeAccountToFacebook", dimensions);
+    analyticsService.trackEvent("upgradeAccountToFacebook", dimensions);
 
     final OnUpgradeCompleted internalCallback = new OnUpgradeCompleted() {
       @Override
@@ -1204,7 +1206,8 @@ public class Model extends AbstractChildEventListener {
   }
 
   private Firebase userGamesReference() {
-    return firebase.child("users").child(userKey).child("games");
+    Firebase users = firebase.child(isFacebookUser ? "facebookUsers" : "users");
+    return users.child(userKey).child("games");
   }
 
   private Firebase userReferenceForGame(String gameId) {
@@ -1225,7 +1228,7 @@ public class Model extends AbstractChildEventListener {
   private RuntimeException die(String message, Object... args) {
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("message", message);
-    analyticsListener.trackEvent("die", dimensions);
+    analyticsService.trackEvent("die", dimensions);
     throw new RuntimeException(String.format(message, args));
   }
 

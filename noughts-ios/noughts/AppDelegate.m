@@ -38,6 +38,7 @@
   [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
   
   _permissionsManager = [PermissionsManager new];
+  [Firebase setOption:@"persistence" to:@YES];
 
   FCFirebase *firebase = [[FCFirebase alloc]
                           initWithNSString:@"https://noughts.firebaseio.com"];
@@ -58,7 +59,10 @@
 
   _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
   if ([FacebookUtils isFacebookUser]) {
-    [self createFacebookModel:firebase withUserId:[FacebookUtils getFacebookId]];
+    _model = [NTSModel facebookModelWithNSString:[FacebookUtils getFacebookId]
+                                  withFCFirebase:firebase
+                  withNTSPushNotificationService:[PushNotificationsServiceImpl new]
+                         withNTSAnalyticsService:[AnalyticsServiceImpl new]];
     [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
       if (user != nil) {
         [[NSNotificationCenter defaultCenter] postNotification:
@@ -69,7 +73,13 @@
       }
     }];
   } else {
-    [self createAnonymousModel:firebase];
+    NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    NSString *userId = [self sha1:userKey];
+    _model = [NTSModel anonymousModelWithNSString:userId
+                                     withNSString:userKey
+                                   withFCFirebase:firebase
+                   withNTSPushNotificationService:[PushNotificationsServiceImpl new]
+                          withNTSAnalyticsService:[AnalyticsServiceImpl new]];
   }
 
   NSString *gameId = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"gameId"];
@@ -95,24 +105,6 @@
 
 - (BOOL)application:(UIApplication *)application shouldRestoreApplicationState:(NSCoder *)coder {
   return YES;
-}
-
-- (void)createAnonymousModel:(FCFirebase*)firebase {
-  NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
-  NSString *userId = [self sha1:userKey];
-  _model = [[NTSModel alloc] initWithNSString:userId
-                                 withNSString:userKey
-                               withFCFirebase:firebase
-            withNTSPushNotificationService:[PushNotificationsServiceImpl new]
-                      withNTSAnalyticsService:[AnalyticsServiceImpl new]];
-}
-
-- (void)createFacebookModel:(FCFirebase*)firebase withUserId:(NSString*)userId {
-  _model = [[NTSModel alloc] initWithNSString:userId
-                                 withNSString:userId
-                               withFCFirebase:firebase
-               withNTSPushNotificationService:[PushNotificationsServiceImpl new]
-                      withNTSAnalyticsService:[AnalyticsServiceImpl new]];
 }
 
 - (NSString*)sha1:(NSString*)input {
@@ -166,14 +158,12 @@
       for (int i = 0; i < [idsArray count]; ++i) {
         if (i == [idsArray count] - 1) {
           // Most recent request -- load it
-          NSLog(@"load game %@", idsArray[i]);
           [_model subscribeToRequestIdsWithNSString:idsArray[i]
                       withNTSRequestLoadedCallback:self];
         } else {
           // Old request -- delete it
           NSString *facebookId = [FacebookUtils getFacebookId];
           NSString *fullId = [NSString stringWithFormat:@"%@_%@", idsArray[i], facebookId];
-          NSLog(@"delete game %@", fullId);
           FBRequest *request = [FBRequest requestWithGraphPath:fullId
                                                     parameters:@{}
                                                     HTTPMethod:@"DELETE"];

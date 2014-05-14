@@ -56,10 +56,10 @@ public class ModelTest extends SharedTestCase {
   public void sharedSetUp(final Runnable done) {
     firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
     firebase.removeValue(new CompletionListener() {
-      @Override public void onComplete(FirebaseError error, Firebase firebase) {
+      @Override public void onComplete(FirebaseError error, Firebase ref) {
         userId = "id" + randomInteger();
         userKey = "K" + userId;
-        model = new Model(userId, userKey, firebase, new TestPushNotificationService(),
+        model = Model.anonymousModel(userId, userKey, firebase, new TestPushNotificationService(),
             new TestAnalyticsService());
         done.run();
       }
