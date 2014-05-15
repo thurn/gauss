@@ -1,5 +1,4 @@
 #import <UIKit/UIKit.h>
-#import "Game.h"
 #import "CommandUpdateListener.h"
 
 @protocol GameCanvasDelegate
@@ -8,6 +7,6 @@
 - (BOOL)allowDragToX:(int)x toY:(int)y;
 @end
 
-@interface GameCanvas : UIView <NTSCommandUpdateListener>
+@interface GameCanvas : UIView<NTSCommandUpdateListener>
 @property(weak,nonatomic) id<GameCanvasDelegate> delegate;
 @end

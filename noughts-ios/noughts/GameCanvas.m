@@ -1,5 +1,6 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import "GameCanvas.h"
+#import "Game.h"
 #import "Action.h"
 #import "SVGKit.h"
 #import "Command.h"
@@ -109,9 +110,9 @@
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
   UIView *view = _views[command];
   [UIView animateWithDuration:0.2 animations:^{
-    view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
+      view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
   } completion:^(BOOL finished) {
-    [view removeFromSuperview];
+      [view removeFromSuperview];
   }];
   [self playSoundIfEnabled:_removeCommandSound];
 }
@@ -128,9 +129,7 @@
     [self removeAllGestureRecognizers:_views[command]];
   }
   [self playSoundIfEnabled:_submitCommandSound];
-  if (!byViewer) {
-    [self drawAction:action animate:YES draggable:NO];
-  }
+  [self drawAction:action animate:YES draggable:NO];
 }
 
 - (void)onGameOverWithNTSGame:(NTSGame *)game {
@@ -139,14 +138,18 @@
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
   for (NTSCommand* command in (id<NSFastEnumeration>)[action getCommandList]) {
-    [self drawCommand:command
-         playerNumber:[action getPlayerNumber]
-              animate:animate
-            draggable:draggable];
+    if (!_views[command]) {
+      [self drawCommand:command
+           playerNumber:[action getPlayerNumber]
+                animate:animate
+              draggable:draggable];
+    }
   }
 }
 
-- (void)drawCommand:(NTSCommand*)command playerNumber:(int)playerNumber animate:(BOOL)animate
+- (void)drawCommand:(NTSCommand*)command
+       playerNumber:(int)playerNumber
+            animate:(BOOL)animate
           draggable:(BOOL)draggable {
   CGRect rect = CGRectMake(([command getColumn] * _squareSize) + _sideMargin,
                            ([command getRow] * _squareSize) + _topOffset + _topMargin,
@@ -158,15 +161,15 @@
     CGAffineTransform transform = newView.transform;
     newView.transform = CGAffineTransformScale(transform, 0.1, 0.1);
     [UIView animateWithDuration:0.2 animations:^{
-      newView.transform = CGAffineTransformScale(transform, 1.1, 1.1);
+        newView.transform = CGAffineTransformScale(transform, 1.1, 1.1);
     } completion:^(BOOL finished) {
-      [UIView animateWithDuration:0.1 animations:^{
-        newView.transform = CGAffineTransformScale(transform, 0.9, 0.9);
-      } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.1 animations:^{
-          newView.transform = transform;
+            newView.transform = CGAffineTransformScale(transform, 0.9, 0.9);
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:0.1 animations:^{
+                newView.transform = transform;
+            }];
         }];
-      }];
     }];
   }
   if (draggable) {
@@ -232,8 +235,10 @@
 - (void)handleTap:(UITapGestureRecognizer*)sender {
   if (sender.state == UIGestureRecognizerStateEnded) {
     CGPoint point = [sender locationInView: self];
-    if (point.y < _topOffset + _topMargin || point.y > _topMargin + _topOffset + (3 * _squareSize) ||
-        point.x < _sideMargin || point.x > (3 * _squareSize) + _sideMargin) {
+    if (point.y < _topOffset + _topMargin ||
+        point.y > _topMargin + _topOffset + (3 * _squareSize) ||
+        point.x < _sideMargin ||
+        point.x > (3 * _squareSize) + _sideMargin) {
       return; // Out of bounds
     }
     [_delegate handleSquareTapAtX:(point.x - _sideMargin) / _squareSize

@@ -1,5 +1,4 @@
 #import <UIKit/UIKit.h>
 
-@interface FacebookInviteViewController : UITableViewController <UITableViewDelegate>
-
+@interface FacebookInviteViewController : UITableViewController<UITableViewDelegate>
 @end

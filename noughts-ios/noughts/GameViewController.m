@@ -3,13 +3,9 @@
 #import "NewGameViewController.h"
 #import "GameListViewController.h"
 #import "Model.h"
-#import "Firebase.h"
 #import "Command.h"
 #import "Profile.h"
 #import "GameStatus.h"
-#import "Games.H"
-#import "java/lang/Integer.h"
-#import "ImageString.h"
 #import "NewLocalGameViewController.h"
 #import "ProfilePromptViewController.h"
 #import "AppDelegate.h"
@@ -71,6 +67,7 @@
 }
 
 - (BOOL)shouldDisplayNotification:(NSString *)gameId {
+  // Don't display push notifications if you're already looking at the game in question
   return ![_currentGameId isEqualToString:gameId];
 }
 
@@ -82,8 +79,8 @@
     color = [self colorFromPlayerNumber:[status getStatusPlayer]];
   }
   [_gameView displayGameStatusWithImageString:[status getStatusImageString]
-                             withString:[status getStatusString]
-                              withColor:color];
+                                   withString:[status getStatusString]
+                                    withColor:color];
   if ([status isComputerThinking]) {
     [_gameView showComputerThinkingIndicator];
   } else {
@@ -171,6 +168,7 @@
   }
 }
 
+// Locate the view controller with the provided class in the navigation controller
 - (UIViewController*)findViewController:(Class)theClass{
   for (UIViewController *viewController in self.navigationController.viewControllers) {
     if ([viewController isMemberOfClass:theClass]) {
@@ -180,11 +178,9 @@
   return nil;
 }
 
+// Creates a new command to place a letter in the provided position
 - (NTSCommand*)commandFromX:(int)x fromY:(int)y {
-  return [[[[NTSCommand newBuilder]
-            setColumnWithInt:x]
-           setRowWithInt:y]
-          build];
+  return [[[[NTSCommand newBuilder] setColumnWithInt:x] setRowWithInt:y] build];
 }
 
 - (void)handleSquareTapAtX:(int)x AtY:(int)y {
@@ -192,12 +188,17 @@
   if ([_model couldAddCommandWithNTSGame:_game
                            withNTSAction:_action
                            withNTSCommand:command]) {
+    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+    BOOL autoSubmit = [[userDefaults valueForKey:kEnableAutosubmitKey] boolValue];
     if (_tutorialMode) {
       [_gameView hideTapSquareCallout];
-      [_gameView showSubmitCallout];
+      if (autoSubmit) {
+         [self setSawTutorial];
+      } else {
+        [_gameView showSubmitCallout];
+      }
     }
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    if([[userDefaults valueForKey:kEnableAutosubmitKey] boolValue]) {
+    if(autoSubmit) {
       [_model addCommandAndSubmitWithNSString:_currentGameId withNTSCommand:command];
     } else {
       [_model addCommandWithNSString:_currentGameId withNTSCommand:command];
@@ -220,11 +221,10 @@
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
   if ([FacebookUtils isFacebookUser]) {
     [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
-                                                      withBlock:
-     ^(NTSProfile* profile) {
-       [_model joinGameIfPossibleWithNSString:_currentGameId
-                               withNTSProfile:profile];
-     }];
+                                                      withBlock:^(NTSProfile* profile) {
+        [_model joinGameIfPossibleWithNSString:_currentGameId
+                                withNTSProfile:profile];
+    }];
   } else {
     [_model joinGameIfPossibleWithNSString:_currentGameId withNTSProfile:nil];
   }
@@ -264,15 +264,20 @@
 - (void)handleSubmit {
   if (_tutorialMode) {
     [_gameView hideSubmitCallout];
-    _tutorialMode = NO;
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:@YES forKey:kSawTutorialKey];
-    [userDefaults synchronize];
+    [self setSawTutorial];
   }
   [_model submitCurrentActionWithNSString:_currentGameId];
   if (![_game isLocalMultiplayer]) {
     [PermissionsManager requestToEnablePushNotifications];
   }
+}
+
+// Record that the user has seen the tutorial
+- (void)setSawTutorial {
+  _tutorialMode = NO;
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  [userDefaults setObject:@YES forKey:kSawTutorialKey];
+  [userDefaults synchronize];
 }
 
 - (void)handleUndo {

@@ -5,8 +5,6 @@
 #import "GameListPartitions.h"
 #import "GameViewController.h"
 #import "java/util/List.h"
-#import <objc/runtime.h>
-#import "ImageString.h"
 #import "GameListEntry.h"
 #import "GameListEntryCell.h"
 #import "GameListListener.h"
@@ -24,9 +22,12 @@
 @property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
-#define YOUR_GAMES_SECTION 0
-#define THEIR_GAMES_SECTION 1
-#define GAME_OVER_SECTION 2
+#define kYourGamesSection 0
+#define kTheirGamesSection 1
+#define kGameOverSection 2
+#define kPadRowHeight 80
+#define kPhoneRowHeight 50
+#define kNumberOfSections 3
 
 @implementation GameListViewController
 
@@ -34,7 +35,8 @@
   [super viewDidLoad];
   self.navigationItem.rightBarButtonItem = self.editButtonItem;
   _scale = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 2 : 1;
-  self.tableView.rowHeight = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 80 : 50;
+  self.tableView.rowHeight =
+      UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? kPadRowHeight : kPhoneRowHeight;
   _pushHandler = [PushNotificationHandler new];
 }
 
@@ -83,16 +85,15 @@
 - (void)onGameRemovedWithNSString:(NSString*)gameId {
   [self.tableView beginUpdates];
   NTSIndexPath *indexPath = [_gameListPartitions getGameIndexPathWithNSString:gameId];
-  [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath
-                                            indexPathForItem:[indexPath getRow]
-                                                   inSection:[indexPath getSection]]]
+  [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForItem:[indexPath getRow]
+                                                               inSection:[indexPath getSection]]]
                         withRowAnimation:UITableViewRowAnimationFade];
   _gameListPartitions = [_model getGameListPartitions];
   [self.tableView endUpdates];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-  return 3;
+  return kNumberOfSections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -101,11 +102,11 @@
 
 - (id<JavaUtilList>)listForSectionNumber:(NSInteger)section {
   switch (section) {
-    case YOUR_GAMES_SECTION:
+    case kYourGamesSection:
       return [self.gameListPartitions yourTurn];
-    case THEIR_GAMES_SECTION:
+    case kTheirGamesSection:
       return [self.gameListPartitions theirTurn];
-    case GAME_OVER_SECTION:
+    case kGameOverSection:
       return [self.gameListPartitions gameOver];
   }
   return nil;
@@ -134,18 +135,18 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
   switch (section) {
-    case YOUR_GAMES_SECTION:
+    case kYourGamesSection:
       return @"Games - Your Turn";
-    case THEIR_GAMES_SECTION:
+    case kTheirGamesSection:
       return @"Games - Their Turn";
-    case GAME_OVER_SECTION:
+    case kGameOverSection:
       return @"Games - Game Over";
   }
   return nil;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:
-    (NSIndexPath *)indexPath {
+- (NSString *)tableView:(UITableView *)tableView
+    titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath {
   NTSGame *game = [self gameForIndexPath:indexPath];
   return [game isGameOver] ? @"Archive" : @"Resign";
 }
@@ -163,7 +164,6 @@
     commitEditingStyle:(UITableViewCellEditingStyle)editingStyle
      forRowAtIndexPath:(NSIndexPath *)indexPath {
   if (editingStyle == UITableViewCellEditingStyleDelete) {
-
     NTSGame *game = [self gameForIndexPath:indexPath];
     if ([game isGameOver]) {
       [_model archiveGameWithNSString:[game getId]];

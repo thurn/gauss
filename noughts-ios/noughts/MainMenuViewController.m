@@ -1,6 +1,4 @@
 #import "MainMenuViewController.h"
-#import "AppDelegate.h"
-#import <FacebookSDK/FacebookSDK.h>
 #import "FacebookUtils.h"
 #import "Identifiers.h"
 #import "PushNotificationHandler.h"
@@ -29,14 +27,15 @@
   [_pushHandler unregisterHandler];
 }
 
+// Hides the facebook login link
 - (void)removeLoginLink:(BOOL)animated {
   if (animated) {
     [UIView animateWithDuration:0.3 animations:^{
-      [self.view viewWithTag:5].alpha = 0.0;
-      [self.view viewWithTag:6].alpha = 0.0;
+        [self.view viewWithTag:5].alpha = 0.0;
+        [self.view viewWithTag:6].alpha = 0.0;
     } completion:^(BOOL finished) {
-      [[self.view viewWithTag:5] removeFromSuperview];
-      [[self.view viewWithTag:6] removeFromSuperview];
+        [[self.view viewWithTag:5] removeFromSuperview];
+        [[self.view viewWithTag:6] removeFromSuperview];
     }];
   } else {
     [[self.view viewWithTag:5] removeFromSuperview];
@@ -46,7 +45,7 @@
 
 - (IBAction)onFacebookLoginClicked {
   [FacebookUtils logInToFacebook:self.view withCallback:^{
-    [self removeLoginLink: YES];
+      [self removeLoginLink: YES];
   }];
 }
 

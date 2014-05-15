@@ -310,6 +310,9 @@ public class Model extends AbstractChildEventListener {
           listener.onRegistered(userId, game, getCurrentAction(gameId));
         }
       } else {
+        if (game.isGameOver() && !oldGame.isGameOver()) {
+          listener.onGameOver(game);
+        }
         int count = game.getSubmittedActionCount();
         while (count > oldGame.getSubmittedActionCount()) {
           Action submitted = game.getSubmittedAction(count - 1);
@@ -317,9 +320,6 @@ public class Model extends AbstractChildEventListener {
               Games.playerNumberForPlayerId(game, userId) == submitted.getPlayerNumber();
           listener.onActionSubmitted(submitted, byViewer);
           count--;
-        }
-        if (game.isGameOver() && !oldGame.isGameOver()) {
-          listener.onGameOver(game);
         }
       }
     }
@@ -479,16 +479,25 @@ public class Model extends AbstractChildEventListener {
   /**
    * Adds the provided command as in {@link Model#addCommand(Game, Command)}
    * and also submits the resulting action as in {@link
-   * Model#submitCurrentAction(Game)}. Note that this will fire multiple
-   * game updates for each step, pass a completion function to execute code
-   * when the submit is finished.
+   * Model#submitCurrentAction(Game)}.
    *
    * @param game The game.
    * @param command Command to add.
    * @param onComplete Optionally, a function to invoke when the command is submitted.
    */
   public void addCommandAndSubmit(String gameId, Command command, OnMutationCompleted onComplete) {
-    addCommand(gameId, command, true /* submit */, onComplete);
+    final Game game = getGame(gameId);
+    if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
+      die("Illegal command: %s", command);
+    }
+    Action toSubmit = currentActions.get(gameId)
+        .toBuilder()
+        .setPlayerNumber(game.getCurrentPlayerNumber())
+        .clearFutureCommandList()
+        .addCommand(command)
+        .build();
+    submitAction(gameId, toSubmit, onComplete);
+    analyticsService.trackEvent("addCommandAndSubmit");
   }
 
   /**
@@ -502,15 +511,7 @@ public class Model extends AbstractChildEventListener {
    * @param command The command to add.
    * @return The game with the command added.
    */
-  public void addCommand(String gameId, Command command) {
-    addCommand(gameId, command, false /* submit */, null /* onComplete */);
-  }
-
-  /**
-   * Add the provided command to the game, optionally also submitting the command.
-   */
-  private void addCommand(final String gameId, final Command command, final boolean submit,
-      final OnMutationCompleted onComplete) {
+  public void addCommand(String gameId, final Command command) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
       die("Illegal command: %s", command);
@@ -522,17 +523,8 @@ public class Model extends AbstractChildEventListener {
         action.addCommand(command);
         action.setPlayerNumber(game.getCurrentPlayerNumber());
       }
-
-      @Override
-      public void onComplete(Action action) {
-        if (submit) {
-          submitCurrentAction(gameId, onComplete);
-        }
-      }
     });
-    Map<String, String> dimensions = new HashMap<String, String>();
-    dimensions.put("submit", submit + "");
-    analyticsService.trackEvent("addCommand", dimensions);
+    analyticsService.trackEvent("addCommand");
     updateLastModified(gameId);
   }
 
@@ -652,20 +644,32 @@ public class Model extends AbstractChildEventListener {
    * @param action The current action.
    * @param onComplete Optionally, a function to invoke when the action is
    *     submitted.
-   * @return The game with the action submitted.
    */
-  public void submitCurrentAction(String gameId, final OnMutationCompleted onComplete) {
-    ensureIsCurrentPlayer(gameId);
+  public void submitCurrentAction(String gameId, OnMutationCompleted onComplete) {
     final Action currentAction = getCurrentAction(gameId);
+    submitAction(gameId, currentAction, onComplete);
+  }
+
+  /**
+   * Submits the provided action.
+   *
+   * @param gameId Current Game ID.
+   * @param action Action to submit.
+   * @param onComplete Optionally, a function to invoke when the action is
+   *     submitted.
+   */
+  private void submitAction(String gameId, final Action action,
+      final OnMutationCompleted onComplete) {
+    ensureIsCurrentPlayer(gameId);
     Game game = getGame(gameId);
-    if (!canSubmit(game, currentAction)) die("Illegal action!");
+    if (!canSubmit(game, action)) die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
-    final List<Integer> victors = computeVictorsIfSubmitted(game, currentAction);
+    final List<Integer> victors = computeVictorsIfSubmitted(game, action);
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
-        game.addSubmittedAction(currentAction.toBuilder().setIsSubmitted(true));
+        game.addSubmittedAction(action.toBuilder().setIsSubmitted(true));
         game.setLastModified(timestamp);
         if (victors == null) {
           game.setCurrentPlayerNumber(newPlayerNumber);

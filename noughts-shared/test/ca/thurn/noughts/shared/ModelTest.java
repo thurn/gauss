@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
@@ -288,15 +287,11 @@ public class ModelTest extends SharedTestCase {
       @Override
       public void run() {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
-          final AtomicInteger numGameUpdates = new AtomicInteger(0);
           @Override
           public void onGameUpdate(Game game) {
-            // Allow for two updates because addAndSubmit fires twice
-            if (numGameUpdates.getAndIncrement() == 1) {
-              assertEquals(command, game.getSubmittedAction(0).getCommand(0));
-              assertEquals(1, game.getCurrentPlayerNumber());
-              finished();
-            }
+            assertEquals(command, game.getSubmittedAction(0).getCommand(0));
+            assertEquals(1, game.getCurrentPlayerNumber());
+            finished();
           }
         }, false /* immediate */);
         model.addCommandAndSubmit(game.getId(), command);

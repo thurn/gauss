@@ -2,9 +2,13 @@
 #import <FirebaseSimpleLogin/FirebaseSimpleLogin.h>
 #import "Model.h"
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+// AppDelegate for noughts
+@interface AppDelegate : UIResponder<UIApplicationDelegate>
 @property(strong, nonatomic) UIWindow *window;
 
+// Get the global Model object
 + (NTSModel*)getModel;
+
+// Get the global Firebase login helper object
 + (FirebaseSimpleLogin*)getFirebaseSimpleLogin;
 @end

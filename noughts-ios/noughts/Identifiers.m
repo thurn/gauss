@@ -19,3 +19,4 @@ NSString* const kDisableSoundsKey = @"kDisableSoundsKey";
 NSString* const kEnableAutosubmitKey = @"kEnableAutosubmitKey";
 NSString* const kEnabledNotificationsKey = @"kEnabledNotificationsKey";
 NSString* const kDeclinedPushDateKey = @"kDeclinedPushDateKey";
+NSString* const kPlayerLocalNameKey = @"kPlayerLocalNameKey";

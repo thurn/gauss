@@ -6,23 +6,33 @@
 #import "ImageType.h"
 #import "AppDelegate.h"
 #import "Identifiers.h"
-#import "Games.h"
 #import "PushNotificationHandler.h"
 #import "InterfaceUtils.h"
 #import "ImageStringUtils.h"
 
+
+#define kPadPickerRowHeight 40.0
+#define kPhonePickerRowHeight 25.0
+#define kPadPickerFontSize 24
+#define kPhonePickerFontSize 14
+#define kPickerRowCount 3
+#define kPickerComponentCount 1
+#define kKeyboardViewOffset 100
+#define kAvatarSize 100
+#define kKeyboardAnimationDuration 0.25
+
 @interface NewLocalGameViewController () <UITextFieldDelegate,
                                           UIPickerViewDataSource,
                                           UIPickerViewDelegate>
-@property (weak, nonatomic) IBOutlet UITextField *p1TextField;
-@property (weak, nonatomic) IBOutlet UITextField *p2TextField;
-@property (weak, nonatomic) IBOutlet UIButton *p1Image;
-@property (weak, nonatomic) IBOutlet UIButton *p2Image;
-@property (weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
-@property (strong, nonatomic) NSArray *playerImages;
-@property (strong, nonatomic) NSArray *computerImages;
-@property (nonatomic) int p1ImageIndex;
-@property (nonatomic) int p2ImageIndex;
+@property(weak, nonatomic) IBOutlet UITextField *p1TextField;
+@property(weak, nonatomic) IBOutlet UITextField *p2TextField;
+@property(weak, nonatomic) IBOutlet UIButton *p1Image;
+@property(weak, nonatomic) IBOutlet UIButton *p2Image;
+@property(weak, nonatomic) IBOutlet UIPickerView *difficultyPicker;
+@property(strong, nonatomic) NSArray *playerImages;
+@property(strong, nonatomic) NSArray *computerImages;
+@property(nonatomic) int p1ImageIndex;
+@property(nonatomic) int p2ImageIndex;
 @property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
@@ -53,21 +63,20 @@
                                            selector:@selector(keyboardWillBeShown:)
                                                name:UIKeyboardWillShowNotification
                                              object:nil];
-  
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(keyboardWillBeHidden:)
                                                name:UIKeyboardWillHideNotification
                                              object:nil];
   UIImage *image1 = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p1ImageIndex]
-                                               size:100];
+                                               size:kAvatarSize];
   [_p1Image setImage:image1 forState:UIControlStateNormal];
   UIImage *image2;
   if (_playVsComputerMode) {
     image2 = [ImageStringUtils getLocalImage:[_computerImages objectAtIndex:_p2ImageIndex]
-                                        size:100];
+                                        size:kAvatarSize];
   } else {
     image2 = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p2ImageIndex]
-                                        size:100];
+                                        size:kAvatarSize];
   }
   [_p2Image setImage:image2 forState:UIControlStateNormal];
   
@@ -95,20 +104,21 @@
   [_pushHandler unregisterHandler];
 }
 
+// Animates the movement of the main view by the given amount in the y dimension
 - (void)animateViewByDeltaY:(int)deltaY {
   [UIView beginAnimations:nil context:NULL];
-  [UIView setAnimationDuration:0.25];
+  [UIView setAnimationDuration:kKeyboardAnimationDuration];
   CGPoint center = self.view.center;
   self.view.center = CGPointMake(center.x, center.y + deltaY);
   [UIView commitAnimations];
 }
 
 - (void)keyboardWillBeShown:(NSNotification*)aNotification {
-  [self animateViewByDeltaY:-100];
+  [self animateViewByDeltaY:-kKeyboardViewOffset];
 }
 
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification {
-  [self animateViewByDeltaY:100];
+  [self animateViewByDeltaY:kKeyboardViewOffset];
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
@@ -129,7 +139,7 @@
     _p1ImageIndex = (_p1ImageIndex + 1) % [_playerImages count];
   }
   UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p1ImageIndex]
-                                              size:100];
+                                              size:kAvatarSize];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -139,7 +149,7 @@
     _p2ImageIndex = (_p2ImageIndex + 1) % [_playerImages count];
   }
   UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_p2ImageIndex]
-                                              size:100];
+                                              size:kAvatarSize];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -149,11 +159,11 @@
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView {
-  return 1;
+  return kPickerComponentCount;
 }
 
 - (NSInteger)pickerView:(UIPickerView *)pickerView numberOfRowsInComponent:(NSInteger)component {
-  return 3;
+  return kPickerRowCount;
 }
 
 - (UIView*)pickerView:(UIPickerView *)pickerView
@@ -163,7 +173,8 @@
   UILabel* label = (UILabel*)view;
   if (!label) {
     label = [[UILabel alloc] init];
-    int fontSize = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 24 : 14;
+    int fontSize = UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ?
+        kPadPickerFontSize : kPhonePickerFontSize;
     [label setFont:[UIFont systemFontOfSize:fontSize]];
   }
   label.text = [self nameForDifficultyLevel:row];
@@ -171,7 +182,8 @@
 }
 
 - (CGFloat)pickerView:(UIPickerView *)pickerView rowHeightForComponent:(NSInteger)component {
-  return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ? 40.0 : 25.0;
+  return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad ?
+      kPadPickerRowHeight : kPhonePickerRowHeight;
 }
 
 - (NSString *)nameForDifficultyLevel:(NSInteger)level {
@@ -197,7 +209,7 @@
        inComponent:(NSInteger)component {
   _p2ImageIndex = (int)row;
   UIImage *image = [ImageStringUtils getLocalImage:[_computerImages objectAtIndex:_p2ImageIndex]
-                                              size:100];
+                                              size:kAvatarSize];
   // Button is disabled for vs. computer
   [_p2Image setImage:image forState:UIControlStateDisabled];
 }
@@ -239,20 +251,22 @@
     [userDefaults setObject:[[NSNumber alloc] initWithInt:difficultyLevel]
                      forKey:kPreferredDifficultyKey];
     [p2Profile setNameWithNSString:[self nameForDifficultyLevel:difficultyLevel]];
-    [p2Profile setImageStringWithNTSImageString:
-     [self localImageString:[_computerImages objectAtIndex:difficultyLevel]]];
+    NTSImageString *imageString =
+        [self localImageString:[_computerImages objectAtIndex:difficultyLevel]];
+    [p2Profile setImageStringWithNTSImageString:imageString];
     [p2Profile setIsComputerPlayerWithBoolean:YES];
     [p2Profile setComputerDifficultyLevelWithInt:difficultyLevel];
   } else {
     [p2Profile setNameWithNSString:p2Name];
-    [p2Profile setImageStringWithNTSImageString:
-     [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]]];
+    NTSImageString *imageString =
+        [self localImageString:[_playerImages objectAtIndex:_p2ImageIndex]];
+    [p2Profile setImageStringWithNTSImageString:imageString];
   }
   NTSModel *model = [AppDelegate getModel];
   [userDefaults synchronize];
   NSArray *profiles = @[[p1Profile build], [p2Profile build]];
-  NSString *gameId = [model newLocalMultiplayerGameWithJavaUtilList:
-                      [JavaUtils nsArrayToJavaUtilList:profiles]];
+  NSString *gameId =
+      [model newLocalMultiplayerGameWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:profiles]];
   id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
   if (sawTutorial == nil) {
     destination.tutorialMode = YES;

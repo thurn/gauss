@@ -75,18 +75,19 @@
 }
 
 - (void)showEnablePushAlert {
-  UIAlertView *alert = [[UIAlertView alloc]
-                        initWithTitle:@"Enable notifications?"
-                        message:@"Would you like to get a notification when it's your turn?"
-                        delegate:self
-                        cancelButtonTitle:@"No Thanks"
-                        otherButtonTitles:@"Notify Me", nil];
+  UIAlertView *alert =
+      [[UIAlertView alloc] initWithTitle:@"Enable notifications?"
+                                 message:@"Would you like to get notified when it's your turn?"
+                                delegate:self
+                       cancelButtonTitle:@"No Thanks"
+                       otherButtonTitles:@"Notify Me", nil];
   [alert show];
 }
 
 + (void)requestToEnablePushNotifications {
-  [[NSNotificationCenter defaultCenter] postNotification:
-   [NSNotification notificationWithName:kRequestEnablePushNotification object:nil]];
+  [[NSNotificationCenter defaultCenter]
+      postNotification: [NSNotification notificationWithName:kRequestEnablePushNotification
+                                                      object:nil]];
 }
 
 @end

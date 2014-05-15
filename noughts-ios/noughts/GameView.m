@@ -1,13 +1,9 @@
 #import "GameView.h"
-#import "SVGKit.h"
-#import "Model.h"
-#import "Action.h"
-#import "Command.h"
-#include "java/lang/Integer.h"
 #import "SMCalloutView.h"
 #import "UIView+AutoLayout.h"
 #import "GameCanvas.h"
 #import "ImageStringUtils.h"
+#import "CommandUpdateListener.h"
 
 #define TOP_OFFSET 80
 #define SQUARE_SIZE 107
@@ -45,7 +41,7 @@
     [self addSubview:_gameCanvas];
     
     _activityView = [[UIActivityIndicatorView alloc]
-                     initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+                        initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     _activityView.center = self.center;
     _activityView.color = [UIColor blackColor];
     _activityView.backgroundColor = [UIColor whiteColor];
@@ -161,15 +157,15 @@
 }
 
 - (void)displayGameStatusWithImageString:(NTSImageString*)imageString
-                       withString:(NSString*)string
-                        withColor:(UIColor*)color {
+                              withString:(NSString*)string
+                               withColor:(UIColor*)color {
   [ImageStringUtils setImage:_gameStatusImage imageString:imageString size:75];
   _gameStatusLabel.text = string;
   _gameStatusColorView.backgroundColor = color;
   [self layoutIfNeeded];
   [UIView animateWithDuration:0.3 animations:^{
-    _gameStatusConstraint.constant = 0;
-    [self layoutIfNeeded];
+      _gameStatusConstraint.constant = 0;
+      [self layoutIfNeeded];
   }];
   dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC);
   double taskId = rand();
@@ -178,20 +174,20 @@
   // the view going back down if we're still the last scheduled task when
   // it's time to run.
   dispatch_after(delay, dispatch_get_main_queue(), ^{
-    if (taskId == _taskId) {
-    [UIView animateWithDuration:0.3 animations:^{
-      _gameStatusConstraint.constant = 75*_scale;
-      [self layoutIfNeeded];
-    }];
-    }
+      if (taskId == _taskId) {
+      [UIView animateWithDuration:0.3 animations:^{
+          _gameStatusConstraint.constant = 75*_scale;
+          [self layoutIfNeeded];
+      }];
+      }
   });
 }
 
 - (void)handleGameStatusTap:(UITapGestureRecognizer *)recognizer {
   // Tap game status to dismiss.
   [UIView animateWithDuration:0.3 animations:^{
-    _gameStatusConstraint.constant = 75*_scale;
-    [self layoutIfNeeded];
+      _gameStatusConstraint.constant = 75*_scale;
+      [self layoutIfNeeded];
   }];
 }
 
@@ -259,11 +255,11 @@
   int undoConstant = undoEnabled ? submitWidth + submitConstant + 5 : -undoWidth;
 
   [UIView animateWithDuration:0.3 animations:^{
-    // Invert constants to convert from insets
-    _submitButtonConstraint.constant = -submitConstant;
-    _redoButtonConstraint.constant = -redoConstant;
-    _undoButtonConstraint.constant = -undoConstant;
-    [self layoutIfNeeded];
+      // Invert constants to convert from insets
+      _submitButtonConstraint.constant = -submitConstant;
+      _redoButtonConstraint.constant = -redoConstant;
+      _undoButtonConstraint.constant = -undoConstant;
+      [self layoutIfNeeded];
   }];
 }
 
@@ -276,16 +272,16 @@
   _activityView.alpha = 0.0;
   [_activityView startAnimating];
   [UIView animateWithDuration:0.3 animations:^{
-    _activityView.alpha = 0.95;
+      _activityView.alpha = 0.95;
   }];
 }
 
 - (void)hideComputerThinkingIndicator {
   [_activityView stopAnimating];
   [UIView animateWithDuration:0.3 animations:^{
-    _activityView.alpha = 0.0;
+      _activityView.alpha = 0.0;
   } completion:^(BOOL finished){
-    _activityView.hidden = YES;
+      _activityView.hidden = YES;
   }];
 }
 
@@ -308,10 +304,10 @@
   // Allow time for the submit animation to finish.
   dispatch_time_t delay = dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC);
   dispatch_after(delay, dispatch_get_main_queue(), ^{
-    [_submitCallout presentCalloutFromRect:_submitButton.frame
-                                    inView:self
-                         constrainedToView:self
-                                  animated:YES];
+      [_submitCallout presentCalloutFromRect:_submitButton.frame
+                                      inView:self
+                           constrainedToView:self
+                                    animated:YES];
   });
 }
 

@@ -10,7 +10,7 @@
 #import "OnUpgradeCompleted.h"
 #import "InterfaceUtils.h"
 
-@interface UpgradeCallback : NSObject <NTSOnUpgradeCompleted>
+@interface UpgradeCallback : NSObject<NTSOnUpgradeCompleted>
 @property (nonatomic, copy) void (^completionBlock)();
 - (void)onUpgradeCompleted;
 @end
@@ -30,29 +30,30 @@
   [MBProgressHUD showHUDAddedTo:view animated:YES];
   UpgradeCallback *onUpgrade = [UpgradeCallback new];
   onUpgrade.completionBlock = ^{
-    [MBProgressHUD hideHUDForView:view animated:YES];
-    if (callback) {
-      callback();
-    }
+      [MBProgressHUD hideHUDForView:view animated:YES];
+      if (callback) {
+        callback();
+      }
+  };
+  void (^completionBlock)(NSError*, FAUser*) = ^(NSError *error, FAUser *user) {
+      if (error) {
+        [InterfaceUtils error:@"Error logging in to Facebook!"];
+      } else {
+        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+        [userDefaults setObject:user.userId forKey:kFacebookIdKey];
+        [userDefaults synchronize];
+        [[NSNotificationCenter defaultCenter]
+            postNotification:[NSNotification notificationWithName:kFacebookLoginNotification
+                                                           object:user.userId]];
+        NTSModel *model = [AppDelegate getModel];
+        [model upgradeAccountToFacebookWithNSString:user.userId
+                          withNTSOnUpgradeCompleted:onUpgrade];
+      }
   };
   [firebaseLogin loginToFacebookAppWithId:@"419772734774541"
                                permissions:@[@"basic_info"]
                                   audience:ACFacebookAudienceOnlyMe
-                       withCompletionBlock:^(NSError *error, FAUser *user) {
-                         if (error) {
-                           [InterfaceUtils error:@"Error logging in to Facebook!"];
-                         } else {
-                           NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-                           [userDefaults setObject:user.userId forKey:kFacebookIdKey];
-                           [userDefaults synchronize];
-                           [[NSNotificationCenter defaultCenter] postNotification:
-                            [NSNotification notificationWithName:kFacebookLoginNotification
-                                                          object:user.userId]];
-                           NTSModel *model = [AppDelegate getModel];
-                           [model upgradeAccountToFacebookWithNSString:user.userId
-                                             withNTSOnUpgradeCompleted:onUpgrade];
-                         }
-                       }];
+                       withCompletionBlock:completionBlock];
 }
 
 + (NTSProfile*)profileFromFacebookDictionary:(NSDictionary*)dictionary {
@@ -74,8 +75,9 @@
     // FQL calls this field something different just to be annoying
     facebookId = dictionary[@"uid"];
   }
-  [imageBuilder setStringWithNSString:
-   [NSString stringWithFormat:@"https://graph.facebook.com/%@/picture", facebookId]];
+  [imageBuilder
+      setStringWithNSString:[NSString stringWithFormat:@"https://graph.facebook.com/%@/picture",
+                                      facebookId]];
   [builder setImageStringWithNTSImageString:[imageBuilder build]];
   return [builder build];
 }

@@ -28,11 +28,10 @@ static NotificationManager* gInstance;
     _values = [NSMutableDictionary new];
     _blocks = [NSMutableDictionary new];
     for (NSString* notification in notifications) {
-      [[NSNotificationCenter defaultCenter]
-       addObserver:self
-       selector:@selector(notificationReceived:)
-       name:notification
-       object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(notificationReceived:)
+                                                   name:notification
+                                                 object:nil];
     }
   }
   return self;

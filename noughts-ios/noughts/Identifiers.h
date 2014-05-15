@@ -19,3 +19,4 @@ FOUNDATION_EXPORT NSString* const kDisableSoundsKey;
 FOUNDATION_EXPORT NSString* const kEnableAutosubmitKey;
 FOUNDATION_EXPORT NSString* const kEnabledNotificationsKey;
 FOUNDATION_EXPORT NSString* const kDeclinedPushDateKey;
+FOUNDATION_EXPORT NSString* const kPlayerLocalNameKey;

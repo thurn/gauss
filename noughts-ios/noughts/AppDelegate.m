@@ -4,10 +4,9 @@
 #import "GameViewController.h"
 #import "MainMenuViewController.h"
 #import <CommonCrypto/CommonDigest.h>
-#import "PushNotificationListener.h"
+#import "PushNotificationService.h"
 #import <Firebase/Firebase.h>
 #import <FacebookSDK/FacebookSDK.h>
-#import "QueryParsing.h"
 #import "RequestLoadedCallback.h"
 #import "Identifiers.h"
 #import "NotificationManager.h"
@@ -17,6 +16,7 @@
 #import "PermissionsManager.h"
 #import "PushNotificationsServiceImpl.h"
 #import "AnalyticsServiceImpl.h"
+#import "NSURL+QueryDictionary.h"
 
 @interface AppDelegate () <NTSRequestLoadedCallback>
 @property BOOL runningQuery;
@@ -64,13 +64,13 @@
                   withNTSPushNotificationService:[PushNotificationsServiceImpl new]
                          withNTSAnalyticsService:[AnalyticsServiceImpl new]];
     [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
-      if (user != nil) {
-        [[NSNotificationCenter defaultCenter] postNotification:
-         [NSNotification notificationWithName:kFacebookLoginNotification
-                                       object:user.userId]];
-      } else {
-        [InterfaceUtils error:@"Error logging in to facebook"];
-      }
+        if (user != nil) {
+          [[NSNotificationCenter defaultCenter]
+              postNotification:[NSNotification notificationWithName:kFacebookLoginNotification
+                                                             object:user.userId]];
+        } else {
+          [InterfaceUtils error:@"Error logging in to facebook"];
+        }
     }];
   } else {
     NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
@@ -84,9 +84,9 @@
 
   NSString *gameId = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"gameId"];
   if (gameId) {
-    [[NSNotificationCenter defaultCenter] postNotification:
-     [NSNotification notificationWithName:kGameRequestedNotification
-                                   object:gameId]];
+    [[NSNotificationCenter defaultCenter]
+        postNotification:[NSNotification notificationWithName:kGameRequestedNotification
+                                                       object:gameId]];
   }
   return YES;
 }
@@ -107,6 +107,7 @@
   return YES;
 }
 
+// Computes the SHA1 hash of the provided string
 - (NSString*)sha1:(NSString*)input {
   const char *cstr = [input cStringUsingEncoding:NSUTF8StringEncoding];
   NSData *data = [NSData dataWithBytes:cstr length:input.length];
@@ -138,121 +139,126 @@
             openURL:(NSURL *)url
   sourceApplication:(NSString *)sourceApplication
          annotation:(id)annotation {
-
   if ([[url scheme] isEqualToString:@"noughts"]) {
     NSArray *paths = [url pathComponents];
     NSString *gameId = paths[1];
-    [[NSNotificationCenter defaultCenter] postNotification:
-     [NSNotification notificationWithName:kGameRequestedNotification
-                                   object:gameId]];
+    [[NSNotificationCenter defaultCenter]
+        postNotification:[NSNotification notificationWithName:kGameRequestedNotification
+                                                       object:gameId]];
     return YES;
   }
 
+  // Handle launch from facebook notification
   [FBAppCall handleOpenURL:url
          sourceApplication:sourceApplication
            fallbackHandler:^(FBAppCall *call) {
-    if (call.appLinkData && call.appLinkData.targetURL) {
-      NSURL *target = call.appLinkData.targetURL;
-      NSString *requestIds = [QueryParsing dictionaryFromQueryComponents:target][@"request_ids"][0];
-      NSArray *idsArray = [requestIds componentsSeparatedByString:@","];
-      for (int i = 0; i < [idsArray count]; ++i) {
-        if (i == [idsArray count] - 1) {
-          // Most recent request -- load it
-          [_model subscribeToRequestIdsWithNSString:idsArray[i]
-                      withNTSRequestLoadedCallback:self];
-        } else {
-          // Old request -- delete it
-          NSString *facebookId = [FacebookUtils getFacebookId];
-          NSString *fullId = [NSString stringWithFormat:@"%@_%@", idsArray[i], facebookId];
-          FBRequest *request = [FBRequest requestWithGraphPath:fullId
-                                                    parameters:@{}
-                                                    HTTPMethod:@"DELETE"];
-          [request startWithCompletionHandler:^(FBRequestConnection *connection,
-                                                id result, NSError *error) {
-          }];
+      if (call.appLinkData && call.appLinkData.targetURL) {
+        NSURL *target = call.appLinkData.targetURL;
+        NSString *requestIds =
+            [target uq_queryDictionary][@"request_ids"][0];
+        NSArray *idsArray = [requestIds componentsSeparatedByString:@","];
+        for (int i = 0; i < [idsArray count]; ++i) {
+          if (i == [idsArray count] - 1) {
+            // Most recent request -- load it
+            [_model subscribeToRequestIdsWithNSString:idsArray[i]
+                         withNTSRequestLoadedCallback:self];
+          } else {
+            // Old request -- delete it
+            NSString *facebookId = [FacebookUtils getFacebookId];
+            NSString *fullId = [NSString stringWithFormat:@"%@_%@", idsArray[i], facebookId];
+            FBRequest *request = [FBRequest requestWithGraphPath:fullId
+                                                      parameters:@{}
+                                                      HTTPMethod:@"DELETE"];
+            [request startWithCompletionHandler:^(FBRequestConnection *connection,
+                                                  id result, NSError *error) {}];
+          }
         }
       }
-    }
   }];
   return YES;
 }
 
+// Game ID loaded from a Facebook Request
 - (void)onRequestLoadedWithNSString:(NSString *)gameId {
-  [[NSNotificationCenter defaultCenter] postNotification:
-   [NSNotification notificationWithName:kGameRequestedNotification
-                                 object:gameId]];
+  [[NSNotificationCenter defaultCenter]
+      postNotification:[NSNotification notificationWithName:kGameRequestedNotification
+                                                     object:gameId]];
 }
 
+// Load |GameViewController| with a game ID from this notification
 - (void)gameRequested:(NSNotification*)notification {
   NSString *gameId = notification.object;
   [_model subscribeViewerToGameWithNSString:gameId];
   UINavigationController *root = (UINavigationController*)self.window.rootViewController;
   root.viewControllers = @[];
   MainMenuViewController *mainMenu =
-  [[InterfaceUtils mainStoryboard]
-   instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
+      [[InterfaceUtils mainStoryboard]
+          instantiateViewControllerWithIdentifier:@"MainMenuViewController"];
   [root pushViewController:mainMenu animated:NO];
   GameViewController *gameViewController =
-  [[InterfaceUtils mainStoryboard]
-   instantiateViewControllerWithIdentifier:@"GameViewController"];
+      [[InterfaceUtils mainStoryboard]
+          instantiateViewControllerWithIdentifier:@"GameViewController"];
   gameViewController.currentGameId = gameId;
   [root pushViewController:gameViewController animated:YES];
 }
 
+// Called after the user has been logged in to Facebook
 - (void)onFacebookLogin:(NSNotification*)notification {
   [self getUserFacebookProfile];
   [self getFacebookFriends];
-  
   FBFrictionlessRecipientCache *friendCache = [FBFrictionlessRecipientCache new];
   [friendCache prefetchAndCacheForSession:nil];
-  [[NSNotificationCenter defaultCenter] postNotification:
-   [NSNotification notificationWithName:kRecipientCacheLoadedNotification
-                                 object:friendCache]];
+  [[NSNotificationCenter defaultCenter]
+      postNotification:[NSNotification notificationWithName:kRecipientCacheLoadedNotification
+                                                     object:friendCache]];
 }
 
+// Loads the user's Facebook profile and publishes a notification with the result
 - (void)getUserFacebookProfile {
   [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection,
                                                          id result,
                                                          NSError *error) {
-    if (error) {
-      [InterfaceUtils error:@"Error loading facebook profile"];
-    } else {
-      NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:result];
-      [[NSNotificationCenter defaultCenter] postNotification:
-       [NSNotification notificationWithName:kFacebookProfileLoadedNotification
-                                     object:profile]];
-    }
+      if (error) {
+        [InterfaceUtils error:@"Error loading facebook profile"];
+      } else {
+        NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:result];
+        [[NSNotificationCenter defaultCenter]
+            postNotification:[NSNotification notificationWithName:kFacebookProfileLoadedNotification
+                                                           object:profile]];
+      }
   }];
 }
 
+// Loads the user's Facebook friends and pusblishes a notification with the result
 - (void)getFacebookFriends {
   NSString *query = @"SELECT uid,mutual_friend_count,name,first_name,sex,is_app_user "
-  @"FROM user WHERE uid IN "
-  @"( SELECT uid2 FROM friend WHERE uid1=me() )";
-  NSDictionary *queryParam = @{ @"q": query };
+      @"FROM user WHERE uid IN "
+      @"( SELECT uid2 FROM friend WHERE uid1=me() )";
+  NSDictionary *queryParam = @{ @"q" : query };
   [FBRequestConnection startWithGraphPath:@"/fql"
                                parameters:queryParam
                                HTTPMethod:@"GET"
                         completionHandler:^(FBRequestConnection *connection,
                                             id result,
                                             NSError *error) {
-                          if (error) {
-                            [InterfaceUtils error:@"Error loading facebook friends"];
-                          } else {
-                            [self handleFriendsResult:result[@"data"]];
-                          }
+                            if (error) {
+                              [InterfaceUtils error:@"Error loading facebook friends"];
+                            } else {
+                              [self handleFriendsResult:result[@"data"]];
+                            }
                         }];
 }
 
+// Sorts the user's friends by mutual_friend_count and publishes a notification with the result
 - (void)handleFriendsResult:(NSArray*)array {
   NSSortDescriptor *appUser = [[NSSortDescriptor alloc] initWithKey:@"is_app_user"
                                                           ascending:NO];
   NSSortDescriptor *mutalFriends = [[NSSortDescriptor alloc] initWithKey:@"mutual_friend_count"
                                                                ascending:NO];
   NSArray *friends = [array sortedArrayUsingDescriptors:@[appUser, mutalFriends]];
-  [[NSNotificationCenter defaultCenter] postNotification:
-   [NSNotification notificationWithName:kFacebookFriendsLoadedNotification
-                                 object:friends]];
+  [[NSNotificationCenter defaultCenter]
+      postNotification:[NSNotification notificationWithName:kFacebookFriendsLoadedNotification
+                                                     object:friends]];
 }
 
 + (NTSModel*)getModel {

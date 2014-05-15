@@ -1,9 +1,7 @@
 #import "FacebookInviteViewController.h"
 #import "AppDelegate.h"
 #import "Model.h"
-#import "QueryParsing.h"
 #import <SDWebImage/UIImageView+WebCache.h>
-#import "java/util/ArrayList.h"
 #import "NotificationManager.h"
 #import "Identifiers.h"
 #import "JavaUtils.h"
@@ -12,12 +10,13 @@
 #import "PushNotificationHandler.h"
 #import "MBProgressHUD.h"
 #import "InterfaceUtils.h"
+#import "NSURL+QueryDictionary.h"
 
 @interface FacebookInviteViewController () <UISearchBarDelegate, UISearchDisplayDelegate>
 @property(strong,nonatomic) NSArray *friends;
 @property(strong,nonatomic) NSArray *searchResults;
 @property(strong,nonatomic) FBFrictionlessRecipientCache *friendCache;
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property(weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
 
@@ -25,16 +24,15 @@
 
 - (void)viewDidLoad {
   [[NotificationManager getInstance] loadValueForNotification:kFacebookFriendsLoadedNotification
-                                                    withBlock:
-   ^(NSArray *friends) {
-     _friends = friends;
-     [self.tableView reloadData];
-   }];
-  [[NotificationManager getInstance] loadValueForNotification:kRecipientCacheLoadedNotification
-                                                    withBlock:
-   ^(FBFrictionlessRecipientCache *friendCache) {
-     _friendCache = friendCache;
-   }];
+                                                    withBlock:^(NSArray *friends) {
+       _friends = friends;
+       [self.tableView reloadData];
+  }];
+  [[NotificationManager getInstance]
+      loadValueForNotification:kRecipientCacheLoadedNotification
+                     withBlock:^(FBFrictionlessRecipientCache *friendCache) {
+       _friendCache = friendCache;
+  }];
   _pushHandler = [PushNotificationHandler new];  
 }
 
@@ -58,37 +56,39 @@
   }
   NSNumber *uid = friend[@"uid"];
   [FBWebDialogs
-   presentRequestsDialogModallyWithSession:nil
-   message:@"Invitation to play noughts"
-   title:@"noughts"
-   parameters:@{@"to": [uid stringValue]}
-   handler: ^(FBWebDialogResult result, NSURL *resultURL, NSError *error){
-     if (error) {
-       [InterfaceUtils error:@"Error sending facebook request!"];
+      presentRequestsDialogModallyWithSession:nil
+                                      message:@"Invitation to play noughts"
+                                        title:@"noughts"
+                                   parameters:@{@"to": [uid stringValue]}
+                                      handler: ^(FBWebDialogResult result,
+                                                 NSURL *resultURL,
+                                                 NSError *error) {
+       if (error) {
+         [InterfaceUtils error:@"Error sending facebook request!"];
+       }
+       else if (result != FBWebDialogResultDialogNotCompleted) {
+         NSDictionary *query = [resultURL uq_queryDictionary];
+         NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:friend];
+         [self onFacebookInvite:query[@"request"][0] withProfile:profile];
+       } else {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+       }
      }
-     else if (result != FBWebDialogResultDialogNotCompleted) {
-       NSDictionary *query = [QueryParsing dictionaryFromQueryComponents:resultURL];
-       NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:friend];
-       [self onFacebookInvite:query[@"request"][0] withProfile:profile];
-     } else {
-       [MBProgressHUD hideHUDForView:self.view animated:YES];
-     }
-   }
-   friendCache:_friendCache];
+                                  friendCache:_friendCache];
 }
 
 - (void)onFacebookInvite:(NSString*)requestId withProfile:(NTSProfile*)profile {
   NTSModel *model = [AppDelegate getModel];
   [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
-                                                    withBlock:
-   ^(id userProfile) {
-     NSString *gameId = [model newGameWithJavaUtilList:
-                         [JavaUtils nsArrayToJavaUtilList:@[userProfile, profile]]];
-     [model putFacebookRequestIdWithNSString:requestId withNSString:gameId];
-     [MBProgressHUD hideHUDForView:self.view animated:YES];
-     [[NSNotificationCenter defaultCenter] postNotification:
-      [NSNotification notificationWithName:kGameRequestedNotification
-                                    object:gameId]];
+                                                    withBlock:^(id userProfile) {
+       NSString *gameId =
+           [model newGameWithJavaUtilList:[JavaUtils
+                                              nsArrayToJavaUtilList:@[userProfile, profile]]];
+       [model putFacebookRequestIdWithNSString:requestId withNSString:gameId];
+       [MBProgressHUD hideHUDForView:self.view animated:YES];
+       [[NSNotificationCenter defaultCenter] postNotification:
+        [NSNotification notificationWithName:kGameRequestedNotification
+                                      object:gameId]];
    }];
 }
 
@@ -96,24 +96,22 @@
     shouldReloadTableForSearchString:(NSString *)searchString {
   NSPredicate *predicate =
       [NSPredicate predicateWithBlock:^BOOL(NSDictionary *friend, NSDictionary *bindings) {
-        NSString *name = [friend[@"name"] lowercaseString];
-        if ([name isEmpty]) {
-          return YES;
-        }
-        NSArray *split = [name componentsSeparatedByCharactersInSet:
-                          [NSCharacterSet whitespaceCharacterSet]];
-        for (NSString *component in split) {
-          if ([component hasPrefix:[searchString lowercaseString]]) {
+          NSString *name = [friend[@"name"] lowercaseString];
+          if ([name isEmpty]) {
             return YES;
           }
-        }
-        return NO;
+          NSArray *split = [name componentsSeparatedByCharactersInSet:
+                            [NSCharacterSet whitespaceCharacterSet]];
+          for (NSString *component in split) {
+            if ([component hasPrefix:[searchString lowercaseString]]) {
+              return YES;
+            }
+          }
+          return NO;
       }];
   _searchResults = [_friends filteredArrayUsingPredicate:predicate];
   return YES;
 }
-
-#pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
   return 1;
@@ -138,9 +136,7 @@
   }
   cell.textLabel.text = friend[@"name"];
   NSString *format = @"https://graph.facebook.com/%@/picture?width=100&height=100";
-  NSURL *photoUrl = [NSURL URLWithString:
-                     [NSString
-                      stringWithFormat:format, friend[@"uid"]]];
+  NSURL *photoUrl = [NSURL URLWithString:[NSString stringWithFormat:format, friend[@"uid"]]];
   [cell.imageView setImageWithURL:photoUrl
                  placeholderImage:[UIImage imageNamed:@"profile_placeholder_medium"]];
   return cell;

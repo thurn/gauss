@@ -1,4 +1,4 @@
 #import <UIKit/UIKit.h>
 
-@interface GameListViewController : UITableViewController <UITableViewDelegate>
+@interface GameListViewController : UITableViewController<UITableViewDelegate>
 @end

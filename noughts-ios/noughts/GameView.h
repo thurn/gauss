@@ -22,8 +22,9 @@ typedef NS_ENUM(NSUInteger, GameMenuSelection) {
 - (BOOL)isGameOver;
 @end
 
-@interface GameView : UIView <UIActionSheetDelegate>
+@interface GameView : UIView<UIActionSheetDelegate>
 @property (weak,nonatomic) id<GameViewDelegate> delegate;
+
 - (void)setGameCanvasDelegate:(id<GameCanvasDelegate>)delegate;
 - (id<NTSCommandUpdateListener>)getCommandUpdateListener;
 - (void)updateButtons;

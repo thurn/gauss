@@ -11,8 +11,6 @@
 #import "PushNotificationHandler.h"
 #import "ImageStringUtils.h"
 
-NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
-
 @interface ProfilePromptViewController () <UITextFieldDelegate, NTSOnMutationCompleted>
 @property(weak, nonatomic) IBOutlet UITextField *nameField;
 @property(strong, nonatomic) NSArray *playerImages;
@@ -23,6 +21,8 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 @property(strong, nonatomic) NSString *proposedName;
 @property(strong,nonatomic) PushNotificationHandler* pushHandler;
 @end
+
+#define kAvatarSize 100
 
 @implementation ProfilePromptViewController
 
@@ -42,7 +42,7 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
   _playerImageIndex = arc4random() % [_playerImages count];
   NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
   UIImage *avatar = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_playerImageIndex]
-                                               size:100];
+                                               size:kAvatarSize];
   [_avatarButton setImage:avatar forState:UIControlStateNormal];
   _nameField.delegate = self;
   NSString *name = [userDefaults objectForKey:kPlayerLocalNameKey];
@@ -84,7 +84,7 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
 - (IBAction)onAvatarClicked:(id)sender {
   _playerImageIndex = (_playerImageIndex + 1) % [_playerImages count];
   UIImage *image = [ImageStringUtils getLocalImage:[_playerImages objectAtIndex:_playerImageIndex]
-                                              size:100];
+                                              size:kAvatarSize];
   [sender setImage:image forState:UIControlStateNormal];
 }
 
@@ -110,10 +110,10 @@ NSString *const kPlayerLocalNameKey = @"kPlayerLocalNameKey";
   [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
                                                     withBlock:
    ^(NTSProfile *profile) {
-     NTSModel *model = [AppDelegate getModel];
-     [model setProfileForViewerWithNSString:_gameId
-                             withNTSProfile:profile
-                 withNTSOnMutationCompleted:self];
+       NTSModel *model = [AppDelegate getModel];
+       [model setProfileForViewerWithNSString:_gameId
+                               withNTSProfile:profile
+                   withNTSOnMutationCompleted:self];
    }];
 }
 

@@ -1,11 +1,9 @@
 #import "NewGameViewController.h"
 #import "NewLocalGameViewController.h"
 #import <FacebookSDK/FacebookSDK.h>
-#import "QueryParsing.h"
 #import "AppDelegate.h"
 #import "EmailInviteViewController.h"
 #import "FacebookUtils.h"
-#import "InterfaceUtils.h"
 #import "PushNotificationHandler.h"
 
 @interface NewGameViewController ()
@@ -28,17 +26,13 @@
 }
 
 - (IBAction)onInviteViaFacebook:(id)sender {
+  UIViewController *facebookController =
+      [self.storyboard instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"];
   if ([FacebookUtils isFacebookUser]) {
-    [self.navigationController
-     pushViewController:[self.storyboard
-                         instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
-     animated:YES];
+    [self.navigationController pushViewController:facebookController animated:YES];
   } else {
     [FacebookUtils logInToFacebook:self.view withCallback:^{
-      [self.navigationController
-       pushViewController:[self.storyboard
-                           instantiateViewControllerWithIdentifier:@"FacebookInviteViewController"]
-       animated:YES];
+        [self.navigationController pushViewController:facebookController animated:YES];
     }];
   }
 }
@@ -66,10 +60,6 @@
       break;
     }
   }
-}
-
-- (void)didReceiveMemoryWarning {
-  [super didReceiveMemoryWarning];
 }
 
 @end

@@ -19,27 +19,25 @@
   }
 
   CRToastInteractionResponder *responder = [CRToastInteractionResponder
-    interactionResponderWithInteractionType:CRToastInteractionTypeAll
-                       automaticallyDismiss:YES
-                                      block:
-      ^(CRToastInteractionType interactionType) {
-        [[NSNotificationCenter defaultCenter] postNotification:
-         [NSNotification notificationWithName:kGameRequestedNotification
-                                       object:gameId]];
+      interactionResponderWithInteractionType:CRToastInteractionTypeAll
+                         automaticallyDismiss:YES
+                                        block:^(CRToastInteractionType interactionType) {
+          [[NSNotificationCenter defaultCenter] postNotification:
+           [NSNotification notificationWithName:kGameRequestedNotification
+                                         object:gameId]];
       }];
-  NSDictionary *options =
-    @{
-      kCRToastTextKey: data[@"aps"][@"alert"],
-      kCRToastNotificationTypeKey: @(CRToastTypeNavigationBar),
-      kCRToastTextAlignmentKey: @(NSTextAlignmentCenter),
-      kCRToastBackgroundColorKey: [UIColor grayColor],
-      kCRToastInteractionRespondersKey: @[responder],
-      kCRToastTimeIntervalKey: @3.0,
-      kCRToastFontKey: [UIFont systemFontOfSize:15.0],
-      kCRToastAnimationInTypeKey :@(CRToastAnimationTypeGravity),
-      kCRToastAnimationOutTypeKey :@(CRToastAnimationTypeGravity),
-      kCRToastAnimationInDirectionKey :@(CRToastAnimationDirectionTop),
-      kCRToastAnimationOutDirectionKey :@(CRToastAnimationDirectionTop)
+  NSDictionary *options = @{
+      kCRToastTextKey                  : data[@"aps"][@"alert"],
+      kCRToastNotificationTypeKey      : @(CRToastTypeNavigationBar),
+      kCRToastTextAlignmentKey         : @(NSTextAlignmentCenter),
+      kCRToastBackgroundColorKey       : [UIColor grayColor],
+      kCRToastInteractionRespondersKey : @[responder],
+      kCRToastTimeIntervalKey          : @3.0,
+      kCRToastFontKey                  : [UIFont systemFontOfSize:15.0],
+      kCRToastAnimationInTypeKey       : @(CRToastAnimationTypeGravity),
+      kCRToastAnimationOutTypeKey      : @(CRToastAnimationTypeGravity),
+      kCRToastAnimationInDirectionKey  : @(CRToastAnimationDirectionTop),
+      kCRToastAnimationOutDirectionKey : @(CRToastAnimationDirectionTop)
     };
   [CRToastManager showNotificationWithOptions:options completionBlock:nil];
 }

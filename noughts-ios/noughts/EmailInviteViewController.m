@@ -1,6 +1,5 @@
 #import "EmailInviteViewController.h"
 #import <Parse/Parse.h>
-#import "java/util/ArrayList.h"
 #import "GameViewController.h"
 #import "AppDelegate.h"
 #import "FacebookUtils.h"
@@ -9,6 +8,7 @@
 #import "JavaUtils.h"
 #import "Pronoun.h"
 #import "PushNotificationHandler.h"
+#import "InterfaceUtils.h"
 
 @interface EmailInviteViewController () <UITextFieldDelegate, UITextViewDelegate>
 @property(weak, nonatomic) IBOutlet UITextField *toEmail;
@@ -34,9 +34,9 @@
   _urlLabel.text = [NSString stringWithFormat:@"http://noughts.firebaseapp.com/open?\nid=%@",
                     _preliminaryGameId];
 
-  UITapGestureRecognizer *recognizer = [[UITapGestureRecognizer alloc]
-                                        initWithTarget:self
-                                        action:@selector(dismissKeyboard)];
+  UITapGestureRecognizer *recognizer =
+      [[UITapGestureRecognizer alloc] initWithTarget:self
+                                              action:@selector(dismissKeyboard)];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(keyboardWillBeShown:)
                                                name:UIKeyboardWillShowNotification
@@ -49,10 +49,10 @@
   [self.view addGestureRecognizer:recognizer];
   
   if ([FacebookUtils isFacebookUser]) {
-   [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
-                                                     withBlock:^(id notificationObject) {
-                                                       _facebookProfile = notificationObject;
-                                                     }];
+    [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
+                                                      withBlock:^(id notificationObject) {
+                                                          _facebookProfile = notificationObject;
+                                                      }];
   }
   _pushHandler = [PushNotificationHandler new];  
 }
@@ -74,7 +74,7 @@
   [self dismissKeyboard];
 }
 
--(void)dismissKeyboard {
+- (void)dismissKeyboard {
   [_message resignFirstResponder];
   [_toEmail resignFirstResponder];
 }
@@ -84,7 +84,7 @@
     _viewDeltaY = [self viewAnimationDelta];
     [self animateViewByDeltaY:-_viewDeltaY];
     [UIView animateWithDuration:0.3 animations:^{
-      _doneEditingButton.alpha = 1.0;
+        _doneEditingButton.alpha = 1.0;
     }];
   } else {
     _viewDeltaY = 0;
@@ -94,7 +94,7 @@
 - (void)keyboardWillBeHidden:(NSNotification*)aNotification {
   [self animateViewByDeltaY:_viewDeltaY];
   [UIView animateWithDuration:0.1 animations:^{
-    _doneEditingButton.alpha = 0.0;
+      _doneEditingButton.alpha = 0.0;
   }];
 }
 
@@ -103,7 +103,7 @@
     _viewDeltaY = [self viewAnimationDelta];
     [self animateViewByDeltaY:-_viewDeltaY];
     [UIView animateWithDuration:0.3 animations:^{
-      _doneEditingButton.alpha = 1.0;
+        _doneEditingButton.alpha = 1.0;
     }];
   }
 }
@@ -116,9 +116,9 @@
   UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
   if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad &&
       UIInterfaceOrientationIsLandscape(orientation)) {
-      return 160;
+    return 160;
   } else {
-      return 0;
+    return 0;
   }
 }
 
@@ -147,20 +147,15 @@
   }
   NSString *gameId = [model newGameWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:profiles]
                                        withNSString:_preliminaryGameId];
-  NSDictionary *params = @{@"message": _message.text,
-                           @"email": _toEmail.text,
-                           @"gameId": gameId};
+  NSDictionary *params = @{@"message" : _message.text,
+                           @"email"   : _toEmail.text,
+                           @"gameId"  : gameId};
   [PFCloud callFunctionInBackground:@"emailInvite"
                      withParameters:params
                               block:^(id result, NSError *error) {
-                                if (error) {
-                                  [[[UIAlertView alloc]
-                                    initWithTitle:@"Error"
-                                    message:@"Error sending email"
-                                    delegate:nil
-                                    cancelButtonTitle:@"Ok"
-                                    otherButtonTitles:nil] show];
-                                }
+                                  if (error) {
+                                    [InterfaceUtils error:@"Error sending email"];
+                                  }
                               }];
   GameViewController *gameViewController = (GameViewController*)segue.destinationViewController;
   gameViewController.currentGameId = gameId;
