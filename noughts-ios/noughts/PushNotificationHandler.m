@@ -32,7 +32,7 @@
       kCRToastTextAlignmentKey         : @(NSTextAlignmentCenter),
       kCRToastBackgroundColorKey       : [UIColor grayColor],
       kCRToastInteractionRespondersKey : @[responder],
-      kCRToastTimeIntervalKey          : @3.0,
+      kCRToastTimeIntervalKey          : @5.0,
       kCRToastFontKey                  : [UIFont systemFontOfSize:15.0],
       kCRToastAnimationInTypeKey       : @(CRToastAnimationTypeGravity),
       kCRToastAnimationOutTypeKey      : @(CRToastAnimationTypeGravity),

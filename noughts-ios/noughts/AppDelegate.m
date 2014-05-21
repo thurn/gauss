@@ -7,7 +7,6 @@
 #import "PushNotificationService.h"
 #import <Firebase/Firebase.h>
 #import <FacebookSDK/FacebookSDK.h>
-#import "RequestLoadedCallback.h"
 #import "Identifiers.h"
 #import "NotificationManager.h"
 #import "Profile.h"
@@ -17,8 +16,10 @@
 #import "PushNotificationsServiceImpl.h"
 #import "AnalyticsServiceImpl.h"
 #import "NSURL+QueryDictionary.h"
+#import "JoinGameCallbacks.h"
+#import "JoinGameCallbacksImpl.h"
 
-@interface AppDelegate () <NTSRequestLoadedCallback>
+@interface AppDelegate () <NTSJoinGameCallbacks>
 @property BOOL runningQuery;
 @property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
 @property(strong, nonatomic) NTSModel *model;
@@ -130,9 +131,17 @@
 
 - (void)application:(UIApplication *)application
     didReceiveRemoteNotification:(NSDictionary *)userInfo {
-  [[NSNotificationCenter defaultCenter] postNotification:
-   [NSNotification notificationWithName:kPushNotificationReceivedNotification
-                                 object:userInfo]];
+  UIApplicationState state = [application applicationState];
+  if (state == UIApplicationStateActive) {
+    [[NSNotificationCenter defaultCenter] postNotification:
+     [NSNotification notificationWithName:kPushNotificationReceivedNotification
+                                   object:userInfo]];
+  } else {
+    NSString *gameId = userInfo[@"gameId"];
+    [[NSNotificationCenter defaultCenter] postNotification:
+     [NSNotification notificationWithName:kGameRequestedNotification
+                                   object:gameId]];
+  }
 }
 
 - (BOOL)application:(UIApplication *)application
@@ -142,9 +151,21 @@
   if ([[url scheme] isEqualToString:@"noughts"]) {
     NSArray *paths = [url pathComponents];
     NSString *gameId = paths[1];
-    [[NSNotificationCenter defaultCenter]
-        postNotification:[NSNotification notificationWithName:kGameRequestedNotification
-                                                       object:gameId]];
+    if ([FacebookUtils isFacebookUser]) {
+      NotificationManager *notificationManager = [NotificationManager getInstance];
+      void (^profileCallback)(id) = ^(id notificationObject) {
+        NTSProfile *profile = notificationObject;
+        [_model joinGameWithNSString:gameId
+                      withNTSProfile:profile
+            withNTSJoinGameCallbacks:[JoinGameCallbacksImpl new]];
+      };
+      [notificationManager loadValueForNotification:kFacebookProfileLoadedNotification
+                                          withBlock:profileCallback];
+    } else {
+      [_model joinGameWithNSString:gameId
+                    withNTSProfile:nil
+          withNTSJoinGameCallbacks:[JoinGameCallbacksImpl new]];
+    }
     return YES;
   }
 
@@ -153,42 +174,15 @@
          sourceApplication:sourceApplication
            fallbackHandler:^(FBAppCall *call) {
       if (call.appLinkData && call.appLinkData.targetURL) {
-        NSURL *target = call.appLinkData.targetURL;
-        NSString *requestIds =
-            [target uq_queryDictionary][@"request_ids"][0];
-        NSArray *idsArray = [requestIds componentsSeparatedByString:@","];
-        for (int i = 0; i < [idsArray count]; ++i) {
-          if (i == [idsArray count] - 1) {
-            // Most recent request -- load it
-            [_model subscribeToRequestIdsWithNSString:idsArray[i]
-                         withNTSRequestLoadedCallback:self];
-          } else {
-            // Old request -- delete it
-            NSString *facebookId = [FacebookUtils getFacebookId];
-            NSString *fullId = [NSString stringWithFormat:@"%@_%@", idsArray[i], facebookId];
-            FBRequest *request = [FBRequest requestWithGraphPath:fullId
-                                                      parameters:@{}
-                                                      HTTPMethod:@"DELETE"];
-            [request startWithCompletionHandler:^(FBRequestConnection *connection,
-                                                  id result, NSError *error) {}];
-          }
-        }
+        [FacebookUtils handleFacebookRequest:call.appLinkData.targetURL];
       }
   }];
   return YES;
 }
 
-// Game ID loaded from a Facebook Request
-- (void)onRequestLoadedWithNSString:(NSString *)gameId {
-  [[NSNotificationCenter defaultCenter]
-      postNotification:[NSNotification notificationWithName:kGameRequestedNotification
-                                                     object:gameId]];
-}
-
 // Load |GameViewController| with a game ID from this notification
 - (void)gameRequested:(NSNotification*)notification {
   NSString *gameId = notification.object;
-  [_model subscribeViewerToGameWithNSString:gameId];
   UINavigationController *root = (UINavigationController*)self.window.rootViewController;
   root.viewControllers = @[];
   MainMenuViewController *mainMenu =
@@ -200,6 +194,14 @@
           instantiateViewControllerWithIdentifier:@"GameViewController"];
   gameViewController.currentGameId = gameId;
   [root pushViewController:gameViewController animated:YES];
+}
+
+- (void)onJoinedGameWithNTSGame:(NTSGame *)game {
+  
+}
+
+- (void)onErrorJoiningGameWithNSString:(NSString *)errorMessage {
+  
 }
 
 // Called after the user has been logged in to Facebook

@@ -124,7 +124,7 @@
   [self playSoundIfEnabled:_addCommandSound];
 }
 
--(void)onActionSubmittedWithNTSAction:(NTSAction *)action withBoolean:(BOOL)byViewer {
+-(void)onActionSubmittedWithNTSAction:(NTSAction *)action {
   for (NTSCommand *command in [action getCommandList]) {
     [self removeAllGestureRecognizers:_views[command]];
   }

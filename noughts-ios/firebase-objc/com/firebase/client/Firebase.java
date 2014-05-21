@@ -94,7 +94,7 @@ public class Firebase extends Query {
   
   private static native Object wrapCompletionListener(CompletionListener listener) /*-[
     return ^(NSError *error, Firebase *ref) {
-      [listener onCompleteWithFCFirebaseError:[[FCFirebaseError alloc] initWithId: error]
+      [listener onCompleteWithFCFirebaseError:[self wrapErrorWithId:error]
                                withFCFirebase:[[FCFirebase alloc] initWithId:ref]];
     };
   ]-*/;
@@ -225,9 +225,9 @@ public class Firebase extends Query {
     };
     void (^completionBlock)(NSError*, BOOL, FDataSnapshot*) =
         ^(NSError *error, BOOL committed, FDataSnapshot *snapshot) {
-      [handler onCompleteWithFCFirebaseError: [[FCFirebaseError alloc] initWithId: error]
-                                 withBoolean: committed
-                          withFCDataSnapshot: [[FCDataSnapshot alloc] initWithId: snapshot]];
+      [handler onCompleteWithFCFirebaseError:[FCFirebase wrapErrorWithId:error]
+                                 withBoolean:committed
+                          withFCDataSnapshot:[[FCDataSnapshot alloc] initWithId: snapshot]];
     };
     [firebase runTransactionBlock: transactionBlock
                andCompletionBlock: completionBlock
@@ -238,4 +238,11 @@ public class Firebase extends Query {
     return new OnDisconnect(firebase);
   }
   
+  private static FirebaseError wrapError(Object error) {
+    if (error == null) {
+      return null;
+    } else {
+      return new FirebaseError(error);
+    }
+  }
 }

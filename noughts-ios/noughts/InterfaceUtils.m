@@ -9,6 +9,7 @@
 
 + (void)error:(NSString*)message {
 #ifdef DEBUG
+  NSLog(@"%@", message);
   @throw message;
 #else
   UIAlertView *alert = [[UIAlertView alloc]

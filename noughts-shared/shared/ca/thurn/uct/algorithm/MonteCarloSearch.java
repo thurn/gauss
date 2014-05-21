@@ -15,25 +15,25 @@ import ca.thurn.uct.core.WinLossEvaluator;
  * the current state and returning the one that had the best average outcome.
  */
 public class MonteCarloSearch implements Agent, AsynchronousAgent {
-  
+
   /**
    * Builder for MonteCarloSearch.
    */
   public static class Builder {
     private final State stateRepresentation;
-    
+
     private int numSimulations = 100000;
 
     private int maxDepth = 500;
-    
-    private double discountRate = 1.0; 
-    
+
+    private double discountRate = 1.0;
+
     private Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
     }
-    
+
     private Evaluator evaluator = new WinLossEvaluator();
-    
+
     /**
      * @return A new MonteCarloSearch instance.
      */
@@ -51,7 +51,7 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
       this.numSimulations = numSimulations;
       return this;
     }
-    
+
     /**
      * @param discountRate The rate at which rewards should be discounted in
      *     the future, used to compute the present value of future rewards.
@@ -85,7 +85,7 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
       return this;
     }
   }
-  
+
   /**
    * @param stateRepresentation State representation to use.
    * @return A new Builder for a MonteCarloSearch agent.
@@ -94,17 +94,17 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
     return new Builder(stateRepresentation);
   }
 
-  private final State stateRepresentation;  
+  private final State stateRepresentation;
   private final int numSimulations;
   private final double discountRate;
   private final int maxDepth;
   private final Evaluator evaluator;
   private volatile ActionScore asyncResult;
   private Thread workerThread;
-  
+
   /**
    * Field-initializing constructor.
-   * 
+   *
    * @param stateRepresentation
    * @param numSimulations
    * @param maxDepth
@@ -132,7 +132,7 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
    */
   @Override
   public ActionScore pickActionBlocking(int player, State root) {
-    Map<Long, Double> actionRewards = new HashMap<Long, Double>(); 
+    Map<Long, Double> actionRewards = new HashMap<Long, Double>();
     return runSimulations(player, root, actionRewards, numSimulations);
   }
 
@@ -146,7 +146,17 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
       public void run() {
         Map<Long, Double> actionRewards = new HashMap<Long, Double>();
         while (!isInterrupted()) {
-          asyncResult = runSimulations(player, root, actionRewards, 1000);         
+          int totalSimulations = 0;
+          if (numSimulations < 1000) {
+            asyncResult = runSimulations(player, root, actionRewards, 1);
+            totalSimulations += 1;
+          } else {
+            asyncResult = runSimulations(player, root, actionRewards, 1000);
+            totalSimulations += 1000;
+          }
+          if (totalSimulations > numSimulations) {
+            break;
+          }
         }
       }
     });
@@ -162,7 +172,7 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
     workerThread = null;
     return asyncResult;
   }
-  
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -175,7 +185,7 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
     builder.append("]");
     return builder.toString();
   }
-  
+
   /**
    * Run random simulations, updating actionRewards with the results.
    *

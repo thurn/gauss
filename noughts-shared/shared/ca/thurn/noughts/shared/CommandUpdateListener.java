@@ -47,7 +47,7 @@ public interface CommandUpdateListener {
    * @param action The action for the command.
    * @param byViewer True if the action was owned by the viewer.
    */
-  public void onActionSubmitted(Action action, boolean byViewer);
+  public void onActionSubmitted(Action action);
 
   /**
    * Called when the game ends.

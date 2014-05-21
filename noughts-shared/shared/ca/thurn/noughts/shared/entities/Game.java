@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// 2 fields:
-// under construction action
-// submitted actions
-
 public class Game extends Entity<Game> {
   public static class Deserializer extends EntityDeserializer<Game> {
     private Deserializer() {

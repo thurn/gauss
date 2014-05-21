@@ -32,6 +32,10 @@ public class GameListPartitions {
     Collections.sort(gameOver, Games.comparator());
   }
 
+  /**
+   * @param game A game.
+   * @return The section which this game belongs in.
+   */
   public GameListSection getSection(Game game) {
     if (game.isGameOver()) {
       return GameListSection.GAME_OVER;
@@ -112,6 +116,21 @@ public class GameListPartitions {
    */
   public List<Game> gameOver() {
     return Collections.unmodifiableList(gameOver);
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("GameListPartitions [yourTurn=");
+    builder.append(yourTurn);
+    builder.append(", theirTurn=");
+    builder.append(theirTurn);
+    builder.append(", gameOver=");
+    builder.append(gameOver);
+    builder.append(", userId=");
+    builder.append(userId);
+    builder.append("]");
+    return builder.toString();
   }
 
 }

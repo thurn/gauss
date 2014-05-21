@@ -21,7 +21,6 @@
 }
 
 - (void)registerForPush {
-  NSLog(@"register for push");
   UIApplication *application = [UIApplication sharedApplication];
   [application registerForRemoteNotificationTypes:UIRemoteNotificationTypeBadge |
    UIRemoteNotificationTypeAlert |

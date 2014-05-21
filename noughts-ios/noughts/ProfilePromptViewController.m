@@ -106,15 +106,16 @@
 }
 
 - (IBAction)onSignInClicked:(id)sender {
-  [FacebookUtils logInToFacebook:self.view withCallback:nil];
-  [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
-                                                    withBlock:
-   ^(NTSProfile *profile) {
-       NTSModel *model = [AppDelegate getModel];
-       [model setProfileForViewerWithNSString:_gameId
-                               withNTSProfile:profile
-                   withNTSOnMutationCompleted:self];
-   }];
+  [FacebookUtils logInToFacebookWithCallback:^{
+      [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
+                                                        withBlock:
+       ^(NTSProfile *profile) {
+           NTSModel *model = [AppDelegate getModel];
+           [model setProfileForViewerWithNSString:_gameId
+                                   withNTSProfile:profile
+                       withNTSOnMutationCompleted:self];
+       }];
+  }];
 }
 
 @end

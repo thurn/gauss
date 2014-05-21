@@ -5,6 +5,5 @@
 @interface GameViewController : UIViewController<NTSGameUpdateListener,
                                                  GameViewDelegate,
                                                  GameCanvasDelegate>
-@property(nonatomic) BOOL tutorialMode;
 @property(strong,nonatomic) NSString *currentGameId;
 @end

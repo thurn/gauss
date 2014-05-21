@@ -69,7 +69,7 @@
        else if (result != FBWebDialogResultDialogNotCompleted) {
          NSDictionary *query = [resultURL uq_queryDictionary];
          NTSProfile *profile = [FacebookUtils profileFromFacebookDictionary:friend];
-         [self onFacebookInvite:query[@"request"][0] withProfile:profile];
+         [self onFacebookInvite:query[@"request"] withProfile:profile];
        } else {
          [MBProgressHUD hideHUDForView:self.view animated:YES];
        }
@@ -135,10 +135,10 @@
     friend = [_searchResults objectAtIndex:indexPath.row];
   }
   cell.textLabel.text = friend[@"name"];
-  NSString *format = @"https://graph.facebook.com/%@/picture?width=100&height=100";
+  NSString *format = @"https://graph.facebook.com/%@/picture?width=80&height=80";
   NSURL *photoUrl = [NSURL URLWithString:[NSString stringWithFormat:format, friend[@"uid"]]];
   [cell.imageView setImageWithURL:photoUrl
-                 placeholderImage:[UIImage imageNamed:@"profile_placeholder_medium"]];
+                 placeholderImage:[UIImage imageNamed:@"profile_placeholder_40"]];
   return cell;
 }
 

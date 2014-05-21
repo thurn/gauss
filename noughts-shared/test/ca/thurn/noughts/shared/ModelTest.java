@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
@@ -13,6 +14,8 @@ import ca.thurn.noughts.shared.entities.Profile;
 import ca.thurn.noughts.shared.entities.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
@@ -22,6 +25,7 @@ public class ModelTest extends SharedTestCase {
   private String userId;
   private String userKey;
   private Firebase firebase;
+  private Map<Firebase, ChildEventListener> listenersToCleanUp;
 
   private static abstract class TestGameUpdateListener implements GameUpdateListener {
     @Override
@@ -53,6 +57,7 @@ public class ModelTest extends SharedTestCase {
 
   @Override
   public void sharedSetUp(final Runnable done) {
+    listenersToCleanUp = new HashMap<Firebase, ChildEventListener>();
     firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase ref) {
@@ -68,6 +73,9 @@ public class ModelTest extends SharedTestCase {
   @Override
   public void sharedTearDown() {
     model.removeAllFirebaseListeners();
+    for (Entry<Firebase, ChildEventListener> entry : listenersToCleanUp.entrySet()) {
+      entry.getKey().removeEventListener(entry.getValue());
+    }
   }
 
   public void testIsCurrentPlayer() {
@@ -697,19 +705,19 @@ public class ModelTest extends SharedTestCase {
     });
     endAsyncTestBlock();
   }
-
-  public void testSubscribeViewerToGame() {
-    beginAsyncTestBlock();
-    model.setGameUpdateListener("gameId", new TestGameUpdateListener() {
-      @Override
-      public void onCurrentActionUpdate(Action currentAction) {
-        assertEquals(newEmptyAction("gameId"), currentAction);
-        finished();
-      }
-    });
-    model.subscribeViewerToGame("gameId");
-    endAsyncTestBlock();
-  }
+//
+//  public void testSubscribeViewerToGame() {
+//    beginAsyncTestBlock();
+//    model.setGameUpdateListener("gameId", new TestGameUpdateListener() {
+//      @Override
+//      public void onCurrentActionUpdate(Action currentAction) {
+//        assertEquals(newEmptyAction("gameId"), currentAction);
+//        finished();
+//      }
+//    });
+//    model.subscribeViewerToGame("gameId");
+//    endAsyncTestBlock();
+//  }
 
   public void testRequestGameStatus() {
     beginAsyncTestBlock();
@@ -733,49 +741,98 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
 
-  public void testJoinGame() {
+//  public void testJoinGame() {
+//    beginAsyncTestBlock();
+//    final Game.Builder game = newGameWithOnePlayer();
+//    final Profile myProfile = Profile.newBuilder()
+//        .setName("myName")
+//        .setIsComputerPlayer(false)
+//        .build();
+//    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
+//      @Override
+//      public void run() {
+//        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
+//          @Override
+//          public void onGameUpdate(Game updated) {
+//            assertTrue(updated.getPlayerList().contains(userId));
+//            assertEquals(myProfile, updated.getProfile(1));
+//            finished();
+//          }
+//        }, false /* immediate */);
+//        model.joinGameIfPossible(game.getId(), myProfile);
+//      }
+//    });
+//    endAsyncTestBlock();
+////  }
+//
+//  private void checkCantJoinWithGame(final Game game) {
+//    beginAsyncTestBlock();
+//    withTestData(game, newEmptyAction(game.getId()), new Runnable() {
+//      @Override
+//      public void run() {
+//        assertFalse(model.joinGameIfPossible(game.getId(), Profile.newBuilder().build()));
+//        finished();
+//      }
+//    });
+//    endAsyncTestBlock();
+//  }
+//
+//  public void testJoinGameGameOver() {
+//    checkCantJoinWithGame(newGameWithOnePlayer().setIsGameOver(true).build());
+//  }
+//
+//  public void testJoinGameGameFull() {
+//    Game game = newGameWithTwoPlayers()
+//        .setPlayer(0, "player")
+//        .build();
+//    checkCantJoinWithGame(game);
+//  }
+//
+//  public void testJoinGameAlreadyPlayer() {
+//    checkCantJoinWithGame(newGameWithTwoPlayers().build());
+//  }
+
+  public void testPutFacebookRequestId() {
     beginAsyncTestBlock();
-    final Game.Builder game = newGameWithOnePlayer();
-    final Profile myProfile = Profile.newBuilder()
-        .setName("myName")
-        .setIsComputerPlayer(false)
-        .build();
-    withTestData(game.build(), newEmptyAction(game.getId()), new Runnable() {
+    final String requestId = randomInteger() + "";
+    ChildEventListener listener = firebase.child("requests").addChildEventListener(
+        new AbstractChildEventListener() {
       @Override
-      public void run() {
-        model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
-          @Override
-          public void onGameUpdate(Game updated) {
-            assertTrue(updated.getPlayerList().contains(userId));
-            assertEquals(myProfile, updated.getProfile(1));
-            finished();
-          }
-        }, false /* immediate */);
-        model.joinGameIfPossible(game.getId(), myProfile);
+      public void onChildAdded(DataSnapshot snapshot, String previous) {
+        assertEquals("r" + requestId, snapshot.getName());
+        assertEquals("gameId", snapshot.getValue());
+        finished();
       }
     });
+    listenersToCleanUp.put(firebase.child("requests"), listener);
+    model.putFacebookRequestId(requestId, "gameId");
     endAsyncTestBlock();
   }
 
-  public void testJoinGameGameOver() {
-    // TODO: implement
-  }
-
-  public void testJoinGameGameFull() {
-    // TODO: implement
-  }
-
-  public void testJoinGameAlreadyPlayer() {
-    // TODO: implement
-  }
-
-  public void testPutFacebookRequestId() {
-    // TODO: implement
-  }
-
-  public void testSubscribeToRequestIds() {
-    // TODO: implement
-  }
+//  public void testSubscribeToRequestId() {
+//    beginAsyncTestBlock(2);
+//    final String requestId = randomInteger() + "";
+//    firebase.child("requests").child("r" + requestId).setValue("gameId", new CompletionListener() {
+//      @Override
+//      public void onComplete(FirebaseError error, Firebase ref) {
+//        model.setGameUpdateListener("gameId", new TestGameUpdateListener() {
+//          @Override
+//          public void onCurrentActionUpdate(Action currentAction) {
+//            assertEquals(newEmptyAction("gameId"), currentAction);
+//            finished();
+//          }
+//        });
+//        model.subscribeToRequestId(requestId, new RequestLoadedCallback() {
+//          @Override
+//          public void onRequestLoaded(String gameId) {
+//            assertEquals("gameId", gameId);
+//            finished();
+//          }
+//        });
+//      }
+//    });
+//    endAsyncTestBlock();
+//  }
 
   public void testUpgradeAccountToFacebook() {
     // TODO: implement

@@ -11,6 +11,11 @@
 // Gets the user's facebook ID from disk
 + (NSString*)getFacebookId;
 
-// Logs the user in to Facebook, invoking the provided callback on success.
-+ (void)logInToFacebook:(UIView*)view withCallback:(void(^)())callback;
+// Logs the user in to Facebook, invoking the provided callback on success. It
+// is possible that the callback will never be invoked, e.g. if the user declines
+// to authorize the app.
++ (void)logInToFacebookWithCallback:(void(^)())callback;
+
+// Handles a URL from a facebook request notification
++ (void)handleFacebookRequest:(NSURL*)targetUrl;
 @end

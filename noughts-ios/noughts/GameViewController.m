@@ -21,6 +21,7 @@
 @property(strong,nonatomic) NTSGame *game;
 @property(strong,nonatomic) NTSAction *action;
 @property(strong,nonatomic) PushNotificationHandler* pushHandler;
+@property(nonatomic) BOOL tutorialMode;
 @end
 
 @implementation GameViewController
@@ -32,7 +33,11 @@
   [_gameView updateButtons];
   [_gameView setGameCanvasDelegate:self];
   self.view = _gameView;
-  _pushHandler = [PushNotificationHandler new];  
+  _pushHandler = [PushNotificationHandler new];
+  NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
+  if ([userDefaults objectForKey:kSawTutorialKey] == nil) {
+    _tutorialMode = YES;
+  }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -219,15 +224,6 @@
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
-  if ([FacebookUtils isFacebookUser]) {
-    [[NotificationManager getInstance] loadValueForNotification:kFacebookProfileLoadedNotification
-                                                      withBlock:^(NTSProfile* profile) {
-        [_model joinGameIfPossibleWithNSString:_currentGameId
-                                withNTSProfile:profile];
-    }];
-  } else {
-    [_model joinGameIfPossibleWithNSString:_currentGameId withNTSProfile:nil];
-  }
   [_model handleComputerActionWithNSString:_currentGameId];
   _game = game;
 }
@@ -240,9 +236,12 @@
 }
 
 - (void)onProfileRequiredWithNSString:(NSString*)gameId withNSString:(NSString *)name {
-  ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId
-                                                                         withProposedName:name];
-  [self presentViewController:ppvc animated:YES completion:nil];
+  if (self.isViewLoaded && self.view.window) {
+    // Only prompt if this ViewController is visible
+    ProfilePromptViewController *ppvc = [[ProfilePromptViewController alloc] initWithGameId:gameId
+                                                                           withProposedName:name];
+    [self presentViewController:ppvc animated:YES completion:nil];
+  }
 }
 
 - (void)onGameStatusChangedWithNTSGameStatus:(NTSGameStatus*)status {

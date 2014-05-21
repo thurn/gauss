@@ -73,11 +73,17 @@
   int newSection = [[_gameListPartitions getSectionWithNTSGame:game] ordinal];
   if ([indexPath getSection] != newSection && [indexPath getSection] != -1) {
     [self.tableView beginUpdates];
+    NSLog(@"move from row %d and section %d", [indexPath getRow], [indexPath getSection]);
+    NSLog(@"TO row %d and section %d", 0, newSection);
     [self.tableView moveRowAtIndexPath:[NSIndexPath indexPathForItem:[indexPath getRow]
                                                            inSection:[indexPath getSection]]
                            toIndexPath:[NSIndexPath indexPathForItem:0
                                                            inSection:newSection]];
+    NSLog(@"Old game list partitions");
+    NSLog(@"%@", [_gameListPartitions description]);
     _gameListPartitions = [_model getGameListPartitions];
+    NSLog(@"New game list partitions");
+    NSLog(@"%@", [_gameListPartitions description]);
     [self.tableView endUpdates];
   }
 }

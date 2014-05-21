@@ -267,10 +267,6 @@
   NSArray *profiles = @[[p1Profile build], [p2Profile build]];
   NSString *gameId =
       [model newLocalMultiplayerGameWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:profiles]];
-  id sawTutorial = [userDefaults objectForKey:kSawTutorialKey];
-  if (sawTutorial == nil) {
-    destination.tutorialMode = YES;
-  }
   destination.currentGameId = gameId;
 }
 

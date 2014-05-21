@@ -44,7 +44,7 @@
 }
 
 - (IBAction)onFacebookLoginClicked {
-  [FacebookUtils logInToFacebook:self.view withCallback:^{
+  [FacebookUtils logInToFacebookWithCallback:^{
       [self removeLoginLink: YES];
   }];
 }

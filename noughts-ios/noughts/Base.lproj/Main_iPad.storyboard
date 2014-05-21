@@ -740,7 +740,7 @@ You've been invited to a game of noughts! To accept this invitation, go here:</s
         <!--RootNavigationController-->
         <scene sceneID="RxD-8g-r7h">
             <objects>
-                <navigationController storyboardIdentifier="RootNavigationController" definesPresentationContext="YES" id="twN-X8-1YP" userLabel="RootNavigationController" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="RootNavigationController" definesPresentationContext="YES" useStoryboardIdentifierAsRestorationIdentifier="YES" id="twN-X8-1YP" userLabel="RootNavigationController" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="TBD-ru-0sB">
                         <autoresizingMask key="autoresizingMask"/>
                         <textAttributes key="titleTextAttributes">

@@ -11,8 +11,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.annotation.Nullable;
-
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
@@ -23,6 +21,7 @@ import ca.thurn.uct.algorithm.MonteCarloSearch;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.MutableData;
@@ -128,6 +127,14 @@ public class Model extends AbstractChildEventListener {
   public boolean isCurrentPlayer(Game game) {
     if (game.isGameOver()) return false;
     return Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId);
+  }
+
+  /**
+   * @param game A game.
+   * @return True if the current user is a player in the provided game.
+   */
+  public boolean isPlayer(Game game) {
+    return game.getPlayerList().contains(userId);
   }
 
   /**
@@ -247,6 +254,7 @@ public class Model extends AbstractChildEventListener {
   @Override
   public void onChildRemoved(DataSnapshot snapshot) {
     String gameId = snapshot.getName();
+    games.remove(gameId);
     if (gameListListener != null) {
       gameListListener.onGameRemoved(gameId);
     }
@@ -316,9 +324,7 @@ public class Model extends AbstractChildEventListener {
         int count = game.getSubmittedActionCount();
         while (count > oldGame.getSubmittedActionCount()) {
           Action submitted = game.getSubmittedAction(count - 1);
-          boolean byViewer = game.isLocalMultiplayer() ||
-              Games.playerNumberForPlayerId(game, userId) == submitted.getPlayerNumber();
-          listener.onActionSubmitted(submitted, byViewer);
+          listener.onActionSubmitted(submitted);
           count--;
         }
       }
@@ -339,7 +345,7 @@ public class Model extends AbstractChildEventListener {
    *     profile yet.
    */
   private boolean profileRequired(Game game) {
-    if (game.isGameOver() || game.isLocalMultiplayer()) return false;
+    if (game.isGameOver() || game.isLocalMultiplayer()|| !isPlayer(game)) return false;
     return !game.getProfile(Games.playerNumberForPlayerId(game, userId)).hasImageString();
   }
 
@@ -748,7 +754,7 @@ public class Model extends AbstractChildEventListener {
     switch (currentProfile.getComputerDifficultyLevel()) {
       case 0: {
         // ~70% player win rate
-        numSimulations = 5;
+        numSimulations = 1;
         break;
       }
       case 1: {
@@ -873,59 +879,67 @@ public class Model extends AbstractChildEventListener {
     analyticsService.trackEvent("archiveGame");
   }
 
-  /**
-   * Subscribes the viewer to the provided game ID. This does NOT make them a
-   * player in the game, it merely adds the game to their game list.
-   *
-   * @param gameId Game ID to subscribe to.
-   */
-  public void subscribeViewerToGame(String gameId) {
-    if (!currentActions.containsKey(gameId)) {
-      actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize());
-      analyticsService.trackEvent("subscribeViewerToGame");
-    }
-  }
-
   public void requestGameStatus(String gameId) {
     if (gameUpdateListeners.containsKey(gameId) && games.containsKey(gameId)) {
       gameUpdateListeners.get(gameId).onGameStatusChanged(Games.gameStatus(getGame(gameId)));
     }
   }
 
-  /**
-   * Add the viewer to the provided game if there's room and they're not
-   * already a player.
-   *
-   * @param game Game to add the viewer to.
-   * @param profile Optionally, a profile to add for this player
-   */
-  public void joinGameIfPossible(String gameId, final @Nullable Profile profile) {
-    Game game = getGame(gameId);
-    if (!(game.isGameOver()) && game.getPlayerCount() < 2 &&
-        !game.getPlayerList().contains(userId)) {
-      GameMutation mutation = new GameMutation() {
-        @Override
-        public void mutate(Game.Builder game) {
-          game.addPlayer(userId);
-          if (profile != null) {
-            if (game.getProfileCount() < 2) {
-              game.addProfile(profile);
-            } else {
-              game.setProfile(1, profile);
-            }
-          }
-        }
+  public void joinGame(final String gameId, final Profile profile,
+      final JoinGameCallbacks callbacks) {
+    gameReference(gameId).addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onCancelled(FirebaseError error) {
+        callbacks.onErrorJoiningGame("Database error");
+      }
 
-        @Override
-        public void onComplete(Game game) {
-          if (!game.isLocalMultiplayer()) {
-            pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
-          }
+      @Override
+      public void onDataChange(DataSnapshot snapshot) {
+        Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+        if (game.getPlayerList().contains(userId)) {
+          // Viewer has already joined
+          callbacks.onJoinedGame(game);
+        } else if (game.isGameOver()) {
+          callbacks.onErrorJoiningGame("Game is over");
+        } else if (game.getPlayerCount() == 2) {
+          callbacks.onErrorJoiningGame("Game is full");
+        } else {
+          GameMutation mutation = new GameMutation() {
+            @Override
+            public void mutate(Game.Builder game) {
+              game.addPlayer(userId);
+              if (profile != null) {
+                if (game.getProfileCount() < 2) {
+                  game.addProfile(profile);
+                } else {
+                  game.setProfile(1, profile);
+                }
+              }
+            }
+
+            @Override
+            public void onComplete(final Game game) {
+              analyticsService.trackEvent("joinGame");
+              if (!game.isLocalMultiplayer()) {
+                pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
+              }
+              actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize(),
+                  new CompletionListener() {
+                @Override
+                public void onComplete(FirebaseError error, Firebase ref) {
+                  if (error != null) {
+                    callbacks.onErrorJoiningGame("Database error");
+                  } else {
+                    callbacks.onJoinedGame(game);
+                  }
+                }
+              });
+            }
+          };
+          mutateGame(gameId, mutation, true /* abortOnConflict */);
         }
-      };
-      mutateGame(gameId, mutation, true /* abortOnConflict */);
-      analyticsService.trackEvent("joinGameIfPossible");
-    }
+      }
+    });
   }
 
   /**
@@ -939,7 +953,16 @@ public class Model extends AbstractChildEventListener {
     analyticsService.trackEvent("putFacebookRequestId");
   }
 
-  public void subscribeToRequestIds(String requestId, final RequestLoadedCallback callback) {
+  /**
+   * Requests to join a game with the provided request ID.
+   *
+   * @param requestId request ID
+   * @param profile Optionally, the user's profile.
+   * @param callbacks Callbacks to invoke if the join attempt succeeds or
+   *     fails.
+   */
+  public void joinFromRequestId(String requestId, final Profile profile,
+      final JoinGameCallbacks callbacks) {
     requestReference(requestId).addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onCancelled(FirebaseError error) {}
@@ -947,8 +970,7 @@ public class Model extends AbstractChildEventListener {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
         String gameId = (String)snapshot.getValue();
-        subscribeViewerToGame(gameId);
-        callback.onRequestLoaded(gameId);
+        joinGame(gameId, profile, callbacks);
       }
     });
   }
@@ -969,6 +991,7 @@ public class Model extends AbstractChildEventListener {
     final String oldKey = userKey;
     final GameListListener listListener = gameListListener;
     final ChildEventListener childListener = this;
+    userGamesReference().removeEventListener(gameChildEventListener);
     gameListListener = null;
     userId = facebookId;
     userKey = facebookId;
@@ -986,12 +1009,15 @@ public class Model extends AbstractChildEventListener {
           @Override
           public void onComplete(FirebaseError error, Firebase reference) {
             gameListListener = listListener;
-            firebase.child("users").child(oldKey).child("games")
-                .removeEventListener(gameChildEventListener);
             gameChildEventListener = userGamesReference().addChildEventListener(childListener);
             callback.onUpgradeCompleted();
           }
         });
+      }
+
+      @Override
+      public void onUpgradeError(String errorMessage) {
+        callback.onUpgradeError(errorMessage);
       }
     };
 
@@ -1024,8 +1050,12 @@ public class Model extends AbstractChildEventListener {
           new Firebase.CompletionListener() {
         @Override
         public void onComplete(FirebaseError error, Firebase reference) {
-          if (callbacksExpected.decrementAndGet() == 0) {
-            internalCallback.onUpgradeCompleted();
+          if (error != null) {
+            internalCallback.onUpgradeError("Database error.");
+          } else {
+            if (callbacksExpected.decrementAndGet() == 0) {
+              internalCallback.onUpgradeCompleted();
+            }
           }
         }
       });
@@ -1143,7 +1173,7 @@ public class Model extends AbstractChildEventListener {
 
   private void  mutateGame(String gameId, final GameMutation mutation,
       final boolean abortOnConflict) {
-    final Game original = getGame(gameId);
+    final Game original = games.containsKey(gameId) ? getGame(gameId) : null;
     gameReference(gameId).runTransaction(new Transaction.Handler() {
       @Override
       public Transaction.Result doTransaction(MutableData data) {
@@ -1151,7 +1181,7 @@ public class Model extends AbstractChildEventListener {
           return Transaction.success(data);
         }
         Game game = Game.newDeserializer().fromMutableData(data);
-        if (!original.equals(game) && abortOnConflict) {
+        if (original != null && !original.equals(game) && abortOnConflict) {
           System.out.println("\naborting on conflict");
           System.out.println("\noriginal " + original);
           System.out.println("\nnew " + game);

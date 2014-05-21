@@ -31,7 +31,7 @@
   if ([FacebookUtils isFacebookUser]) {
     [self.navigationController pushViewController:facebookController animated:YES];
   } else {
-    [FacebookUtils logInToFacebook:self.view withCallback:^{
+    [FacebookUtils logInToFacebookWithCallback:^{
         [self.navigationController pushViewController:facebookController animated:YES];
     }];
   }
