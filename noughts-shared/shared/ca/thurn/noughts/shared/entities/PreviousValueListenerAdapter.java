@@ -1,0 +1,35 @@
+package ca.thurn.noughts.shared.entities;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+public class PreviousValueListenerAdapter<T extends Entity<T>> implements ValueEventListener {
+  private final PreviousValueListener<T> listener;
+  private final Entity.EntityDeserializer<T> deserializer;
+  private T previousValue;
+
+  public PreviousValueListenerAdapter(Entity.EntityDeserializer<T> deserializer,
+      PreviousValueListener<T> listener) {
+    this.listener = listener;
+    this.deserializer = deserializer;
+    this.previousValue = null;
+  }
+
+  @Override
+  public final void onCancelled(FirebaseError error) {
+    listener.onError(error);
+  }
+
+  @Override
+  public final void onDataChange(DataSnapshot snapshot) {
+    T entity = deserializer.fromDataSnapshot(snapshot);
+    if (previousValue == null) {
+      listener.onInitialValue(entity);
+    } else {
+      listener.onUpdate(entity, previousValue);
+    }
+    previousValue = entity;
+  }
+
+}

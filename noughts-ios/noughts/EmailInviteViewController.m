@@ -31,8 +31,7 @@
                                                     alpha:1.0] CGColor];
   _message.layer.borderWidth = 1;
   _message.layer.cornerRadius = 5;
-  _urlLabel.text = [NSString stringWithFormat:@"http://noughts.firebaseapp.com/open?\nid=%@",
-                    _preliminaryGameId];
+  [self setUrlText];
 
   UITapGestureRecognizer *recognizer =
       [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -63,6 +62,11 @@
 
 - (void)viewWillDisappear:(BOOL)animated {
   [_pushHandler unregisterHandler];
+}
+
+- (void)setUrlText {
+  _urlLabel.text = [NSString stringWithFormat:@"http://noughts.firebaseapp.com/open?\nid=%@",
+                    _preliminaryGameId];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -109,6 +113,10 @@
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
+  [self toggleSendButton];
+}
+
+- (void)toggleSendButton {
   _sendButton.enabled = [_toEmail.text rangeOfString:@"@"].location != NSNotFound;
 }
 

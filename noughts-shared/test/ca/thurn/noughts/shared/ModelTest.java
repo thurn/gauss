@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
+import ca.thurn.noughts.shared.entities.AbstractChildListener;
+import ca.thurn.noughts.shared.entities.AbstractValueListener;
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
@@ -26,6 +29,10 @@ public class ModelTest extends SharedTestCase {
   private String userKey;
   private Firebase firebase;
   private Map<Firebase, ChildEventListener> listenersToCleanUp;
+  private FirebaseReferences firebaseReferences;
+  private DataEventService dataEventService;
+  private GameList gameList;
+  private List<Unsubscriber> unsubscribers;
 
   private static abstract class TestGameUpdateListener implements GameUpdateListener {
     @Override
@@ -59,10 +66,14 @@ public class ModelTest extends SharedTestCase {
   public void sharedSetUp(final Runnable done) {
     listenersToCleanUp = new HashMap<Firebase, ChildEventListener>();
     firebase = new Firebase("https://noughts-test.firebaseio-demo.com");
+    userId = "id" + randomInteger();
+    userKey = "K" + userId;
+    unsubscribers = new ArrayList<Unsubscriber>();
+    firebaseReferences = FirebaseReferences.anonymous(userKey, firebase);
+    gameList = new GameList(userId, firebaseReferences);
+    dataEventService = new DataEventService(userId, firebaseReferences, gameList);
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase ref) {
-        userId = "id" + randomInteger();
-        userKey = "K" + userId;
         model = Model.anonymousModel(userId, userKey, firebase, new TestPushNotificationService(),
             new TestAnalyticsService());
         done.run();
@@ -75,6 +86,10 @@ public class ModelTest extends SharedTestCase {
     model.removeAllFirebaseListeners();
     for (Entry<Firebase, ChildEventListener> entry : listenersToCleanUp.entrySet()) {
       entry.getKey().removeEventListener(entry.getValue());
+    }
+
+    for (Unsubscriber unsubscriber : unsubscribers) {
+      unsubscriber.unsubscribe();
     }
   }
 
@@ -96,7 +111,7 @@ public class ModelTest extends SharedTestCase {
     assertNotNull(model.getPreliminaryGameId());
   }
 
-  public void testNewGame() {
+  public void testNewGameOLD() {
     beginAsyncTestBlock();
     model.setGameListListener(new AbstractGameListListener() {
       @Override
@@ -119,7 +134,30 @@ public class ModelTest extends SharedTestCase {
     endAsyncTestBlock();
   }
 
-  public void testNewGameGameUpdate() {
+  public void testNewGame2() {
+    beginAsyncTestBlock();
+    unsubscribers.add(dataEventService.addGameListListener(new AbstractChildListener<Game>() {
+      @Override
+      public void onChildAdded(Game game, String previous) {
+        assertTrue(game.getPlayerList().contains(userId));
+        assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
+        assertTrue(game.getLastModified() > 0);
+        assertTrue(game.isLocalMultiplayer());
+        assertFalse(game.isGameOver());
+        assertEquals(0, game.getSubmittedActionCount());
+        assertEquals("John", game.getProfile(0).getName());
+        finished();
+      }
+    }));
+    List<Profile> localProfiles = new ArrayList<Profile>();
+    Profile profile = Profile.newBuilder().setName("John").build();
+    localProfiles.add(profile);
+    String id = model.newLocalMultiplayerGame(localProfiles);
+    assertFalse(id.equals(""));
+    endAsyncTestBlock();
+  }
+
+  public void testNewGameGameUpdateOLD() {
     beginAsyncTestBlock();
     List<Profile> profiles = new ArrayList<Profile>();
     Profile.Builder profile = Profile.newBuilder();
@@ -140,6 +178,30 @@ public class ModelTest extends SharedTestCase {
         finished();
       }
     });
+    endAsyncTestBlock();
+  }
+
+  public void testNewGameGameUpdate() {
+    beginAsyncTestBlock();
+    List<Profile> profiles = new ArrayList<Profile>();
+    Profile.Builder profile = Profile.newBuilder();
+    profile.setName("John");
+    profile.setPronoun(Pronoun.NEUTRAL);
+    profiles.add(profile.build());
+    String id = model.newGame(profiles);
+    unsubscribers.add(dataEventService.addGameValueListener(id, new AbstractValueListener<Game>() {
+      @Override
+      public void onUpdate(Game game) {
+        assertTrue(game.getPlayerList().contains(userId));
+        assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
+        assertTrue(game.getLastModified() > 0);
+        assertFalse(game.isLocalMultiplayer());
+        assertFalse(game.isGameOver());
+        assertEquals(0, game.getSubmittedActionCount());
+        assertEquals("John", game.getProfile(0).getName());
+        finished();
+      }
+    }));
     endAsyncTestBlock();
   }
 

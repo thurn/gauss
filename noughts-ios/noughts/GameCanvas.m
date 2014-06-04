@@ -30,6 +30,7 @@
 
 - (id)initWithFrame:(CGRect)frame {
   self = [super initWithFrame:frame];
+  NSLog(@"GameCanvas initialized: %@", NSStringFromCGRect(frame));
   if (self) {
     _backgroundSvg = [SVGKImage imageNamed:@"background.svg"];
     _xSvg = [SVGKImage imageNamed:@"x.svg"];
@@ -63,6 +64,8 @@
 - (void)onRegisteredWithNSString:(NSString *)viewerId
                      withNTSGame:(NTSGame *)game
                    withNTSAction:(NTSAction *)currentAction {
+  NSLog(@"GameCanvas: onRegistered: viewer is %@ game is %@ frame is %@", viewerId, game,
+        NSStringFromCGRect(self.frame));
   float scale = [self computeScaleFactorWithWidth:320 withHeight:480];
   int backgroundWidth = 320 * scale;
   int backgroundHeight = 480 * scale;
@@ -103,6 +106,7 @@
 }
 
 - (void)onCommandAddedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
+  NSLog(@"onCommandAdded: %@", command);
   [self drawCommand:command playerNumber:[action getPlayerNumber] animate:YES draggable:YES];
   [self playSoundIfEnabled:_addCommandSound];
 }
@@ -156,6 +160,7 @@
                            _squareSize,
                            _squareSize);
   SVGKImage *image = playerNumber == [NTSModel X_PLAYER] ? _xSvg : _oSvg;
+  NSLog(@"draw command: %@", command);
   UIView *newView = [self drawSvg:image inRect:rect];
   if (animate) {
     CGAffineTransform transform = newView.transform;
@@ -229,6 +234,7 @@
 - (SVGKImageView*)drawSvg:(SVGKImage*)svg inRect:(CGRect)rect {
   SVGKImageView *view = [[SVGKFastImageView alloc] initWithSVGKImage:svg];
   view.frame = rect;
+  NSLog(@"drawing svg %@ in frame %@", svg, NSStringFromCGRect(rect));
   return view;
 }
 

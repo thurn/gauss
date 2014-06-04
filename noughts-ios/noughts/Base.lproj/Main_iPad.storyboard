@@ -315,7 +315,7 @@
         <!--GameVsComputer-->
         <scene sceneID="1jR-al-Llp">
             <objects>
-                <viewController id="SSR-Lv-DBn" userLabel="GameVsComputer" customClass="NewLocalGameViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="GameVsComputer" useStoryboardIdentifierAsRestorationIdentifier="YES" id="SSR-Lv-DBn" userLabel="GameVsComputer" customClass="NewLocalGameViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="mVd-zD-bHd"/>
                         <viewControllerLayoutGuide type="bottom" id="6hd-Cm-y0M"/>
@@ -497,7 +497,7 @@
         <!--EmailInviteViewController-->
         <scene sceneID="Tyt-02-gig">
             <objects>
-                <viewController id="wS2-Rw-cTG" userLabel="EmailInviteViewController" customClass="EmailInviteViewController" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="EmailInviteViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="wS2-Rw-cTG" userLabel="EmailInviteViewController" customClass="EmailInviteViewController" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="hTC-ll-1Xt"/>
                         <viewControllerLayoutGuide type="bottom" id="B2D-Yi-Jus"/>
@@ -506,7 +506,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="768" height="1024"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CDq-4B-T4s">
+                            <button opaque="NO" contentMode="scaleToFill" restorationIdentifier="SendButton" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CDq-4B-T4s">
                                 <rect key="frame" x="260" y="912" width="249" height="72"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="50"/>
@@ -524,7 +524,7 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="jane@example.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zcB-gd-hQ1">
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="ToEmail" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="jane@example.com" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="zcB-gd-hQ1">
                                 <rect key="frame" x="144" y="136" width="574" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="28"/>
@@ -539,7 +539,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="34"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="s9a-FU-fNm">
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" restorationIdentifier="Email" translatesAutoresizingMaskIntoConstraints="NO" id="s9a-FU-fNm">
                                 <rect key="frame" x="40" y="282" width="688" height="200"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>

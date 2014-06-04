@@ -337,6 +337,19 @@ public class Games {
             old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
   }
 
+  /**
+   * @param game A game.
+   * @return True if the viewer is a player in this game and does not have a
+   *     profile yet.
+   */
+  static boolean profileRequired(Game game, String viewerId) {
+    if (game.isGameOver() || game.isLocalMultiplayer() ||
+        !game.getPlayerList().contains(viewerId)) {
+      return false;
+    }
+    return !game.getProfile(Games.playerNumberForPlayerId(game, viewerId)).hasImageString();
+  }
+
   static int compareGames(Game game, Game other) {
     if (other == null) {
       throw new NullPointerException("Null game in compareTo()");

@@ -224,6 +224,7 @@
 }
 
 - (void)onGameUpdateWithNTSGame:(NTSGame*)game {
+  NSLog(@"onGameUpdate");
   [_model handleComputerActionWithNSString:_currentGameId];
   _game = game;
 }

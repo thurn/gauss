@@ -67,6 +67,12 @@ file icon_imageset => ["ios/icon.svg"] do
   FileUtils.cp("ios/IconContents.json", "#{icon_imageset}/Contents.json")
 end
 
+large_app_icon = "../noughts-ios/itunes/large_app_icon.png" 
+file large_app_icon => ["ios/icon.svg"] do
+  FileUtils.mkdir("../noughts-ios/itunes")
+  inkscape_convert_to_size("ios/icon.svg", large_app_icon, 1024)
+end
+
 task :clean do
   ios_image_sets = Dir.glob("../noughts-ios/noughts/Images.xcassets/*.imageset")
   ios_image_sets.each do |file|
@@ -75,4 +81,4 @@ task :clean do
   FileUtils.rm_r icon_imageset
 end
 
-task :default => [*ios_outputs, *ios_avatar_outputs, icon_imageset]
+task :default => [*ios_outputs, *ios_avatar_outputs, icon_imageset, large_app_icon]

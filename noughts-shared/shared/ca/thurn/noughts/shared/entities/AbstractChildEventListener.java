@@ -1,11 +1,10 @@
-package ca.thurn.noughts.shared;
+package ca.thurn.noughts.shared.entities;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 
 public class AbstractChildEventListener implements ChildEventListener {
-
   @Override
   public void onCancelled(FirebaseError error) {
   }
@@ -25,5 +24,4 @@ public class AbstractChildEventListener implements ChildEventListener {
   @Override
   public void onChildRemoved(DataSnapshot snapshot) {
   }
-
 }

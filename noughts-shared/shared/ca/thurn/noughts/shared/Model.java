@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
@@ -82,6 +83,7 @@ public class Model extends AbstractChildEventListener {
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
   private final Map<String, Action> currentActions;
   private final Map<String, Game> games;
+  private final FirebaseReferences firebaseReferences;
   private boolean isComputerThinking = false;
 
   public static Model anonymousModel(String userId, String userKey, Firebase firebase,
@@ -109,6 +111,11 @@ public class Model extends AbstractChildEventListener {
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
     currentActions = new HashMap<String, Action>();
     games = new HashMap<String, Game>();
+    if (isFacebookUser) {
+      firebaseReferences = FirebaseReferences.facebook(userId, firebase);
+    } else {
+      firebaseReferences = FirebaseReferences.anonymous(userKey, firebase);
+    }
     gameChildEventListener = userGamesReference().addChildEventListener(this);
   }
 
@@ -300,7 +307,7 @@ public class Model extends AbstractChildEventListener {
       if (oldGame == null || !game.equals(oldGame)) {
         gameListener.onGameUpdate(game);
       }
-      if (game != null && !game.equals(oldGame) && profileRequired(game)) {
+      if (game != null && !game.equals(oldGame) && Games.profileRequired(game, userId)) {
         String name = null;
         if (Games.viewerProfile(game, userId).hasName()) {
           name = Games.viewerProfile(game, userId).getName();
@@ -337,16 +344,6 @@ public class Model extends AbstractChildEventListener {
       }
     }
     return game;
-  }
-
-  /**
-   * @param game A game.
-   * @return True if the viewer is a player in this game and does not have a
-   *     profile yet.
-   */
-  private boolean profileRequired(Game game) {
-    if (game.isGameOver() || game.isLocalMultiplayer()|| !isPlayer(game)) return false;
-    return !game.getProfile(Games.playerNumberForPlayerId(game, userId)).hasImageString();
   }
 
   /**
@@ -437,13 +434,16 @@ public class Model extends AbstractChildEventListener {
     ref.setValue(game.serialize());
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
+
     if (!game.isLocalMultiplayer()) {
       pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
     }
+
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
     dimensions.put("profileCount", profiles.size() + "");
     analyticsService.trackEvent("newGame", dimensions);
+
     return game.getId();
   }
 
