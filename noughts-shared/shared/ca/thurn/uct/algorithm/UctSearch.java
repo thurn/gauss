@@ -13,41 +13,41 @@ import ca.thurn.uct.core.WinLossEvaluator;
  * An agent which selects actions based on the UCT algorithm described in the
  * 2006 paper "Bandit based Monte-Carlo Planning" by Kocsis and Szepesvari.
  */
-public class UctSearch implements AsynchronousAgent {
-  
+public class UctSearch extends AsynchronousAgent {
+
   /**
     * This exploration bias value, 1/sqrt(2), was shown by Kocsis and
-    * Szepesvari to work well if rewards are in the range [0,1]. 
+    * Szepesvari to work well if rewards are in the range [0,1].
    */
   public static final double UNIT_EXPLORATION_BIAS = 0.70710678;
-  
+
   /**
    * Builder for UctSearch agents.
    */
   public static class Builder {
     private final State stateRepresentation;
-    
+
     private int numSimulations = 100000;
-  
+
     private double explorationBias = UNIT_EXPLORATION_BIAS;
 
     private double discountRate = 1.0;
-    
+
     private int maxDepth = 500;
-    
+
     private int numInitialVisits = 1;
-    
+
     private Evaluator evaluator = new WinLossEvaluator();
-    
+
     /**
      * Constructor for UctSearch Builders.
-     * 
+     *
      * @param stateRepresentation State representation to employ for this agent.
      */
     public Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
     }
-    
+
     /**
      * @return A new UctSearch agent based on this builder.
      */
@@ -100,7 +100,7 @@ public class UctSearch implements AsynchronousAgent {
       this.maxDepth = maxDepth;
       return this;
     }
-    
+
     /**
      * @param numInitialVisits For the first numInitialVisits to a given game
      *     tree position, play random games instead of expanding the tree. This
@@ -122,7 +122,7 @@ public class UctSearch implements AsynchronousAgent {
       return this;
     }
   }
-  
+
   /**
    * @param stateRepresentation State representation to employ.
    * @return A new builder for UctSearch agents.
@@ -137,11 +137,9 @@ public class UctSearch implements AsynchronousAgent {
   private final double discountRate;
   private final int maxDepth;
   private final int numInitialVisits;
-  private final Evaluator evaluator;  
+  private final Evaluator evaluator;
   private final Random random = new Random();
-  private volatile ActionScore asyncResult;
-  private Thread workerThread;
-  
+
   private UctSearch(State stateRepresentation, int numSimulations, double explorationBias,
       double discountRate, int maxDepth, int numInitialVisits, Evaluator evaluator) {
     this.stateRepresentation = stateRepresentation;
@@ -154,7 +152,7 @@ public class UctSearch implements AsynchronousAgent {
   }
 
   /**
-   * {@inheritDoc} 
+   * {@inheritDoc}
    */
   @Override
   public ActionScore pickActionBlocking(int player, State root) {
@@ -169,34 +167,7 @@ public class UctSearch implements AsynchronousAgent {
   public State getStateRepresentation() {
     return stateRepresentation.copy();
   }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void beginAsynchronousSearch(final int player, final State root) {
-    workerThread = (new Thread() {
-      @Override
-      public void run() {
-        ActionTree actionTree = new ActionTree();
-        while (!isInterrupted()) {
-          asyncResult = runSimulations(player, root, actionTree, 1000);         
-        }
-      }
-    });
-    workerThread.start();    
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ActionScore getAsynchronousSearchResult() {
-    workerThread.interrupt();
-    workerThread = null;
-    return asyncResult;
-  }
-  
+
   /**
    * Runs a number of simulations to determine the best action to take from the
    * provided root state.
@@ -226,8 +197,8 @@ public class UctSearch implements AsynchronousAgent {
     }
     return new ActionScore(bestAction, bestPayoff);
   }
-  
-  
+
+
   /**
    * Runs a simulation to determine the total payoff associated with being at
    * the provided state.
@@ -237,7 +208,7 @@ public class UctSearch implements AsynchronousAgent {
    * @param player The player we are trying to optimize for.
    * @param state The current state.
    * @param depth The current depth in the search tree.
-   * @return The heuristic value of being in this state. 
+   * @return The heuristic value of being in this state.
    */
   private double runSimulation(ActionTree actionTree, int player, State state,
       int depth) {
@@ -255,14 +226,14 @@ public class UctSearch implements AsynchronousAgent {
       final double reward = discountRate *
           -runSimulation(actionTree.child(action), state.getCurrentPlayer(), state, depth + 1);
       updateTree(actionTree, reward);
-      return reward;      
+      return reward;
     }
   }
-  
+
   /**
    * Play a random game and return the evaluated outcome for the provided
    * player.
-   * 
+   *
    * @param player Player to evaluate the end result for.
    * @param state Starting game state.
    * @param depth Maximum depth to simulate before quitting.
@@ -272,12 +243,12 @@ public class UctSearch implements AsynchronousAgent {
   private double playRandomGame(int player, State state, int depth) {
     if (depth > maxDepth || state.isTerminal()) {
       return evaluator.evaluate(player, state);
-    }    
+    }
     long action = state.getRandomAction();
     state.perform(action);
-    return playRandomGame(player, state, depth + 1);   
+    return playRandomGame(player, state, depth + 1);
   }
-  
+
   /**
    * Updates the tree at the given position, adding the given reward and
    * marking this node as visited
@@ -320,7 +291,7 @@ public class UctSearch implements AsynchronousAgent {
     }
     return result;
   }
-  
+
   /**
    * @param actionTree An ActionTree tracking the rewards at each game tree
    *     position.

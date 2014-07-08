@@ -6,6 +6,7 @@
 
 - (void)trackEventWithNSString:(NSString *)name;
 
-- (void)trackEventWithNSString:(NSString *)name withJavaUtilMap:(id<JavaUtilMap>)dimensions;
+- (void)trackEventDimensionsWithNSString:(NSString *)name
+                         withJavaUtilMap:(id<JavaUtilMap>)dimensions;
 
 @end

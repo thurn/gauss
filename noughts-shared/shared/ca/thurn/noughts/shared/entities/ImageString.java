@@ -3,11 +3,19 @@ package ca.thurn.noughts.shared.entities;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.NoExport;
+
 /**
  * A string which represents an image, either a URL or a local resource.
  */
-public class ImageString extends Entity<ImageString> {
-  public static class Deserializer extends EntityDeserializer<ImageString> {
+@Export
+@ExportPackage("nts")
+public final class ImageString extends Entity<ImageString> implements Exportable {
+  @Export
+  public static class Deserializer extends EntityDeserializer<ImageString> implements Exportable {
     private Deserializer() {
     }
 
@@ -17,7 +25,8 @@ public class ImageString extends Entity<ImageString> {
     }
   }
 
-  public static class Builder extends EntityBuilder<ImageString> {
+  @Export
+  public static class Builder extends EntityBuilder<ImageString> implements Exportable {
     private final ImageString imageString;
 
     private Builder() {
@@ -80,10 +89,6 @@ public class ImageString extends Entity<ImageString> {
     return new Builder();
   }
 
-  public static Builder newBuilder(ImageString imageString) {
-    return new Builder(imageString);
-  }
-
   public static Deserializer newDeserializer() {
     return new Deserializer();
   }
@@ -113,6 +118,7 @@ public class ImageString extends Entity<ImageString> {
   }
 
   @Override
+  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "string", string);

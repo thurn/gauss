@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameListEntry;
 import ca.thurn.noughts.shared.entities.GameStatus;
@@ -11,12 +15,14 @@ import ca.thurn.noughts.shared.entities.ImageString;
 import ca.thurn.noughts.shared.entities.ImageType;
 import ca.thurn.noughts.shared.entities.Profile;
 
-public class Games {
-  public static final ImageString GAME_OVER_IMAGE_STRING = ImageString.newBuilder()
+@Export
+@ExportPackage("nts")
+public class Games implements Exportable {
+  static final ImageString GAME_OVER_IMAGE_STRING = ImageString.newBuilder()
       .setString("game_over")
       .setType(ImageType.LOCAL)
       .build();
-  public static final ImageString NO_OPPONENT_IMAGE_STRING = ImageString.newBuilder()
+  static final ImageString NO_OPPONENT_IMAGE_STRING = ImageString.newBuilder()
       .setString("no_opponent")
       .setType(ImageType.LOCAL).build();
   private static final long ONE_SECOND = 1000;
@@ -36,7 +42,7 @@ public class Games {
   /**
    * @return A Comparator for Games.
    */
-  public static Comparator<Game> comparator() {
+  static Comparator<Game> comparator() {
     return new Comparator<Game>() {
       @Override
       public int compare(Game o1, Game o2) {

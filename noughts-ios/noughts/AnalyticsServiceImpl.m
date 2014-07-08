@@ -7,7 +7,8 @@
   [PFAnalytics trackEvent:name];
 }
 
-- (void)trackEventWithNSString:(NSString *)name withJavaUtilMap:(id<JavaUtilMap>)dimensions {
+- (void)trackEventDimensionsWithNSString:(NSString *)name
+                         withJavaUtilMap:(id<JavaUtilMap>)dimensions {
   [PFAnalytics trackEvent:name dimensions:[JavaUtils javaUtilMapToNsDictionary:dimensions]];
 }
 

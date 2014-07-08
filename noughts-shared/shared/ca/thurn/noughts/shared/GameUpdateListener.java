@@ -2,6 +2,10 @@ package ca.thurn.noughts.shared;
 
 import javax.annotation.Nullable;
 
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.ExportedInterface;
+
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameStatus;
@@ -9,7 +13,9 @@ import ca.thurn.noughts.shared.entities.GameStatus;
 /**
  * Interface to implement to listen for game updates.
  */
-public interface GameUpdateListener {
+@ExportedInterface
+@ExportPackage("nts")
+public interface GameUpdateListener extends Exportable {
   /**
    * Called with the new value whenever the game changes.
    *

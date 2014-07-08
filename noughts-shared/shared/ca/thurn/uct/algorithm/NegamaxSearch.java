@@ -9,8 +9,8 @@ import ca.thurn.uct.core.State;
 /**
  * An agent which selects an action via the Negamax search algorithm.
  */
-public class NegamaxSearch implements AsynchronousAgent {
-  
+public class NegamaxSearch extends AsynchronousAgent {
+
   /**
    * Builder for NegamaxSearch.
    */
@@ -18,16 +18,17 @@ public class NegamaxSearch implements AsynchronousAgent {
     private final State stateRepresentation;
     private int searchDepth = 5;
     private Evaluator evaluator;
-    
+
     /**
      * Constructor.
-     * 
+     *
      * @param stateRepresentation State representation to employ.
      */
     public Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
       this.evaluator = new AgentEvaluator(
-          MonteCarloSearch.builder(stateRepresentation).setNumSimulations(500).setDiscountRate(0.9).build(), 0L);
+          MonteCarloSearch.builder(stateRepresentation)
+              .setNumSimulations(500).setDiscountRate(0.9).build());
     }
 
     /**
@@ -36,7 +37,7 @@ public class NegamaxSearch implements AsynchronousAgent {
     public NegamaxSearch build() {
       return new NegamaxSearch(stateRepresentation, searchDepth, evaluator);
     }
-    
+
     /**
      * @param searchDepth Depth to search to before evaluating nodes in the
      *     search tree. Default value: 5.
@@ -46,7 +47,7 @@ public class NegamaxSearch implements AsynchronousAgent {
       this.searchDepth = searchDepth;
       return this;
     }
-    
+
     /**
      * @param evaluator Function to use to evaluate the quality of nodes in
      *     the search tree once the depth limit is hit. Default value is an
@@ -56,9 +57,9 @@ public class NegamaxSearch implements AsynchronousAgent {
     public Builder setEvaluator(Evaluator evaluator) {
       this.evaluator = evaluator;
       return this;
-    }    
+    }
   }
-  
+
   /**
    * @param stateRepresentation State representation to employ.
    * @return A new builder for NegamaxSearch agents.
@@ -66,13 +67,11 @@ public class NegamaxSearch implements AsynchronousAgent {
   public static Builder builder(State stateRepresentation) {
     return new Builder(stateRepresentation);
   }
-  
+
   private final State stateRepresentation;
   private final int searchDepth;
   private final Evaluator evaluator;
-  private volatile ActionScore asyncResult;
-  private Thread workerThread;  
-  
+
   private NegamaxSearch(State stateRepresentation, int searchDepth, Evaluator evaluator) {
     this.stateRepresentation = stateRepresentation;
     this.searchDepth = searchDepth;
@@ -85,7 +84,7 @@ public class NegamaxSearch implements AsynchronousAgent {
   @Override
   public ActionScore pickActionBlocking(int player, State rootNode) {
     return search(player, rootNode, searchDepth, Double.NEGATIVE_INFINITY,
-        Double.POSITIVE_INFINITY, null /* thread */);
+        Double.POSITIVE_INFINITY);
   }
 
   /**
@@ -96,31 +95,9 @@ public class NegamaxSearch implements AsynchronousAgent {
     return stateRepresentation.copy();
   }
 
-  @Override
-  public void beginAsynchronousSearch(final int player, final State root) {
-    workerThread = (new Thread() {
-      @Override
-      public void run() {
-        int searchDepth = 1;        
-        while (!isInterrupted()) {
-          asyncResult = search(player, root.copy(), searchDepth++, Double.NEGATIVE_INFINITY,
-              Double.POSITIVE_INFINITY, this);
-        }
-      }
-    });
-    workerThread.start();        
-  }
-
-  @Override
-  public ActionScore getAsynchronousSearchResult() {
-    workerThread.interrupt();
-    workerThread = null;
-    return asyncResult;
-  }
-  
   /**
    * Search for the best action to take for the provided player.
-   * 
+   *
    * @param player The player to find an action for.
    * @param state The root state for the search.
    * @param maxDepth The maximum depth to search to in the game tree.
@@ -133,7 +110,7 @@ public class NegamaxSearch implements AsynchronousAgent {
    *     to take and the heuristic score associated with this action.
    */
   private ActionScore search(int player, State state, int maxDepth, double alpha,
-      double beta, Thread thread) {
+      double beta) {
     if (state.isTerminal() || maxDepth == 0) {
       return new ActionScore(-1, evaluator.evaluate(player, state.copy()));
     }
@@ -144,8 +121,7 @@ public class NegamaxSearch implements AsynchronousAgent {
       long action = actionIterator.nextAction();
       long undoToken = state.perform(action);
       double value = -1 *
-          search(state.getCurrentPlayer(), state, maxDepth - 1, -beta, -alpha,
-              null /* thread */).getScore();
+          search(state.getCurrentPlayer(), state, maxDepth - 1, -beta, -alpha).getScore();
       state.undo(action, undoToken);
       if (value > bestValue) {
         bestValue = value;
@@ -154,10 +130,7 @@ public class NegamaxSearch implements AsynchronousAgent {
       if (value > alpha) {
         alpha = value;
       }
-      if (alpha >= beta) {        
-        break;
-      }
-      if (thread != null && thread.isInterrupted()) {
+      if (alpha >= beta) {
         break;
       }
     }

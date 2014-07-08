@@ -1,8 +1,14 @@
 package ca.thurn.noughts.shared;
 
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+
 import ca.thurn.noughts.shared.entities.Pronoun;
 
-public class Pronouns {
+@Export
+@ExportPackage("nts")
+public class Pronouns implements Exportable {
   /**
    * @param pronoun The pronoun.
    * @param capitalize Whether to capitalize the word.
@@ -21,12 +27,12 @@ public class Pronouns {
       }
     }
   }
-  
+
   /**
    * @param pronoun The pronoun.
    * @param capitalize Whether to capitalize the word.
    * @return The correct singular objective pronoun for this user.
-   */  
+   */
   public static String getObjectivePronoun(Pronoun pronoun, boolean capitalize) {
     switch (pronoun) {
       case MALE: {

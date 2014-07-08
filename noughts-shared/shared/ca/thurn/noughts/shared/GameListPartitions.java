@@ -5,6 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+
 import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.GameListSection;
 
@@ -13,7 +17,10 @@ import ca.thurn.noughts.shared.entities.GameListSection;
  * provided user's turn, games where it is not their turn, and games which
  * are over.
  */
-public class GameListPartitions {
+
+@Export
+@ExportPackage("nts")
+public class GameListPartitions implements Exportable {
   private final List<Game> yourTurn;
   private final List<Game> theirTurn;
   private final List<Game> gameOver;
@@ -50,7 +57,6 @@ public class GameListPartitions {
 
   /**
    * @param game A game
-   * @param viewerId The viewer's ID
    * @return True if a game with the same ID as the provided game exists in the
    *     correct section.
    */

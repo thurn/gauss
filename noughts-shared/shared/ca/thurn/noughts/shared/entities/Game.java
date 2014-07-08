@@ -6,8 +6,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Game extends Entity<Game> {
-  public static class Deserializer extends EntityDeserializer<Game> {
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.NoExport;
+
+@Export
+@ExportPackage("nts")
+public final class Game extends Entity<Game> implements Exportable {
+  @Export
+  public static class Deserializer extends EntityDeserializer<Game> implements Exportable {
     private Deserializer() {
     }
 
@@ -17,7 +25,8 @@ public class Game extends Entity<Game> {
     }
   }
 
-  public static class Builder extends EntityBuilder<Game> {
+  @Export
+  public static class Builder extends EntityBuilder<Game> implements Exportable {
     private final Game game;
 
     private Builder() {
@@ -103,6 +112,7 @@ public class Game extends Entity<Game> {
       return game.profileList;
     }
 
+    @NoExport
     public Builder setProfile(int index, EntityBuilder<Profile> profile) {
       return setProfile(index, profile.build());
     }
@@ -113,6 +123,7 @@ public class Game extends Entity<Game> {
       return this;
     }
 
+    @NoExport
     public Builder addProfile(EntityBuilder<Profile> profile) {
       return addProfile(profile.build());
     }
@@ -164,6 +175,7 @@ public class Game extends Entity<Game> {
       return game.submittedActionList;
     }
 
+    @NoExport
     public Builder setSubmittedAction(int index, EntityBuilder<Action> action) {
       return setSubmittedAction(index, action.build());
     }
@@ -174,6 +186,7 @@ public class Game extends Entity<Game> {
       return this;
     }
 
+    @NoExport
     public Builder addSubmittedAction(EntityBuilder<Action> action) {
       return addSubmittedAction(action.build());
     }
@@ -287,10 +300,6 @@ public class Game extends Entity<Game> {
     return new Builder();
   }
 
-  public static Builder newBuilder(Game game) {
-    return new Builder(game);
-  }
-
   public static Deserializer newDeserializer() {
     return new Deserializer();
   }
@@ -383,6 +392,7 @@ public class Game extends Entity<Game> {
   }
 
   @Override
+  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "id", id);

@@ -112,7 +112,7 @@
 }
 
 - (void)onCommandRemovedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)command {
-  UIView *view = _views[command];
+  UIView *view = _views[@([command hash])];
   [UIView animateWithDuration:0.2 animations:^{
       view.transform = CGAffineTransformScale(view.transform, 0.1, 0.1);
   } completion:^(BOOL finished) {
@@ -123,14 +123,14 @@
 
 - (void)onCommandChangedWithNTSAction:(NTSAction *)action withNTSCommand:(NTSCommand *)oldCommand
     withNTSCommand:(NTSCommand *)newCommand {
-  _views[newCommand] = _views[oldCommand];
-  [_views removeObjectForKey:oldCommand];
+  _views[@([newCommand hash])] = _views[@([oldCommand hash])];
+  [_views removeObjectForKey:@([oldCommand hash])];
   [self playSoundIfEnabled:_addCommandSound];
 }
 
 -(void)onActionSubmittedWithNTSAction:(NTSAction *)action {
   for (NTSCommand *command in [action getCommandList]) {
-    [self removeAllGestureRecognizers:_views[command]];
+    [self removeAllGestureRecognizers:_views[@([command hash])]];
   }
   [self playSoundIfEnabled:_submitCommandSound];
   [self drawAction:action animate:YES draggable:NO];
@@ -142,7 +142,7 @@
 
 - (void)drawAction:(NTSAction*)action animate:(BOOL)animate draggable:(BOOL)draggable {
   for (NTSCommand* command in (id<NSFastEnumeration>)[action getCommandList]) {
-    if (!_views[command]) {
+    if (!_views[@([command hash])]) {
       [self drawCommand:command
            playerNumber:[action getPlayerNumber]
                 animate:animate
@@ -183,7 +183,7 @@
     [panRecognizer setMinimumNumberOfTouches:1];
     [newView addGestureRecognizer:panRecognizer];
   }
-  _views[command] = newView;
+  _views[@([command hash])] = newView;
   [self addSubview:newView];
 }
 

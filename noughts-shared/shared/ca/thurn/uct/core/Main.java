@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import com.google.gwt.core.shared.GwtIncompatible;
+
 /**
  * A helper class for running games & sets of games between multiple Agents.
  */
+@GwtIncompatible
 public class Main {
   private final List<Agent> agents;
   private final State initialState;
@@ -31,7 +34,7 @@ public class Main {
     this.agents = agents;
     this.initialState = canonicalState;
   }
-  
+
   /**
    * Run a series of matches between the agents, selected at random, and then
    * report the results.
@@ -39,7 +42,7 @@ public class Main {
    * @param tournamentSize The number of matches to run.
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
   public void runTournament(int tournamentSize, long perMoveTimeBudget)
       throws InterruptedException {
@@ -75,29 +78,29 @@ public class Main {
       } else if (winner == 0) {
         draws++;
       }
-      
+
       if (i >= 10 && i % (tournamentSize / 10) == 0) {
         // Print intermediate results
-        printTournamentResults(wins, draws);        
+        printTournamentResults(wins, draws);
       }
     }
-    
+
     printTournamentResults(wins, draws);
-    
+
     long duration = System.currentTimeMillis() - startTime;
     String elapsed = new SimpleDateFormat("mm:ss").format(new Date(duration));
     String perTournament = new SimpleDateFormat("mm:ss").format(new Date(duration / tournamentSize));
-    System.out.println("Tournament finished in " + elapsed + " (" + perTournament + 
-        " per tournament)");    
+    System.out.println("Tournament finished in " + elapsed + " (" + perTournament +
+        " per tournament)");
   }
-  
+
   /**
    * Run a single match between the first two provided agents, printing out the
    * current game state between each move.
-   * 
+   *
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
   public void runMatch(long perMoveTimeBudget) throws InterruptedException {
     final Map<Integer, Agent> agentMap = new HashMap<Integer, Agent>();
@@ -110,7 +113,7 @@ public class Main {
       System.out.println("Game drawn.");
     }
   }
-  
+
   /**
    * Play a match between the supplied agents.
    *
@@ -120,7 +123,7 @@ public class Main {
    *     information.
    * @return The winner of the game as defined by the canonical state's
    *     {@link State#getWinner()} method.
-   * @throws InterruptedException 
+   * @throws InterruptedException
    */
   private int playGame(Map<Integer, Agent> agentMap, boolean isInteractive,
       long perMoveTimeBudget) throws InterruptedException {
@@ -133,10 +136,8 @@ public class Main {
       long action;
       if (agent instanceof AsynchronousAgent) {
         AsynchronousAgent async = (AsynchronousAgent)agent;
-        async.beginAsynchronousSearch(canonicalState.getCurrentPlayer(),
+        ActionScore pair = async.pickActionBlocking(canonicalState.getCurrentPlayer(),
             async.getStateRepresentation().initializeFrom(canonicalState));
-        Thread.sleep(perMoveTimeBudget);
-        ActionScore pair = async.getAsynchronousSearchResult();
         if (pair == null) {
           throw new RuntimeException("Agent " + async + " needed more time.");
         }
@@ -155,7 +156,7 @@ public class Main {
     }
     return canonicalState.getWinner();
   }
-  
+
   /**
    * Prints out the results of a tournament.
    *
@@ -169,5 +170,5 @@ public class Main {
     }
     System.out.println(draws + " draws");
   }
-  
+
 }

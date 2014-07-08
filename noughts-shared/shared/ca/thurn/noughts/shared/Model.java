@@ -1,16 +1,20 @@
 package ca.thurn.noughts.shared;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nullable;
+
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.NoExport;
+
+import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;
+import ca.thurn.gwtcompat.client.AtomicInteger;
 import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
@@ -18,6 +22,7 @@ import ca.thurn.noughts.shared.entities.Game;
 import ca.thurn.noughts.shared.entities.Profile;
 import ca.thurn.noughts.shared.entities.Pronoun;
 import ca.thurn.uct.algorithm.MonteCarloSearch;
+import ca.thurn.uct.core.ActionScore;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -28,12 +33,13 @@ import com.firebase.client.GenericTypeIndicator;
 import com.firebase.client.MutableData;
 import com.firebase.client.Transaction;
 import com.firebase.client.ValueEventListener;
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The data model for noughts.
  */
-public class Model extends AbstractChildEventListener {
+@Export
+@ExportPackage("nts")
+public class Model extends AbstractChildEventListener implements Exportable {
   public static final int X_PLAYER = 0;
   public static final int O_PLAYER = 1;
 
@@ -42,7 +48,7 @@ public class Model extends AbstractChildEventListener {
    */
   private static abstract class GameMutation {
     /**
-     * @param game Game to mutate.
+     * @param gameBuilder Game to mutate.
      */
     public abstract void mutate(Game.Builder gameBuilder);
 
@@ -83,27 +89,26 @@ public class Model extends AbstractChildEventListener {
   private final Map<String, CommandUpdateListener> commandUpdateListeners;
   private final Map<String, Action> currentActions;
   private final Map<String, Game> games;
-  private final FirebaseReferences firebaseReferences;
   private boolean isComputerThinking = false;
 
-  public static Model anonymousModel(String userId, String userKey, Firebase firebase,
+  public static Model anonymousModel(String userId, String userKey, String firebaseUrl,
       PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
-    return new Model(userId, userKey, false /* isFacebookUser */, firebase,
+    return new Model(userId, userKey, false /* isFacebookUser */, firebaseUrl,
         pushNotificationService, analyticsService);
   }
 
-  public static Model facebookModel(String facebookId, Firebase firebase,
+  public static Model facebookModel(String facebookId, String firebaseUrl,
       PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
-    return new Model(facebookId, facebookId, true /* isFacebookuser */, firebase,
+    return new Model(facebookId, facebookId, true /* isFacebookuser */, firebaseUrl,
         pushNotificationService, analyticsService);
   }
 
-  private Model(String userId, String userKey, boolean isFacebookUser, Firebase firebase,
+  private Model(String userId, String userKey, boolean isFacebookUser, String firebaseUrl,
       PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
     this.userId = userId;
     this.userKey = userKey;
     this.isFacebookUser = isFacebookUser;
-    this.firebase = firebase;
+    this.firebase = new Firebase(firebaseUrl);
     this.pushNotificationService = pushNotificationService;
     this.analyticsService = analyticsService;
     valueEventListeners = new HashMap<String, ValueEventListener>();
@@ -111,11 +116,11 @@ public class Model extends AbstractChildEventListener {
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
     currentActions = new HashMap<String, Action>();
     games = new HashMap<String, Game>();
-    if (isFacebookUser) {
-      firebaseReferences = FirebaseReferences.facebook(userId, firebase);
-    } else {
-      firebaseReferences = FirebaseReferences.anonymous(userKey, firebase);
-    }
+//    if (isFacebookUser) {
+//      firebaseReferences = FirebaseReferences.facebook(userId, firebase);
+//    } else {
+//      firebaseReferences = FirebaseReferences.anonymous(userKey, firebase);
+//    }
     gameChildEventListener = userGamesReference().addChildEventListener(this);
   }
 
@@ -156,6 +161,7 @@ public class Model extends AbstractChildEventListener {
   /**
    * See {@link Model#setGameUpdateListener(String, GameUpdateListener, boolean)}.
    */
+  @NoExport
   public void setGameUpdateListener(String gameId, GameUpdateListener listener) {
     setGameUpdateListener(gameId, listener, true /* immediate */);
   }
@@ -307,7 +313,7 @@ public class Model extends AbstractChildEventListener {
       if (oldGame == null || !game.equals(oldGame)) {
         gameListener.onGameUpdate(game);
       }
-      if (game != null && !game.equals(oldGame) && Games.profileRequired(game, userId)) {
+      if (!game.equals(oldGame) && Games.profileRequired(game, userId)) {
         String name = null;
         if (Games.viewerProfile(game, userId).hasName()) {
           name = Games.viewerProfile(game, userId).getName();
@@ -369,8 +375,9 @@ public class Model extends AbstractChildEventListener {
   }
 
   /**
-   * Version of {@link Model#newGame(Map, String)} with no game ID specified.
+   * Version of {@link Model#newGame(java.util.List, String)}  with no game ID specified.
    */
+  @NoExport
   public String newGame(List<Profile> profiles) {
     return newGame(profiles, null /* gameId */);
   }
@@ -383,14 +390,14 @@ public class Model extends AbstractChildEventListener {
    * @param gameId Optionally, the game ID to use.
    * @return The newly created game's ID.
    */
-  public String newGame(List<Profile> profiles, String gameId) {
+  public String newGame(List<Profile> profiles, @Nullable String gameId) {
     return newGame(false /* localMultiplayer */, profiles, gameId);
   }
 
   /**
    * Create a new local multiplayer game.
    *
-   * @param localProfiles List of local profiles for players in this game.
+   * @param profiles List of profiles for players in this game.
    * @return The newly created game's ID.
    */
   public String newLocalMultiplayerGame(List<Profile> profiles) {
@@ -402,8 +409,7 @@ public class Model extends AbstractChildEventListener {
    * game ID.
    *
    * @param localMultiplayer Sets whether the game is a local multiplayer game.
-   * @param userProfile Map from user IDs to profiles.
-   * @param profiles List of local profiles for players in this game.
+   * @param profiles List of profiles for players in this game.
    * @param gameId Optionally, the game ID to use.
    * @return The newly created game's ID.
    */
@@ -414,7 +420,6 @@ public class Model extends AbstractChildEventListener {
     } else {
       ref = gameReference(gameId);
     }
-
     Game.Builder builder = Game.newBuilder();
     builder.setId(ref.getName());
     builder.addPlayer(userId);
@@ -431,19 +436,17 @@ public class Model extends AbstractChildEventListener {
       }
     }
     Game game = builder.build();
-    ref.setValue(game.serialize());
+    Map<String, Object> map = game.serialize();
+    ref.setValue(map);
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
-
     if (!game.isLocalMultiplayer()) {
       pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
     }
-
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
     dimensions.put("profileCount", profiles.size() + "");
-    analyticsService.trackEvent("newGame", dimensions);
-
+    analyticsService.trackEventDimensions("newGame", dimensions);
     return game.getId();
   }
 
@@ -451,7 +454,7 @@ public class Model extends AbstractChildEventListener {
    * Sets a profile for the current player. Automatically sets them to "not a
    * computer player".
    *
-   * @param game The game.
+   * @param gameId The game's ID.
    * @param profile The profile.
    * @param onComplete Completion callback.
    */
@@ -475,26 +478,28 @@ public class Model extends AbstractChildEventListener {
   /**
    * Add and submit the provided command.
    *
-   * @param game Game to add and submit command for
+   * @param gameId ID of Game to add and submit command for
    * @param command Command to add and submit.
    */
+  @NoExport
   public void addCommandAndSubmit(String gameId, Command command) {
     addCommandAndSubmit(gameId, command, null /* onComplete */);
   }
 
   /**
-   * Adds the provided command as in {@link Model#addCommand(Game, Command)}
+   * Adds the provided command as in {@link Model#addCommand(String, Command)}
    * and also submits the resulting action as in {@link
-   * Model#submitCurrentAction(Game)}.
+   * Model#submitCurrentAction(String)}.
    *
-   * @param game The game.
+   * @param gameId The game ID.
    * @param command Command to add.
    * @param onComplete Optionally, a function to invoke when the command is submitted.
    */
-  public void addCommandAndSubmit(String gameId, Command command, OnMutationCompleted onComplete) {
+  public void addCommandAndSubmit(String gameId, Command command,
+      @Nullable OnMutationCompleted onComplete) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
-      die("Illegal command: %s", command);
+      die("Illegal command: %s", command.toString());
     }
     Action toSubmit = currentActions.get(gameId)
         .toBuilder()
@@ -511,16 +516,14 @@ public class Model extends AbstractChildEventListener {
    * is no current action, creates one. Any commands beyond the current
    * location in the undo history are deleted.
    *
-   * @param game The current game.
-   * @param currentAction The game's current action, or null if there is no
-   *     current action.
+   * @param gameId The current game ID.
    * @param command The command to add.
    * @return The game with the command added.
    */
   public void addCommand(String gameId, final Command command) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
-      die("Illegal command: %s", command);
+      die("Illegal command: %s", command.toString());
     }
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
@@ -539,12 +542,12 @@ public class Model extends AbstractChildEventListener {
    * the provided command. The current action must exist and already have one
    * or more commands.
    *
-   * @param game Game to modify the last command of.
+   * @param gameId ID of game to modify the last command of.
    * @param command New value to use as the game's last command.
    */
   public void updateLastCommand(String gameId, final Command command) {
     if (!couldUpdateLastCommand(getGame(gameId), getCurrentAction(gameId), command)) {
-      die("Illegal Command: %s", command);
+      die("Illegal Command: %s", command.toString());
     }
 
     mutateCurrentAction(gameId, new ActionMutation() {
@@ -564,7 +567,7 @@ public class Model extends AbstractChildEventListener {
    * @param game The game to check.
    * @param command The proposed new value for the game's last command.
    * @return True if updating the game's last command by
-   *     {@link Model#updateLastCommand(Game, Command)} would produce a legal
+   *     {@link Model#updateLastCommand(String, Command)}  would produce a legal
    *     game state.
    */
   public boolean couldUpdateLastCommand(Game game, Action currentAction, Command command) {
@@ -631,12 +634,9 @@ public class Model extends AbstractChildEventListener {
   }
 
   /**
-   * Version of {@link Model#submitCurrentAction(Game, OnMutationCompleted)}
-   * with no completion function.
-   *
-   * @param game The game to submit the current action of.
-   * @param action The action to submit.
+   * @see {@link Model#submitCurrentAction(String, OnMutationCompleted)}
    */
+  @NoExport
   public void submitCurrentAction(String gameId) {
     submitCurrentAction(gameId, null /* onCommplete */);
   }
@@ -646,8 +646,7 @@ public class Model extends AbstractChildEventListener {
    * ends the game: populates the "victors" array and sets the "gameOver"
    * bit. Otherwise, updates the current player.
    *
-   * @param game The game to submit the current action of.
-   * @param action The current action.
+   * @param gameId ID of the game to submit the current action of.
    * @param onComplete Optionally, a function to invoke when the action is
    *     submitted.
    */
@@ -736,7 +735,7 @@ public class Model extends AbstractChildEventListener {
    * Checks if it is the computer's turn in this game, and performs the
    * appropriate computer move if it is.
    *
-   * @param game Game to check.
+   * @param gameId ID of game to check.
    */
   public void handleComputerAction(final String gameId) {
     Game game = getGame(gameId);
@@ -775,12 +774,10 @@ public class Model extends AbstractChildEventListener {
         .setNumSimulations(numSimulations)
         .build();
     int player = computerState.convertPlayerNumber(game.getCurrentPlayerNumber());
-    agent.beginAsynchronousSearch(player, computerState);
-    Timer timer = new Timer();
-    timer.schedule(new TimerTask() {
-      @Override public void run() {
-        long action = agent.getAsynchronousSearchResult().getAction();
-        Command command = computerState.longToCommand(action);
+    agent.beginAsynchronousSearch(player, computerState, new OnComplete<ActionScore>() {
+      @Override
+      public void onComplete(ActionScore result) {
+        Command command = computerState.longToCommand(result.getAction());
         addCommandAndSubmit(gameId, command, new OnMutationCompleted() {
           @Override
           public void onMutationCompleted(Game game) {
@@ -788,16 +785,14 @@ public class Model extends AbstractChildEventListener {
           }
         });
       }
-    }, 4000L);
+    });
   }
 
   /**
    * Undoes the player's previous command. Throws an exception if there's no
    * previous command to undo.
    *
-   * @param game The game to undo the previous command of.
-   * @param action The current action.
-   * @return The game with the command undone.
+   * @param gameId ID of the game to undo the previous command of.
    */
   public void undoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
@@ -817,8 +812,7 @@ public class Model extends AbstractChildEventListener {
    * Re-does the player's previously undone command. Throws an exception if there's no
    * previous command to redo.
    *
-   * @param game The game to redo the previous command of.
-   * @return The game with the command redone.
+   * @param gameId ID of the game to redo the previous command of.
    */
   public void redoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
@@ -838,8 +832,7 @@ public class Model extends AbstractChildEventListener {
   /**
    * Leave a game. In a 2-player game, this means your opponent wins.
    *
-   * @param game Game to resign from.
-   * @return The game after resignation.
+   * @param gameId ID of the game to resign from.
    */
   public void resignGame(String gameId) {
     ensureIsPlayer(gameId);
@@ -872,7 +865,7 @@ public class Model extends AbstractChildEventListener {
   /**
    * Remove a game from a user's game list.
    *
-   * @param game The game to archive.
+   * @param gameId ID of the game to archive.
    */
   public void archiveGame(String gameId) {
     userReferenceForGame(gameId).removeValue();
@@ -1000,7 +993,7 @@ public class Model extends AbstractChildEventListener {
         new AtomicInteger(games.size() + currentActions.size());
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("callbacksExpected", callbacksExpected.get() + "");
-    analyticsService.trackEvent("upgradeAccountToFacebook", dimensions);
+    analyticsService.trackEventDimensions("upgradeAccountToFacebook", dimensions);
 
     final OnUpgradeCompleted internalCallback = new OnUpgradeCompleted() {
       @Override
@@ -1073,20 +1066,17 @@ public class Model extends AbstractChildEventListener {
    * @return A list of player numbers of victors or null if the game is not
    *     over.
    */
-  @VisibleForTesting
   List<Integer> computeVictorsIfSubmitted(Game game, Action currentAction) {
-    checkNotNull(currentAction);
-
     // 1) check for win
     Action[][] actionTable = makeActionTable(game, currentAction);
     // All possible winning lines in [column, row] format:
     int[][][] lines =  { {{0,0}, {1,0}, {2,0}}, {{0,1}, {1,1}, {2,1}},
         {{0,2}, {1,2}, {2,2}}, {{0,0}, {0,1}, {0,2}}, {{1,0}, {1,1}, {1,2}},
         {{2,0}, {2,1}, {2,2}}, {{0,0}, {1,1}, {2,2}}, {{2,0}, {1,1}, {0,2}} };
-    for (int i = 0; i < lines.length; ++i) {
-      Action action1 = actionTable[lines[i][0][0]][lines[i][0][1]];
-      Action action2 = actionTable[lines[i][1][0]][lines[i][1][1]];
-      Action action3 = actionTable[lines[i][2][0]][lines[i][2][1]];
+    for (int[][] line : lines) {
+      Action action1 = actionTable[line[0][0]][line[0][1]];
+      Action action2 = actionTable[line[1][0]][line[1][1]];
+      Action action3 = actionTable[line[2][0]][line[2][1]];
       if (action1 != null && action2 != null && action3 != null &&
           action1.getPlayerNumber() == action2.getPlayerNumber() &&
           action2.getPlayerNumber() == action3.getPlayerNumber()) {
@@ -1259,12 +1249,23 @@ public class Model extends AbstractChildEventListener {
   /**
    * Throws an exception.
    */
-  private RuntimeException die(String message, Object... args) {
+  private RuntimeException die(String message, String... args) {
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("message", message);
-    analyticsService.trackEvent("die", dimensions);
-    throw new RuntimeException(String.format(message, args));
+    analyticsService.trackEventDimensions("die", dimensions);
+    throw new RuntimeException(formatString(message, args));
   }
+
+  private static String formatString(String format, String... args) {
+    String[] split = format.split("%s");
+    final StringBuilder msg = new StringBuilder();
+    for (int pos = 0; pos < split.length - 1; ++pos) {
+        msg.append(split[pos]);
+        msg.append(args[pos]);
+    }
+    msg.append(split[split.length - 1]);
+    return msg.toString();
+ }
 
   /**
    * Ensures the current user is the current player in the provided game.

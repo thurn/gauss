@@ -2,8 +2,6 @@ package ca.thurn.uct.core;
 
 import java.util.Iterator;
 
-
-
 /**
  * Represents the game state of a given game. A state is responsible for
  * tracking whose turn it is, what actions have been taken, and if anybody has

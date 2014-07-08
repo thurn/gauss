@@ -157,7 +157,8 @@ public class ComputerState implements State {
   }
 
   int convertPlayerNumber(int playerNumber) {
-    return playerNumber == Model.X_PLAYER ? Player.PLAYER_ONE : Player.PLAYER_TWO;
+    // TODO: Model.X_PLAYER
+    return playerNumber == 0 ? Player.PLAYER_ONE : Player.PLAYER_TWO;
   }
 
   private Map<Command, Long> commandToLongMap() {

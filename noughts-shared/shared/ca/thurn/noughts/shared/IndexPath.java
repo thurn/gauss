@@ -1,8 +1,14 @@
 package ca.thurn.noughts.shared;
 
-public class IndexPath {
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+
+@Export
+@ExportPackage("nts")
+public class IndexPath implements Exportable {
   public static final IndexPath NOT_FOUND = new IndexPath(-1, -1);
-  
+
   private final int section;
   private final int row;
 

@@ -2,8 +2,13 @@ package ca.thurn.noughts.shared;
 
 import java.util.Map;
 
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.ExportedInterface;
 
-public interface PushNotificationService {
+@ExportedInterface
+@ExportPackage("nts")
+public interface PushNotificationService extends Exportable {
   /**
    * Called to subscribe the user to a new channel.
    *

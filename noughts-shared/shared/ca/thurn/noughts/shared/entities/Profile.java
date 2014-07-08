@@ -3,8 +3,16 @@ package ca.thurn.noughts.shared.entities;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Profile extends Entity<Profile> {
-  public static class Deserializer extends EntityDeserializer<Profile> {
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.NoExport;
+
+@Export
+@ExportPackage("nts")
+public final class Profile extends Entity<Profile> implements Exportable {
+  @Export
+  public static class Deserializer extends EntityDeserializer<Profile> implements Exportable {
     private Deserializer() {
     }
 
@@ -13,18 +21,19 @@ public class Profile extends Entity<Profile> {
       return new Profile(profileMap);
     }
   }
-  
-  public static class Builder extends EntityBuilder<Profile> {
+
+  @Export
+  public static class Builder extends EntityBuilder<Profile> implements Exportable {
     private final Profile profile;
-    
+
     private Builder() {
       this.profile = new Profile();
     }
-    
+
     private Builder(Profile profile) {
       this.profile = new Profile(profile);
     }
-    
+
     @Override
     public Profile build() {
       return new Profile(profile);
@@ -32,8 +41,8 @@ public class Profile extends Entity<Profile> {
 
     @Override protected Profile getInternalEntity() {
       return profile;
-    }    
-    
+    }
+
     public boolean hasName() {
       return profile.hasName();
     }
@@ -41,13 +50,13 @@ public class Profile extends Entity<Profile> {
     public String getName() {
       return profile.getName();
     }
-    
+
     public Builder setName(String name) {
       checkNotNull(name);
       profile.name = name;
       return this;
     }
-    
+
     public Builder clearName() {
       profile.name = null;
       return this;
@@ -60,17 +69,18 @@ public class Profile extends Entity<Profile> {
     public ImageString getImageString() {
       return profile.getImageString();
     }
-    
+
+    @NoExport
     public Builder setImageString(EntityBuilder<ImageString> imageString) {
       return setImageString(imageString.build());
     }
-    
+
     public Builder setImageString(ImageString imageString) {
       checkNotNull(imageString);
       profile.imageString = imageString;
       return this;
     }
-    
+
     public Builder clearImageString() {
       profile.imageString = null;
       return this;
@@ -83,13 +93,13 @@ public class Profile extends Entity<Profile> {
     public Pronoun getPronoun() {
       return profile.getPronoun();
     }
-    
+
     public Builder setPronoun(Pronoun pronoun) {
       checkNotNull(pronoun);
       profile.pronoun = pronoun;
       return this;
     }
-    
+
     public Builder clearPronoun() {
       profile.pronoun = null;
       return this;
@@ -102,12 +112,12 @@ public class Profile extends Entity<Profile> {
     public boolean isComputerPlayer() {
       return profile.isComputerPlayer();
     }
-    
+
     public Builder setIsComputerPlayer(boolean isComputerPlayer) {
       profile.computerPlayer = isComputerPlayer;
       return this;
     }
-    
+
     public Builder clearIsComputerPlayer() {
       profile.computerPlayer = null;
       return this;
@@ -120,26 +130,22 @@ public class Profile extends Entity<Profile> {
     public int getComputerDifficultyLevel() {
       return profile.getComputerDifficultyLevel();
     }
-    
+
     public Builder setComputerDifficultyLevel(int computerDifficultyLevel) {
       profile.computerDifficultyLevel = computerDifficultyLevel;
       return this;
     }
-    
+
     public Builder clearComputerDifficultyLevel() {
       profile.computerDifficultyLevel = null;
       return this;
     }
   }
-  
+
   public static Builder newBuilder() {
     return new Builder();
   }
-  
-  public static Builder newBuilder(Profile profile) {
-    return new Builder(profile);
-  }
-  
+
   public static Deserializer newDeserializer() {
     return new Deserializer();
   }
@@ -149,10 +155,10 @@ public class Profile extends Entity<Profile> {
   private Pronoun pronoun;
   private Boolean computerPlayer;
   private Integer computerDifficultyLevel;
-  
+
   private Profile() {
   }
-  
+
   private Profile(Profile profile) {
     this.name = profile.name;
     this.imageString = profile.imageString;
@@ -160,12 +166,12 @@ public class Profile extends Entity<Profile> {
     this.computerPlayer = profile.computerPlayer;
     this.computerDifficultyLevel = profile.computerDifficultyLevel;
   }
-  
+
   @Override
   public String entityName() {
     return "Profile";
-  }  
-  
+  }
+
   private Profile(Map<String, Object> map) {
     this.name = getString(map, "name");
     this.imageString = getEntity(map, "imageString", ImageString.newDeserializer());
@@ -173,8 +179,9 @@ public class Profile extends Entity<Profile> {
     this.computerPlayer = getBoolean(map, "isComputerPlayer");
     this.computerDifficultyLevel = getInteger(map, "computerDifficultyLevel");
   }
-  
+
   @Override
+  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "name", name);
@@ -184,12 +191,12 @@ public class Profile extends Entity<Profile> {
     putSerialized(result, "computerDifficultyLevel", computerDifficultyLevel);
     return result;
   }
-  
+
   @Override
   public Builder toBuilder() {
     return new Builder(this);
   }
-  
+
   public boolean hasName() {
     return name != null;
   }
@@ -202,12 +209,12 @@ public class Profile extends Entity<Profile> {
   public boolean hasImageString() {
     return imageString != null;
   }
-  
+
   public ImageString getImageString() {
     checkNotNull(imageString);
     return imageString;
   }
-  
+
   public boolean hasPronoun() {
     return pronoun != null;
   }
@@ -220,7 +227,7 @@ public class Profile extends Entity<Profile> {
   public boolean hasIsComputerPlayer() {
     return computerPlayer != null;
   }
-  
+
   public boolean isComputerPlayer() {
     checkNotNull(computerPlayer);
     return computerPlayer;
@@ -229,7 +236,7 @@ public class Profile extends Entity<Profile> {
   public boolean hasComputerDifficultyLevel() {
     return computerDifficultyLevel != null;
   }
-  
+
   public int getComputerDifficultyLevel() {
     checkNotNull(computerDifficultyLevel);
     return computerDifficultyLevel;

@@ -1,10 +1,16 @@
 package ca.thurn.noughts.shared;
 
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.ExportedInterface;
+
 import ca.thurn.noughts.shared.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
 import ca.thurn.noughts.shared.entities.Game;
 
-public interface CommandUpdateListener {
+@ExportedInterface
+@ExportPackage("nts")
+public interface CommandUpdateListener extends Exportable {
   /**
    * Called with the initial value of the game when the listener is first
    * attached.

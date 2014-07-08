@@ -59,7 +59,7 @@ public class ModelTest extends SharedTestCase {
     public void trackEvent(String name) {}
 
     @Override
-    public void trackEvent(String name, Map<String, String> dimensions) {}
+    public void trackEventDimensions(String name, Map<String, String> dimensions) {}
   }
 
   @Override
@@ -74,7 +74,9 @@ public class ModelTest extends SharedTestCase {
     dataEventService = new DataEventService(userId, firebaseReferences, gameList);
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase ref) {
-        model = Model.anonymousModel(userId, userKey, firebase, new TestPushNotificationService(),
+        model = Model.anonymousModel(userId, userKey,
+            "https://noughts-test.firebaseio-demo.com",
+            new TestPushNotificationService(),
             new TestAnalyticsService());
         done.run();
       }

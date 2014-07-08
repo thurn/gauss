@@ -1,8 +1,14 @@
 package ca.thurn.noughts.shared;
 
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+import org.timepedia.exporter.client.ExportedInterface;
+
 import ca.thurn.noughts.shared.entities.Game;
 
-public interface JoinGameCallbacks {
+@ExportedInterface
+@ExportPackage("nts")
+public interface JoinGameCallbacks extends Exportable {
   /**
    * Called when the user successfully joins a game.
    *

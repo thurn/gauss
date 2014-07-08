@@ -1,8 +1,14 @@
 package ca.thurn.noughts.shared.entities;
 
+import org.timepedia.exporter.client.Export;
+import org.timepedia.exporter.client.ExportPackage;
+import org.timepedia.exporter.client.Exportable;
+
 import com.firebase.client.FirebaseError;
 
-public class AbstractChildListener<T> implements ChildListener<T> {
+@Export
+@ExportPackage("nts")
+public class AbstractChildListener<T> implements ChildListener<T>, Exportable {
   @Override
   public void onChildAdded(T child, String previousChildName) {}
 

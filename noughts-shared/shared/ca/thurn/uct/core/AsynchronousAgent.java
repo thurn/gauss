@@ -1,24 +1,25 @@
 package ca.thurn.uct.core;
 
-public interface AsynchronousAgent extends Agent {
+import ca.thurn.gwtcompat.client.AsyncOperation;
+import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;
+import ca.thurn.gwtcompat.client.AsyncOperation.Task;
+
+public abstract class AsynchronousAgent implements Agent {
   /**
    * Instructs the Agent to kick off an asynchronous action search and then
-   * return. This method should not block on completion of the search -- the
-   * result will be requested later via getAsynchronousSearchResult.
-   * 
+   * return. The agent will invoke onComplete with the result of the search.
+   *
    * @param player The player who this Agent is trying to optimize for.
    * @param rootNode The current state of the game.
+   * @param onComplete Function to invoke when the search is finished.
    */
-  public void beginAsynchronousSearch(int player, State rootNode);
-  
-  /**
-   * Halts the current asynchronous action search and returns the result.
-   * Returning "null" is allowed to indicate the agent needs more time to find
-   * a meaningful result.
-   *
-   * @return The current best-known action for this agent to take, along with
-   *     an associated heuristic score, or null if insufficient time has
-   *     elapsed to find a useful result.
-   */
-  public ActionScore getAsynchronousSearchResult();
+  public void beginAsynchronousSearch(final int player, final State rootNode,
+      OnComplete<ActionScore> onComplete) {
+    new AsyncOperation<ActionScore>(onComplete, new Task<ActionScore>() {
+      @Override
+      public ActionScore execute() {
+        return pickActionBlocking(player, rootNode);
+      }
+    });
+  }
 }

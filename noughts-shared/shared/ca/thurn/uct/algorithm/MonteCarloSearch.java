@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ca.thurn.uct.core.ActionScore;
-import ca.thurn.uct.core.Agent;
 import ca.thurn.uct.core.AsynchronousAgent;
 import ca.thurn.uct.core.Evaluator;
 import ca.thurn.uct.core.State;
@@ -14,7 +13,7 @@ import ca.thurn.uct.core.WinLossEvaluator;
  * An agent which picks actions by running repeated random simulations from
  * the current state and returning the one that had the best average outcome.
  */
-public class MonteCarloSearch implements Agent, AsynchronousAgent {
+public class MonteCarloSearch extends AsynchronousAgent {
 
   /**
    * Builder for MonteCarloSearch.
@@ -99,8 +98,6 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
   private final double discountRate;
   private final int maxDepth;
   private final Evaluator evaluator;
-  private volatile ActionScore asyncResult;
-  private Thread workerThread;
 
   /**
    * Field-initializing constructor.
@@ -134,43 +131,6 @@ public class MonteCarloSearch implements Agent, AsynchronousAgent {
   public ActionScore pickActionBlocking(int player, State root) {
     Map<Long, Double> actionRewards = new HashMap<Long, Double>();
     return runSimulations(player, root, actionRewards, numSimulations);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public synchronized void beginAsynchronousSearch(final int player, final State root) {
-    workerThread = (new Thread() {
-      @Override
-      public void run() {
-        Map<Long, Double> actionRewards = new HashMap<Long, Double>();
-        while (!isInterrupted()) {
-          int totalSimulations = 0;
-          if (numSimulations < 1000) {
-            asyncResult = runSimulations(player, root, actionRewards, 1);
-            totalSimulations += 1;
-          } else {
-            asyncResult = runSimulations(player, root, actionRewards, 1000);
-            totalSimulations += 1000;
-          }
-          if (totalSimulations > numSimulations) {
-            break;
-          }
-        }
-      }
-    });
-    workerThread.start();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public synchronized ActionScore getAsynchronousSearchResult() {
-    workerThread.interrupt();
-    workerThread = null;
-    return asyncResult;
   }
 
   @Override

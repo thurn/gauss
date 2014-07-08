@@ -61,7 +61,7 @@
   _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
   if ([FacebookUtils isFacebookUser]) {
     _model = [NTSModel facebookModelWithNSString:[FacebookUtils getFacebookId]
-                                  withFCFirebase:firebase
+                                    withNSString:@"https://noughts.firebaseio.com"
                   withNTSPushNotificationService:[PushNotificationsServiceImpl new]
                          withNTSAnalyticsService:[AnalyticsServiceImpl new]];
     [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
@@ -78,7 +78,7 @@
     NSString *userId = [self sha1:userKey];
     _model = [NTSModel anonymousModelWithNSString:userId
                                      withNSString:userKey
-                                   withFCFirebase:firebase
+                                     withNSString:@"https://noughts.firebaseio.com"
                    withNTSPushNotificationService:[PushNotificationsServiceImpl new]
                           withNTSAnalyticsService:[AnalyticsServiceImpl new]];
   }
