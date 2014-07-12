@@ -8,6 +8,9 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import com.tinlib.inject.Injector;
+import com.tinlib.shared.AnalyticsService;
+import com.tinlib.shared.PushNotificationService;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -91,26 +94,26 @@ public class Model extends AbstractChildEventListener implements Exportable {
   private final Map<String, Game> games;
   private boolean isComputerThinking = false;
 
-  public static Model anonymousModel(String userId, String userKey, String firebaseUrl,
-      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
-    return new Model(userId, userKey, false /* isFacebookUser */, firebaseUrl,
-        pushNotificationService, analyticsService);
+  public static Model anonymousModel(Injector injector, String userId, String userKey,
+      String firebaseUrl, PushNotificationService pushNotificationService) {
+    return new Model(injector, userId, userKey, false /* isFacebookUser */, firebaseUrl,
+        pushNotificationService);
   }
 
-  public static Model facebookModel(String facebookId, String firebaseUrl,
-      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
-    return new Model(facebookId, facebookId, true /* isFacebookuser */, firebaseUrl,
-        pushNotificationService, analyticsService);
+  public static Model facebookModel(Injector injector, String facebookId, String firebaseUrl,
+      PushNotificationService pushNotificationService) {
+    return new Model(injector, facebookId, facebookId, true /* isFacebookuser */, firebaseUrl,
+        pushNotificationService);
   }
 
-  private Model(String userId, String userKey, boolean isFacebookUser, String firebaseUrl,
-      PushNotificationService pushNotificationService, AnalyticsService analyticsService) {
+  private Model(Injector injector, String userId, String userKey, boolean isFacebookUser, String firebaseUrl,
+      PushNotificationService pushNotificationService) {
     this.userId = userId;
     this.userKey = userKey;
     this.isFacebookUser = isFacebookUser;
     this.firebase = new Firebase(firebaseUrl);
     this.pushNotificationService = pushNotificationService;
-    this.analyticsService = analyticsService;
+    this.analyticsService = (AnalyticsService)injector.get("AnalyticsService");
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();
@@ -251,7 +254,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
 
   private void processCurrentActionUpdate(DataSnapshot snapshot) {
     String gameId = snapshot.getName();
-    if (!snapshot.hasChild("currentAction")) die("No current action for game %s", gameId);
+    if (!snapshot.hasChild("currentAction")) throw die("No current action for game %s", gameId);
     Map<String, Object> value = snapshot.child("currentAction").getValue(
         new GenericTypeIndicator<Map<String, Object>>(){});
     Action action = Action.newDeserializer().deserialize(value);
@@ -446,7 +449,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
     dimensions.put("profileCount", profiles.size() + "");
-    analyticsService.trackEventDimensions("newGame", dimensions);
+    analyticsService.trackEvent("newGame", dimensions);
     return game.getId();
   }
 
@@ -499,7 +502,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
       @Nullable OnMutationCompleted onComplete) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
-      die("Illegal command: %s", command.toString());
+      throw die("Illegal command: %s", command.toString());
     }
     Action toSubmit = currentActions.get(gameId)
         .toBuilder()
@@ -518,12 +521,11 @@ public class Model extends AbstractChildEventListener implements Exportable {
    *
    * @param gameId The current game ID.
    * @param command The command to add.
-   * @return The game with the command added.
    */
   public void addCommand(String gameId, final Command command) {
     final Game game = getGame(gameId);
     if (!couldAddCommand(game, getCurrentAction(gameId), command)) {
-      die("Illegal command: %s", command.toString());
+      throw die("Illegal command: %s", command.toString());
     }
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
@@ -547,7 +549,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public void updateLastCommand(String gameId, final Command command) {
     if (!couldUpdateLastCommand(getGame(gameId), getCurrentAction(gameId), command)) {
-      die("Illegal Command: %s", command.toString());
+      throw die("Illegal Command: %s", command.toString());
     }
 
     mutateCurrentAction(gameId, new ActionMutation() {
@@ -667,7 +669,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
       final OnMutationCompleted onComplete) {
     ensureIsCurrentPlayer(gameId);
     Game game = getGame(gameId);
-    if (!canSubmit(game, action)) die("Illegal action!");
+    if (!canSubmit(game, action)) throw die("Illegal action!");
     boolean isXPlayer = game.getCurrentPlayerNumber() == X_PLAYER;
     final long timestamp = Clock.getInstance().currentTimeMillis();
     final int newPlayerNumber = isXPlayer ? O_PLAYER : X_PLAYER;
@@ -796,7 +798,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public void undoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
-    if (!canUndo(getGame(gameId), getCurrentAction(gameId))) die("Can't undo.");
+    if (!canUndo(getGame(gameId), getCurrentAction(gameId))) throw die("Can't undo.");
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
       public void mutate(Action.Builder action) {
@@ -816,7 +818,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public void redoCommand(String gameId) {
     ensureIsCurrentPlayer(gameId);
-    if (!canRedo(getGame(gameId), getCurrentAction(gameId))) die("Can't redo.");
+    if (!canRedo(getGame(gameId), getCurrentAction(gameId))) throw die("Can't redo.");
     mutateCurrentAction(gameId, new ActionMutation() {
       @Override
       public void mutate(Action.Builder action) {
@@ -836,7 +838,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public void resignGame(String gameId) {
     ensureIsPlayer(gameId);
-    if (getGame(gameId).isGameOver()) die("Can't resign from a game which is already over");
+    if (getGame(gameId).isGameOver()) throw die("Can't resign from a game which is already over");
     final long timestamp = Clock.getInstance().currentTimeMillis();
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
@@ -993,7 +995,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
         new AtomicInteger(games.size() + currentActions.size());
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("callbacksExpected", callbacksExpected.get() + "");
-    analyticsService.trackEventDimensions("upgradeAccountToFacebook", dimensions);
+    analyticsService.trackEvent("upgradeAccountToFacebook", dimensions);
 
     final OnUpgradeCompleted internalCallback = new OnUpgradeCompleted() {
       @Override
@@ -1247,13 +1249,13 @@ public class Model extends AbstractChildEventListener implements Exportable {
   }
 
   /**
-   * Throws an exception.
+   * Returns a new runtime exception
    */
   private RuntimeException die(String message, String... args) {
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("message", message);
-    analyticsService.trackEventDimensions("die", dimensions);
-    throw new RuntimeException(formatString(message, args));
+    analyticsService.trackEvent("die", dimensions);
+    return new RuntimeException(formatString(message, args));
   }
 
   private static String formatString(String format, String... args) {
@@ -1271,17 +1273,17 @@ public class Model extends AbstractChildEventListener implements Exportable {
    * Ensures the current user is the current player in the provided game.
    */
   void ensureIsCurrentPlayer(String gameId) {
-    if (!isCurrentPlayer(getGame(gameId))) die("Not current player: %s", userId);
+    if (!isCurrentPlayer(getGame(gameId))) throw die("Not current player: %s", userId);
   }
 
   /**
    * Ensures the current user is a player in the provided game.
    */
   void ensureIsPlayer(String gameId) {
-    if (!getGame(gameId).getPlayerList().contains(userId)) die("Not player: %s", userId);
+    if (!getGame(gameId).getPlayerList().contains(userId)) throw die("Not player: %s", userId);
   }
 
   void ensureGameIsNotOver(String gameId) {
-    if (getGame(gameId).isGameOver()) die("Game has ended");
+    if (getGame(gameId).isGameOver()) throw die("Game has ended");
   }
 }

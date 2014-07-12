@@ -1,3 +1,4 @@
+/*
 package ca.thurn.noughts.shared;
 
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
+import com.tinlib.shared.AnalyticsService;
+import com.tinlib.shared.FirebaseReferences;
 
 public class ModelTest extends SharedTestCase {
   private Model model;
@@ -74,10 +77,11 @@ public class ModelTest extends SharedTestCase {
     dataEventService = new DataEventService(userId, firebaseReferences, gameList);
     firebase.removeValue(new CompletionListener() {
       @Override public void onComplete(FirebaseError error, Firebase ref) {
-        model = Model.anonymousModel(userId, userKey,
+        model = Model.anonymousModel(null */
+/* injector *//*
+, userId, userKey,
             "https://noughts-test.firebaseio-demo.com",
-            new TestPushNotificationService(),
-            new TestAnalyticsService());
+            new TestPushNotificationService());
         done.run();
       }
     });
@@ -224,7 +228,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(profile, game.getProfile(0));
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.setProfileForViewer(game.getId(), profile, new OnMutationCompleted() {
           @Override
           public void onMutationCompleted(Game game) {
@@ -260,7 +266,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(game.getId(), currentAction.getGameId());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.addCommand(game.getId(), command);
       }
     });
@@ -281,7 +289,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(list(command), currentAction.getCommandList());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.updateLastCommand(game.getId(), command);
       }
     });
@@ -344,7 +354,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(command, currentAction.getCommand(0));
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.addCommand(game.getId(), command);
       }
     });
@@ -365,7 +377,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(1, game.getCurrentPlayerNumber());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.addCommandAndSubmit(game.getId(), command);
       }
     });
@@ -492,7 +506,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(newEmptyAction(game.getId()), currentAction);
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.submitCurrentAction(game.getId());
       }
     });
@@ -512,7 +528,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(1, status.getStatusPlayer());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.submitCurrentAction(game.getId());
       }
     });
@@ -557,7 +575,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(userId, Games.currentPlayerId(game));
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.submitCurrentAction(game.getId());
       }
     });
@@ -596,7 +616,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(newEmptyAction(game.getId()), currentAction);
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.submitCurrentAction(game.getId());
       }
     });
@@ -617,7 +639,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(action.getCommand(0), currentAction.getFutureCommand(0));
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.undoCommand(game.getId());
       }
     });
@@ -640,7 +664,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(0, currentAction.getFutureCommandCount());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.redoCommand(game.getId());
       }
     });
@@ -715,7 +741,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(newEmptyAction(game.getId()), currentAction);
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.resignGame(game.getId());
       }
     });
@@ -744,7 +772,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals(newEmptyAction(game.getId()), currentAction);
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.resignGame(game.getId());
       }
     });
@@ -798,7 +828,9 @@ public class ModelTest extends SharedTestCase {
             assertEquals("User's turn", status.getStatusString());
             finished();
           }
-        }, false /* immediate */);
+        }, false */
+/* immediate *//*
+);
         model.requestGameStatus(game.getId());
       }
     });
@@ -822,7 +854,9 @@ public class ModelTest extends SharedTestCase {
 //            assertEquals(myProfile, updated.getProfile(1));
 //            finished();
 //          }
-//        }, false /* immediate */);
+//        }, false */
+/* immediate *//*
+);
 //        model.joinGameIfPossible(game.getId(), myProfile);
 //      }
 //    });
@@ -1035,3 +1069,4 @@ private Game.Builder newGameWithOnePlayer() {
     return result;
   }
 }
+*/

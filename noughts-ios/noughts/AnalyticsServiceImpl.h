@@ -2,7 +2,7 @@
 
 #import "AnalyticsService.h"
 
-@interface AnalyticsServiceImpl : NSObject <NTSAnalyticsService>
+@interface AnalyticsServiceImpl : NSObject <TINAnalyticsService>
 
 - (void)trackEventWithNSString:(NSString *)name;
 

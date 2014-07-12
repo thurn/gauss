@@ -1,9 +1,8 @@
-goog.provide("other")
+goog.provide("other");
 
 goog.require("jsu");
 goog.require("nts.Command");
 goog.require("nts.AbstractValueListener");
-goog.require("nts.AnalyticsService");
 goog.require("nts.PushNotificationService");
 goog.require("nts.Game");
 goog.require("nts.Profile");
@@ -11,6 +10,8 @@ goog.require("nts.Games");
 goog.require("nts.Model");
 goog.require("nts.GameUpdateListener");
 goog.require("nts.GameListListener");
+goog.require("tin.AnalyticsService");
+goog.require("infuse.Module");
 
 other.command = function() {
   alert(nts.Command.newBuilder().setRow(1).setColumn(1).build());
@@ -41,15 +42,17 @@ other.TestValueListener.prototype.onError = function(firebaseError) {
 /**
  * @constructor
  * @suppress {checkTypes}
- * @implements {nts.AnalyticsService}
+ * @implements {tin.AnalyticsService}
  */
 other.MyAnalyticsService = function() {
 };
 
 other.MyAnalyticsService.prototype.trackEvent = function(name) {
+  window.console.log("trackEvent " + name);
 };
 
 other.MyAnalyticsService.prototype.trackEventDimensions = function(name, dimensions) {
+  window.console.log("trackEvent " + name);
 };
 
 /**
@@ -102,23 +105,58 @@ other.MyGameListListener = function() {
 
 other.MyGameListListener.prototype.onGameAdded = function(game) {
   window.console.log("onGameAdded " + game);
-}
+};
 
 other.MyGameListListener.prototype.onGameChanged = function(game) {
   window.console.log("onGameChanged " + game);
-}
+};
 
 other.MyGameListListener.prototype.onGameRemoved = function(gameId) {
   window.console.log("onGameRemoved " + gameId);
-}
+};
+
+/**
+ * @param {function(!infuse.Injector)} initializerFunction Initializer function
+ * @constructor
+ * @implements {infuse.Initializer}
+ */
+other.FunctionInitializer = function(initializerFunction) {
+  this.initializerFunction = initializerFunction;
+};
+
+/**
+ * @param {!infuse.Injector} injector
+ */
+other.FunctionInitializer.prototype.initialize = function(injector) {
+  this.initializerFunction(injector);
+};
+
+/**
+ * @constructor
+ * @implements {infuse.Module}
+ */
+other.NoughtsModule = function() {
+};
+
+/**
+ * @param {!infuse.Binder} binder
+ */
+other.NoughtsModule.prototype.configure = function(binder) {
+  binder.bindKey("AnalyticsService", new other.FunctionInitializer(function(injector) {
+    return new other.MyAnalyticsService();
+  }));
+};
 
 other.test3 = function() {
+  var modules = jsu.javaList([new other.NoughtsModule()]);
+  var injector = infuse.Injectors.newInjectorFromList(modules);
+
   var model = nts.Model.anonymousModel(
+      injector,
       "userId",
       "userKey",
       "https://noughts.firebaseio-demo.com/",
-      new other.MyPushNotificationsService(),
-      new other.MyAnalyticsService());
+      new other.MyPushNotificationsService());
   model.setGameListListener(new other.MyGameListListener());
   var gameId = model.newGame(jsu.javaList(), null /* gameId */);
   window.console.log("gameId " + gameId);

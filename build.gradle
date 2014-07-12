@@ -11,9 +11,6 @@ def closureDir = "noughts-web/public/closure"
 def gwtOutputFile = "${jsDir}/shared.nocache.js"
 def depsFile = "${jsDir}/deps.js"
 def jsOutputFile = "${jsDir}/compiled.js"
-if (!hasProperty('optimize')) {
-  ext.optimize = false
-}
 
 def commonGwtArgs = [
   'ca.thurn.noughts.Shared',

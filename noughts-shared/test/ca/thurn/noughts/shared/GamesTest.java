@@ -1,3 +1,4 @@
+/*
 package ca.thurn.noughts.shared;
 
 import static ca.thurn.noughts.shared.ModelTest.list;
@@ -279,3 +280,4 @@ public class GamesTest extends SharedTestCase {
     return ImageString.newBuilder().setString(name).setType(ImageType.LOCAL).build();
   }
 }
+*/

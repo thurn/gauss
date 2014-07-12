@@ -8,6 +8,8 @@
   <inherits name="com.firebase.Firebase"/>
   <inherits name="ca.thurn.gwtcompat.GwtCompat"/>
   <inherits name="ca.thurn.uct.Uct"/>
+  <inherits name="ca.thurn.Infuse"/>
+  <inherits name="com.tinlib.Tin"/>
   <entry-point class="ca.thurn.noughts.shared.GwtMain"/>
   <source path="shared"/>
   <set-property name="user.agent" value="safari"/>

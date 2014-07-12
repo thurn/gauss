@@ -1,4 +1,4 @@
-package ca.thurn.noughts.shared;
+package com.tinlib.shared;
 
 import java.util.Map;
 
@@ -26,7 +26,7 @@ public interface PushNotificationService extends Exportable {
   /**
    * Called when a push notification needs to be sent.
    *
-   * @param channeId ID of channel to send the notification out on.
+   * @param channelId ID of channel to send the notification out on.
    * @param data Data for the notification
    */
   public void sendPushNotification(String channelId, Map<String, String> data);

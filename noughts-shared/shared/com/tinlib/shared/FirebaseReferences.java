@@ -1,4 +1,4 @@
-package ca.thurn.noughts.shared;
+package com.tinlib.shared;
 
 import com.firebase.client.Firebase;
 
@@ -25,32 +25,32 @@ public class FirebaseReferences {
    * @param gameId A game ID
    * @return A Firebase reference for this game in the master game list.
    */
-  Firebase gameReference(String gameId) {
+  public Firebase gameReference(String gameId) {
     return firebase.child("games").child(gameId);
   }
 
-  Firebase gameSubmittedActionsReference(String gameId) {
+  public Firebase gameSubmittedActionsReference(String gameId) {
     return gameReference(gameId).child("submittedActionList");
   }
 
-  Firebase userGamesReference() {
+  public Firebase userGamesReference() {
     Firebase users = firebase.child(isFacebookUser ? "facebookUsers" : "users");
     return users.child(userKey).child("games");
   }
 
-  Firebase userReferenceForGame(String gameId) {
+  public Firebase userReferenceForGame(String gameId) {
     return userGamesReference().child(gameId);
   }
 
-  Firebase currentActionReferenceForGame(String gameId) {
+  public Firebase currentActionReferenceForGame(String gameId) {
     return userReferenceForGame(gameId).child("currentAction");
   }
 
-  Firebase commandsReferenceForCurrentAction(String gameId) {
+  public Firebase commandsReferenceForCurrentAction(String gameId) {
     return currentActionReferenceForGame(gameId).child("commandList");
   }
 
-  Firebase requestReference(String requestId) {
+  public Firebase requestReference(String requestId) {
     return firebase.child("requests").child("r" + requestId);
   }
 }

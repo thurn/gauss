@@ -18,11 +18,16 @@
 #import "NSURL+QueryDictionary.h"
 #import "JoinGameCallbacks.h"
 #import "JoinGameCallbacksImpl.h"
+#import "Injectors.h"
+#import "Injector.h"
+#import "NoughtsModule.h"
+#import "JavaUtils.h"
 
 @interface AppDelegate () <NTSJoinGameCallbacks>
 @property BOOL runningQuery;
 @property(strong, nonatomic) FirebaseSimpleLogin *firebaseLogin;
 @property(strong, nonatomic) NTSModel *model;
+@property(strong, nonatomic) id<NFUSInjector> injector;
 @property(strong, nonatomic) PermissionsManager *permissionsManager;
 @end
 
@@ -59,11 +64,15 @@
   }
 
   _firebaseLogin = [[FirebaseSimpleLogin alloc] initWithRef:[firebase getWrappedFirebase]];
+  NSArray *modules = @[[NoughtsModule new]];
+  _injector = [NFUSInjectors
+               newInjectorFromListWithJavaUtilList:[JavaUtils nsArrayToJavaUtilList:modules]];
+  
   if ([FacebookUtils isFacebookUser]) {
-    _model = [NTSModel facebookModelWithNSString:[FacebookUtils getFacebookId]
-                                    withNSString:@"https://noughts.firebaseio.com"
-                  withNTSPushNotificationService:[PushNotificationsServiceImpl new]
-                         withNTSAnalyticsService:[AnalyticsServiceImpl new]];
+    _model = [NTSModel facebookModelWithNFUSInjector:_injector
+                                        withNSString:[FacebookUtils getFacebookId]
+                                        withNSString:@"https://noughts.firebaseio.com"
+                      withNTSPushNotificationService:[PushNotificationsServiceImpl new]];
     [_firebaseLogin checkAuthStatusWithBlock:^(NSError *error, FAUser *user) {
         if (user != nil) {
           [[NSNotificationCenter defaultCenter]
@@ -76,11 +85,11 @@
   } else {
     NSString *userKey = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
     NSString *userId = [self sha1:userKey];
-    _model = [NTSModel anonymousModelWithNSString:userId
-                                     withNSString:userKey
-                                     withNSString:@"https://noughts.firebaseio.com"
-                   withNTSPushNotificationService:[PushNotificationsServiceImpl new]
-                          withNTSAnalyticsService:[AnalyticsServiceImpl new]];
+    _model = [NTSModel anonymousModelWithNFUSInjector:_injector
+                                         withNSString:userId
+                                         withNSString:userKey
+                                         withNSString:@"https://noughts.firebaseio.com"
+                       withNTSPushNotificationService:[PushNotificationsServiceImpl new]];
   }
 
   NSString *gameId = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey][@"gameId"];

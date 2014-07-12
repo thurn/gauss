@@ -1,3 +1,4 @@
+/*
 package ca.thurn.noughts.shared;
 
 import ca.thurn.testing.SharedTestCase;
@@ -23,3 +24,4 @@ public class GameListPartitionsTest extends SharedTestCase {
     // TODO: implement.
   }
 }
+*/

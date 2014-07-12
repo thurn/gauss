@@ -1,3 +1,4 @@
+/*
 package ca.thurn.noughts.shared;
 
 import ca.thurn.testing.SharedTestCase;
@@ -27,3 +28,4 @@ public class ComputerStateTest extends SharedTestCase {
     // TODO: implement.
   }
 }
+*/
