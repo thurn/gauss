@@ -1,31 +1,39 @@
 package com.tinlib.shared;
 
-import com.tinlib.message.Bus;
-import com.tinlib.inject.Injector;
 import com.firebase.client.Firebase;
+import com.tinlib.core.TinKeys;
+import com.tinlib.core.TinMessages;
+import com.tinlib.inject.Injector;
+import com.tinlib.message.Bus;
+
+import java.util.Map;
 
 /**
  * Manages the state of the current viewer and allows you to change the current viewer.
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>TinKeys.BUS</li>
- *   <li>TinKeys.FIREBASE</li>
+ *   <li>{@link com.tinlib.core.TinKeys#BUS}</li>
+ *   <li>{@link com.tinlib.core.TinKeys#FIREBASE}</li>
  * </ul>
  *
- * <h1>Output Events</h1>
+ * <h1>Output Messages</h1>
  * <ul>
- *   <li>TinMessages.FIREBASE_REFERENCES</li>
- *   <li>TinMessages.VIEWER_ID</li>
+ *   <li>{@link com.tinlib.core.TinMessages#FIREBASE_REFERENCES}</li>
+ *   <li>{@link com.tinlib.core.TinMessages#VIEWER_ID}</li>
  * </ul>
  */
 public class Viewer {
+  public static interface Function {
+    public void apply(Map<String, Object> map, String viewerId, FirebaseReferences references);
+  }
+
   private final Bus bus;
   private final Firebase firebase;
 
   public Viewer(Injector injector) {
-    bus = (Bus)injector.get(TinKeys.BUS);
-    firebase = (Firebase)injector.get(TinKeys.FIREBASE);
+    bus = injector.get(TinKeys.BUS);
+    firebase = injector.get(TinKeys.FIREBASE);
   }
 
   /**

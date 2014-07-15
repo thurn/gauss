@@ -23,7 +23,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
-import com.tinlib.shared.AnalyticsService;
+import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.shared.FirebaseReferences;
 
 public class ModelTest extends SharedTestCase {

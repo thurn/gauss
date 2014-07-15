@@ -9,8 +9,8 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 import com.tinlib.inject.Injector;
-import com.tinlib.shared.AnalyticsService;
-import com.tinlib.shared.PushNotificationService;
+import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.push.PushNotificationService;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -444,7 +444,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
     if (!game.isLocalMultiplayer()) {
-      pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
+//      pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
     }
     Map<String, String> dimensions = new HashMap<String, String>();
     dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
@@ -730,7 +730,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     data.put("title", "noughts");
     data.put("badge", "Increment");
     String channelId = Games.channelIdForPlayer(gameId, playerNumber);
-    pushNotificationService.sendPushNotification(channelId, data);
+//    pushNotificationService.sendPushNotification(channelId, data);
   }
 
   /**
@@ -855,7 +855,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
 
       @Override public void onComplete(Game game) {
         if (game != null && !game.isLocalMultiplayer()) {
-          pushNotificationService.removeChannel(Games.channelIdForViewer(game, userId));
+//          pushNotificationService.removeChannel(Games.channelIdForViewer(game, userId));
         }
       }
     };
@@ -916,7 +916,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
             public void onComplete(final Game game) {
               analyticsService.trackEvent("joinGame");
               if (!game.isLocalMultiplayer()) {
-                pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
+//                pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
               }
               actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize(),
                   new CompletionListener() {

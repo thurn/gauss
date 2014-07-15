@@ -1,9 +1,9 @@
 package com.tinlib.shared;
 
-import com.google.common.collect.ImmutableMap;
-import com.tinlib.inject.Binder;
-import com.tinlib.inject.Initializers;
-import com.tinlib.inject.Module;
+import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.error.ErrorHandler;
+import com.tinlib.error.ErrorService;
+import com.tinlib.test.TestHelper;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,47 +11,33 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ErrorServiceTest extends TinTestCase {
-  ErrorService errorService;
-
   @Mock
-  AnalyticsService mockAnalyticsService;
-
-  @Override
-  public void setUp(Runnable done) {
-    errorService = new ErrorService(newTestInjector(new Module() {
-      @Override
-      public void configure(Binder binder) {
-        binder.bindKey(TinKeys.ANALYTICS_SERVICE, Initializers.returnValue(mockAnalyticsService));
-      }
-    }));
-    done.run();
-  }
-
-  @Override
-  public void tearDown(Runnable done) {
-    done.run();
-  }
+  AnalyticsHandler mockAnalyticsHandler;
 
   @Test
   public void testError() {
     beginAsyncTestBlock();
-    expectMessage(TinMessages.ERROR, new ValueListener() {
+    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setAnalyticsHandler(mockAnalyticsHandler);
+    builder.setErrorHandler(new ErrorHandler() {
       @Override
-      public void onValue(Object object) {
-        assertEquals("Error arg", object);
+      public void error(String message, Object[] args) {
+        assertEquals("Error %s", message);
         finished();
       }
     });
-    errorService.error("Error %s", "arg");
-    verify(mockAnalyticsService, times(1)).trackEvent(eq("Error %s"),
-        eq(ImmutableMap.of("[0]", "arg")));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(TestHelper helper) {
+        ErrorService errorService = new ErrorService(helper.injector());
+        errorService.error("Error %s", "Error arg");
+      }
+    });
     endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
   }
 }

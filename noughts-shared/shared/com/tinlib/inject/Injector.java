@@ -1,5 +1,9 @@
 package com.tinlib.inject;
 
+import java.util.Set;
+
 public interface Injector {
-  public Object get(String key);
+  public <T> T get(String key);
+
+  public <T> Set<T> getMultiple(String key);
 }

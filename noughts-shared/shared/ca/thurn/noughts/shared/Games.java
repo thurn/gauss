@@ -348,7 +348,7 @@ public class Games implements Exportable {
    * @return True if the viewer is a player in this game and does not have a
    *     profile yet.
    */
-  static boolean profileRequired(Game game, String viewerId) {
+  public static boolean profileRequired(Game game, String viewerId) {
     if (game.isGameOver() || game.isLocalMultiplayer() ||
         !game.getPlayerList().contains(viewerId)) {
       return false;

@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.core;
 
 public final class TinMessages {
   /**
@@ -8,7 +8,7 @@ public final class TinMessages {
   public static final String ERROR = "tin.ERROR";
 
   /**
-   * A {@link FirebaseReferences} instance configured with the ID of the
+   * A {@link com.tinlib.shared.FirebaseReferences} instance configured with the ID of the
    * current viewer.
    */
   public static final String FIREBASE_REFERENCES = "tin.FIREBASE_REFERENCES";
@@ -33,7 +33,7 @@ public final class TinMessages {
    * The current {@link ca.thurn.noughts.shared.entities.Action} of the current
    * game.
    */
-  public static final String CURRENT_ACTION_UPDATED = "tin.CURRENT_ACTION_UPDATED";
+  public static final String CURRENT_ACTION = "tin.CURRENT_ACTION";
 
   /**
    * The {@link ca.thurn.noughts.shared.entities.GameStatus} of the current
@@ -43,9 +43,24 @@ public final class TinMessages {
 
   /**
    * Fired when the user is playing in a game with an incomplete profile. The
-   * value is a String containing a proposed name for the viewer to use.
+   * value will be a suggested {@link ca.thurn.noughts.shared.entities.Profile}
+   * for the user.
+   *
+   * <p>This message is never fired when the current game is a local
+   * multiplayer game, or when the game is over.</p>
    */
   public static final String PROFILE_REQUIRED = "tin.PROFILE_REQUIRED";
+
+  /**
+   * Fired when the user's profile is loaded or set and it's complete. The
+   * companion message to {@link TinMessages#PROFILE_REQUIRED}, which is fired
+   * when the user's profile is not complete. The associated value will be
+   * the user's completed {@link ca.thurn.noughts.shared.entities.Profile}.
+   *
+   * <p>This message is never fired when the current game is a local
+   * multiplayer game, or when the game is over.</p>
+   */
+  public static final String COMPLETED_VIEWER_PROFILE = "tin.COMPLETED_VIEWER_PROFILE";
 
   /**
    * Fired when an action is submitted. The value will be the just-submitted
@@ -82,10 +97,4 @@ public final class TinMessages {
    * {@link ca.thurn.noughts.shared.entities.Game}.
    */
   public static final String GAME_CREATED = "tin.GAME_CREATED";
-
-  /**
-   * Fired when the user upgrades their account to use Facebook. No associated
-   * value.
-   */
-  public static final String ACCOUNT_UPGRADED_TO_FACEBOOK = "tin.ACCOUNT_UPGRADED_TO_FACEBOOK";
 }

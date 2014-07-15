@@ -28,7 +28,6 @@ public final class ChildListenerAdapter<T extends Entity<T>>
 
   @Override
   public final void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-    System.out.println("val() " + snapshot.getValue());
     listener.onChildAdded(deserializer.fromDataSnapshot(snapshot), previousChildName);
   }
 

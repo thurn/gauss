@@ -1,10 +1,10 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Game;
+import ca.thurn.noughts.shared.entities.Action;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinMessages;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.inject.Injector;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
@@ -18,53 +18,44 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CurrentGameTest extends TinTestCase {
+public class CurrentActionTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
 
   @Mock
-  ErrorHandler mockErrorHandler;
+  private ErrorHandler mockErrorHandler;
 
   @Test
-  public void testLoadGame() {
-    beginAsyncTestBlock(2);
-    final Game testGame = TestUtils.newGameWithOnePlayer().build();
+  public void testSetCurrentAction() {
+    beginAsyncTestBlock();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand().build();
+
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        final CurrentGame currentGame = new CurrentGame(helper.injector());
-        helper.bus().once(TinMessages.CURRENT_GAME_ID, new Subscriber1<String>() {
+        final CurrentAction currentAction = new CurrentAction(helper.injector());
+
+        helper.bus().once(TinMessages.CURRENT_ACTION, new Subscriber1<Action>() {
           @Override
-          public void onMessage(String currentGameId) {
-            assertEquals(TestUtils.GAME_ID, currentGameId);
-            finished();
-          }
-        });
-        helper.bus().once(TinMessages.CURRENT_GAME, new Subscriber1<Game>() {
-          @Override
-          public void onMessage(Game currentGame) {
-            assertEquals(testGame, currentGame);
+          public void onMessage(Action currentAction) {
+            assertEquals(testAction, currentAction);
             finished();
           }
         });
 
-        helper.references().gameReference(TestUtils.GAME_ID).setValue(testGame.serialize(),
-            new Firebase.CompletionListener() {
-          @Override
-          public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            currentGame.loadGame(TestUtils.GAME_ID);
-          }
-        });
+        helper.references().currentActionReferenceForGame(TestUtils.GAME_ID).setValue(
+            testAction.serialize());
+        helper.bus().produce(TinMessages.CURRENT_GAME_ID, TestUtils.GAME_ID);
       }
     });
     endAsyncTestBlock();
   }
 
   @Test
-  public void testLoadGameError() {
+  public void testCurrentActionError() {
     beginAsyncTestBlock();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL));
@@ -73,8 +64,8 @@ public class CurrentGameTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        CurrentGame currentGame = new CurrentGame(helper.injector());
-        currentGame.loadGame(TestUtils.GAME_ID);
+        CurrentAction currentAction = new CurrentAction(helper.injector());
+        helper.bus().produce(TinMessages.CURRENT_GAME_ID, TestUtils.GAME_ID);
         finished();
       }
     });
