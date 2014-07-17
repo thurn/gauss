@@ -1,21 +1,17 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.entities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.MutableData;
 
-@Export
-@ExportPackage("nts")
-public abstract class Entity<T extends Entity<T>> implements Exportable {
+public abstract class Entity<T extends Entity<T>> {
   public static abstract class EntityDeserializer<T extends Entity<T>> {
     /**
      * You must define this method to instantiate a new instance of your class
@@ -103,20 +99,20 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
    * @return The object passed in.
    * @throws NullPointerException if object is null.
    */
-  static <T> T checkNotNull(T object) {
+  protected static <T> T checkNotNull(T object) {
     if (object == null) {
       throw new NullPointerException();
     }
     return object;
   }
 
-  static void checkListForNull(List<?> list) {
+  protected static void checkListForNull(List<?> list) {
     for (Object object : list) {
       checkNotNull(object);
     }
   }
 
-  static void checkMapForNull(Map<?, ?> map) {
+  protected static void checkMapForNull(Map<?, ?> map) {
     for (Entry<?, ?> entry : map.entrySet()) {
       checkNotNull(entry.getKey());
       checkNotNull(entry.getValue());
@@ -124,16 +120,56 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
   }
 
   @SuppressWarnings("unchecked")
-  static <T> List<T> getList(Map<String, Object> map, String key) {
+  protected static <T> T get(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
-      return (List<T>)map.get(key);
+      return (T)map.get(key);
     } else {
-      return new ArrayList<T>();
+      return null;
     }
   }
 
-  static <T> List<Integer> getIntegerList(List<T> list) {
-    List<Integer> result = new ArrayList<Integer>();
+  @SuppressWarnings("unchecked")
+  protected static <T extends Entity<T>> T get(Map<String, Object> map, String key,
+    EntityDeserializer<T> deserializer) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return deserializer.deserialize((Map<String, Object>)map.get(key));
+    } else {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static <T> List<T> getRepeated(Map<String, Object> map, String key) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return (List<T>)map.get(key);
+    } else {
+      return Lists.newArrayList();
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static <T extends Entity<T>> List<T> getRepeated(Map<String, Object> map, String key,
+      EntityDeserializer<T> deserializer) {
+    List<T> result = Lists.newArrayList();
+    if (map.containsKey(key) && map.get(key) != null) {
+      for (Map<String, Object> object : (List<Map<String, Object>>)map.get(key)) {
+        result.add(deserializer.deserialize(object));
+      }
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static <T> List<T> getList(Map<String, Object> map, String key) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return (List<T>)map.get(key);
+    } else {
+      return Lists.newArrayList();
+    }
+  }
+
+  protected static <T> List<Integer> getIntegerList(List<T> list) {
+    List<Integer> result = Lists.newArrayList();
     for (T t : list) {
       result.add(((Number)t).intValue());
     }
@@ -141,35 +177,35 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
   }
 
   @SuppressWarnings("unchecked")
-  static <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
+  protected static <K,V> Map<K,V> getMap(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return (Map<K,V>)map.get(key);
     } else {
-      return new HashMap<K,V>();
+      return Maps.newHashMap();
     }
   }
 
-  static void checkExists(Map<String, Object> map, String key) {
+  protected static void checkExists(Map<String, Object> map, String key) {
     if (!map.containsKey(key) || map.get(key) == null) {
       throw new IllegalArgumentException("Missing key " + key + "!");
     }
   }
 
-  static void putSerialized(Map<String, Object> map, String key, Number object) {
+  protected static void putSerialized(Map<String, Object> map, String key, Number object) {
     putSerializedObject(map, key, object);
   }
 
-  static void putSerialized(Map<String, Object> map, String key, String object) {
+  protected static void putSerialized(Map<String, Object> map, String key, String object) {
     putSerializedObject(map, key, object);
   }
 
-  static void putSerialized(Map<String, Object> map, String key, Boolean object) {
+  protected static void putSerialized(Map<String, Object> map, String key, Boolean object) {
     putSerializedObject(map, key, object == null ? null : object.toString());
   }
 
-  static void putSerialized(Map<String, Object> map, String key, List<?> list) {
-    List<Map<String, Object>> maps = new ArrayList<Map<String, Object>>();
-    List<Object> objects = new ArrayList<Object>();
+  protected static void putSerialized(Map<String, Object> map, String key, List<?> list) {
+    List<Map<String, Object>> maps = Lists.newArrayList();
+    List<Object> objects = Lists.newArrayList();
     for (Object object : list) {
       if (object instanceof Entity) {
         maps.add(((Entity<?>)object).serialize());
@@ -188,9 +224,9 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
+  protected static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
       Map<String, T> entities) {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = Maps.newHashMap();
     for (Entry<String, T> entry : entities.entrySet()) {
       result.put(entry.getKey(), entry.getValue().serialize());
     }
@@ -199,25 +235,27 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key, Entity<T> entity) {
+  protected static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
+      Entity<T> entity) {
     if (entity != null) {
       map.put(key, entity.serialize());
     }
   }
 
-  static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key, Enum<T> enumObject) {
+  protected static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key,
+      Enum<T> enumObject) {
     if (enumObject != null) {
       map.put(key, enumObject.name());
     }
   }
 
-  static void putSerializedObject(Map<String, Object> map, String key, Object object) {
+  protected static void putSerializedObject(Map<String, Object> map, String key, Object object) {
     if (object != null) {
       map.put(key, object);
     }
   }
 
-  static String getString(Map<String, Object> map, String key) {
+  protected static String getString(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (String)map.get(key);
     } else {
@@ -225,7 +263,7 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static Integer getInteger(Map<String, Object> map, String key) {
+  protected static Integer getInteger(Map<String, Object> map, String key) {
     if (map.containsKey(key) && map.get(key) != null) {
       return ((Number) map.get(key)).intValue();
     } else {
@@ -233,7 +271,7 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static Long getLong(Map<String, Object> map, String key) {
+  protected static Long getLong(Map<String, Object> map, String key) {
     if (map.containsKey(key)) {
       return (Long)map.get(key);
     } else {
@@ -241,7 +279,7 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static boolean getBoolean(Map<String, Object> map, String key) {
+  protected static boolean getBoolean(Map<String, Object> map, String key) {
     if (!map.containsKey(key) || map.get(key) == null) {
       return false;
     } else {
@@ -250,7 +288,8 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
     }
   }
 
-  static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key, Class<T> enumClass) {
+  protected static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key,
+      Class<T> enumClass) {
     if (map.containsKey(key) && map.get(key) != null) {
       return Enum.valueOf(enumClass, map.get(key).toString());
     } else {
@@ -259,7 +298,7 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> T getEntity(Map<String, Object> map, String key,
+  protected static <T extends Entity<T>> T getEntity(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
     if (map.containsKey(key) && map.get(key) != null) {
       return deserializer.deserialize((Map<String, Object>)map.get(key));
@@ -269,9 +308,9 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> List<T> getEntities(Map<String, Object> map, String key,
+  protected static <T extends Entity<T>> List<T> getEntities(Map<String, Object> map, String key,
       EntityDeserializer<T> deserializer) {
-    ArrayList<T> result = new ArrayList<T>();
+    List<T> result = Lists.newArrayList();
     if (map.containsKey(key)) {
       for (Map<String, Object> object : (List<Map<String, Object>>)map.get(key)) {
         result.add(deserializer.deserialize(object));
@@ -281,9 +320,9 @@ public abstract class Entity<T extends Entity<T>> implements Exportable {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Entity<T>> Map<String, T> getEntityMap(Map<String, Object> output, String key,
-      EntityDeserializer<T> deserializer) {
-    Map<String, T> result = new HashMap<String, T>();
+  protected static <T extends Entity<T>> Map<String, T> getEntityMap(Map<String, Object> output,
+      String key, EntityDeserializer<T> deserializer) {
+    Map<String, T> result = Maps.newHashMap();
     if (output.containsKey(key)) {
       Map<String, Object> map = (Map<String, Object>)output.get(key);
       for(Entry<String, Object> entry : map.entrySet()) {

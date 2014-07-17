@@ -1,8 +1,8 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.EntityMutator;
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Action;
+import com.tinlib.entities.EntityMutator;
+import com.tinlib.generated.Game;
 import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinKeys;
 import com.tinlib.core.TinMessages;

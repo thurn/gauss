@@ -19,11 +19,11 @@ import org.timepedia.exporter.client.NoExport;
 import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;
 import ca.thurn.gwtcompat.client.AtomicInteger;
 import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Command;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.Profile;
-import ca.thurn.noughts.shared.entities.Pronoun;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Command;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.Profile;
+import com.tinlib.generated.Pronoun;
 import ca.thurn.uct.algorithm.MonteCarloSearch;
 import ca.thurn.uct.core.ActionScore;
 

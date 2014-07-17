@@ -1,6 +1,7 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.entities;
 
 import com.firebase.client.*;
+import com.tinlib.entities.Entity;
 
 public class EntityMutator {
   public static interface Mutation<E extends Entity<E>, B extends Entity.EntityBuilder<E>> {
@@ -25,14 +26,7 @@ public class EntityMutator {
         // returns the associated builder type.
         @SuppressWarnings("unchecked")
         B builder = (B)deserializer.fromMutableData(mutableData).toBuilder();
-        try {
-          mutation.mutate(builder);
-        } catch(Error error) {
-          // Firebase silently swallows Errors! This makes debugging extremely
-          // difficult. Instead, we crash the program.
-          System.err.println(error);
-          System.exit(1);
-        }
+        mutation.mutate(builder);
         mutableData.setValue(builder.build().serialize());
         return Transaction.success(mutableData);
       }
@@ -40,6 +34,10 @@ public class EntityMutator {
       @Override
       public void onComplete(FirebaseError error, boolean committed, DataSnapshot dataSnapshot) {
         if (error == null && committed) {
+          if (dataSnapshot.getValue() == null) {
+            System.err.println("+++++ null data snapshot +++++++");
+            return;
+          }
           mutation.onComplete(deserializer.fromDataSnapshot(dataSnapshot));
         } else {
           mutation.onError(error, committed);

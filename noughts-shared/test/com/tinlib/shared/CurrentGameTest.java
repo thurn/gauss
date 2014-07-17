@@ -1,6 +1,6 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinMessages;
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertEquals;
 public class CurrentGameTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
+  private static final String GAME_ID = TestUtils.newGameId();
 
   @Mock
   ErrorHandler mockErrorHandler;
@@ -28,7 +29,7 @@ public class CurrentGameTest extends TinTestCase {
   @Test
   public void testLoadGame() {
     beginAsyncTestBlock(2);
-    final Game testGame = TestUtils.newGameWithOnePlayer().build();
+    final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
@@ -39,7 +40,7 @@ public class CurrentGameTest extends TinTestCase {
         helper.bus().once(TinMessages.CURRENT_GAME_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String currentGameId) {
-            assertEquals(TestUtils.GAME_ID, currentGameId);
+            assertEquals(GAME_ID, currentGameId);
             finished();
           }
         });
@@ -51,11 +52,11 @@ public class CurrentGameTest extends TinTestCase {
           }
         });
 
-        helper.references().gameReference(TestUtils.GAME_ID).setValue(testGame.serialize(),
+        helper.references().gameReference(GAME_ID).setValue(testGame.serialize(),
             new Firebase.CompletionListener() {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            currentGame.loadGame(TestUtils.GAME_ID);
+            currentGame.loadGame(GAME_ID);
           }
         });
       }
@@ -74,7 +75,7 @@ public class CurrentGameTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         CurrentGame currentGame = new CurrentGame(helper.injector());
-        currentGame.loadGame(TestUtils.GAME_ID);
+        currentGame.loadGame(GAME_ID);
         finished();
       }
     });

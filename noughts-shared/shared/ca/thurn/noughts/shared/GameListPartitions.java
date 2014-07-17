@@ -9,8 +9,8 @@ import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameListSection;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.GameListSection;
 
 /**
  * A value object consisting of three game lists: games where it is the

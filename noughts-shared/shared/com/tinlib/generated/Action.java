@@ -1,4 +1,6 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.generated;
+
+import com.tinlib.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,16 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
-
-@Export
-@ExportPackage("nts")
-public final class Action extends Entity<Action> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<Action> implements Exportable {
+public final class Action extends Entity<Action> {
+  public static class Deserializer extends EntityDeserializer<Action> {
     private Deserializer() {
     }
 
@@ -25,8 +19,7 @@ public final class Action extends Entity<Action> implements Exportable {
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<Action> implements Exportable {
+  public static class Builder extends EntityBuilder<Action> {
     private final Action action;
 
     private Builder() {
@@ -113,9 +106,8 @@ public final class Action extends Entity<Action> implements Exportable {
       return action.commandList;
     }
 
-    @NoExport
     public Builder setCommand(int index, EntityBuilder<Command> command) {
-      return setCommand(index, command);
+      return setCommand(index, command.build());
     }
 
     public Builder setCommand(int index, Command command) {
@@ -124,7 +116,6 @@ public final class Action extends Entity<Action> implements Exportable {
       return this;
     }
 
-    @NoExport
     public Builder addCommand(EntityBuilder<Command> command) {
       return addCommand(command.build());
     }
@@ -205,16 +196,16 @@ public final class Action extends Entity<Action> implements Exportable {
   private final List<Command> futureCommandList;
 
   private Action() {
-    this.commandList = new ArrayList<Command>();
-    this.futureCommandList = new ArrayList<Command>();
+    this.commandList = new ArrayList<>();
+    this.futureCommandList = new ArrayList<>();
   }
 
   private Action(Action action) {
     this.playerNumber = action.playerNumber;
     this.gameId = action.gameId;
     this.submitted = action.submitted;
-    this.commandList = new ArrayList<Command>(action.commandList);
-    this.futureCommandList = new ArrayList<Command>(action.futureCommandList);
+    this.commandList = new ArrayList<>(action.commandList);
+    this.futureCommandList = new ArrayList<>(action.futureCommandList);
   }
 
   private Action(Map<String, Object> actionMap) {
@@ -231,9 +222,8 @@ public final class Action extends Entity<Action> implements Exportable {
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "playerNumber", playerNumber);
     putSerialized(result, "gameId", gameId);
     putSerialized(result, "submitted", submitted);

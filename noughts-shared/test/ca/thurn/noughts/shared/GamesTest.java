@@ -2,12 +2,12 @@
 package ca.thurn.noughts.shared;
 
 import static ca.thurn.noughts.shared.ModelTest.list;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameStatus;
-import ca.thurn.noughts.shared.entities.ImageString;
-import ca.thurn.noughts.shared.entities.ImageType;
-import ca.thurn.noughts.shared.entities.Profile;
-import ca.thurn.noughts.shared.entities.Pronoun;
+import com.tinlib.entities.Game;
+import com.tinlib.entities.GameStatus;
+import com.tinlib.entities.ImageString;
+import com.tinlib.entities.ImageType;
+import com.tinlib.entities.Profile;
+import com.tinlib.entities.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 public class GamesTest extends SharedTestCase {

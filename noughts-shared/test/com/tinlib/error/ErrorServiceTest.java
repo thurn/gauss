@@ -1,5 +1,6 @@
-package com.tinlib.shared;
+package com.tinlib.error;
 
+import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.error.ErrorService;
@@ -21,6 +22,7 @@ public class ErrorServiceTest extends TinTestCase {
   public void testError() {
     beginAsyncTestBlock();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnalyticsHandler(mockAnalyticsHandler);
     builder.setErrorHandler(new ErrorHandler() {
       @Override

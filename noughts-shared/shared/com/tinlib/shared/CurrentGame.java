@@ -1,6 +1,6 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Game;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;

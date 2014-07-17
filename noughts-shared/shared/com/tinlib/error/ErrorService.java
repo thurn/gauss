@@ -1,5 +1,6 @@
 package com.tinlib.error;
 
+import com.google.common.base.Throwables;
 import com.tinlib.inject.Injector;
 import com.tinlib.core.TinKeys;
 
@@ -56,7 +57,8 @@ public class ErrorService {
    * then returns an exception initialized with the error message.
    */
   public RuntimeException die(String message, Object... args) {
-    error(message, args);
-    return new RuntimeException(String.format(message, args));
+    RuntimeException result = new RuntimeException(String.format(message, args));
+    error(message + "\n" + Throwables.getStackTraceAsString(result), args);
+    return result;
   }
 }

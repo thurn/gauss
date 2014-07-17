@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Command;
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Command;
+import com.tinlib.generated.Game;
 import ca.thurn.uct.core.Copyable;
 import ca.thurn.uct.core.Player;
 import ca.thurn.uct.core.State;

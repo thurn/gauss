@@ -1,31 +1,23 @@
 package com.tinlib.test;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Game;
 import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.google.common.collect.Lists;
 import com.jayway.awaitility.Awaitility;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinModule;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
 import com.tinlib.shared.*;
 import org.junit.After;
 import org.junit.Before;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public abstract class TinTestCase {
@@ -101,22 +93,23 @@ public abstract class TinTestCase {
   @Before
   public final void tinSetUp() {
     beginAsyncTestBlock();
-    firebase.removeValue(new Firebase.CompletionListener() {
-      @Override
-      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-        setUp(finishedRunnable);
-      }
-    });
+    setUp(finishedRunnable);
     endAsyncTestBlock();
   }
 
   @After
   public final void tinTearDown() {
     beginAsyncTestBlock();
-    tearDown(finishedRunnable);
-    if (testHelper != null) {
-      testHelper.cleanUp();
-    }
+    tearDown(new Runnable() {
+      @Override
+      public void run() {
+        if (testHelper != null) {
+          testHelper.cleanUp(finishedRunnable);
+        } else {
+          finished();
+        }
+      }
+    });
     endAsyncTestBlock();
   }
 
@@ -156,15 +149,6 @@ public abstract class TinTestCase {
     }
   }
 
-  public void schedule(int delayMillis, final Runnable runnable) {
-    new java.util.Timer().schedule(new TimerTask() {
-      @Override
-      public void run() {
-        runnable.run();
-      }
-    }, delayMillis);
-  }
-
   public void assertDeepEquals(Object o1, Object o2) {
     assertDeepEquals("(no message)", o1, o2);
   }
@@ -192,47 +176,5 @@ public abstract class TinTestCase {
     } else {
       assertEquals(msg, o1, o2);
     }
-  }
-
-  public Injector newTinInjector(Module... modules) {
-    Injector result = Injectors.newInjector(Lists.asList(new TinModule(), modules));
-    bus = result.get(TinKeys.BUS);
-    keyedListenerService = result.get(TinKeys.KEYED_LISTENER_SERVICE);
-    return result;
-  }
-
-  public void verifyError() {
-    verify(mockErrorHandler, times(1)).error(Matchers.anyString(), Matchers.any(Object[].class));
-  }
-
-  public void verifyTrackEvent() {
-    verify(mockAnalyticsHandler, times(1)).trackEvent(Matchers.anyString(),
-        Matchers.<Map<String, String>>any());
-  }
-
-  public void withTestGameAndAction(final Game game, final Action action,
-      final TestFunction function) {
-    final FirebaseReferences references = FirebaseReferences.anonymous("viewerKey", firebase);
-    references.gameReference(game.getId()).setValue(game.serialize(),
-        new Firebase.CompletionListener() {
-      @Override
-      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-        references.currentActionReferenceForGame(game.getId()).setValue(action.serialize(),
-            new Firebase.CompletionListener() {
-          @Override
-          public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            Injector injector = newTinInjector(new FirebaseModule(),
-                new MockAnalyticsHandlerModule(),
-                new FailOnErrorModule());
-            Viewer viewer = new Viewer(injector);
-            viewer.setViewerAnonymousId(VIEWER_ID, VIEWER_KEY);
-            CurrentGame currentGame = new CurrentGame(injector);
-            currentGame.loadGame(game.getId());
-            new CurrentAction(injector);
-            function.runTest(injector);
-          }
-        });
-      }
-    });
   }
 }

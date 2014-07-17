@@ -1,10 +1,9 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Action;
+import com.tinlib.generated.Action;
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinMessages;
 import com.tinlib.error.ErrorHandler;
-import com.tinlib.inject.Injector;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
@@ -21,6 +20,7 @@ import static org.junit.Assert.assertEquals;
 public class CurrentActionTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
+  private static final String GAME_ID = TestUtils.newGameId();
 
   @Mock
   private ErrorHandler mockErrorHandler;
@@ -28,7 +28,7 @@ public class CurrentActionTest extends TinTestCase {
   @Test
   public void testSetCurrentAction() {
     beginAsyncTestBlock();
-    final Action testAction = TestUtils.newUnsubmittedActionWithCommand().build();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
 
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
@@ -46,9 +46,9 @@ public class CurrentActionTest extends TinTestCase {
           }
         });
 
-        helper.references().currentActionReferenceForGame(TestUtils.GAME_ID).setValue(
+        helper.references().currentActionReferenceForGame(GAME_ID).setValue(
             testAction.serialize());
-        helper.bus().produce(TinMessages.CURRENT_GAME_ID, TestUtils.GAME_ID);
+        helper.bus().produce(TinMessages.CURRENT_GAME_ID, GAME_ID);
       }
     });
     endAsyncTestBlock();
@@ -65,7 +65,7 @@ public class CurrentActionTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         CurrentAction currentAction = new CurrentAction(helper.injector());
-        helper.bus().produce(TinMessages.CURRENT_GAME_ID, TestUtils.GAME_ID);
+        helper.bus().produce(TinMessages.CURRENT_GAME_ID, GAME_ID);
         finished();
       }
     });

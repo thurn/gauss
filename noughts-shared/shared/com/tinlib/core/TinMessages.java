@@ -25,25 +25,25 @@ public final class TinMessages {
   public static final String CURRENT_GAME_ID = "tin.CURRENT_GAME_ID";
 
   /**
-   * The current {@link ca.thurn.noughts.shared.entities.Game}
+   * The current {@link com.tinlib.generated.Game}
    */
   public static final String CURRENT_GAME = "tin.CURRENT_GAME";
 
   /**
-   * The current {@link ca.thurn.noughts.shared.entities.Action} of the current
+   * The current {@link com.tinlib.generated.Action} of the current
    * game.
    */
   public static final String CURRENT_ACTION = "tin.CURRENT_ACTION";
 
   /**
-   * The {@link ca.thurn.noughts.shared.entities.GameStatus} of the current
+   * The {@link com.tinlib.generated.GameStatus} of the current
    * game, fired whenever the game status changes.
    */
   public static final String GAME_STATUS = "tin.GAME_STATUS";
 
   /**
    * Fired when the user is playing in a game with an incomplete profile. The
-   * value will be a suggested {@link ca.thurn.noughts.shared.entities.Profile}
+   * value will be a suggested {@link com.tinlib.generated.Profile}
    * for the user.
    *
    * <p>This message is never fired when the current game is a local
@@ -55,7 +55,7 @@ public final class TinMessages {
    * Fired when the user's profile is loaded or set and it's complete. The
    * companion message to {@link TinMessages#PROFILE_REQUIRED}, which is fired
    * when the user's profile is not complete. The associated value will be
-   * the user's completed {@link ca.thurn.noughts.shared.entities.Profile}.
+   * the user's completed {@link com.tinlib.generated.Profile}.
    *
    * <p>This message is never fired when the current game is a local
    * multiplayer game, or when the game is over.</p>
@@ -64,7 +64,7 @@ public final class TinMessages {
 
   /**
    * Fired when an action is submitted. The value will be the just-submitted
-   * {@link ca.thurn.noughts.shared.entities.Action}.
+   * {@link com.tinlib.generated.Action}.
    */
   public static final String ACTION_SUBMITTED = "tin.ACTION_SUBMITTED";
 
@@ -94,7 +94,7 @@ public final class TinMessages {
 
   /**
    * Fired when a new game is created. The value will be the newly-created
-   * {@link ca.thurn.noughts.shared.entities.Game}.
+   * {@link com.tinlib.generated.Game}.
    */
   public static final String GAME_CREATED = "tin.GAME_CREATED";
 }

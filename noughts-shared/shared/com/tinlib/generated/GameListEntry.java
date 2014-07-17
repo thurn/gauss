@@ -1,35 +1,25 @@
-package ca.thurn.noughts.shared.entities;
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package com.tinlib.generated;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
+import java.util.*;
 
-/**
- * Represents a game entry in the game list.
- */
-@Export
-@ExportPackage("nts")
-public final class GameListEntry extends Entity<GameListEntry> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<GameListEntry> implements Exportable {
+import com.tinlib.entities.Entity;
+
+public final class GameListEntry extends Entity<GameListEntry> {
+  public static final class Deserializer extends EntityDeserializer<GameListEntry> {
     private Deserializer() {
     }
 
     @Override
-    public GameListEntry deserialize(Map<String, Object> map) {
-      return new GameListEntry(map);
+    public GameListEntry deserialize(Map<String, Object> gameListEntryMap) {
+      return new GameListEntry(gameListEntryMap);
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<GameListEntry> implements Exportable {
+  public static final class Builder extends EntityBuilder<GameListEntry> {
     private final GameListEntry gameListEntry;
 
     private Builder() {
@@ -45,16 +35,18 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
       return new GameListEntry(gameListEntry);
     }
 
-    @Override protected GameListEntry getInternalEntity() {
+    @Override
+    protected GameListEntry getInternalEntity() {
       return gameListEntry;
     }
 
     public boolean hasVsString() {
-      return gameListEntry.hasVsString();
+      return gameListEntry.vsString != null;
     }
 
     public String getVsString() {
-      return gameListEntry.getVsString();
+      checkNotNull(gameListEntry.vsString);
+      return gameListEntry.vsString;
     }
 
     public Builder setVsString(String vsString) {
@@ -69,11 +61,12 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
     }
 
     public boolean hasModifiedString() {
-      return gameListEntry.hasModifiedString();
+      return gameListEntry.modifiedString != null;
     }
 
     public String getModifiedString() {
-      return gameListEntry.getModifiedString();
+      checkNotNull(gameListEntry.modifiedString);
+      return gameListEntry.modifiedString;
     }
 
     public Builder setModifiedString(String modifiedString) {
@@ -88,20 +81,15 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
     }
 
     public int getImageStringCount() {
-      return gameListEntry.getImageStringCount();
+      return gameListEntry.imageStringList.size();
     }
 
     public ImageString getImageString(int index) {
-      return gameListEntry.getImageString(index);
+      return gameListEntry.imageStringList.get(index);
     }
 
     public List<ImageString> getImageStringList() {
-      return gameListEntry.imageStringList;
-    }
-
-    @NoExport
-    public Builder setImageString(int index, EntityBuilder<ImageString> imageString) {
-      return setImageString(index, imageString.build());
+      return Collections.unmodifiableList(gameListEntry.imageStringList);
     }
 
     public Builder setImageString(int index, ImageString imageString) {
@@ -110,20 +98,15 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
       return this;
     }
 
-    @NoExport
-    public Builder addImageString(EntityBuilder<ImageString> imageString) {
-      return addImageString(imageString.build());
-    }
-
     public Builder addImageString(ImageString imageString) {
       checkNotNull(imageString);
       gameListEntry.imageStringList.add(imageString);
       return this;
     }
 
-    public Builder addAllImageString(List<ImageString> imageStrings) {
-      checkListForNull(imageStrings);
-      gameListEntry.imageStringList.addAll(imageStrings);
+    public Builder addAllImageString(List<ImageString> imageStringList) {
+      checkListForNull(imageStringList);
+      gameListEntry.imageStringList.addAll(imageStringList);
       return this;
     }
 
@@ -131,6 +114,7 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
       gameListEntry.imageStringList.clear();
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -146,19 +130,19 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
   private final List<ImageString> imageStringList;
 
   private GameListEntry() {
-    this.imageStringList = new ArrayList<ImageString>();
+    imageStringList = new ArrayList<>();
   }
 
   private GameListEntry(GameListEntry gameListEntry) {
-    this.vsString = gameListEntry.vsString;
-    this.modifiedString = gameListEntry.modifiedString;
-    this.imageStringList = gameListEntry.imageStringList;
+    vsString = gameListEntry.vsString;
+    modifiedString = gameListEntry.modifiedString;
+    imageStringList = new ArrayList<>(gameListEntry.imageStringList);
   }
 
   private GameListEntry(Map<String, Object> map) {
-    vsString = getString(map, "vsString");
-    modifiedString = getString(map, "modifiedString");
-    imageStringList = getEntities(map, "imageStringList", ImageString.newDeserializer());
+    vsString = get(map, "vsString");
+    modifiedString = get(map, "modifiedString");
+    imageStringList = getRepeated(map, "imageString", ImageString.newDeserializer());
   }
 
   @Override
@@ -167,12 +151,11 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "vsString", vsString);
     putSerialized(result, "modifiedString", modifiedString);
-    putSerialized(result, "imageStringList", imageStringList);
+    putSerialized(result, "imageString", imageStringList);
     return result;
   }
 
@@ -210,4 +193,5 @@ public final class GameListEntry extends Entity<GameListEntry> implements Export
   public List<ImageString> getImageStringList() {
     return Collections.unmodifiableList(imageStringList);
   }
+
 }

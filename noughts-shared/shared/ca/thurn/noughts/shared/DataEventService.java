@@ -2,12 +2,12 @@ package ca.thurn.noughts.shared;
 
 import ca.thurn.noughts.shared.entities.AbstractPreviousValueListener;
 import ca.thurn.noughts.shared.entities.AbstractValueListener;
-import ca.thurn.noughts.shared.entities.Action;
+import com.tinlib.generated.Action;
 import ca.thurn.noughts.shared.entities.ChildListener;
 import ca.thurn.noughts.shared.entities.ChildListenerAdapter;
-import ca.thurn.noughts.shared.entities.Command;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameStatus;
+import com.tinlib.generated.Command;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.GameStatus;
 import ca.thurn.noughts.shared.entities.PreviousValueListener;
 import ca.thurn.noughts.shared.entities.PreviousValueListenerAdapter;
 import ca.thurn.noughts.shared.entities.ValueListener;

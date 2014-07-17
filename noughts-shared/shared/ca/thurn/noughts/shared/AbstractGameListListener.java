@@ -4,7 +4,7 @@ import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Game;
 
 @Export
 @ExportPackage("nts")

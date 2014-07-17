@@ -1,11 +1,13 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.ImageString;
-import ca.thurn.noughts.shared.entities.Profile;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.ImageString;
+import com.tinlib.generated.Profile;
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinMessages;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.message.Subscriber1;
+import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
@@ -51,6 +53,61 @@ public class ProfileServiceTest extends TinTestCase {
             finished();
           }
         });
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testSetProfileLocalMultiplayerError() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID)
+        .setIsLocalMultiplayer(true)
+        .build();
+    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
+    builder.setGame(testGame);
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(TestHelper helper) {
+        ProfileService profileService = new ProfileService(helper.injector());
+        final Profile testProfile = TestUtils.newTestProfile()
+            .setImageString(ImageString.newBuilder().setString("foo"))
+            .build();
+        profileService.setProfileForViewer(GAME_ID, testProfile);
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testSetProfileFirebaseError() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL));
+    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
+    builder.setGame(testGame);
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(TestHelper helper) {
+        ProfileService profileService = new ProfileService(helper.injector());
+        final Profile testProfile = TestUtils.newTestProfile()
+            .setImageString(ImageString.newBuilder().setString("foo"))
+            .build();
       }
     });
     endAsyncTestBlock();

@@ -10,12 +10,12 @@ import java.util.Map.Entry;
 import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import ca.thurn.noughts.shared.entities.AbstractChildListener;
 import ca.thurn.noughts.shared.entities.AbstractValueListener;
-import ca.thurn.noughts.shared.entities.Action;
+import com.tinlib.entities.Action;
 import ca.thurn.noughts.shared.entities.Command;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameStatus;
-import ca.thurn.noughts.shared.entities.Profile;
-import ca.thurn.noughts.shared.entities.Pronoun;
+import com.tinlib.entities.Game;
+import com.tinlib.entities.GameStatus;
+import com.tinlib.entities.Profile;
+import com.tinlib.entities.Pronoun;
 import ca.thurn.testing.SharedTestCase;
 
 import com.firebase.client.ChildEventListener;

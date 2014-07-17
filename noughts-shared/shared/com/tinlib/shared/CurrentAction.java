@@ -1,6 +1,6 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Action;
+import com.tinlib.generated.Action;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;

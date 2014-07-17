@@ -1,18 +1,12 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.generated;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
+import com.tinlib.entities.Entity;
 
-@Export
-@ExportPackage("nts")
-public final class Command extends Entity<Command> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<Command> implements Exportable {
+public final class Command extends Entity<Command> {
+  public static class Deserializer extends EntityDeserializer<Command> {
     private Deserializer() {
     }
 
@@ -22,8 +16,7 @@ public final class Command extends Entity<Command> implements Exportable {
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<Command> implements Exportable {
+  public static class Builder extends EntityBuilder<Command> {
     private final Command command;
 
     private Builder() {
@@ -110,7 +103,6 @@ public final class Command extends Entity<Command> implements Exportable {
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "column", column);

@@ -175,6 +175,14 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="com.squareup:javawriter:2.5.0" type="repository">
+      <properties maven-id="com.squareup:javawriter:2.5.0" />
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/com/squareup/javawriter/2.5.0/javawriter-2.5.0.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="junit:junit:4.11" type="repository">
       <properties maven-id="junit:junit:4.11" />
       <CLASSES>
@@ -194,6 +202,14 @@
       </SOURCES>
       <jarDirectory url="file://$PROJECT_DIR$/noughts-shared/lib" recursive="false" />
       <jarDirectory url="file://$PROJECT_DIR$/noughts-shared/lib" recursive="false" type="SOURCES" />
+    </library>
+    <library name="org.json:json:20140107" type="repository">
+      <properties maven-id="org.json:json:20140107" />
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/json/json/20140107/json-20140107.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="org.mockito:mockito-all:1.9.5" type="repository">
       <properties maven-id="org.mockito:mockito-all:1.9.5" />

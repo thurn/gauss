@@ -1,8 +1,8 @@
 package com.tinlib.shared;
 
 import ca.thurn.noughts.shared.Games;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.Profile;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.Profile;
 import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;

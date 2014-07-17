@@ -1,0 +1,25 @@
+[
+    {
+        "type":"entity",
+        "name":"GameListEntry",
+        "package":"com.tinlib.generated",
+        "fields":[
+            {
+                "name":"vsString",
+                "type":"String",
+                "desc":"A string describing the players in the game."
+            },
+            {
+                "name":"modifiedString",
+                "type":"String",
+                "desc":"A string describing when the game was last modified."
+            },
+            {
+                "name":"imageString",
+                "type":"ImageString",
+                "repeated":true,
+                "desc":"An image associated with this game list entry."
+            }
+        ]
+    }
+]

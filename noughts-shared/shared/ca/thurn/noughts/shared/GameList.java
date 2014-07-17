@@ -7,7 +7,7 @@ import java.util.Set;
 
 import ca.thurn.noughts.shared.entities.AbstractValueEventListener;
 import ca.thurn.noughts.shared.entities.ChildListener;
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Game;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;

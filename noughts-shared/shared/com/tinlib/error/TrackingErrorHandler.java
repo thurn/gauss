@@ -16,7 +16,7 @@ public class TrackingErrorHandler implements ErrorHandler {
   public void error(String message, Object[] args) {
     ImmutableMap.Builder<String, String> map = ImmutableMap.builder();
     for (int i = 0; i < args.length; ++i) {
-      map.put("[" + i + "]", args[i].toString());
+      map.put("[" + i + "]", args[i] + "");
     }
     analyticsService.trackEvent(message, map.build());
   }

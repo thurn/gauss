@@ -1,21 +1,15 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.generated;
+
+import com.tinlib.entities.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
-
 /**
  * A string which represents an image, either a URL or a local resource.
  */
-@Export
-@ExportPackage("nts")
-public final class ImageString extends Entity<ImageString> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<ImageString> implements Exportable {
+public final class ImageString extends Entity<ImageString> {
+  public static class Deserializer extends EntityDeserializer<ImageString> {
     private Deserializer() {
     }
 
@@ -25,8 +19,7 @@ public final class ImageString extends Entity<ImageString> implements Exportable
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<ImageString> implements Exportable {
+  public static class Builder extends EntityBuilder<ImageString> {
     private final ImageString imageString;
 
     private Builder() {
@@ -118,7 +111,6 @@ public final class ImageString extends Entity<ImageString> implements Exportable
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "string", string);

@@ -1,4 +1,6 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.generated;
+
+import com.tinlib.entities.Entity;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,16 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
-
-@Export
-@ExportPackage("nts")
-public final class Game extends Entity<Game> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<Game> implements Exportable {
+public final class Game extends Entity<Game> {
+  public static class Deserializer extends EntityDeserializer<Game> {
     private Deserializer() {
     }
 
@@ -25,8 +19,7 @@ public final class Game extends Entity<Game> implements Exportable {
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<Game> implements Exportable {
+  public static class Builder extends EntityBuilder<Game> {
     private final Game game;
 
     private Builder() {
@@ -112,7 +105,6 @@ public final class Game extends Entity<Game> implements Exportable {
       return game.profileList;
     }
 
-    @NoExport
     public Builder setProfile(int index, EntityBuilder<Profile> profile) {
       return setProfile(index, profile.build());
     }
@@ -123,7 +115,6 @@ public final class Game extends Entity<Game> implements Exportable {
       return this;
     }
 
-    @NoExport
     public Builder addProfile(EntityBuilder<Profile> profile) {
       return addProfile(profile.build());
     }
@@ -175,7 +166,6 @@ public final class Game extends Entity<Game> implements Exportable {
       return game.submittedActionList;
     }
 
-    @NoExport
     public Builder setSubmittedAction(int index, EntityBuilder<Action> action) {
       return setSubmittedAction(index, action.build());
     }
@@ -186,7 +176,6 @@ public final class Game extends Entity<Game> implements Exportable {
       return this;
     }
 
-    @NoExport
     public Builder addSubmittedAction(EntityBuilder<Action> action) {
       return addSubmittedAction(action.build());
     }
@@ -392,7 +381,6 @@ public final class Game extends Entity<Game> implements Exportable {
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "id", id);

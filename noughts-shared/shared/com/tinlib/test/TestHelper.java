@@ -1,7 +1,7 @@
 package com.tinlib.test;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
@@ -86,6 +86,9 @@ public class TestHelper {
     }
 
     public void runTest(final Test test) {
+      if (firebase == null) {
+        throw new RuntimeException("setFirebase() is required.");
+      }
       if (errorHandler == null) {
         errorHandler = new ErrorHandler() {
           @Override
@@ -195,9 +198,15 @@ public class TestHelper {
     return injector;
   }
 
-  public void cleanUp() {
+  public void cleanUp(final Runnable done) {
     getKeyedListenerService().unregisterAll();
     bus().clearAll();
+    firebase().removeValue(new CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        done.run();
+      }
+    });
   }
 
   public static void verifyTrackedEvent(AnalyticsHandler handler) {

@@ -4,9 +4,9 @@ import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 import org.timepedia.exporter.client.ExportedInterface;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Command;
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Command;
+import com.tinlib.generated.Game;
 
 @ExportedInterface
 @ExportPackage("nts")

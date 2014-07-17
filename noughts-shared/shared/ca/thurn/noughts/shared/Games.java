@@ -8,12 +8,12 @@ import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameListEntry;
-import ca.thurn.noughts.shared.entities.GameStatus;
-import ca.thurn.noughts.shared.entities.ImageString;
-import ca.thurn.noughts.shared.entities.ImageType;
-import ca.thurn.noughts.shared.entities.Profile;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.GameListEntry;
+import com.tinlib.generated.GameStatus;
+import com.tinlib.generated.ImageString;
+import com.tinlib.generated.ImageType;
+import com.tinlib.generated.Profile;
 
 @Export
 @ExportPackage("nts")

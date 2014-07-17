@@ -1,9 +1,8 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.entities.Game;
+import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.tinlib.inject.Injector;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;

@@ -8,6 +8,7 @@ import com.tinlib.test.TinTestCase;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -37,7 +38,14 @@ public class ViewerTest extends TinTestCase {
 
             assertEquals("games", references.userGamesReference().getName());
             assertEquals("viewerKey", references.userGamesReference().getParent().getName());
-            assertEquals("users", references.userGamesReference().getParent().getParent().getName());
+            assertEquals("users",
+                references.userGamesReference().getParent().getParent().getName());
+
+            assertEquals("submittedActionList",
+                references.gameSubmittedActionsReference("gameId").getName());
+            assertEquals("commandList",
+                references.commandsReferenceForCurrentAction("gameId").getName());
+            assertEquals("r123", references.requestReference("123").getName());
             finished();
           }
             }

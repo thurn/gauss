@@ -1,18 +1,12 @@
-package ca.thurn.noughts.shared.entities;
+package com.tinlib.generated;
+
+import com.tinlib.entities.Entity;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-import org.timepedia.exporter.client.NoExport;
-
-@Export
-@ExportPackage("nts")
-public final class Profile extends Entity<Profile> implements Exportable {
-  @Export
-  public static class Deserializer extends EntityDeserializer<Profile> implements Exportable {
+public final class Profile extends Entity<Profile> {
+  public static class Deserializer extends EntityDeserializer<Profile> {
     private Deserializer() {
     }
 
@@ -22,8 +16,7 @@ public final class Profile extends Entity<Profile> implements Exportable {
     }
   }
 
-  @Export
-  public static class Builder extends EntityBuilder<Profile> implements Exportable {
+  public static class Builder extends EntityBuilder<Profile> {
     private final Profile profile;
 
     private Builder() {
@@ -70,7 +63,6 @@ public final class Profile extends Entity<Profile> implements Exportable {
       return profile.getImageString();
     }
 
-    @NoExport
     public Builder setImageString(EntityBuilder<ImageString> imageString) {
       return setImageString(imageString.build());
     }
@@ -181,7 +173,6 @@ public final class Profile extends Entity<Profile> implements Exportable {
   }
 
   @Override
-  @NoExport
   public Map<String, Object> serialize() {
     Map<String, Object> result = new HashMap<String, Object>();
     putSerialized(result, "name", name);

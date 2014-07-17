@@ -6,9 +6,9 @@ import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 import org.timepedia.exporter.client.ExportedInterface;
 
-import ca.thurn.noughts.shared.entities.Action;
-import ca.thurn.noughts.shared.entities.Game;
-import ca.thurn.noughts.shared.entities.GameStatus;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.GameStatus;
 
 /**
  * Interface to implement to listen for game updates.
