@@ -44,10 +44,10 @@ public class GameListPartitions implements Exportable {
    * @return The section which this game belongs in.
    */
   public GameListSection getSection(Game game) {
-    if (game.isGameOver()) {
+    if (game.getIsGameOver()) {
       return GameListSection.GAME_OVER;
     }
-    if (game.isLocalMultiplayer() ||
+    if (game.getIsLocalMultiplayer() ||
         (Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId))) {
       return GameListSection.YOUR_TURN;
     } else {

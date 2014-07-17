@@ -129,6 +129,39 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   @SuppressWarnings("unchecked")
+  protected static <T> T get(Map<String, Object> map, String key, Class<T> outputType) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return processPrimitive(map.get(key), outputType);
+    } else {
+      return null;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> T processPrimitive(Object primitive, Class<T> outputType) {
+    if (primitive instanceof Number) {
+      Number value = (Number)primitive;
+      if (outputType == Long.class) {
+        return (T) new Long(value.longValue());
+      } else if (outputType == Integer.class) {
+        return (T) new Integer(value.intValue());
+      } else if (outputType == Short.class) {
+        return (T) new Short(value.shortValue());
+      } else if (outputType == Byte.class) {
+        return (T) new Byte(value.byteValue());
+      } else if (outputType == Double.class) {
+        return (T) new Double(value.doubleValue());
+      } else if (outputType == Float.class) {
+        return (T) new Float(value.floatValue());
+      } else {
+        throw new RuntimeException("Unknown Number type " + outputType);
+      }
+    } else {
+      return (T)primitive;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   protected static <T extends Entity<T>> T get(Map<String, Object> map, String key,
     EntityDeserializer<T> deserializer) {
     if (map.containsKey(key) && map.get(key) != null) {
@@ -139,12 +172,24 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   @SuppressWarnings("unchecked")
-  protected static <T> List<T> getRepeated(Map<String, Object> map, String key) {
+  protected static <T> List<T> getRepeated(Map<String, Object> map, String key,
+      Class<T> outputType) {
+    List<T> result = Lists.newArrayList();
     if (map.containsKey(key) && map.get(key) != null) {
-      return (List<T>)map.get(key);
-    } else {
-      return Lists.newArrayList();
+      for (T t : (List<T>)map.get(key)) {
+        result.add(processPrimitive(t, outputType));
+      }
     }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  protected static <T> List<T> getRepeated(Map<String, Object> map, String key) {
+    List<T> result = Lists.newArrayList();
+    if (map.containsKey(key) && map.get(key) != null) {
+      result = (List<T>)map.get(key);
+    }
+    return result;
   }
 
   @SuppressWarnings("unchecked")
@@ -157,6 +202,15 @@ public abstract class Entity<T extends Entity<T>> {
       }
     }
     return result;
+  }
+
+  protected static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key,
+                                                 Class<T> enumClass) {
+    if (map.containsKey(key) && map.get(key) != null) {
+      return Enum.valueOf(enumClass, map.get(key).toString());
+    } else {
+      return null;
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -200,7 +254,7 @@ public abstract class Entity<T extends Entity<T>> {
   }
 
   protected static void putSerialized(Map<String, Object> map, String key, Boolean object) {
-    putSerializedObject(map, key, object == null ? null : object.toString());
+    putSerializedObject(map, key, object);
   }
 
   protected static void putSerialized(Map<String, Object> map, String key, List<?> list) {
@@ -285,15 +339,6 @@ public abstract class Entity<T extends Entity<T>> {
     } else {
       String string = (String)map.get(key);
       return string.equals("true");
-    }
-  }
-
-  protected static <T extends Enum<T>> T getEnum(Map<String, Object> map, String key,
-      Class<T> enumClass) {
-    if (map.containsKey(key) && map.get(key) != null) {
-      return Enum.valueOf(enumClass, map.get(key).toString());
-    } else {
-      return null;
     }
   }
 

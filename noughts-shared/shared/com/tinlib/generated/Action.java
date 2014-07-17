@@ -1,15 +1,15 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
+
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public final class Action extends Entity<Action> {
-  public static class Deserializer extends EntityDeserializer<Action> {
+  public static final class Deserializer extends EntityDeserializer<Action> {
     private Deserializer() {
     }
 
@@ -19,7 +19,7 @@ public final class Action extends Entity<Action> {
     }
   }
 
-  public static class Builder extends EntityBuilder<Action> {
+  public static final class Builder extends EntityBuilder<Action> {
     private final Action action;
 
     private Builder() {
@@ -35,16 +35,18 @@ public final class Action extends Entity<Action> {
       return new Action(action);
     }
 
-    @Override protected Action getInternalEntity() {
+    @Override
+    protected Action getInternalEntity() {
       return action;
     }
 
     public boolean hasPlayerNumber() {
-      return action.hasPlayerNumber();
+      return action.playerNumber != null;
     }
 
     public int getPlayerNumber() {
-      return action.getPlayerNumber();
+      checkNotNull(action.playerNumber);
+      return action.playerNumber;
     }
 
     public Builder setPlayerNumber(int playerNumber) {
@@ -58,11 +60,12 @@ public final class Action extends Entity<Action> {
     }
 
     public boolean hasGameId() {
-      return action.hasGameId();
+      return action.gameId != null;
     }
 
     public String getGameId() {
-      return action.getGameId();
+      checkNotNull(action.gameId);
+      return action.gameId;
     }
 
     public Builder setGameId(String gameId) {
@@ -77,33 +80,34 @@ public final class Action extends Entity<Action> {
     }
 
     public boolean hasIsSubmitted() {
-      return action.hasIsSubmitted();
+      return action.isSubmitted != null;
     }
 
-    public boolean isSubmitted() {
-      return action.isSubmitted();
+    public boolean getIsSubmitted() {
+      checkNotNull(action.isSubmitted);
+      return action.isSubmitted;
     }
 
-    public Builder setIsSubmitted(boolean submitted) {
-      action.submitted = submitted;
+    public Builder setIsSubmitted(boolean isSubmitted) {
+      action.isSubmitted = isSubmitted;
       return this;
     }
 
     public Builder clearIsSubmitted() {
-      action.submitted = null;
+      action.isSubmitted = null;
       return this;
     }
 
     public int getCommandCount() {
-      return action.getCommandCount();
+      return action.commandList.size();
     }
 
     public Command getCommand(int index) {
-      return action.getCommand(index);
+      return action.commandList.get(index);
     }
 
     public List<Command> getCommandList() {
-      return action.commandList;
+      return Collections.unmodifiableList(action.commandList);
     }
 
     public Builder setCommand(int index, EntityBuilder<Command> command) {
@@ -126,9 +130,9 @@ public final class Action extends Entity<Action> {
       return this;
     }
 
-    public Builder addAllCommand(List<Command> commands) {
-      checkListForNull(commands);
-      action.commandList.addAll(commands);
+    public Builder addAllCommand(List<Command> commandList) {
+      checkListForNull(commandList);
+      action.commandList.addAll(commandList);
       return this;
     }
 
@@ -138,18 +142,18 @@ public final class Action extends Entity<Action> {
     }
 
     public int getFutureCommandCount() {
-      return action.getFutureCommandCount();
+      return action.futureCommandList.size();
     }
 
     public Command getFutureCommand(int index) {
-      return action.getFutureCommand(index);
+      return action.futureCommandList.get(index);
     }
 
     public List<Command> getFutureCommandList() {
-      return action.futureCommandList;
+      return Collections.unmodifiableList(action.futureCommandList);
     }
 
-    public Builder setFutureCommandBuilder(int index, EntityBuilder<Command> futureCommand) {
+    public Builder setFutureCommand(int index, EntityBuilder<Command> futureCommand) {
       return setFutureCommand(index, futureCommand.build());
     }
 
@@ -159,7 +163,7 @@ public final class Action extends Entity<Action> {
       return this;
     }
 
-    public Builder addFutureCommandBuilder(EntityBuilder<Command> futureCommand) {
+    public Builder addFutureCommand(EntityBuilder<Command> futureCommand) {
       return addFutureCommand(futureCommand.build());
     }
 
@@ -169,9 +173,9 @@ public final class Action extends Entity<Action> {
       return this;
     }
 
-    public Builder addAllFutureCommand(List<Command> futureCommands) {
-      checkListForNull(futureCommands);
-      action.futureCommandList.addAll(futureCommands);
+    public Builder addAllFutureCommand(List<Command> futureCommandList) {
+      checkListForNull(futureCommandList);
+      action.futureCommandList.addAll(futureCommandList);
       return this;
     }
 
@@ -179,6 +183,7 @@ public final class Action extends Entity<Action> {
       action.futureCommandList.clear();
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -191,29 +196,29 @@ public final class Action extends Entity<Action> {
 
   private Integer playerNumber;
   private String gameId;
-  private Boolean submitted;
+  private Boolean isSubmitted;
   private final List<Command> commandList;
   private final List<Command> futureCommandList;
 
   private Action() {
-    this.commandList = new ArrayList<>();
-    this.futureCommandList = new ArrayList<>();
+    commandList = new ArrayList<>();
+    futureCommandList = new ArrayList<>();
   }
 
   private Action(Action action) {
-    this.playerNumber = action.playerNumber;
-    this.gameId = action.gameId;
-    this.submitted = action.submitted;
-    this.commandList = new ArrayList<>(action.commandList);
-    this.futureCommandList = new ArrayList<>(action.futureCommandList);
+    playerNumber = action.playerNumber;
+    gameId = action.gameId;
+    isSubmitted = action.isSubmitted;
+    commandList = new ArrayList<>(action.commandList);
+    futureCommandList = new ArrayList<>(action.futureCommandList);
   }
 
-  private Action(Map<String, Object> actionMap) {
-    playerNumber = getInteger(actionMap, "playerNumber");
-    gameId = getString(actionMap, "gameId");
-    submitted = getBoolean(actionMap, "submitted");
-    commandList = getEntities(actionMap, "commandList", Command.newDeserializer());
-    futureCommandList = getEntities(actionMap, "futureCommandList", Command.newDeserializer());
+  private Action(Map<String, Object> map) {
+    playerNumber = get(map, "playerNumber", Integer.class);
+    gameId = get(map, "gameId", String.class);
+    isSubmitted = get(map, "isSubmitted", Boolean.class);
+    commandList = getRepeated(map, "command", Command.newDeserializer());
+    futureCommandList = getRepeated(map, "futureCommand", Command.newDeserializer());
   }
 
   @Override
@@ -226,24 +231,15 @@ public final class Action extends Entity<Action> {
     Map<String, Object> result = new HashMap<>();
     putSerialized(result, "playerNumber", playerNumber);
     putSerialized(result, "gameId", gameId);
-    putSerialized(result, "submitted", submitted);
-    putSerialized(result, "commandList", commandList);
-    putSerialized(result, "futureCommandList", futureCommandList);
+    putSerialized(result, "isSubmitted", isSubmitted);
+    putSerialized(result, "command", commandList);
+    putSerialized(result, "futureCommand", futureCommandList);
     return result;
   }
 
   @Override
   public Builder toBuilder() {
     return new Builder(this);
-  }
-
-  public boolean hasIsSubmitted() {
-    return submitted != null;
-  }
-
-  public boolean isSubmitted() {
-    checkNotNull(submitted);
-    return submitted;
   }
 
   public boolean hasPlayerNumber() {
@@ -262,6 +258,15 @@ public final class Action extends Entity<Action> {
   public String getGameId() {
     checkNotNull(gameId);
     return gameId;
+  }
+
+  public boolean hasIsSubmitted() {
+    return isSubmitted != null;
+  }
+
+  public boolean getIsSubmitted() {
+    checkNotNull(isSubmitted);
+    return isSubmitted;
   }
 
   public int getCommandCount() {
@@ -287,4 +292,5 @@ public final class Action extends Entity<Action> {
   public List<Command> getFutureCommandList() {
     return Collections.unmodifiableList(futureCommandList);
   }
+
 }

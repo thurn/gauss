@@ -78,7 +78,7 @@ public class Games implements Exportable {
    *     number.
    */
   public static GameStatus gameStatus(Game game) {
-    if (game.isGameOver()) {
+    if (game.getIsGameOver()) {
       if (game.getVictorCount() == 1) {
         int winnerNumber = game.getVictor(0);
         Profile winnerProfile = game.getProfile(winnerNumber);
@@ -116,7 +116,7 @@ public class Games implements Exportable {
               currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING)
           .setStatusPlayer(game.getCurrentPlayerNumber())
           .setIsComputerThinking(currentPlayerProfile.hasIsComputerPlayer() ?
-              currentPlayerProfile.isComputerPlayer() : false)
+              currentPlayerProfile.getIsComputerPlayer() : false)
           .build();
     }
   }
@@ -158,7 +158,7 @@ public class Games implements Exportable {
    *     multiplayer game.
    */
   static int opponentPlayerNumber(Game game, String viewerId) {
-    if (game.isLocalMultiplayer()) {
+    if (game.getIsLocalMultiplayer()) {
       throw new IllegalStateException("Tried to get opponent player number in a local " +
           "multiplayer game.");
     } else if (game.getPlayerCount() == 0) {
@@ -172,7 +172,7 @@ public class Games implements Exportable {
   }
 
   public static int playerNumberForPlayerId(Game game, String playerId) {
-    if (game.isLocalMultiplayer()) {
+    if (game.getIsLocalMultiplayer()) {
       throw new IllegalArgumentException("Can't call playerNumberForPlayerId on a local " +
           "multiplayer game.");
     }
@@ -212,7 +212,7 @@ public class Games implements Exportable {
    *     "vs. Frank".
    */
   public static String vsString(Game game, String viewerId) {
-    if (game.isLocalMultiplayer()) {
+    if (game.getIsLocalMultiplayer()) {
       if (game.getProfile(0).hasName() && game.getProfile(1).hasName()) {
         return game.getProfile(0).getName() + " vs. " + game.getProfile(1).getName();
       } else {
@@ -221,7 +221,7 @@ public class Games implements Exportable {
     } else if (opponentProfile(game, viewerId).hasName()) {
       return "vs. " + opponentProfile(game, viewerId).getName();
     } else {
-      if (game.isGameOver()) {
+      if (game.getIsGameOver()) {
         return "vs. (No Opponent)";
       } else {
         return "vs. (No Opponent Yet)";
@@ -276,8 +276,8 @@ public class Games implements Exportable {
    */
   private static String timeAgoString(Game game, String viewerId, long number, String unit) {
     String statusString;
-    if (game.isGameOver()) {
-      if (game.isLocalMultiplayer()) {
+    if (game.getIsGameOver()) {
+      if (game.getIsLocalMultiplayer()) {
         statusString = "Game ended";
       } else {
         if (game.getVictorCount() == 2) {
@@ -313,7 +313,7 @@ public class Games implements Exportable {
    */
   static List<ImageString> imageList(Game game, String viewerId) {
     List<ImageString> result = new ArrayList<ImageString>();
-    if (game.isLocalMultiplayer()) {
+    if (game.getIsLocalMultiplayer()) {
       for (Profile profile : game.getProfileList()) {
         if (profile.hasImageString()) {
           result.add(profile.getImageString());
@@ -338,7 +338,7 @@ public class Games implements Exportable {
    *     player's turn, game is over, etc).
    */
   static boolean differentStatus(Game old, Game next) {
-    return (old.hasIsGameOver() && next.hasIsGameOver() && old.isGameOver() != next.isGameOver()) ||
+    return (old.hasIsGameOver() && next.hasIsGameOver() && old.getIsGameOver() != next.getIsGameOver()) ||
         (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
             old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
   }
@@ -349,7 +349,7 @@ public class Games implements Exportable {
    *     profile yet.
    */
   public static boolean profileRequired(Game game, String viewerId) {
-    if (game.isGameOver() || game.isLocalMultiplayer() ||
+    if (game.getIsGameOver() || game.getIsLocalMultiplayer() ||
         !game.getPlayerList().contains(viewerId)) {
       return false;
     }

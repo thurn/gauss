@@ -1,15 +1,15 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
+
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public final class Game extends Entity<Game> {
-  public static class Deserializer extends EntityDeserializer<Game> {
+  public static final class Deserializer extends EntityDeserializer<Game> {
     private Deserializer() {
     }
 
@@ -19,7 +19,7 @@ public final class Game extends Entity<Game> {
     }
   }
 
-  public static class Builder extends EntityBuilder<Game> {
+  public static final class Builder extends EntityBuilder<Game> {
     private final Game game;
 
     private Builder() {
@@ -35,16 +35,18 @@ public final class Game extends Entity<Game> {
       return new Game(game);
     }
 
-    @Override protected Game getInternalEntity() {
+    @Override
+    protected Game getInternalEntity() {
       return game;
     }
 
     public boolean hasId() {
-      return game.hasId();
+      return game.id != null;
     }
 
     public String getId() {
-      return game.getId();
+      checkNotNull(game.id);
+      return game.id;
     }
 
     public Builder setId(String id) {
@@ -59,15 +61,15 @@ public final class Game extends Entity<Game> {
     }
 
     public int getPlayerCount() {
-      return game.getPlayerCount();
+      return game.playerList.size();
     }
 
     public String getPlayer(int index) {
-      return game.getPlayer(index);
+      return game.playerList.get(index);
     }
 
     public List<String> getPlayerList() {
-      return game.playerList;
+      return Collections.unmodifiableList(game.playerList);
     }
 
     public Builder setPlayer(int index, String player) {
@@ -94,15 +96,15 @@ public final class Game extends Entity<Game> {
     }
 
     public int getProfileCount() {
-      return game.getProfileCount();
+      return game.profileList.size();
     }
 
     public Profile getProfile(int index) {
-      return game.getProfile(index);
+      return game.profileList.get(index);
     }
 
     public List<Profile> getProfileList() {
-      return game.profileList;
+      return Collections.unmodifiableList(game.profileList);
     }
 
     public Builder setProfile(int index, EntityBuilder<Profile> profile) {
@@ -137,11 +139,12 @@ public final class Game extends Entity<Game> {
     }
 
     public boolean hasCurrentPlayerNumber() {
-      return game.hasCurrentPlayerNumber();
+      return game.currentPlayerNumber != null;
     }
 
     public int getCurrentPlayerNumber() {
-      return game.getCurrentPlayerNumber();
+      checkNotNull(game.currentPlayerNumber);
+      return game.currentPlayerNumber;
     }
 
     public Builder setCurrentPlayerNumber(int currentPlayerNumber) {
@@ -155,40 +158,40 @@ public final class Game extends Entity<Game> {
     }
 
     public int getSubmittedActionCount() {
-      return game.getSubmittedActionCount();
+      return game.submittedActionList.size();
     }
 
     public Action getSubmittedAction(int index) {
-      return game.getSubmittedAction(index);
+      return game.submittedActionList.get(index);
     }
 
     public List<Action> getSubmittedActionList() {
-      return game.submittedActionList;
+      return Collections.unmodifiableList(game.submittedActionList);
     }
 
-    public Builder setSubmittedAction(int index, EntityBuilder<Action> action) {
-      return setSubmittedAction(index, action.build());
+    public Builder setSubmittedAction(int index, EntityBuilder<Action> submittedAction) {
+      return setSubmittedAction(index, submittedAction.build());
     }
 
-    public Builder setSubmittedAction(int index, Action action) {
-      checkNotNull(action);
-      game.submittedActionList.set(index, action);
+    public Builder setSubmittedAction(int index, Action submittedAction) {
+      checkNotNull(submittedAction);
+      game.submittedActionList.set(index, submittedAction);
       return this;
     }
 
-    public Builder addSubmittedAction(EntityBuilder<Action> action) {
-      return addSubmittedAction(action.build());
+    public Builder addSubmittedAction(EntityBuilder<Action> submittedAction) {
+      return addSubmittedAction(submittedAction.build());
     }
 
-    public Builder addSubmittedAction(Action action) {
-      checkNotNull(action);
-      game.submittedActionList.add(action);
+    public Builder addSubmittedAction(Action submittedAction) {
+      checkNotNull(submittedAction);
+      game.submittedActionList.add(submittedAction);
       return this;
     }
 
-    public Builder addAllSubmittedAction(List<Action> actionList) {
-      checkListForNull(actionList);
-      game.submittedActionList.addAll(actionList);
+    public Builder addAllSubmittedAction(List<Action> submittedActionList) {
+      checkListForNull(submittedActionList);
+      game.submittedActionList.addAll(submittedActionList);
       return this;
     }
 
@@ -198,11 +201,12 @@ public final class Game extends Entity<Game> {
     }
 
     public boolean hasLastModified() {
-      return game.hasLastModified();
+      return game.lastModified != null;
     }
 
     public long getLastModified() {
-      return game.getLastModified();
+      checkNotNull(game.lastModified);
+      return game.lastModified;
     }
 
     public Builder setLastModified(long lastModified) {
@@ -216,15 +220,15 @@ public final class Game extends Entity<Game> {
     }
 
     public int getVictorCount() {
-      return game.getVictorCount();
+      return game.victorList.size();
     }
 
     public int getVictor(int index) {
-      return game.getVictor(index);
+      return game.victorList.get(index);
     }
 
     public List<Integer> getVictorList() {
-      return game.victorList;
+      return Collections.unmodifiableList(game.victorList);
     }
 
     public Builder setVictor(int index, int victor) {
@@ -249,40 +253,43 @@ public final class Game extends Entity<Game> {
     }
 
     public boolean hasIsGameOver() {
-      return game.hasIsGameOver();
+      return game.isGameOver != null;
     }
 
-    public boolean isGameOver() {
-      return game.isGameOver();
+    public boolean getIsGameOver() {
+      checkNotNull(game.isGameOver);
+      return game.isGameOver;
     }
 
-    public Builder setIsGameOver(boolean gameOver) {
-      game.gameOver = gameOver;
+    public Builder setIsGameOver(boolean isGameOver) {
+      game.isGameOver = isGameOver;
       return this;
     }
 
     public Builder clearIsGameOver() {
-      game.gameOver = null;
+      game.isGameOver = null;
       return this;
     }
 
     public boolean hasIsLocalMultiplayer() {
-      return game.hasIsLocalMultiplayer();
+      return game.isLocalMultiplayer != null;
     }
 
-    public boolean isLocalMultiplayer() {
-      return game.isLocalMultiplayer();
+    public boolean getIsLocalMultiplayer() {
+      checkNotNull(game.isLocalMultiplayer);
+      return game.isLocalMultiplayer;
     }
 
-    public Builder setIsLocalMultiplayer(boolean localMultiplayer) {
-      game.localMultiplayer = localMultiplayer;
+    public Builder setIsLocalMultiplayer(boolean isLocalMultiplayer) {
+      game.isLocalMultiplayer = isLocalMultiplayer;
       return this;
     }
 
     public Builder clearIsLocalMultiplayer() {
-      game.localMultiplayer = null;
+      game.isLocalMultiplayer = null;
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -293,86 +300,45 @@ public final class Game extends Entity<Game> {
     return new Deserializer();
   }
 
-  /**
-   * The game ID
-   */
   private String id;
-
-  /**
-   * An array of the players in the game, which can be though of as a bimap
-   * from Player Number to Player ID.
-   */
   private final List<String> playerList;
-
-  /**
-   * List of player profiles in the same order as the player list.
-   */
   private final List<Profile> profileList;
-
-  /**
-   * The number of the player whose turn it is, that is, their index within
-   * the players array. Null when the game is not in progress.
-   */
   private Integer currentPlayerNumber;
-
-  /**
-   * Actions taken in this game, in the order in which they were submitted.
-   */
   private final List<Action> submittedActionList;
-
-  /**
-   * UNIX timestamp of time when game was last modified.
-   */
   private Long lastModified;
-
-  /**
-   * List of player numbers of the players who won this game. In the case of a
-   * draw, it should contain all of the drawing players. In the case of a
-   * "nobody wins" situation, an empty list should be present. This field
-   * cannot be present on a game which is still in progress.
-   */
   private final List<Integer> victorList;
+  private Boolean isGameOver;
+  private Boolean isLocalMultiplayer;
 
-  /**
-   * True if this game has ended.
-   */
-  private Boolean gameOver;
-
-  /**
-   * True if this game is in local multiplayer mode
-   */
-  private Boolean localMultiplayer;
-
-  public Game() {
-    playerList = new ArrayList<String>();
-    profileList = new ArrayList<Profile>();
-    submittedActionList = new ArrayList<Action>();
-    victorList = new ArrayList<Integer>();
+  private Game() {
+    playerList = new ArrayList<>();
+    profileList = new ArrayList<>();
+    submittedActionList = new ArrayList<>();
+    victorList = new ArrayList<>();
   }
 
-  public Game(Game game) {
-    this.id = game.id;
-    this.playerList = new ArrayList<String>(game.playerList);
-    this.profileList = new ArrayList<Profile>(game.profileList);
-    this.currentPlayerNumber = game.currentPlayerNumber;
-    this.submittedActionList = new ArrayList<Action>(game.submittedActionList);
-    this.lastModified = game.lastModified;
-    this.victorList = new ArrayList<Integer>(game.victorList);
-    this.gameOver = game.gameOver;
-    this.localMultiplayer = game.localMultiplayer;
+  private Game(Game game) {
+    id = game.id;
+    playerList = new ArrayList<>(game.playerList);
+    profileList = new ArrayList<>(game.profileList);
+    currentPlayerNumber = game.currentPlayerNumber;
+    submittedActionList = new ArrayList<>(game.submittedActionList);
+    lastModified = game.lastModified;
+    victorList = new ArrayList<>(game.victorList);
+    isGameOver = game.isGameOver;
+    isLocalMultiplayer = game.isLocalMultiplayer;
   }
 
-  private Game(Map<String, Object> gameMap) {
-    checkExists(gameMap, "id");
-    id = getString(gameMap, "id");
-    playerList = getList(gameMap, "playerList");
-    profileList = getEntities(gameMap, "profileList", Profile.newDeserializer());
-    currentPlayerNumber = getInteger(gameMap, "currentPlayerNumber");
-    submittedActionList = getEntities(gameMap, "submittedActionList", Action.newDeserializer());
-    lastModified = getLong(gameMap, "lastModified");
-    victorList = getIntegerList(getList(gameMap, "victorList"));
-    gameOver = getBoolean(gameMap, "gameOver");
-    localMultiplayer = getBoolean(gameMap, "localMultiplayer");
+  private Game(Map<String, Object> map) {
+    id = get(map, "id", String.class);
+    playerList = getRepeated(map, "player", String.class);
+    profileList = getRepeated(map, "profile", Profile.newDeserializer());
+    currentPlayerNumber = get(map, "currentPlayerNumber", Integer.class);
+    submittedActionList = getRepeated(map, "submittedAction", Action.newDeserializer());
+    lastModified = get(map, "lastModified", Long.class);
+    victorList = getRepeated(map, "victor", Integer.class);
+    isGameOver = get(map, "isGameOver", Boolean.class);
+    isLocalMultiplayer = get(map, "isLocalMultiplayer", Boolean.class);
   }
 
   @Override
@@ -382,16 +348,16 @@ public final class Game extends Entity<Game> {
 
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "id", id);
-    putSerialized(result, "playerList", playerList);
-    putSerialized(result, "profileList", profileList);
+    putSerialized(result, "player", playerList);
+    putSerialized(result, "profile", profileList);
     putSerialized(result, "currentPlayerNumber", currentPlayerNumber);
-    putSerialized(result, "submittedActionList", submittedActionList);
+    putSerialized(result, "submittedAction", submittedActionList);
     putSerialized(result, "lastModified", lastModified);
-    putSerialized(result, "victorList", victorList);
-    putSerialized(result, "gameOver", gameOver);
-    putSerialized(result, "localMultiplayer", localMultiplayer);
+    putSerialized(result, "victor", victorList);
+    putSerialized(result, "isGameOver", isGameOver);
+    putSerialized(result, "isLocalMultiplayer", isLocalMultiplayer);
     return result;
   }
 
@@ -476,20 +442,21 @@ public final class Game extends Entity<Game> {
   }
 
   public boolean hasIsGameOver() {
-    return gameOver != null;
+    return isGameOver != null;
   }
 
-  public boolean isGameOver() {
-    checkNotNull(gameOver);
-    return gameOver;
+  public boolean getIsGameOver() {
+    checkNotNull(isGameOver);
+    return isGameOver;
   }
 
   public boolean hasIsLocalMultiplayer() {
-    return localMultiplayer != null;
+    return isLocalMultiplayer != null;
   }
 
-  public boolean isLocalMultiplayer() {
-    checkNotNull(localMultiplayer);
-    return localMultiplayer;
+  public boolean getIsLocalMultiplayer() {
+    checkNotNull(isLocalMultiplayer);
+    return isLocalMultiplayer;
   }
+
 }

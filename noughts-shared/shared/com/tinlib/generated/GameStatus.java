@@ -1,146 +1,156 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
+
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Represents the current status of the game.
- */
 public final class GameStatus extends Entity<GameStatus> {
-  public static class Deserializer extends EntityDeserializer<GameStatus> {
+  public static final class Deserializer extends EntityDeserializer<GameStatus> {
     private Deserializer() {
     }
 
     @Override
-    public GameStatus deserialize(Map<String, Object> map) {
-      return new GameStatus(map);
+    public GameStatus deserialize(Map<String, Object> gameStatusMap) {
+      return new GameStatus(gameStatusMap);
     }
   }
 
-  public static class Builder extends EntityBuilder<GameStatus> {
-    private final GameStatus status;
+  public static final class Builder extends EntityBuilder<GameStatus> {
+    private final GameStatus gameStatus;
 
     private Builder() {
-      this.status = new GameStatus();
+      this.gameStatus = new GameStatus();
     }
 
-    private Builder(GameStatus status) {
-      this.status = new GameStatus(status);
+    private Builder(GameStatus gameStatus) {
+      this.gameStatus = new GameStatus(gameStatus);
     }
 
-    @Override public GameStatus build() {
-      return new GameStatus(status);
+    @Override
+    public GameStatus build() {
+      return new GameStatus(gameStatus);
     }
 
-    @Override protected GameStatus getInternalEntity() {
-      return status;
+    @Override
+    protected GameStatus getInternalEntity() {
+      return gameStatus;
     }
 
     public boolean hasStatusString() {
-      return status.hasStatusString();
+      return gameStatus.statusString != null;
     }
 
     public String getStatusString() {
-      return status.getStatusString();
+      checkNotNull(gameStatus.statusString);
+      return gameStatus.statusString;
     }
 
-    public GameStatus.Builder setStatusString(String statusString) {
+    public Builder setStatusString(String statusString) {
       checkNotNull(statusString);
-      status.statusString = statusString;
+      gameStatus.statusString = statusString;
       return this;
     }
 
-    public GameStatus.Builder clearStatusString() {
-      status.statusString = null;
+    public Builder clearStatusString() {
+      gameStatus.statusString = null;
       return this;
     }
 
     public boolean hasStatusImageString() {
-      return status.hasStatusImageString();
+      return gameStatus.statusImageString != null;
     }
 
     public ImageString getStatusImageString() {
-      return status.getStatusImageString();
+      checkNotNull(gameStatus.statusImageString);
+      return gameStatus.statusImageString;
     }
 
-    public GameStatus.Builder setStatusImageString(ImageString statusImageString) {
+    public Builder setStatusImageString(EntityBuilder<ImageString> statusImageString) {
+      return setStatusImageString(statusImageString.build());
+    }
+    public Builder setStatusImageString(ImageString statusImageString) {
       checkNotNull(statusImageString);
-      status.statusImageString = statusImageString;
+      gameStatus.statusImageString = statusImageString;
       return this;
     }
 
-    public GameStatus.Builder clearStatusImageString() {
-      status.statusImageString = null;
+    public Builder clearStatusImageString() {
+      gameStatus.statusImageString = null;
       return this;
     }
 
     public boolean hasStatusPlayer() {
-      return status.hasStatusPlayer();
+      return gameStatus.statusPlayer != null;
     }
 
     public int getStatusPlayer() {
-      return status.getStatusPlayer();
+      checkNotNull(gameStatus.statusPlayer);
+      return gameStatus.statusPlayer;
     }
 
-    public GameStatus.Builder setStatusPlayer(int player) {
-      status.statusPlayer = player;
+    public Builder setStatusPlayer(int statusPlayer) {
+      gameStatus.statusPlayer = statusPlayer;
       return this;
     }
 
-    public GameStatus.Builder clearStatusPlayer() {
-      status.statusPlayer = null;
+    public Builder clearStatusPlayer() {
+      gameStatus.statusPlayer = null;
       return this;
     }
 
     public boolean hasIsComputerThinking() {
-      return status.hasIsComputerThinking();
+      return gameStatus.isComputerThinking != null;
     }
 
-    public boolean isComputerThinking() {
-      return status.isComputerThinking();
+    public boolean getIsComputerThinking() {
+      checkNotNull(gameStatus.isComputerThinking);
+      return gameStatus.isComputerThinking;
     }
 
-    public Builder setIsComputerThinking(boolean computerThinking) {
-      status.computerThinking = computerThinking;
+    public Builder setIsComputerThinking(boolean isComputerThinking) {
+      gameStatus.isComputerThinking = isComputerThinking;
       return this;
     }
 
     public Builder clearIsComputerThinking() {
-      status.computerThinking = null;
+      gameStatus.isComputerThinking = null;
       return this;
     }
+
   }
 
-  public static GameStatus.Builder newBuilder() {
+  public static Builder newBuilder() {
     return new Builder();
   }
 
-  public static GameStatus.Deserializer newDeserializer() {
+  public static Deserializer newDeserializer() {
     return new Deserializer();
   }
 
   private String statusString;
   private ImageString statusImageString;
   private Integer statusPlayer;
-  private Boolean computerThinking;
+  private Boolean isComputerThinking;
 
   private GameStatus() {
   }
 
-  private GameStatus(GameStatus status) {
-    this.statusString = status.statusString;
-    this.statusImageString = status.statusImageString;
-    this.statusPlayer = status.statusPlayer;
-    this.computerThinking = status.computerThinking;
+  private GameStatus(GameStatus gameStatus) {
+    statusString = gameStatus.statusString;
+    statusImageString = gameStatus.statusImageString;
+    statusPlayer = gameStatus.statusPlayer;
+    isComputerThinking = gameStatus.isComputerThinking;
   }
 
   private GameStatus(Map<String, Object> map) {
-    statusString = getString(map, "statusString");
-    statusImageString = getEntity(map, "statusImageString", ImageString.newDeserializer());
-    statusPlayer = getInteger(map, "statusPlayer");
-    computerThinking = getBoolean(map, "computerThinking");
+    statusString = get(map, "statusString", String.class);
+    statusImageString = get(map, "statusImageString", ImageString.newDeserializer());
+    statusPlayer = get(map, "statusPlayer", Integer.class);
+    isComputerThinking = get(map, "isComputerThinking", Boolean.class);
   }
 
   @Override
@@ -150,16 +160,16 @@ public final class GameStatus extends Entity<GameStatus> {
 
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "statusString", statusString);
     putSerialized(result, "statusImageString", statusImageString);
     putSerialized(result, "statusPlayer", statusPlayer);
-    putSerialized(result, "computerThinking", computerThinking);
+    putSerialized(result, "isComputerThinking", isComputerThinking);
     return result;
   }
 
   @Override
-  public GameStatus.Builder toBuilder() {
+  public Builder toBuilder() {
     return new Builder(this);
   }
 
@@ -191,11 +201,12 @@ public final class GameStatus extends Entity<GameStatus> {
   }
 
   public boolean hasIsComputerThinking() {
-    return computerThinking != null;
+    return isComputerThinking != null;
   }
 
-  public boolean isComputerThinking() {
-    checkNotNull(computerThinking);
-    return computerThinking;
+  public boolean getIsComputerThinking() {
+    checkNotNull(isComputerThinking);
+    return isComputerThinking;
   }
+
 }

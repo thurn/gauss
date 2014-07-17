@@ -140,7 +140,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    * game.
    */
   public boolean isCurrentPlayer(Game game) {
-    if (game.isGameOver()) return false;
+    if (game.getIsGameOver()) return false;
     return Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId);
   }
 
@@ -334,7 +334,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
           listener.onRegistered(userId, game, getCurrentAction(gameId));
         }
       } else {
-        if (game.isGameOver() && !oldGame.isGameOver()) {
+        if (game.getIsGameOver() && !oldGame.getIsGameOver()) {
           listener.onGameOver(game);
         }
         int count = game.getSubmittedActionCount();
@@ -443,11 +443,11 @@ public class Model extends AbstractChildEventListener implements Exportable {
     ref.setValue(map);
     Firebase userRef = actionReferenceForGame(game.getId());
     userRef.setValue(newEmptyAction(game.getId()).serialize());
-    if (!game.isLocalMultiplayer()) {
+    if (!game.getIsLocalMultiplayer()) {
 //      pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
     }
     Map<String, String> dimensions = new HashMap<String, String>();
-    dimensions.put("localMultiplayer", game.isLocalMultiplayer() + "");
+    dimensions.put("localMultiplayer", game.getIsLocalMultiplayer() + "");
     dimensions.put("profileCount", profiles.size() + "");
     analyticsService.trackEvent("newGame", dimensions);
     return game.getId();
@@ -706,9 +706,9 @@ public class Model extends AbstractChildEventListener implements Exportable {
    * @param game The current game.
    */
   private void sendPushNotification(Game game) {
-    if (!game.isLocalMultiplayer() && game.getPlayerCount() > 1) {
+    if (!game.getIsLocalMultiplayer() && game.getPlayerCount() > 1) {
       String opponentId = game.getPlayer(Games.opponentPlayerNumber(game, userId));
-      if (game.isGameOver()) {
+      if (game.getIsGameOver()) {
         int viewerPlayerNumber = Games.playerNumberForPlayerId(game, userId);
         for (int i = 0; i < game.getPlayerCount(); ++i) {
           if (i != viewerPlayerNumber) {
@@ -743,7 +743,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     Game game = getGame(gameId);
     if (!game.hasCurrentPlayerNumber() || isComputerThinking ||
         !game.getProfile(game.getCurrentPlayerNumber()).hasIsComputerPlayer() ||
-        !game.getProfile(game.getCurrentPlayerNumber()).isComputerPlayer()) {
+        !game.getProfile(game.getCurrentPlayerNumber()).getIsComputerPlayer()) {
       return;
     }
     analyticsService.trackEvent("handleComputerAction");
@@ -838,12 +838,12 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public void resignGame(String gameId) {
     ensureIsPlayer(gameId);
-    if (getGame(gameId).isGameOver()) throw die("Can't resign from a game which is already over");
+    if (getGame(gameId).getIsGameOver()) throw die("Can't resign from a game which is already over");
     final long timestamp = Clock.getInstance().currentTimeMillis();
     GameMutation mutation = new GameMutation() {
       @Override public void mutate(Game.Builder game) {
         game.setIsGameOver(true);
-        if (game.isLocalMultiplayer() && game.getPlayerCount() == 2) {
+        if (game.getIsLocalMultiplayer() && game.getPlayerCount() == 2) {
           game.addVictor(game.getCurrentPlayerNumber() == 0 ? 1 : 0);
         } else {
           int opponentPlayerNumber = Games.opponentPlayerNumber(game.build(), userId);
@@ -854,7 +854,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
       }
 
       @Override public void onComplete(Game game) {
-        if (game != null && !game.isLocalMultiplayer()) {
+        if (game != null && !game.getIsLocalMultiplayer()) {
 //          pushNotificationService.removeChannel(Games.channelIdForViewer(game, userId));
         }
       }
@@ -894,7 +894,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
         if (game.getPlayerList().contains(userId)) {
           // Viewer has already joined
           callbacks.onJoinedGame(game);
-        } else if (game.isGameOver()) {
+        } else if (game.getIsGameOver()) {
           callbacks.onErrorJoiningGame("Game is over");
         } else if (game.getPlayerCount() == 2) {
           callbacks.onErrorJoiningGame("Game is full");
@@ -915,7 +915,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
             @Override
             public void onComplete(final Game game) {
               analyticsService.trackEvent("joinGame");
-              if (!game.isLocalMultiplayer()) {
+              if (!game.getIsLocalMultiplayer()) {
 //                pushNotificationService.addChannel(Games.channelIdForViewer(game, userId));
               }
               actionReferenceForGame(gameId).setValue(newEmptyAction(gameId).serialize(),
@@ -1091,7 +1091,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     // 2) check for draw
     int submitted = 0;
     for (Action action : game.getSubmittedActionList()) {
-      if (action.isSubmitted()) submitted++;
+      if (action.getIsSubmitted()) submitted++;
     }
     if (submitted >= 8) {
       List<Integer> both = new ArrayList<Integer>();
@@ -1284,6 +1284,6 @@ public class Model extends AbstractChildEventListener implements Exportable {
   }
 
   void ensureGameIsNotOver(String gameId) {
-    if (getGame(gameId).isGameOver()) throw die("Game has ended");
+    if (getGame(gameId).getIsGameOver()) throw die("Game has ended");
   }
 }

@@ -31,7 +31,7 @@ public class ProfileService implements Subscriber2<String, Game> {
     gameMutator.mutateGame(gameId, new GameMutator.GameMutation() {
       @Override
       public void mutate(String viewerId, Game.Builder game) {
-        if (game.isLocalMultiplayer()) {
+        if (game.getIsLocalMultiplayer()) {
           throw errorService.die(
               "Can't setProfileForViewer for local multiplayer game %s", game);
         }
@@ -54,7 +54,7 @@ public class ProfileService implements Subscriber2<String, Game> {
 
   @Override
   public void onMessage(String viewerId, Game currentGame) {
-    if (currentGame.isLocalMultiplayer() || currentGame.isGameOver() ||
+    if (currentGame.getIsLocalMultiplayer() || currentGame.getIsGameOver() ||
         !currentGame.getPlayerList().contains(viewerId)) {
       return;
     }

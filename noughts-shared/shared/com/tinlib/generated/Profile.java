@@ -1,12 +1,15 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
+
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public final class Profile extends Entity<Profile> {
-  public static class Deserializer extends EntityDeserializer<Profile> {
+  public static final class Deserializer extends EntityDeserializer<Profile> {
     private Deserializer() {
     }
 
@@ -16,7 +19,7 @@ public final class Profile extends Entity<Profile> {
     }
   }
 
-  public static class Builder extends EntityBuilder<Profile> {
+  public static final class Builder extends EntityBuilder<Profile> {
     private final Profile profile;
 
     private Builder() {
@@ -32,16 +35,18 @@ public final class Profile extends Entity<Profile> {
       return new Profile(profile);
     }
 
-    @Override protected Profile getInternalEntity() {
+    @Override
+    protected Profile getInternalEntity() {
       return profile;
     }
 
     public boolean hasName() {
-      return profile.hasName();
+      return profile.name != null;
     }
 
     public String getName() {
-      return profile.getName();
+      checkNotNull(profile.name);
+      return profile.name;
     }
 
     public Builder setName(String name) {
@@ -56,17 +61,17 @@ public final class Profile extends Entity<Profile> {
     }
 
     public boolean hasImageString() {
-      return profile.hasImageString();
+      return profile.imageString != null;
     }
 
     public ImageString getImageString() {
-      return profile.getImageString();
+      checkNotNull(profile.imageString);
+      return profile.imageString;
     }
 
     public Builder setImageString(EntityBuilder<ImageString> imageString) {
       return setImageString(imageString.build());
     }
-
     public Builder setImageString(ImageString imageString) {
       checkNotNull(imageString);
       profile.imageString = imageString;
@@ -79,11 +84,12 @@ public final class Profile extends Entity<Profile> {
     }
 
     public boolean hasPronoun() {
-      return profile.hasPronoun();
+      return profile.pronoun != null;
     }
 
     public Pronoun getPronoun() {
-      return profile.getPronoun();
+      checkNotNull(profile.pronoun);
+      return profile.pronoun;
     }
 
     public Builder setPronoun(Pronoun pronoun) {
@@ -98,29 +104,31 @@ public final class Profile extends Entity<Profile> {
     }
 
     public boolean hasIsComputerPlayer() {
-      return profile.hasIsComputerPlayer();
+      return profile.isComputerPlayer != null;
     }
 
-    public boolean isComputerPlayer() {
-      return profile.isComputerPlayer();
+    public boolean getIsComputerPlayer() {
+      checkNotNull(profile.isComputerPlayer);
+      return profile.isComputerPlayer;
     }
 
     public Builder setIsComputerPlayer(boolean isComputerPlayer) {
-      profile.computerPlayer = isComputerPlayer;
+      profile.isComputerPlayer = isComputerPlayer;
       return this;
     }
 
     public Builder clearIsComputerPlayer() {
-      profile.computerPlayer = null;
+      profile.isComputerPlayer = null;
       return this;
     }
 
     public boolean hasComputerDifficultyLevel() {
-      return profile.hasComputerDifficultyLevel();
+      return profile.computerDifficultyLevel != null;
     }
 
     public int getComputerDifficultyLevel() {
-      return profile.getComputerDifficultyLevel();
+      checkNotNull(profile.computerDifficultyLevel);
+      return profile.computerDifficultyLevel;
     }
 
     public Builder setComputerDifficultyLevel(int computerDifficultyLevel) {
@@ -132,6 +140,7 @@ public final class Profile extends Entity<Profile> {
       profile.computerDifficultyLevel = null;
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -145,18 +154,26 @@ public final class Profile extends Entity<Profile> {
   private String name;
   private ImageString imageString;
   private Pronoun pronoun;
-  private Boolean computerPlayer;
+  private Boolean isComputerPlayer;
   private Integer computerDifficultyLevel;
 
   private Profile() {
   }
 
   private Profile(Profile profile) {
-    this.name = profile.name;
-    this.imageString = profile.imageString;
-    this.pronoun = profile.pronoun;
-    this.computerPlayer = profile.computerPlayer;
-    this.computerDifficultyLevel = profile.computerDifficultyLevel;
+    name = profile.name;
+    imageString = profile.imageString;
+    pronoun = profile.pronoun;
+    isComputerPlayer = profile.isComputerPlayer;
+    computerDifficultyLevel = profile.computerDifficultyLevel;
+  }
+
+  private Profile(Map<String, Object> map) {
+    name = get(map, "name", String.class);
+    imageString = get(map, "imageString", ImageString.newDeserializer());
+    pronoun = getEnum(map, "pronoun", Pronoun.class);
+    isComputerPlayer = get(map, "isComputerPlayer", Boolean.class);
+    computerDifficultyLevel = get(map, "computerDifficultyLevel", Integer.class);
   }
 
   @Override
@@ -164,21 +181,13 @@ public final class Profile extends Entity<Profile> {
     return "Profile";
   }
 
-  private Profile(Map<String, Object> map) {
-    this.name = getString(map, "name");
-    this.imageString = getEntity(map, "imageString", ImageString.newDeserializer());
-    this.pronoun = getEnum(map, "pronoun", Pronoun.class);
-    this.computerPlayer = getBoolean(map, "isComputerPlayer");
-    this.computerDifficultyLevel = getInteger(map, "computerDifficultyLevel");
-  }
-
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "name", name);
     putSerialized(result, "imageString", imageString);
     putSerialized(result, "pronoun", pronoun);
-    putSerialized(result, "isComputerPlayer", computerPlayer);
+    putSerialized(result, "isComputerPlayer", isComputerPlayer);
     putSerialized(result, "computerDifficultyLevel", computerDifficultyLevel);
     return result;
   }
@@ -216,12 +225,12 @@ public final class Profile extends Entity<Profile> {
   }
 
   public boolean hasIsComputerPlayer() {
-    return computerPlayer != null;
+    return isComputerPlayer != null;
   }
 
-  public boolean isComputerPlayer() {
-    checkNotNull(computerPlayer);
-    return computerPlayer;
+  public boolean getIsComputerPlayer() {
+    checkNotNull(isComputerPlayer);
+    return isComputerPlayer;
   }
 
   public boolean hasComputerDifficultyLevel() {
@@ -232,4 +241,5 @@ public final class Profile extends Entity<Profile> {
     checkNotNull(computerDifficultyLevel);
     return computerDifficultyLevel;
   }
+
 }

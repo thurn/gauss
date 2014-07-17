@@ -1,12 +1,15 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
 public final class Command extends Entity<Command> {
-  public static class Deserializer extends EntityDeserializer<Command> {
+  public static final class Deserializer extends EntityDeserializer<Command> {
     private Deserializer() {
     }
 
@@ -16,7 +19,7 @@ public final class Command extends Entity<Command> {
     }
   }
 
-  public static class Builder extends EntityBuilder<Command> {
+  public static final class Builder extends EntityBuilder<Command> {
     private final Command command;
 
     private Builder() {
@@ -32,16 +35,18 @@ public final class Command extends Entity<Command> {
       return new Command(command);
     }
 
-    @Override protected Command getInternalEntity() {
+    @Override
+    protected Command getInternalEntity() {
       return command;
     }
 
     public boolean hasColumn() {
-      return command.hasColumn();
+      return command.column != null;
     }
 
     public int getColumn() {
-      return command.getColumn();
+      checkNotNull(command.column);
+      return command.column;
     }
 
     public Builder setColumn(int column) {
@@ -55,11 +60,12 @@ public final class Command extends Entity<Command> {
     }
 
     public boolean hasRow() {
-      return command.hasRow();
+      return command.row != null;
     }
 
     public int getRow() {
-      return command.getRow();
+      checkNotNull(command.row);
+      return command.row;
     }
 
     public Builder setRow(int row) {
@@ -71,6 +77,7 @@ public final class Command extends Entity<Command> {
       command.row = null;
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -88,13 +95,13 @@ public final class Command extends Entity<Command> {
   }
 
   private Command(Command command) {
-    this.column = command.column;
-    this.row = command.row;
+    column = command.column;
+    row = command.row;
   }
 
-  private Command(Map<String, Object> commandMap) {
-    column = getInteger(commandMap, "column");
-    row = getInteger(commandMap, "row");
+  private Command(Map<String, Object> map) {
+    column = get(map, "column", Integer.class);
+    row = get(map, "row", Integer.class);
   }
 
   @Override
@@ -104,7 +111,7 @@ public final class Command extends Entity<Command> {
 
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "column", column);
     putSerialized(result, "row", row);
     return result;
@@ -132,4 +139,5 @@ public final class Command extends Entity<Command> {
     checkNotNull(row);
     return row;
   }
+
 }

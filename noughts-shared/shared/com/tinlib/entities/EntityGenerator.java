@@ -1,10 +1,7 @@
 package com.tinlib.entities;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import com.google.common.io.Files;
 import com.squareup.javawriter.JavaWriter;
 import org.json.JSONArray;
@@ -18,9 +15,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 
 public class EntityGenerator {
-
   public static final EnumSet<Modifier> PUBLIC = EnumSet.of(Modifier.PUBLIC);
   public static final EnumSet<Modifier> PRIVATE = EnumSet.of(Modifier.PRIVATE);
 
@@ -29,12 +26,22 @@ public class EntityGenerator {
     private final String type;
     private final boolean repeated;
     private final String description;
+    private final String packageString;
 
-    public FieldDescription(JSONObject object) throws JSONException {
+    public FieldDescription(String packageString, JSONObject object) throws JSONException {
       name = object.getString("name");
       type = object.getString("type");
       repeated = object.optBoolean("repeated");
       description = object.optString("desc");
+      if (isPrimitive(name)) {
+        this.packageString = "";
+      } else {
+        this.packageString = packageString;
+      }
+    }
+
+    public String fullyQualifiedType() {
+      return packageString.equals("") ? type : packageString + "." + type;
     }
   }
 
@@ -49,7 +56,7 @@ public class EntityGenerator {
   }
 
   private static class EntityDescription {
-    private final String type;
+    private final EntityType type;
     private final String name;
     private final String packageString;
     private final String description;
@@ -58,18 +65,18 @@ public class EntityGenerator {
     private final File parent;
 
     public EntityDescription(JSONObject object, File parent) throws JSONException {
-      type = object.getString("type");
+      type = object.getString("type").equals("entity") ? EntityType.ENTITY : EntityType.ENUM;
       name = object.getString("name");
       packageString = object.getString("package");
       description = object.optString("desc");
       switch (type) {
-        case "entity":
-        case "extension":
+        case ENTITY:
           for (int i = 0; i < object.getJSONArray("fields").length(); ++i) {
-            fields.add(new FieldDescription(object.getJSONArray("fields").getJSONObject(i)));
+            fields.add(new FieldDescription(packageString,
+                object.getJSONArray("fields").getJSONObject(i)));
           }
           break;
-        case "enum":
+        case ENUM:
           for (int i = 0; i < object.getJSONArray("values").length(); ++i) {
             values.add(new EnumValueDescription(object.getJSONArray("values").getJSONObject(i)));
           }
@@ -79,9 +86,25 @@ public class EntityGenerator {
       }
       this.parent = parent;
     }
+
+    public String fullyQualifiedName() {
+      return packageString + "." + name;
+    }
   }
 
+  private static enum EntityType {
+    ENTITY,
+    ENUM
+  }
+
+  public Map<String, EntityType> entityTypes = Maps.newHashMap();
+
   public static void main(String[] args) throws IOException, JSONException {
+    EntityGenerator entityGenerator = new EntityGenerator();
+    entityGenerator.run(args);
+  }
+
+  public void run(String[] args) throws IOException, JSONException {
     if (args.length == 0) {
       System.out.println("Usage: EntityGenerator entities1.json entities2.json");
     }
@@ -95,6 +118,7 @@ public class EntityGenerator {
         EntityDescription description = new EntityDescription(array.getJSONObject(i),
             file.getParentFile());
         descriptions.put(description.name, description);
+        entityTypes.put(description.fullyQualifiedName(), description.type);
       }
     }
 
@@ -105,31 +129,19 @@ public class EntityGenerator {
     }
   }
 
-  private static EntityDescription getCanonicalEntity(Collection<EntityDescription> descriptions) {
-    EntityDescription result = null;
-    for (EntityDescription description : descriptions) {
-      if (!description.type.equals("extension")) {
-        if (result != null) {
-          throw new RuntimeException("Multiple canonical entities for entity " + result.name);
-        }
-        result = description;
-      }
-    }
-    if (result == null) {
-      throw new RuntimeException("No canonical entity for entity "
-          + descriptions.iterator().next().name);
-    }
-    return result;
+  private EntityDescription getCanonicalEntity(Collection<EntityDescription> descriptions) {
+    // TODO this
+    return descriptions.iterator().next();
   }
 
-  private static void writeEntityDescriptions(JavaWriter writer,
+  private void writeEntityDescriptions(JavaWriter writer,
       Collection<EntityDescription> descriptions) throws IOException {
     EntityDescription canonical = getCanonicalEntity(descriptions);
     switch (canonical.type) {
-      case "entity":
+      case ENTITY:
         writeEntity(writer, canonical);
         break;
-      case "enum":
+      case ENUM:
         writeEnum(writer, canonical);
         break;
       default:
@@ -137,13 +149,9 @@ public class EntityGenerator {
     }
   }
 
-  private static void writeEntity(JavaWriter writer, EntityDescription description)
+  private void writeEntity(JavaWriter writer, EntityDescription description)
       throws IOException {
-    writer.emitSingleLineComment("================================");
-    writer.emitSingleLineComment("GENERATED CODE -- DO NOT MODIFY!");
-    writer.emitSingleLineComment("================================");
-    writer.emitEmptyLine();
-    writer.emitPackage(description.packageString);
+    writePreface(writer, description);
     writer.emitImports(ImmutableList.of("java.util.*"));
     writer.emitEmptyLine();
     writer.emitImports(ImmutableList.of("com.tinlib.entities.Entity"));
@@ -161,7 +169,15 @@ public class EntityGenerator {
     writer.close();
   }
 
-  private static void writeDeserializer(JavaWriter writer, String name) throws IOException {
+  private void writePreface(JavaWriter writer, EntityDescription description) throws IOException {
+    writer.emitSingleLineComment("================================");
+    writer.emitSingleLineComment("GENERATED CODE -- DO NOT MODIFY!");
+    writer.emitSingleLineComment("================================");
+    writer.emitEmptyLine();
+    writer.emitPackage(description.packageString);
+  }
+
+  private void writeDeserializer(JavaWriter writer, String name) throws IOException {
     String paramName = decapitalize(name) + "Map";
     writer.beginType("Deserializer", "class",
         EnumSet.of(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL),
@@ -178,7 +194,7 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeBuilder(JavaWriter writer, EntityDescription description)
+  private void writeBuilder(JavaWriter writer, EntityDescription description)
       throws IOException {
     String name = description.name;
     String paramName = decapitalize(name);
@@ -213,7 +229,7 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeCommonStaticMethods(JavaWriter writer, EntityDescription description)
+  private void writeCommonStaticMethods(JavaWriter writer, EntityDescription description)
       throws IOException {
     writer.beginMethod("Builder", "newBuilder", EnumSet.of(Modifier.PUBLIC, Modifier.STATIC));
     writer.emitStatement("return new Builder()");
@@ -227,7 +243,7 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeFields(JavaWriter writer, EntityDescription description)
+  private void writeFields(JavaWriter writer, EntityDescription description)
       throws IOException {
     for (FieldDescription field : description.fields) {
       if (field.repeated) {
@@ -240,7 +256,7 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeConstructors(JavaWriter writer, EntityDescription description)
+  private void writeConstructors(JavaWriter writer, EntityDescription description)
       throws IOException {
     String name = description.name;
     String paramName = decapitalize(name);
@@ -269,15 +285,23 @@ public class EntityGenerator {
     writer.beginConstructor(PRIVATE, "Map<String, Object>", "map");
     for (FieldDescription field : description.fields) {
       if (field.repeated) {
-        if (isPrimitive(field) || field.type.equals("String")) {
-          writer.emitStatement("%sList = getRepeated(map, \"%s\")", field.name, field.name);
+        if (isPrimitive(field.type) || field.type.equals("String")) {
+          writer.emitStatement("%sList = getRepeated(map, \"%s\", %s.class)", field.name,
+              field.name, field.type);
+        } else if (entityTypes.get(field.fullyQualifiedType()) == EntityType.ENUM) {
+          writer.emitStatement("%sList = getRepeatedEnum(map, \"%s\", %s.class)", field.name,
+              field.name, field.type);
         } else {
           writer.emitStatement("%sList = getRepeated(map, \"%s\", %s.newDeserializer())",
               field.name, field.name, field.type);
         }
       } else {
-        if (isPrimitive(field) || field.type.equals("String")) {
-          writer.emitStatement("%s = get(map, \"%s\")", field.name, field.name);
+        if (isPrimitive(field.type) || field.type.equals("String")) {
+          writer.emitStatement("%s = get(map, \"%s\", %s.class)", field.name, field.name,
+              field.type);
+        } else if (entityTypes.get(field.fullyQualifiedType()) == EntityType.ENUM) {
+          writer.emitStatement("%s = getEnum(map, \"%s\", %s.class)", field.name,
+              field.name, field.type);
         } else {
           writer.emitStatement("%s = get(map, \"%s\", %s.newDeserializer())", field.name,
               field.name, field.type);
@@ -288,7 +312,7 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeCommonMethods(JavaWriter writer, EntityDescription description)
+  private void writeCommonMethods(JavaWriter writer, EntityDescription description)
       throws IOException {
     writer.emitAnnotation("Override");
     writer.beginMethod("String", "entityName", PUBLIC);
@@ -317,14 +341,14 @@ public class EntityGenerator {
     writer.emitEmptyLine();
   }
 
-  private static void writeFieldMethods(JavaWriter writer, EntityDescription description)
+  private void writeFieldMethods(JavaWriter writer, EntityDescription description)
       throws IOException {
     for (FieldDescription field : description.fields) {
       writeAccessors(writer, field, "");
     }
   }
 
-  private static void writeAccessors(JavaWriter writer, FieldDescription field, String accessor)
+  private void writeAccessors(JavaWriter writer, FieldDescription field, String accessor)
       throws IOException {
     String name = accessor + field.name;
     String capitalName = capitalize(field.name);
@@ -335,13 +359,13 @@ public class EntityGenerator {
       writer.endMethod();
       writer.emitEmptyLine();
 
-      writer.beginMethod(capitalName, "get" + capitalName, PUBLIC, "int",
+      writer.beginMethod(maybePrimitive(field), "get" + capitalName, PUBLIC, "int",
           "index");
       writer.emitStatement("return %sList.get(index)", name);
       writer.endMethod();
       writer.emitEmptyLine();
 
-      writer.beginMethod("List<" + capitalName + ">", "get" + capitalName + "List",
+      writer.beginMethod("List<" + field.type + ">", "get" + capitalName + "List",
           PUBLIC);
       writer.emitStatement("return Collections.unmodifiableList(%sList)", name);
       writer.endMethod();
@@ -360,13 +384,22 @@ public class EntityGenerator {
     }
   }
 
-  private static void writeMutators(JavaWriter writer, FieldDescription field, String accessor)
+  private void writeMutators(JavaWriter writer, FieldDescription field, String accessor)
       throws IOException {
     String name = field.name;
     String capitalName = capitalize(field.name);
     if (field.repeated) {
-      writer.beginMethod("Builder", "set" + capitalName, PUBLIC, "int", "index", capitalName, name);
-      if (!isPrimitive(field)) {
+      if (entityTypes.get(field.fullyQualifiedType()) == EntityType.ENTITY) {
+        writer.beginMethod("Builder", "set" + capitalName, PUBLIC, "int", "index",
+            "EntityBuilder<" + field.type + ">", name);
+        writer.emitStatement("return set%s(index, %s.build())", capitalName, name);
+        writer.endMethod();
+        writer.emitEmptyLine();
+      }
+
+      writer.beginMethod("Builder", "set" + capitalName, PUBLIC, "int", "index", maybePrimitive(field),
+          name);
+      if (!isPrimitive(field.type)) {
         writer.emitStatement("checkNotNull(%s)", name);
       }
       writer.emitStatement("%s.%sList.set(index, %s)", accessor, name, name);
@@ -374,8 +407,16 @@ public class EntityGenerator {
       writer.endMethod();
       writer.emitEmptyLine();
 
-      writer.beginMethod("Builder", "add" + capitalName, PUBLIC, capitalName, name);
-      if (!isPrimitive(field)) {
+      if (entityTypes.get(field.fullyQualifiedType()) == EntityType.ENTITY) {
+        writer.beginMethod("Builder", "add" + capitalName, PUBLIC,
+            "EntityBuilder<" + field.type + ">", name);
+        writer.emitStatement("return add%s(%s.build())", capitalName, name);
+        writer.endMethod();
+        writer.emitEmptyLine();
+      }
+
+      writer.beginMethod("Builder", "add" + capitalName, PUBLIC, maybePrimitive(field), name);
+      if (!isPrimitive(field.type)) {
         writer.emitStatement("checkNotNull(%s)", name);
       }
       writer.emitStatement("%s.%sList.add(%s)", accessor, name, name);
@@ -383,7 +424,7 @@ public class EntityGenerator {
       writer.endMethod();
       writer.emitEmptyLine();
 
-      writer.beginMethod("Builder", "addAll" + capitalName, PUBLIC, "List<" + capitalName + ">",
+      writer.beginMethod("Builder", "addAll" + capitalName, PUBLIC, "List<" + field.type + ">",
           name + "List");
       writer.emitStatement("checkListForNull(%sList)", name);
       writer.emitStatement("%s.%sList.addAll(%sList)", accessor, name, name);
@@ -397,8 +438,15 @@ public class EntityGenerator {
       writer.endMethod();
       writer.emitEmptyLine();
     } else {
+      if (entityTypes.get(field.fullyQualifiedType()) == EntityType.ENTITY) {
+        writer.beginMethod("Builder", "set" + capitalName, PUBLIC,
+            "EntityBuilder<" + field.type + ">", name);
+        writer.emitStatement("return set%s(%s.build())", capitalName, name);
+        writer.endMethod();
+      }
+
       writer.beginMethod("Builder", "set" + capitalName, PUBLIC, maybePrimitive(field), name);
-      if (!isPrimitive(field)) {
+      if (!isPrimitive(field.type)) {
         writer.emitStatement("checkNotNull(%s)", name);
       }
       writer.emitStatement("%s.%s = %s", accessor, name, name);
@@ -414,13 +462,19 @@ public class EntityGenerator {
     }
   }
 
-  private static void writeEnum(JavaWriter writer, EntityDescription description)
+  private void writeEnum(JavaWriter writer, EntityDescription description)
       throws IOException {
-
+    writePreface(writer, description);
+    writer.beginType(description.name, "enum", PUBLIC);
+    for (EnumValueDescription enumDescription : description.values) {
+      writer.emitEnumValue(enumDescription.name);
+    }
+    writer.endType();
+    writer.close();
   }
 
-  private static boolean isPrimitive(FieldDescription field) {
-    switch (field.type) {
+  private static boolean isPrimitive(String type) {
+    switch (type) {
       case "Byte":
       case "Short":
       case "Integer":

@@ -138,7 +138,7 @@ public class DataEventService {
         new AbstractPreviousValueListener<Game>() {
       @Override
       public void onUpdate(Game game, Game oldGame) {
-        if (game.isGameOver() && !oldGame.isGameOver()) {
+        if (game.getIsGameOver() && !oldGame.getIsGameOver()) {
           listener.onUpdate(game);
         }
       }

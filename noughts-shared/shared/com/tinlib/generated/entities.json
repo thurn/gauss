@@ -1,25 +1,261 @@
 [
-    {
-        "type":"entity",
-        "name":"GameListEntry",
-        "package":"com.tinlib.generated",
-        "fields":[
-            {
-                "name":"vsString",
-                "type":"String",
-                "desc":"A string describing the players in the game."
-            },
-            {
-                "name":"modifiedString",
-                "type":"String",
-                "desc":"A string describing when the game was last modified."
-            },
-            {
-                "name":"imageString",
-                "type":"ImageString",
-                "repeated":true,
-                "desc":"An image associated with this game list entry."
-            }
-        ]
-    }
+  {
+    "type":"entity",
+    "name":"GameListEntry",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"vsString",
+        "type":"String",
+        "desc":"A string describing the players in the game."
+      },
+      {
+        "name":"modifiedString",
+        "type":"String",
+        "desc":"A string describing when the game was last modified."
+      },
+      {
+        "name":"imageString",
+        "type":"ImageString",
+        "repeated":true,
+        "desc":"An image associated with this game list entry."
+      }
+    ]
+  },
+  {
+    "type":"enum",
+    "name":"ImageType",
+    "package":"com.tinlib.generated",
+    "values":[
+      {
+        "name":"LOCAL",
+        "desc":"An image which is included with the application."
+      },
+      {
+        "name":"FACEBOOK",
+        "desc":"An image which needs to be downloaded from Facebook."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"ImageString",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"string",
+        "type":"String",
+        "desc":"A string identifying an image."
+      },
+      {
+        "name":"type",
+        "type":"ImageType",
+        "desc":"The type of this ImageString."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"Command",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"column",
+        "type":"Integer",
+        "desc":"Column at which mark was placed."
+      },
+      {
+        "name":"row",
+        "type":"Integer",
+        "desc":"Row at which mark was placed."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"Action",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"playerNumber",
+        "type":"Integer",
+        "desc":"The number of the player who performed this action."
+      },
+      {
+        "name":"gameId",
+        "type":"String",
+        "desc":"The ID of the game this Action belongs to."
+      },
+      {
+        "name":"isSubmitted",
+        "type":"Boolean",
+        "desc":"Whether or not this action has been submitted."
+      },
+      {
+        "name":"command",
+        "type":"Command",
+        "repeated":true,
+        "desc":"A command for this action."
+      },
+      {
+        "name":"futureCommand",
+        "type":"Command",
+        "repeated":true,
+        "desc":"A command for this action which has been undone."
+      }
+    ]
+  },
+  {
+    "type":"enum",
+    "name":"Pronoun",
+    "package":"com.tinlib.generated",
+    "values":[
+      {
+        "name":"MALE",
+        "desc":"A male pronoun."
+      },
+      {
+        "name":"FEMALE",
+        "desc":"A female pronoun."
+      },
+      {
+        "name":"NEUTRAL",
+        "desc":"A neutral pronoun."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"Profile",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"name",
+        "type":"String",
+        "desc":"The player's name."
+      },
+      {
+        "name":"imageString",
+        "type":"ImageString",
+        "desc":"An image representing the player."
+      },
+      {
+        "name":"pronoun",
+        "type":"Pronoun",
+        "desc":"The pronoun to use to refer to this player."
+      },
+      {
+        "name":"isComputerPlayer",
+        "type":"Boolean",
+        "desc":"True if the player is a computer player."
+      },
+      {
+        "name":"computerDifficultyLevel",
+        "type":"Integer",
+        "desc":"The difficulty level of this computer player."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"GameStatus",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"statusString",
+        "type":"String",
+        "desc":"A string describing the current status of the game."
+      },
+      {
+        "name":"statusImageString",
+        "type":"ImageString",
+        "desc":"An image representing the current status of the game."
+      },
+      {
+        "name":"statusPlayer",
+        "type":"Integer",
+        "desc":"The number of the player associated with the current game status e.g. because it is their turn."
+      },
+      {
+        "name":"isComputerThinking",
+        "type":"Boolean",
+        "desc":"True if the AI is currently searching for a move in this game."
+      }
+    ]
+  },
+  {
+    "type":"enum",
+    "name":"GameListSection",
+    "package":"com.tinlib.generated",
+    "values":[
+      {
+        "name":"YOUR_TURN",
+        "desc":"Section of games where it is the viewer's turn."
+      },
+      {
+        "name":"THEIR_TURN",
+        "desc":"Section of games where it is not the viewer's turn."
+      },
+      {
+        "name":"GAME_OVER",
+        "desc":"Section of games that have ended."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"Game",
+    "package":"com.tinlib.generated",
+    "fields":[
+      {
+        "name":"id",
+        "type":"String",
+        "desc":"The ID of this game."
+      },
+      {
+        "name":"player",
+        "type":"String",
+        "repeated":true,
+        "desc":"A player in this game."
+      },
+      {
+        "name":"profile",
+        "type":"Profile",
+        "repeated":true,
+        "desc":"The profile for the corresponding player in the player list"
+      },
+      {
+        "name":"currentPlayerNumber",
+        "type":"Integer",
+        "desc":"The player number of the player whose turn it is, or null if there is no current player."
+      },
+      {
+        "name":"submittedAction",
+        "type":"Action",
+        "repeated":true,
+        "desc":"An action which has been submitted in this game."
+      },
+      {
+        "name":"lastModified",
+        "type":"Long",
+        "desc":"The timestamp at which the last modification to this game occurred."
+      },
+      {
+        "name":"victor",
+        "type":"Integer",
+        "repeated":true,
+        "desc":"The number of a player who has won this game."
+      },
+      {
+        "name":"isGameOver",
+        "type":"Boolean",
+        "desc":"True if this game has ended."
+      },
+      {
+        "name":"isLocalMultiplayer",
+        "type":"Boolean",
+        "desc":"True if this is a local multiplayer game."
+      }
+    ]
+  }
 ]

@@ -8,13 +8,13 @@ import com.tinlib.generated.Game;
 public class DefaultActionValidator implements ActionValidator {
   @Override
   public boolean canAddCommand(String viewerId, Game game, Action currentAction, Command command) {
-    if (game.isGameOver() || !Games.hasCurrentPlayerId(game)) return false;
+    if (game.getIsGameOver() || !Games.hasCurrentPlayerId(game)) return false;
     return Games.currentPlayerId(game).equals(viewerId);
   }
 
   @Override
   public boolean canSubmitAction(String viewerId, Game game, Action currentAction) {
-    if (game.isGameOver() || !Games.hasCurrentPlayerId(game)) return false;
+    if (game.getIsGameOver() || !Games.hasCurrentPlayerId(game)) return false;
     if (currentAction.getCommandCount() == 0) return false;
     return Games.currentPlayerId(game).equals(viewerId);
   }

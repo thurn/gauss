@@ -44,7 +44,7 @@ public class GameMutatorTest extends TinTestCase {
           @Override
           public void onComplete(String viewerId, Game game) {
             assertEquals(VIEWER_ID, viewerId);
-            assertTrue(game.isGameOver());
+            assertTrue(game.getIsGameOver());
             assertEquals(507, game.getCurrentPlayerNumber());
             assertEquals(11, game.getVictor(0));
             finished();

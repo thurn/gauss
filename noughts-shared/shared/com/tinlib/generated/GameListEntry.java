@@ -92,10 +92,18 @@ public final class GameListEntry extends Entity<GameListEntry> {
       return Collections.unmodifiableList(gameListEntry.imageStringList);
     }
 
+    public Builder setImageString(int index, EntityBuilder<ImageString> imageString) {
+      return setImageString(index, imageString.build());
+    }
+
     public Builder setImageString(int index, ImageString imageString) {
       checkNotNull(imageString);
       gameListEntry.imageStringList.set(index, imageString);
       return this;
+    }
+
+    public Builder addImageString(EntityBuilder<ImageString> imageString) {
+      return addImageString(imageString.build());
     }
 
     public Builder addImageString(ImageString imageString) {
@@ -140,8 +148,8 @@ public final class GameListEntry extends Entity<GameListEntry> {
   }
 
   private GameListEntry(Map<String, Object> map) {
-    vsString = get(map, "vsString");
-    modifiedString = get(map, "modifiedString");
+    vsString = get(map, "vsString", String.class);
+    modifiedString = get(map, "modifiedString", String.class);
     imageStringList = getRepeated(map, "imageString", ImageString.newDeserializer());
   }
 

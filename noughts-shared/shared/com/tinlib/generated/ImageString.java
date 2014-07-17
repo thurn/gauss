@@ -1,25 +1,25 @@
+// ================================
+// GENERATED CODE -- DO NOT MODIFY!
+// ================================
+
 package com.tinlib.generated;
+
+import java.util.*;
 
 import com.tinlib.entities.Entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * A string which represents an image, either a URL or a local resource.
- */
 public final class ImageString extends Entity<ImageString> {
-  public static class Deserializer extends EntityDeserializer<ImageString> {
+  public static final class Deserializer extends EntityDeserializer<ImageString> {
     private Deserializer() {
     }
 
     @Override
-    public ImageString deserialize(Map<String, Object> map) {
-      return new ImageString(map);
+    public ImageString deserialize(Map<String, Object> imageStringMap) {
+      return new ImageString(imageStringMap);
     }
   }
 
-  public static class Builder extends EntityBuilder<ImageString> {
+  public static final class Builder extends EntityBuilder<ImageString> {
     private final ImageString imageString;
 
     private Builder() {
@@ -35,16 +35,18 @@ public final class ImageString extends Entity<ImageString> {
       return new ImageString(imageString);
     }
 
-    @Override protected ImageString getInternalEntity() {
+    @Override
+    protected ImageString getInternalEntity() {
       return imageString;
     }
 
     public boolean hasString() {
-      return imageString.hasString();
+      return imageString.string != null;
     }
 
     public String getString() {
-      return imageString.getString();
+      checkNotNull(imageString.string);
+      return imageString.string;
     }
 
     public Builder setString(String string) {
@@ -59,11 +61,12 @@ public final class ImageString extends Entity<ImageString> {
     }
 
     public boolean hasType() {
-      return imageString.hasType();
+      return imageString.type != null;
     }
 
     public ImageType getType() {
-      return imageString.getType();
+      checkNotNull(imageString.type);
+      return imageString.type;
     }
 
     public Builder setType(ImageType type) {
@@ -76,6 +79,7 @@ public final class ImageString extends Entity<ImageString> {
       imageString.type = null;
       return this;
     }
+
   }
 
   public static Builder newBuilder() {
@@ -86,23 +90,20 @@ public final class ImageString extends Entity<ImageString> {
     return new Deserializer();
   }
 
-  // Identifies the image
   private String string;
-
-  // Type of image
   private ImageType type;
 
   private ImageString() {
   }
 
   private ImageString(ImageString imageString) {
-    this.string = imageString.string;
-    this.type = imageString.type;
+    string = imageString.string;
+    type = imageString.type;
   }
 
   private ImageString(Map<String, Object> map) {
-    this.string = getString(map, "string");
-    this.type = getEnum(map, "type", ImageType.class);
+    string = get(map, "string", String.class);
+    type = getEnum(map, "type", ImageType.class);
   }
 
   @Override
@@ -112,7 +113,7 @@ public final class ImageString extends Entity<ImageString> {
 
   @Override
   public Map<String, Object> serialize() {
-    Map<String, Object> result = new HashMap<String, Object>();
+    Map<String, Object> result = new HashMap<>();
     putSerialized(result, "string", string);
     putSerialized(result, "type", type);
     return result;
@@ -140,4 +141,5 @@ public final class ImageString extends Entity<ImageString> {
     checkNotNull(type);
     return type;
   }
+
 }

@@ -125,8 +125,8 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.getPlayerList().contains(userId));
         assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
         assertTrue(game.getLastModified() > 0);
-        assertTrue(game.isLocalMultiplayer());
-        assertFalse(game.isGameOver());
+        assertTrue(game.getIsLocalMultiplayer());
+        assertFalse(game.getIsGameOver());
         assertEquals(0, game.getSubmittedActionCount());
         assertEquals("John", game.getProfile(0).getName());
         finished();
@@ -148,8 +148,8 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.getPlayerList().contains(userId));
         assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
         assertTrue(game.getLastModified() > 0);
-        assertTrue(game.isLocalMultiplayer());
-        assertFalse(game.isGameOver());
+        assertTrue(game.getIsLocalMultiplayer());
+        assertFalse(game.getIsGameOver());
         assertEquals(0, game.getSubmittedActionCount());
         assertEquals("John", game.getProfile(0).getName());
         finished();
@@ -177,8 +177,8 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.getPlayerList().contains(userId));
         assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
         assertTrue(game.getLastModified() > 0);
-        assertFalse(game.isLocalMultiplayer());
-        assertFalse(game.isGameOver());
+        assertFalse(game.getIsLocalMultiplayer());
+        assertFalse(game.getIsGameOver());
         assertEquals(0, game.getSubmittedActionCount());
         assertEquals("John", game.getProfile(0).getName());
         finished();
@@ -201,8 +201,8 @@ public class ModelTest extends SharedTestCase {
         assertTrue(game.getPlayerList().contains(userId));
         assertEquals(Model.X_PLAYER, game.getCurrentPlayerNumber());
         assertTrue(game.getLastModified() > 0);
-        assertFalse(game.isLocalMultiplayer());
-        assertFalse(game.isGameOver());
+        assertFalse(game.getIsLocalMultiplayer());
+        assertFalse(game.getIsGameOver());
         assertEquals(0, game.getSubmittedActionCount());
         assertEquals("John", game.getProfile(0).getName());
         finished();
@@ -607,7 +607,7 @@ public class ModelTest extends SharedTestCase {
             assertFalse(game.hasCurrentPlayerNumber());
             assertEquals(0, game.getVictor(0));
             assertEquals(1, game.getVictorCount());
-            assertTrue(game.isGameOver());
+            assertTrue(game.getIsGameOver());
             finished();
           }
 
@@ -729,7 +729,7 @@ public class ModelTest extends SharedTestCase {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
-            assertTrue(game.isGameOver());
+            assertTrue(game.getIsGameOver());
             assertFalse(game.hasCurrentPlayerNumber());
             assertTrue(game.getVictorList().contains(1));
             assertTrue(game.getLastModified() > 150L);
@@ -760,7 +760,7 @@ public class ModelTest extends SharedTestCase {
         model.setGameUpdateListener(game.getId(), new TestGameUpdateListener() {
           @Override
           public void onGameUpdate(Game game) {
-            assertTrue(game.isGameOver());
+            assertTrue(game.getIsGameOver());
             assertFalse(game.hasCurrentPlayerNumber());
             assertTrue(game.getVictorList().contains(1));
             assertTrue(game.getLastModified() > 150L);
@@ -824,7 +824,7 @@ public class ModelTest extends SharedTestCase {
           @Override
           public void onGameStatusChanged(GameStatus status) {
             assertEquals(0, status.getStatusPlayer());
-            assertEquals(false, status.isComputerThinking());
+            assertEquals(false, status.getIsComputerThinking());
             assertEquals("User's turn", status.getStatusString());
             finished();
           }
