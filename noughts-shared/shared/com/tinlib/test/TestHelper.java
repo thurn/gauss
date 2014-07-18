@@ -1,5 +1,7 @@
 package com.tinlib.test;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.ValueEventListener;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
@@ -13,11 +15,15 @@ import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.shared.*;
+import com.tinlib.time.TimeService;
 import org.mockito.Matchers;
 
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -38,6 +44,9 @@ public class TestHelper {
     private ErrorHandler errorHandler;
     private AnalyticsHandler analyticsHandler;
     private PushNotificationHandler pushNotificationHandler;
+    private TimeService timeService;
+    private GameOverService gameOverService;
+    private NextPlayerService nextPlayerService;
     private Game game;
     private Action action;
     private String gameId;
@@ -85,6 +94,18 @@ public class TestHelper {
       this.action = action;
     }
 
+    public void setTimeService(TimeService timeService) {
+      this.timeService = timeService;
+    }
+
+    public void setGameOverService(GameOverService gameOverService) {
+      this.gameOverService = gameOverService;
+    }
+
+    public void setNextPlayerService(NextPlayerService nextPlayerService) {
+      this.nextPlayerService = nextPlayerService;
+    }
+
     public void runTest(final Test test) {
       if (firebase == null) {
         throw new RuntimeException("setFirebase() is required.");
@@ -99,7 +120,8 @@ public class TestHelper {
       }
 
       final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
-          errorHandler, analyticsHandler, pushNotificationHandler, gameId);
+          errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
+          gameOverService, nextPlayerService);
       testCase.setTestHelper(testHelper);
       if (game == null) {
         test.run(testHelper);
@@ -139,7 +161,10 @@ public class TestHelper {
       final ErrorHandler errorHandler,
       final AnalyticsHandler analyticsHandler,
       final PushNotificationHandler pushNotificationHandler,
-      String gameId) {
+      String gameId,
+      final TimeService timeService,
+      final GameOverService gameOverService,
+      final NextPlayerService nextPlayerService) {
     injector = Injectors.newInjector(new TinModule(), new Module() {
       @Override
       public void configure(Binder binder) {
@@ -158,6 +183,18 @@ public class TestHelper {
         if (pushNotificationHandler != null) {
           binder.multibindKey(TinKeys.PUSH_NOTIFICATION_HANDLERS,
               Initializers.returnValue(pushNotificationHandler));
+        }
+        if (timeService != null) {
+          binder.bindSingletonKey(TinKeys.TIME_SERVICE,
+              Initializers.returnValue(timeService));
+        }
+        if (gameOverService != null) {
+          binder.bindSingletonKey(TinKeys.GAME_OVER_SERVICE,
+              Initializers.returnValue(gameOverService));
+        }
+        if (nextPlayerService != null) {
+          binder.bindSingletonKey(TinKeys.NEXT_PLAYER_SERVICE,
+              Initializers.returnValue(nextPlayerService));
         }
       }
     });
@@ -198,6 +235,38 @@ public class TestHelper {
     return injector;
   }
 
+  public void assertGameEquals(final Game game, final Runnable runnable) {
+    references().gameReference(game.getId()).addListenerForSingleValueEvent(
+        new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        assertEquals(game, Game.newDeserializer().fromDataSnapshot(dataSnapshot));
+        runnable.run();
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        fail("assertGameEquals listener cancelled.");
+      }
+    });
+  }
+
+  public void assertCurrentActionEquals(final Action action, final Runnable runnable) {
+    references().currentActionReferenceForGame(action.getGameId()).addListenerForSingleValueEvent(
+        new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        assertEquals(action, Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+        runnable.run();
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        fail("assertCurrentActionEquals listener cancelled.");
+      }
+    });
+  }
+
   public void cleanUp(final Runnable done) {
     getKeyedListenerService().unregisterAll();
     bus().clearAll();
@@ -215,5 +284,11 @@ public class TestHelper {
 
   public static void verifyError(ErrorHandler handler) {
     verify(handler, times(1)).error(Matchers.anyString(), Matchers.any(Object[].class));
+  }
+
+  public static void verifyPushSent(PushNotificationHandler handler, String gameId,
+      int playerNumber, String substring) {
+    verify(handler, times(1)).sendPushNotification(eq(gameId), eq(playerNumber),
+        contains(substring));
   }
 }

@@ -1,23 +1,13 @@
-package ca.thurn.noughts.shared;
+package com.tinlib.shared;
 
-import java.util.ArrayList;
+import com.google.common.collect.Lists;
+import com.tinlib.generated.*;
+import com.tinlib.time.TimeService;
+
 import java.util.Comparator;
 import java.util.List;
 
-import org.timepedia.exporter.client.Export;
-import org.timepedia.exporter.client.ExportPackage;
-import org.timepedia.exporter.client.Exportable;
-
-import com.tinlib.generated.Game;
-import com.tinlib.generated.GameListEntry;
-import com.tinlib.generated.GameStatus;
-import com.tinlib.generated.ImageString;
-import com.tinlib.generated.ImageType;
-import com.tinlib.generated.Profile;
-
-@Export
-@ExportPackage("nts")
-public class Games implements Exportable {
+public class Games {
   static final ImageString GAME_OVER_IMAGE_STRING = ImageString.newBuilder()
       .setString("game_over")
       .setType(ImageType.LOCAL)
@@ -42,7 +32,7 @@ public class Games implements Exportable {
   /**
    * @return A Comparator for Games.
    */
-  static Comparator<Game> comparator() {
+  public static Comparator<Game> comparator() {
     return new Comparator<Game>() {
       @Override
       public int compare(Game o1, Game o2) {
@@ -115,16 +105,16 @@ public class Games implements Exportable {
           .setStatusImageString(currentPlayerProfile.hasImageString() ?
               currentPlayerProfile.getImageString() : NO_OPPONENT_IMAGE_STRING)
           .setStatusPlayer(game.getCurrentPlayerNumber())
-          .setIsComputerThinking(currentPlayerProfile.hasIsComputerPlayer() ?
-              currentPlayerProfile.getIsComputerPlayer() : false)
+          .setIsComputerThinking(currentPlayerProfile.hasIsComputerPlayer() &&
+              currentPlayerProfile.getIsComputerPlayer())
           .build();
     }
   }
 
-  public static GameListEntry gameListEntry(Game game, String viewerId) {
+  public static GameListEntry gameListEntry(TimeService timeService, Game game, String viewerId) {
     return GameListEntry.newBuilder()
         .setVsString(vsString(game, viewerId))
-        .setModifiedString(lastUpdatedString(game, viewerId))
+        .setModifiedString(lastUpdatedString(timeService, game, viewerId))
         .addAllImageString(imageList(game, viewerId))
         .build();
   }
@@ -157,7 +147,7 @@ public class Games implements Exportable {
    * @throws IllegalStateException If this method is called on a local
    *     multiplayer game.
    */
-  static int opponentPlayerNumber(Game game, String viewerId) {
+  public static int opponentPlayerNumber(Game game, String viewerId) {
     if (game.getIsLocalMultiplayer()) {
       throw new IllegalStateException("Tried to get opponent player number in a local " +
           "multiplayer game.");
@@ -191,7 +181,7 @@ public class Games implements Exportable {
    * @throws IllegalStateException If this method is called on a local
    *     multiplayer game.
    */
-  static Profile opponentProfile(Game game, String viewerId) {
+  public static Profile opponentProfile(Game game, String viewerId) {
     int opponentNumber = opponentPlayerNumber(game, viewerId);
     return game.getProfile(opponentNumber);
   }
@@ -234,8 +224,8 @@ public class Games implements Exportable {
    * @return A string describing the last state of the game, such as "Updated 1
    *     second ago" or "You won 4 years ago".
    */
-  static String lastUpdatedString(Game game, String viewerId) {
-    long duration = Math.max(Clock.getInstance().currentTimeMillis() - game.getLastModified(), 0);
+  public static String lastUpdatedString(TimeService timeService, Game game, String viewerId) {
+    long duration = Math.max(timeService.currentTimeMillis() - game.getLastModified(), 0);
     long number;
     number = duration / ONE_YEAR;
     if (number > 0) {
@@ -311,8 +301,8 @@ public class Games implements Exportable {
    * @return A list of image strings to use to represent this game in the game
    *     list.
    */
-  static List<ImageString> imageList(Game game, String viewerId) {
-    List<ImageString> result = new ArrayList<ImageString>();
+  public static List<ImageString> imageList(Game game, String viewerId) {
+    List<ImageString> result = Lists.newArrayList();
     if (game.getIsLocalMultiplayer()) {
       for (Profile profile : game.getProfileList()) {
         if (profile.hasImageString()) {
@@ -337,7 +327,7 @@ public class Games implements Exportable {
    * @return True if the two game states have different "status" (different
    *     player's turn, game is over, etc).
    */
-  static boolean differentStatus(Game old, Game next) {
+  public static boolean differentStatus(Game old, Game next) {
     return (old.hasIsGameOver() && next.hasIsGameOver() && old.getIsGameOver() != next.getIsGameOver()) ||
         (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
             old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
@@ -356,7 +346,7 @@ public class Games implements Exportable {
     return !game.getProfile(Games.playerNumberForPlayerId(game, viewerId)).hasImageString();
   }
 
-  static int compareGames(Game game, Game other) {
+  public static int compareGames(Game game, Game other) {
     if (other == null) {
       throw new NullPointerException("Null game in compareTo()");
     } else if (game.equals(other)) {

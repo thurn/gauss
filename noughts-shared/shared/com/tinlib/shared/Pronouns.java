@@ -1,4 +1,4 @@
-package ca.thurn.noughts.shared;
+package com.tinlib.shared;
 
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;

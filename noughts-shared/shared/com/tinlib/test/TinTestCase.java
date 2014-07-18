@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
 
 public abstract class TinTestCase {
   public static interface TestFunction {
@@ -67,9 +66,6 @@ public abstract class TinTestCase {
           Initializers.returnValue(mockAnalyticsHandler));
     }
   }
-
-  public static final String VIEWER_ID = "viewerId";
-  public static final String VIEWER_KEY = "viewerKey";
 
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);

@@ -1,5 +1,6 @@
 package com.tinlib.action.validator;
 
+import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
@@ -31,20 +32,20 @@ public class ActionValidatorServiceTest extends TinTestCase {
         Command command = Command.newBuilder().build();
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
         assertTrue(validator.canAddCommand(VIEWER_ID, game.build(),
-            TestUtils.newEmptyAction(GAME_ID), command));
+            TestUtils.newEmptyAction(GAME_ID).build(), command));
 
         game.setIsGameOver(true);
         assertFalse(validator.canAddCommand(VIEWER_ID, game.build(),
-            TestUtils.newEmptyAction(game.getId()), command));
+            TestUtils.newEmptyAction(game.getId()).build(), command));
 
         game.setIsGameOver(false);
         game.clearCurrentPlayerNumber();
         assertFalse(validator.canAddCommand(VIEWER_ID, game.build(),
-            TestUtils.newEmptyAction(game.getId()), command));
+            TestUtils.newEmptyAction(game.getId()).build(), command));
 
         game.setCurrentPlayerNumber(1);
         assertFalse(validator.canAddCommand(VIEWER_ID, game.build(),
-            TestUtils.newEmptyAction(game.getId()), command));
+            TestUtils.newEmptyAction(game.getId()).build(), command));
 
         finished();
       }
@@ -60,6 +61,29 @@ public class ActionValidatorServiceTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
+        ActionValidatorService validator = new ActionValidatorService(helper.injector());
+        Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            TestUtils.newEmptyAction(GAME_ID).build()));
+
+        Action.Builder currentAction = Action.newBuilder().setGameId(GAME_ID)
+            .addCommand(Command.newBuilder());
+        assertTrue(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+
+        game.setIsGameOver(true);
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+
+        game.setIsGameOver(false);
+        game.clearCurrentPlayerNumber();
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+
+        game.setCurrentPlayerNumber(1);
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+
         finished();
       }
     });

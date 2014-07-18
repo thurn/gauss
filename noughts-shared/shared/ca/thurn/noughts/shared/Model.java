@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import com.tinlib.shared.Games;
 import com.tinlib.inject.Injector;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.push.PushNotificationService;
@@ -1124,8 +1125,8 @@ public class Model extends AbstractChildEventListener implements Exportable {
    * Returns true if the square mentioned in this command is available.
    */
   private boolean isSquareAvailable(Game game, Command command) {
-    int column = command.getColumn();
-    int row = command.getRow();
+    int column = 0/*command.getColumn()*/;
+    int row = 0/*command.getRow()*/;
     if (column < 0 || row < 0 || column > 2 || row > 2) {
       return false;
     }
@@ -1142,12 +1143,12 @@ public class Model extends AbstractChildEventListener implements Exportable {
     Action[][] result = new Action[3][3];
     for (Action action : game.getSubmittedActionList()) {
       for (Command command : action.getCommandList()) {
-        result[command.getColumn()][command.getRow()] = action;
+//        result[command.getColumn()][command.getRow()] = action;
       }
     }
     if (currentAction != null) {
       for (Command command : currentAction.getCommandList()) {
-        result[command.getColumn()][command.getRow()] = currentAction;
+//        result[command.getColumn()][command.getRow()] = currentAction;
       }
     }
     return result;

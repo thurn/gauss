@@ -25,10 +25,6 @@ class BusImpl implements Bus {
       this.subscriber = subscriber;
       this.dependencies = dependencies;
       this.once = once;
-
-      if (allSatisfied()) {
-        handleMessage();
-      }
     }
 
     @SuppressWarnings("unchecked")
@@ -174,6 +170,10 @@ class BusImpl implements Bus {
 
   private void addSubscriber(final List<String> messages, boolean once, AnySubscriber subscriber) {
     final SubscriberHolder subscriberHolder = new SubscriberHolder(subscriber, messages, once);
+    if (subscriberHolder.allSatisfied()) {
+      subscriberHolder.handleMessage();
+      if (once) return;
+    }
     for (String message : messages) {
       if (!subscribers.containsKey(message)) {
         subscribers.put(message, Sets.<SubscriberHolder>newHashSet());
@@ -238,7 +238,7 @@ class BusImpl implements Bus {
   }
 
   @Override
-  public void remove(String message) {
+  public void invalidate(String message) {
     values.remove(message);
   }
 

@@ -54,6 +54,8 @@ public class CurrentGame implements Subscriber2<FirebaseReferences, String> {
    * Broadcasts the TinMessages.CURRENT_GAME_ID message.
    */
   public void loadGame(String gameId) {
+    bus.invalidate(TinMessages.CURRENT_ACTION);
+    bus.invalidate(TinMessages.CURRENT_GAME);
     bus.produce(TinMessages.CURRENT_GAME_ID, gameId);
   }
 

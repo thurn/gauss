@@ -3,6 +3,7 @@
     "type":"entity",
     "name":"GameListEntry",
     "package":"com.tinlib.generated",
+    "desc":"A description of a game, to appear in the game list.",
     "fields":[
       {
         "name":"vsString",
@@ -26,6 +27,7 @@
     "type":"enum",
     "name":"ImageType",
     "package":"com.tinlib.generated",
+    "desc":"Represents the possible types of an {@link ImageString}.",
     "values":[
       {
         "name":"LOCAL",
@@ -41,6 +43,7 @@
     "type":"entity",
     "name":"ImageString",
     "package":"com.tinlib.generated",
+    "desc":"The data needed to display an image.",
     "fields":[
       {
         "name":"string",
@@ -58,16 +61,12 @@
     "type":"entity",
     "name":"Command",
     "package":"com.tinlib.generated",
+    "desc":"An atomic change that a user can make on their turn which can be independently undone.",
     "fields":[
       {
-        "name":"column",
+        "name":"playerNumber",
         "type":"Integer",
-        "desc":"Column at which mark was placed."
-      },
-      {
-        "name":"row",
-        "type":"Integer",
-        "desc":"Row at which mark was placed."
+        "desc":"The number of the player who performed this command."
       }
     ]
   },
@@ -75,6 +74,7 @@
     "type":"entity",
     "name":"Action",
     "package":"com.tinlib.generated",
+    "desc":"A series of {@link Command}s which the user creates during their turn. At the end of a turn, the Action is submitted and it becomes the next player's turn.",
     "fields":[
       {
         "name":"playerNumber",
@@ -109,6 +109,7 @@
     "type":"enum",
     "name":"Pronoun",
     "package":"com.tinlib.generated",
+    "desc":"Possible types of pronoun.",
     "values":[
       {
         "name":"MALE",
@@ -128,6 +129,7 @@
     "type":"entity",
     "name":"Profile",
     "package":"com.tinlib.generated",
+    "desc":"Description of a player in a game.",
     "fields":[
       {
         "name":"name",
@@ -160,6 +162,7 @@
     "type":"entity",
     "name":"GameStatus",
     "package":"com.tinlib.generated",
+    "desc":"Description of the current status of a game.",
     "fields":[
       {
         "name":"statusString",
@@ -187,6 +190,7 @@
     "type":"enum",
     "name":"GameListSection",
     "package":"com.tinlib.generated",
+    "desc":"Possible sections in the game list.",
     "values":[
       {
         "name":"YOUR_TURN",
@@ -205,6 +209,7 @@
   {
     "type":"entity",
     "name":"Game",
+    "desc":"A single game, represented as a sequence of submitted Actions and data about the players who performed them along with general information about the current status the game.",
     "package":"com.tinlib.generated",
     "fields":[
       {

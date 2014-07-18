@@ -78,4 +78,19 @@ public class TinKeys {
    * actions are legal.
    */
   public static final String ACTION_VALIDATORS = "tin.ACTION_VALIDATORS";
+
+  /**
+   * A {@link com.tinlib.shared.GameOverService} implementation.
+   */
+  public static final String GAME_OVER_SERVICE = "tin.GAME_OVER_SERVICE";
+
+  /**
+   * A {@link com.tinlib.shared.NextPlayerService} implementation.
+   */
+  public static final String NEXT_PLAYER_SERVICE = "tin.NEXT_PLAYER_SERVICE";
+
+  /**
+   * A {@link com.tinlib.time.TimeService} implementation.
+   */
+  public static final String TIME_SERVICE = "tin.TIME_SERVICE";
 }

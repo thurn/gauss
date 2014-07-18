@@ -20,13 +20,13 @@ public class PushNotificationService {
 
   public void unregisterForPushNotifications(String gameId, int playerNumber) {
     for(PushNotificationHandler handler : pushNotificationHandlers) {
-      handler.registerForPushNotifications(gameId, playerNumber);
+      handler.unregisterForPushNotifications(gameId, playerNumber);
     }
   }
 
   public void sendPushNotification(String gameId, int playerNumber, String message) {
     for(PushNotificationHandler handler : pushNotificationHandlers) {
-      handler.registerForPushNotifications(gameId, playerNumber);
+      handler.sendPushNotification(gameId, playerNumber, message);
     }
   }
 }

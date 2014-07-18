@@ -178,8 +178,8 @@ public class ComputerState implements State {
   private Command newCommand(int column, int row) {
     return Command
         .newBuilder()
-        .setColumn(column)
-        .setRow(row)
+//        .setColumn(column)
+//        .setRow(row)
         .build();
   }
 

@@ -47,7 +47,7 @@ public interface Bus {
 
   public void unregister(Listener listener);
 
-  public void remove(String message);
+  public void invalidate(String message);
 
   public void clearAll();
 }

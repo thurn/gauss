@@ -1,5 +1,6 @@
 package com.tinlib.shared;
 
+import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.ImageString;
 import com.tinlib.generated.Profile;
@@ -15,6 +16,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.Map;
+
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -25,7 +28,7 @@ public class ProfileServiceTest extends TinTestCase {
 
   @Test
   public void testSetProfileForViewer() {
-    beginAsyncTestBlock(2);
+    beginAsyncTestBlock(3);
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));

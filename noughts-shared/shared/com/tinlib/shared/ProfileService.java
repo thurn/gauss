@@ -1,6 +1,5 @@
 package com.tinlib.shared;
 
-import ca.thurn.noughts.shared.Games;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.firebase.client.FirebaseError;
@@ -61,10 +60,10 @@ public class ProfileService implements Subscriber2<String, Game> {
     Profile profile = currentGame.getProfile(Games.playerNumberForPlayerId(currentGame, viewerId));
     // For now, a profile is defined as "completed" if it has an image selected.
     if (!profile.hasImageString()) {
-      bus.remove(TinMessages.COMPLETED_VIEWER_PROFILE);
+      bus.invalidate(TinMessages.COMPLETED_VIEWER_PROFILE);
       bus.produce(TinMessages.PROFILE_REQUIRED, profile);
     } else {
-      bus.remove(TinMessages.PROFILE_REQUIRED);
+      bus.invalidate(TinMessages.PROFILE_REQUIRED);
       bus.produce(TinMessages.COMPLETED_VIEWER_PROFILE, profile);
     }
   }

@@ -1,6 +1,6 @@
 package com.tinlib.action.validator;
 
-import ca.thurn.noughts.shared.Games;
+import com.tinlib.shared.Games;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;

@@ -6,21 +6,18 @@ import com.tinlib.generated.*;
 import java.util.Random;
 
 public class TestUtils {
-  public static Action action(int player, int column, int row, boolean submitted) {
+  public static Action action(int player, boolean submitted) {
     return Action.newBuilder()
         .setPlayerNumber(player)
         .setIsSubmitted(submitted)
-        .addCommand(Command.newBuilder()
-            .setColumn(column)
-            .setRow(row))
+        .addCommand(Command.newBuilder())
         .build();
   }
 
-  public static Action newEmptyAction(String gameId) {
+  public static Action.Builder newEmptyAction(String gameId) {
     return Action.newBuilder()
         .setGameId(gameId)
-        .setIsSubmitted(false)
-        .build();
+        .setIsSubmitted(false);
   }
 
   public static Action.Builder newUnsubmittedActionWithCommand(String gameId) {
@@ -28,7 +25,7 @@ public class TestUtils {
         .setPlayerNumber(0)
         .setIsSubmitted(false)
         .setGameId(gameId)
-        .addCommand(Command.newBuilder().setColumn(0).setRow(0));
+        .addCommand(Command.newBuilder().setPlayerNumber(0).build());
   }
 
   public static Game.Builder newGameWithOnePlayer(String gameId) {
