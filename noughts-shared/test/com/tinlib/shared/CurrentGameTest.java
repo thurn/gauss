@@ -68,7 +68,8 @@ public class CurrentGameTest extends TinTestCase {
   public void testLoadGameError() {
     beginAsyncTestBlock();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL));
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
+        "addValueEventListener"));
     builder.setErrorHandler(mockErrorHandler);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.runTest(new TestHelper.Test() {

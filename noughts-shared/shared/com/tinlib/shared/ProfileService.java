@@ -1,5 +1,6 @@
 package com.tinlib.shared;
 
+import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.firebase.client.FirebaseError;
@@ -31,7 +32,7 @@ public class ProfileService implements Subscriber2<String, Game> {
       @Override
       public void mutate(String viewerId, Game.Builder game) {
         if (game.getIsLocalMultiplayer()) {
-          throw errorService.die(
+          throw new TinException(
               "Can't setProfileForViewer for local multiplayer game %s", game);
         }
         int playerNumber = Games.playerNumberForPlayerId(game.build(), viewerId);

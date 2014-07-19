@@ -4,10 +4,12 @@ import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.core.TinMessages;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber0;
 import com.tinlib.push.PushNotificationHandler;
+import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
@@ -46,16 +48,7 @@ public class SubmitActionServiceTest extends TinTestCase {
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
         .build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
-    builder.setCurrentAction(testAction);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
-    builder.setPushNotificationHandler(mockPushNotificationHandler);
-    builder.setGameOverService(mockGameOverService);
-    builder.setNextPlayerService(mockNextPlayerService);
-    builder.setTimeService(mockTimeService);
+    TestHelper.Builder builder = newBuilder(testGame, testAction);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
@@ -63,6 +56,7 @@ public class SubmitActionServiceTest extends TinTestCase {
 
         final Game expectedGame = testGame.toBuilder()
             .addSubmittedAction(testAction.toBuilder().setIsSubmitted(true))
+            .setLastModified(456L)
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
@@ -84,7 +78,7 @@ public class SubmitActionServiceTest extends TinTestCase {
           }
         });
 
-        when(mockTimeService.currentTimeMillis()).thenReturn(123L);
+        when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
             .thenReturn(Optional.<List<Integer>>absent());
         when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(testAction)))
@@ -97,5 +91,71 @@ public class SubmitActionServiceTest extends TinTestCase {
 
     TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
     TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
+  }
+
+  @Test
+  public void testSubmitActionIllegalAction() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
+    TestHelper.Builder builder = newBuilder(testGame, testAction);
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        submitService.submitCurrentAction();
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testSubmitActionFirebaseError() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
+        .build();
+    TestHelper.Builder builder = newBuilder(testGame, testAction);
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "/games/" + GAME_ID,
+        "runTransaction"));
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        when(mockTimeService.currentTimeMillis()).thenReturn(456L);
+        when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
+            .thenReturn(Optional.<List<Integer>>absent());
+        when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(testAction)))
+            .thenReturn(1);
+        submitService.submitCurrentAction();
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  private TestHelper.Builder newBuilder(Game testGame, Action testAction) {
+    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
+    builder.setGame(testGame);
+    builder.setCurrentAction(testAction);
+    builder.setGameOverService(mockGameOverService);
+    builder.setNextPlayerService(mockNextPlayerService);
+    builder.setTimeService(mockTimeService);
+    builder.setAnalyticsHandler(mockAnalyticsHandler);
+    builder.setPushNotificationHandler(mockPushNotificationHandler);
+    return builder;
   }
 }

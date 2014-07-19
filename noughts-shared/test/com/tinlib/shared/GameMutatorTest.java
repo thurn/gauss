@@ -64,7 +64,8 @@ public class GameMutatorTest extends TinTestCase {
   public void testMutateGameError() {
     beginAsyncTestBlock();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL));
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
+        "runTransaction"));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.runTest(new TestHelper.Test() {
       @Override

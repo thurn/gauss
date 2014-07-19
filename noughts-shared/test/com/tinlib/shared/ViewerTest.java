@@ -73,18 +73,18 @@ public class ViewerTest extends TinTestCase {
           }
         });
         helper.bus().once(TinMessages.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
-              @Override
-              public void onMessage(FirebaseReferences references) {
-                assertEquals("gameId", references.gameReference("gameId").getName());
-                assertEquals("games", references.gameReference("games").getParent().getName());
+          @Override
+          public void onMessage(FirebaseReferences references) {
+            assertEquals("gameId", references.gameReference("gameId").getName());
+            assertEquals("games", references.gameReference("games").getParent().getName());
 
-                assertEquals("games", references.userGamesReference().getName());
-                assertEquals("facebookId", references.userGamesReference().getParent().getName());
-                assertEquals("facebookUsers",
-                    references.userGamesReference().getParent().getParent().getName());
-                finished();
-              }
-            }
+            assertEquals("games", references.userGamesReference().getName());
+            assertEquals("facebookId", references.userGamesReference().getParent().getName());
+            assertEquals("facebookUsers",
+                references.userGamesReference().getParent().getParent().getName());
+            finished();
+          }
+        }
         );
         viewer.setViewerFacebookId("facebookId");
       }

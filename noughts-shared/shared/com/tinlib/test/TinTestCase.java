@@ -3,9 +3,7 @@ package com.tinlib.test;
 import com.firebase.client.Firebase;
 import com.jayway.awaitility.Awaitility;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
-import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
 import com.tinlib.shared.*;
 import org.junit.After;
@@ -20,53 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 public abstract class TinTestCase {
-  public static interface TestFunction {
-    public void runTest(Injector injector);
-  }
-
-  public class FirebaseModule implements Module {
-    @Override
-    public void configure(Binder binder) {
-      binder.bindSingletonKey(TinKeys.FIREBASE, Initializers.returnValue(firebase));
-    }
-  }
-
-  public static class ErroringFirebaseModule implements Module {
-    @Override
-    public void configure(Binder binder) {
-      binder.bindSingletonKey(TinKeys.FIREBASE,
-          Initializers.returnValue(new ErroringFirebase("https://tintest.firebaseio-demo.com")));
-    }
-  }
-
-  public class MockErrorHandlerModule implements Module {
-    @Override
-    public void configure(Binder binder) {
-      binder.multibindKey(TinKeys.ERROR_HANDLERS,
-          Initializers.returnValue(mockErrorHandler));
-    }
-  }
-
-  public class FailOnErrorModule implements Module {
-    @Override
-    public void configure(Binder binder) {
-      binder.multibindKey(TinKeys.ERROR_HANDLERS, Initializers.returnValue(new ErrorHandler() {
-        @Override
-        public void error(String message, Object[] args) {
-          fail(message);
-        }
-      }));
-    }
-  }
-
-  public class MockAnalyticsHandlerModule implements Module {
-    @Override
-    public void configure(Binder binder) {
-      binder.multibindKey(TinKeys.ANALYTICS_HANDLERS,
-          Initializers.returnValue(mockAnalyticsHandler));
-    }
-  }
-
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);
   private final Runnable finishedRunnable = new Runnable() {

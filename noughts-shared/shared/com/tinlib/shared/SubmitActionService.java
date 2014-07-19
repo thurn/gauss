@@ -49,7 +49,8 @@ public class SubmitActionService {
       public void onMessage(String viewerId, final FirebaseReferences firebaseReferences,
           Game currentGame, final Action currentAction) {
         if (!validatorService.canSubmitAction(viewerId, currentGame, currentAction)) {
-          throw errorService.die("Illegal action %s\nIn game %s", currentGame, currentAction);
+          errorService.error("Illegal action '%s'\nIn game '%s'", currentGame, currentAction);
+          return;
         }
         final Optional<List<Integer>> victors = gameOverService.computeVictors(currentGame,
             currentAction);

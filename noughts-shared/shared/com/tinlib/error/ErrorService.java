@@ -1,6 +1,5 @@
 package com.tinlib.error;
 
-import com.google.common.base.Throwables;
 import com.tinlib.inject.Injector;
 import com.tinlib.core.TinKeys;
 
@@ -42,23 +41,5 @@ public class ErrorService {
     for (ErrorHandler handler : errorHandlers) {
       handler.error(message, args);
     }
-  }
-
-  /**
-   * Reports an error as in {@link ErrorService#error(String)} and then returns
-   * an exception initialized with the error message.
-   */
-  public RuntimeException die(String message) {
-    return die(message, new Object[]{});
-  }
-
-  /**
-   * Reports an error as in {@link ErrorService#error(String, Object...)} and
-   * then returns an exception initialized with the error message.
-   */
-  public RuntimeException die(String message, Object... args) {
-    RuntimeException result = new RuntimeException(String.format(message, args));
-    error(message + "\n" + Throwables.getStackTraceAsString(result), args);
-    return result;
   }
 }

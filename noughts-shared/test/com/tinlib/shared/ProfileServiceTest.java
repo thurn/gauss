@@ -1,6 +1,7 @@
 package com.tinlib.shared;
 
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.ImageString;
 import com.tinlib.generated.Profile;
@@ -28,7 +29,7 @@ public class ProfileServiceTest extends TinTestCase {
 
   @Test
   public void testSetProfileForViewer() {
-    beginAsyncTestBlock(3);
+    beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
@@ -46,7 +47,6 @@ public class ProfileServiceTest extends TinTestCase {
           public void onMessage(Profile profile) {
             assertEquals(testGame.getProfile(0), profile);
             profileService.setProfileForViewer(GAME_ID, testProfile);
-            finished();
           }
         });
         helper.bus().once(TinMessages.COMPLETED_VIEWER_PROFILE, new Subscriber1<Profile>() {
@@ -61,7 +61,6 @@ public class ProfileServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  @Test
   public void testSetProfileLocalMultiplayerError() {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID)
@@ -95,7 +94,8 @@ public class ProfileServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL));
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
+        "runTransaction"));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setErrorHandler(new ErrorHandler() {
       @Override
@@ -111,6 +111,7 @@ public class ProfileServiceTest extends TinTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
+        profileService.setProfileForViewer(GAME_ID, testProfile);
       }
     });
     endAsyncTestBlock();
