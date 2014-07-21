@@ -229,7 +229,7 @@ public class EntityGenerator {
     writer.endMethod();
     writer.emitEmptyLine();
     for (FieldDescription field : description.fields) {
-      writeAccessors(writer, field, paramName + ".");
+      writeAccessors(writer, field, paramName + ".", true /* inBuilder */);
       writeMutators(writer, field, paramName);
     }
     writer.endType();
@@ -359,12 +359,12 @@ public class EntityGenerator {
   private void writeFieldMethods(JavaWriter writer, EntityDescription description)
       throws IOException {
     for (FieldDescription field : description.fields) {
-      writeAccessors(writer, field, "");
+      writeAccessors(writer, field, "", false /* inBuilder */);
     }
   }
 
-  private void writeAccessors(JavaWriter writer, FieldDescription field, String accessor)
-      throws IOException {
+  private void writeAccessors(JavaWriter writer, FieldDescription field, String accessor,
+      boolean inBuilder) throws IOException {
     String name = accessor + field.name;
     String capitalName = capitalize(field.name);
 
@@ -386,7 +386,11 @@ public class EntityGenerator {
       writer.emitJavadoc("Returns the %sList.\n\nValues: %s", field.name, field.description);
       writer.beginMethod("List<" + field.type + ">", "get" + capitalName + "List",
           PUBLIC);
-      writer.emitStatement("return Collections.unmodifiableList(%sList)", name);
+      if (inBuilder) {
+        writer.emitStatement("return %sList", name);
+      } else {
+        writer.emitStatement("return Collections.unmodifiableList(%sList)", name);
+      }
       writer.endMethod();
       writer.emitEmptyLine();
     } else {

@@ -15,6 +15,7 @@ import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.shared.*;
+import com.tinlib.time.LastModifiedService;
 import com.tinlib.time.TimeService;
 import org.mockito.Matchers;
 
@@ -50,6 +51,7 @@ public class TestHelper {
     private Game game;
     private Action action;
     private String gameId;
+    private LastModifiedService lastModifiedService;
 
     private Builder(TinTestCase testCase) {
       this.testCase = testCase;
@@ -106,6 +108,10 @@ public class TestHelper {
       this.nextPlayerService = nextPlayerService;
     }
 
+    public void setLastModifiedService(LastModifiedService lastModifiedService) {
+      this.lastModifiedService = lastModifiedService;
+    }
+
     public void runTest(final Test test) {
       if (firebase == null) {
         throw new RuntimeException("setFirebase() is required.");
@@ -121,7 +127,7 @@ public class TestHelper {
 
       final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
           errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
-          gameOverService, nextPlayerService);
+          gameOverService, nextPlayerService, lastModifiedService);
       testCase.setTestHelper(testHelper);
       if (game == null) {
         test.run(testHelper);
@@ -164,8 +170,9 @@ public class TestHelper {
       String gameId,
       final TimeService timeService,
       final GameOverService gameOverService,
-      final NextPlayerService nextPlayerService) {
-    injector = Injectors.newInjector(new TinModule(), new Module() {
+      final NextPlayerService nextPlayerService,
+      final LastModifiedService lastModifiedService) {
+    injector = OverridingInjector.newOverridingInjector(new TinModule(), new Module() {
       @Override
       public void configure(Binder binder) {
         if (firebase != null) {
@@ -195,6 +202,10 @@ public class TestHelper {
         if (nextPlayerService != null) {
           binder.bindSingletonKey(TinKeys.NEXT_PLAYER_SERVICE,
               Initializers.returnValue(nextPlayerService));
+        }
+        if (lastModifiedService != null) {
+          binder.bindSingletonKey(TinKeys.LAST_MODIFIED_SERVICE,
+              Initializers.returnValue(lastModifiedService));
         }
       }
     });
@@ -280,10 +291,6 @@ public class TestHelper {
 
   public static void verifyTrackedEvent(AnalyticsHandler handler) {
     verify(handler, times(1)).trackEvent(Matchers.anyString(), Matchers.<Map<String, String>>any());
-  }
-
-  public static void verifyError(ErrorHandler handler) {
-    verify(handler, times(1)).error(Matchers.anyString(), Matchers.any(Object[].class));
   }
 
   public static void verifyPushSent(PushNotificationHandler handler, String gameId,

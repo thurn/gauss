@@ -149,7 +149,7 @@ public final class GameListEntry extends Entity<GameListEntry> {
      * Values: An image associated with this game list entry.
      */
     public List<ImageString> getImageStringList() {
-      return Collections.unmodifiableList(gameListEntry.imageStringList);
+      return gameListEntry.imageStringList;
     }
 
     /**

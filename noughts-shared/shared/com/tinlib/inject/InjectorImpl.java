@@ -10,8 +10,14 @@ import java.util.Set;
 
 class InjectorImpl implements Binder, Injector {
   private final Map<String, Initializer> initializers = Maps.newHashMap();
+  private final boolean allowDuplicates;
 
   InjectorImpl(List<Module> modules) {
+    this(modules, false /* allowDuplicates */);
+  }
+
+  InjectorImpl(List<Module> modules, boolean allowDuplicates) {
+    this.allowDuplicates = allowDuplicates;
     for (Module module : modules) {
       module.configure(this);
     }
@@ -49,7 +55,7 @@ class InjectorImpl implements Binder, Injector {
   }
 
   private void checkForDuplicate(String key) {
-    if (initializers.containsKey(key)) {
+    if (initializers.containsKey(key) && !allowDuplicates) {
       throw new IllegalStateException("Attempted to bind duplicate key '" + key + "'");
     }
   }

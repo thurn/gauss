@@ -1,6 +1,7 @@
 package com.tinlib.shared;
 
 import com.tinlib.error.TinException;
+import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.firebase.client.FirebaseError;
@@ -27,10 +28,10 @@ public class ProfileService implements Subscriber2<String, Game> {
     bus.await(TinMessages.VIEWER_ID, TinMessages.CURRENT_GAME, this);
   }
 
-  public void setProfileForViewer(final String gameId, final Profile profile) {
-    gameMutator.mutateGame(gameId, new GameMutator.GameMutation() {
+  public void setProfileForViewer(final Profile profile) {
+    gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
-      public void mutate(String viewerId, Game.Builder game) {
+      public void mutate(String viewerId, Action currentAction, Game.Builder game) {
         if (game.getIsLocalMultiplayer()) {
           throw new TinException(
               "Can't setProfileForViewer for local multiplayer game %s", game);
@@ -40,9 +41,11 @@ public class ProfileService implements Subscriber2<String, Game> {
       }
 
       @Override
-      public void onComplete(String viewerId, Game game) {
+      public void onComplete(String viewerId, FirebaseReferences references, Action currentAction,
+          Game game) {
         analyticsService.trackEvent("Set viewer profile",
-            ImmutableMap.of("gameId", gameId, "viewerId", viewerId, "profile", profile.toString()));
+            ImmutableMap.of("gameId", game.getId(), "viewerId", viewerId,
+                "profile", profile.toString()));
       }
 
       @Override

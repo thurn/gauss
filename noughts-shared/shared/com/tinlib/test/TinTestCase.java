@@ -18,6 +18,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 public abstract class TinTestCase {
+  public Runnable FINISHED = new Runnable() {
+    @Override
+    public void run() {
+      finished();
+    }
+  };
+
+  public ErrorHandler FINISHED_ERROR_HANDLER = new ErrorHandler() {
+    @Override
+    public void error(String message, Object[] args) {
+      finished();
+    }
+  };
+
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);
   private final Runnable finishedRunnable = new Runnable() {

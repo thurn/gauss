@@ -70,18 +70,20 @@ public class CurrentGameTest extends TinTestCase {
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
         "addValueEventListener"));
-    builder.setErrorHandler(mockErrorHandler);
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
         CurrentGame currentGame = new CurrentGame(helper.injector());
         currentGame.loadGame(GAME_ID);
-        finished();
       }
     });
     endAsyncTestBlock();
-
-    TestHelper.verifyError(mockErrorHandler);
   }
 }

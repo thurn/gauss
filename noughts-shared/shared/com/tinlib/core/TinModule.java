@@ -1,7 +1,7 @@
 package com.tinlib.core;
 
-import com.tinlib.action.validator.ActionValidatorService;
-import com.tinlib.action.validator.DefaultActionValidator;
+import com.tinlib.validator.ActionValidatorService;
+import com.tinlib.validator.DefaultActionValidator;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.PrintlnErrorHandler;
@@ -11,6 +11,7 @@ import com.tinlib.message.Buses;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.shared.GameMutator;
 import com.tinlib.shared.KeyedListenerService;
+import com.tinlib.time.LastModifiedService;
 
 public class TinModule implements Module {
   @Override
@@ -59,5 +60,11 @@ public class TinModule implements Module {
     });
     binder.multibindKey(TinKeys.ACTION_VALIDATORS,
         Initializers.returnValue(new DefaultActionValidator()));
+    binder.bindSingletonKey(TinKeys.LAST_MODIFIED_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new LastModifiedService(injector);
+      }
+    });
   }
 }

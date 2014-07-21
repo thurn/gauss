@@ -1,4 +1,4 @@
-package com.tinlib.action.validator;
+package com.tinlib.validator;
 
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
@@ -18,6 +18,14 @@ public class ActionValidatorService {
   public boolean canAddCommand(String viewerId, Game game, Action currentAction, Command command) {
     for (ActionValidator validator : actionValidators) {
       if (!validator.canAddCommand(viewerId, game, currentAction, command)) return false;
+    }
+    return true;
+  }
+
+  public boolean canSetCommand(String viewerId, Game game, Action currentAction, Command command,
+      int index) {
+    for (ActionValidator validator : actionValidators) {
+      if (!validator.canSetCommand(viewerId, game, currentAction, command, index)) return false;
     }
     return true;
   }

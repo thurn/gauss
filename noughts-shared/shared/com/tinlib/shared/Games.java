@@ -62,6 +62,11 @@ public class Games {
     return game.getPlayer(game.getCurrentPlayerNumber());
   }
 
+  public static boolean isCurrentPlayer(String viewerId, Game game) {
+    if (game.getIsGameOver()) return false;
+    return hasCurrentPlayerId(game) && currentPlayerId(game).equals(viewerId);
+  }
+
   /**
    * @return A GameStatus object summarizing whose turn it is in the game (or
    *     if the game is over), along with an associated image string and player

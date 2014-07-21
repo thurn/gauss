@@ -183,7 +183,7 @@ public final class Action extends Entity<Action> {
      * Values: A command for this action.
      */
     public List<Command> getCommandList() {
-      return Collections.unmodifiableList(action.commandList);
+      return action.commandList;
     }
 
     /**
@@ -263,7 +263,7 @@ public final class Action extends Entity<Action> {
      * Values: A command for this action which has been undone.
      */
     public List<Command> getFutureCommandList() {
-      return Collections.unmodifiableList(action.futureCommandList);
+      return action.futureCommandList;
     }
 
     /**

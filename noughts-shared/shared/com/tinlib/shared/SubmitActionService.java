@@ -4,16 +4,16 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.tinlib.action.validator.ActionValidatorService;
+import com.tinlib.validator.ActionValidatorService;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
 import com.tinlib.core.TinMessages;
 import com.tinlib.error.ErrorService;
+import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
-import com.tinlib.message.Subscriber4;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.time.TimeService;
 
@@ -43,55 +43,54 @@ public class SubmitActionService {
   }
 
   public void submitCurrentAction() {
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME,
-        TinMessages.CURRENT_ACTION, new Subscriber4<String, FirebaseReferences, Game, Action>() {
+    gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
-      public void onMessage(String viewerId, final FirebaseReferences firebaseReferences,
-          Game currentGame, final Action currentAction) {
+      public void mutate(String viewerId, Action currentAction, Game.Builder game) {
+        Game currentGame = game.build();
         if (!validatorService.canSubmitAction(viewerId, currentGame, currentAction)) {
-          errorService.error("Illegal action '%s'\nIn game '%s'", currentGame, currentAction);
-          return;
+          throw new TinException("Illegal action '%s'\nIn game '%s'", currentGame, currentAction);
         }
-        final Optional<List<Integer>> victors = gameOverService.computeVictors(currentGame,
-            currentAction);
-        final int newPlayerNumber = nextPlayerService.nextPlayerNumber(currentGame, currentAction);
+        Optional<List<Integer>> victors =
+            gameOverService.computeVictors(currentGame, currentAction);
 
-        gameMutator.mutateGame(currentGame.getId(), new GameMutator.GameMutation() {
-          @Override
-          public void mutate(String viewerId, Game.Builder game) {
-            game.addSubmittedAction(currentAction.toBuilder().setIsSubmitted(true));
-            game.setLastModified(timeService.currentTimeMillis());
-            if (victors.isPresent()) {
-              // Game over!
-              game.clearCurrentPlayerNumber();
-              game.addAllVictor(victors.get());
-              game.setIsGameOver(true);
-            } else {
-              game.setCurrentPlayerNumber(newPlayerNumber);
-            }
-          }
+        game.addSubmittedAction(currentAction.toBuilder().setIsSubmitted(true));
+        game.setLastModified(timeService.currentTimeMillis());
+        if (victors.isPresent()) {
+          // Game over!
+          game.clearCurrentPlayerNumber();
+          game.addAllVictor(victors.get());
+          game.setIsGameOver(true);
+        } else {
+          game.setCurrentPlayerNumber(
+              nextPlayerService.nextPlayerNumber(currentGame, currentAction));
+        }
+      }
 
-          @Override
-          public void onComplete(final String viewerId, final Game game) {
-            Action emptyAction = Actions.newEmptyAction(game.getId());
-            firebaseReferences.currentActionReferenceForGame(game.getId()).setValue(
-                emptyAction.serialize(), new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(final String viewerId, FirebaseReferences references,
+          Action currentAction, final Game game) {
+        Action emptyAction = Actions.newEmptyAction(game.getId());
+        references.currentActionReferenceForGame(game.getId()).setValue(
+            emptyAction.serialize(), new Firebase.CompletionListener() {
               @Override
-              public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                ImmutableMap<String, String> dimensions = ImmutableMap.of(
-                    "viewerId", viewerId, "game", game.toString());
-                analyticsService.trackEvent("submitCurrentAction", dimensions);
-                sendNotificationOnActionSubmitted(viewerId, game);
-                bus.produce(TinMessages.ACTION_SUBMITTED);
+              public void onComplete(FirebaseError error, Firebase firebase) {
+                if (error != null) {
+                  errorService.error("Error updating current action for game. %s", error);
+                } else {
+                  ImmutableMap<String, String> dimensions = ImmutableMap.of(
+                      "viewerId", viewerId, "gameId", game.getId());
+                  analyticsService.trackEvent("submitCurrentAction", dimensions);
+                  sendNotificationOnActionSubmitted(viewerId, game);
+                  bus.produce(TinMessages.ACTION_SUBMITTED);
+                }
               }
-            });
-          }
+            }
+        );
+      }
 
-          @Override
-          public void onError(String viewerId, FirebaseError error) {
-            errorService.error("Error submitting action %s.", error);
-          }
-        });
+      @Override
+      public void onError(String viewerId, FirebaseError error) {
+        errorService.error("Error submitting action. %s.", error);
       }
     });
   }

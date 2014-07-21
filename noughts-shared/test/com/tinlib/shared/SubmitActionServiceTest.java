@@ -2,9 +2,9 @@ package com.tinlib.shared;
 
 import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.core.TinMessages;
-import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber0;
@@ -63,18 +63,8 @@ public class SubmitActionServiceTest extends TinTestCase {
         helper.bus().once(TinMessages.ACTION_SUBMITTED, new Subscriber0() {
           @Override
           public void onMessage() {
-          helper.assertGameEquals(expectedGame, new Runnable() {
-            @Override
-            public void run() {
-              finished();
-            }
-          });
-          helper.assertCurrentActionEquals(expectedAction, new Runnable() {
-            @Override
-            public void run() {
-              finished();
-            }
-          });
+          helper.assertGameEquals(expectedGame, FINISHED);
+          helper.assertCurrentActionEquals(expectedAction, FINISHED);
           }
         });
 
@@ -94,17 +84,53 @@ public class SubmitActionServiceTest extends TinTestCase {
   }
 
   @Test
+  public void testSubmitActionEndsGame() {
+    beginAsyncTestBlock(2);
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
+        .build();
+    TestHelper.Builder builder = newBuilder(testGame, testAction);
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        SubmitActionService submitService = new SubmitActionService(helper.injector());
+
+        final Game expectedGame = testGame.toBuilder()
+            .addSubmittedAction(testAction.toBuilder().setIsSubmitted(true))
+            .setLastModified(456L)
+            .clearCurrentPlayerNumber()
+            .addVictor(0)
+            .setIsGameOver(true)
+            .build();
+        final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
+        helper.bus().once(TinMessages.ACTION_SUBMITTED, new Subscriber0() {
+          @Override
+          public void onMessage() {
+            helper.assertGameEquals(expectedGame, FINISHED);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED);
+          }
+        });
+
+        when(mockTimeService.currentTimeMillis()).thenReturn(456L);
+        when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
+            .thenReturn(Optional.<List<Integer>>of(ImmutableList.of(0)));
+
+        submitService.submitCurrentAction();
+      }
+    });
+    endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "Game over");
+  }
+
+  @Test
   public void testSubmitActionIllegalAction() {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
     TestHelper.Builder builder = newBuilder(testGame, testAction);
-    builder.setErrorHandler(new ErrorHandler() {
-      @Override
-      public void error(String message, Object[] args) {
-        finished();
-      }
-    });
+    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
@@ -116,20 +142,25 @@ public class SubmitActionServiceTest extends TinTestCase {
   }
 
   @Test
-  public void testSubmitActionFirebaseError() {
+  public void testSubmitActionFirebaseGameError() {
+    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL, "/games/" + GAME_ID,
+        "runTransaction"));
+  }
+
+  @Test
+  public void testSubmitActionFirebaseActionError() {
+    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
+        "games/" + GAME_ID + "/currentAction", "setValue"));
+  }
+
+  private void runFirebaseErrorTest(ErroringFirebase firebase) {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
         .build();
     TestHelper.Builder builder = newBuilder(testGame, testAction);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "/games/" + GAME_ID,
-        "runTransaction"));
-    builder.setErrorHandler(new ErrorHandler() {
-      @Override
-      public void error(String message, Object[] args) {
-        finished();
-      }
-    });
+    builder.setFirebase(firebase);
+    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {

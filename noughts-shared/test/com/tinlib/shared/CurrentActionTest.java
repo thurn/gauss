@@ -22,9 +22,6 @@ public class CurrentActionTest extends TinTestCase {
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
 
-  @Mock
-  private ErrorHandler mockErrorHandler;
-
   @Test
   public void testSetCurrentAction() {
     beginAsyncTestBlock();
@@ -60,18 +57,20 @@ public class CurrentActionTest extends TinTestCase {
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "addValueEventListener"));
-    builder.setErrorHandler(mockErrorHandler);
+    builder.setErrorHandler(new ErrorHandler() {
+      @Override
+      public void error(String message, Object[] args) {
+        finished();
+      }
+    });
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
         CurrentAction currentAction = new CurrentAction(helper.injector());
         helper.bus().produce(TinMessages.CURRENT_GAME_ID, GAME_ID);
-        finished();
       }
     });
     endAsyncTestBlock();
-
-    TestHelper.verifyError(mockErrorHandler);
   }
 }

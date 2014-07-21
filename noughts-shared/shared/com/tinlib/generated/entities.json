@@ -262,5 +262,23 @@
         "desc":"True if this is a local multiplayer game."
       }
     ]
+  },
+  {
+    "type":"entity",
+    "name":"IndexCommand",
+    "package":"com.tinlib.generated",
+    "desc":"A command and its associated index",
+    "fields":[
+      {
+        "name":"command",
+        "type":"Command",
+        "desc":"The command."
+      },
+      {
+        "name":"index",
+        "type":"Integer",
+        "desc":"The command's index."
+      }
+    ]
   }
 ]

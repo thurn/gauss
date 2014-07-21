@@ -113,7 +113,7 @@ public final class Game extends Entity<Game> {
      * Values: A player in this game.
      */
     public List<String> getPlayerList() {
-      return Collections.unmodifiableList(game.playerList);
+      return game.playerList;
     }
 
     /**
@@ -179,7 +179,7 @@ public final class Game extends Entity<Game> {
      * Values: The profile for the corresponding player in the player list
      */
     public List<Profile> getProfileList() {
-      return Collections.unmodifiableList(game.profileList);
+      return game.profileList;
     }
 
     /**
@@ -294,7 +294,7 @@ public final class Game extends Entity<Game> {
      * Values: An action which has been submitted in this game.
      */
     public List<Action> getSubmittedActionList() {
-      return Collections.unmodifiableList(game.submittedActionList);
+      return game.submittedActionList;
     }
 
     /**
@@ -409,7 +409,7 @@ public final class Game extends Entity<Game> {
      * Values: The number of a player who has won this game.
      */
     public List<Integer> getVictorList() {
-      return Collections.unmodifiableList(game.victorList);
+      return game.victorList;
     }
 
     /**

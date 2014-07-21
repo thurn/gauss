@@ -70,25 +70,27 @@ public final class TinMessages {
 
   /**
    * Fired when a command is undone. The value will be the undone
-   * {@link ca.thurn.noughts.shared.entities.Command}.
+   * {@link com.tinlib.generated.Command}.
    */
   public static final String COMMAND_UNDONE = "tin.COMMAND_UNDONE";
 
   /**
    * Fired when a command is redone. The value will be the redone
-   * {@link ca.thurn.noughts.shared.entities.Command}.
+   * {@link com.tinlib.generated.Command}.
    */
   public static final String COMMAND_REDONE = "tin.COMMAND_REDONE";
 
   /**
    * Fired when a command is added. The value will be the newly-added
-   * {@link ca.thurn.noughts.shared.entities.Command}.
+   * {@link com.tinlib.generated.Command}.
    */
   public static final String COMMAND_ADDED = "tin.COMMAND_ADDED";
 
   /**
-   * Fired when a command is changed. The value will be the new value of the
-   * {@link ca.thurn.noughts.shared.entities.Command}
+   * Fired when a command is changed. The value will be a
+   * {@link com.tinlib.util.Pair} where the first element is the index at which
+   * the command was changed and the second element is the new value of the
+   * command.
    */
   public static final String COMMAND_CHANGED = "tin.COMMAND_CHANGED";
 

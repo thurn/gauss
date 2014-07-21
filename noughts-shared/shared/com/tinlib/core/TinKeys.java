@@ -64,17 +64,17 @@ public class TinKeys {
   public static final String GAME_MUTATOR = "tin.GAME_MUTATOR";
 
   /**
-   * A {@link com.tinlib.action.validator.ActionValidatorService} which you can ask to
+   * A {@link com.tinlib.validator.ActionValidatorService} which you can ask to
    * check the legality of game actions by referring to the
-   * {@link com.tinlib.action.validator.ActionValidator} instances bound to the
+   * {@link com.tinlib.validator.ActionValidator} instances bound to the
    * {@link TinKeys#ACTION_VALIDATORS} key.
    */
   public static final String ACTION_VALIDATOR_SERVICE = "tin.ACTION_VALIDATOR_SERVICE";
 
   /**
-   * A multibinding key for {@link com.tinlib.action.validator.ActionValidator} instances
+   * A multibinding key for {@link com.tinlib.validator.ActionValidator} instances
    * which will be consulted in turn by
-   * {@link com.tinlib.action.validator.ActionValidatorService} to determine whether game
+   * {@link com.tinlib.validator.ActionValidatorService} to determine whether game
    * actions are legal.
    */
   public static final String ACTION_VALIDATORS = "tin.ACTION_VALIDATORS";
@@ -93,4 +93,9 @@ public class TinKeys {
    * A {@link com.tinlib.time.TimeService} implementation.
    */
   public static final String TIME_SERVICE = "tin.TIME_SERVICE";
+
+  /**
+   * A {@link com.tinlib.time.LastModifiedService} implementation.
+   */
+  public static final String LAST_MODIFIED_SERVICE = "tin.LAST_MODIFIED_SERVICE";
 }

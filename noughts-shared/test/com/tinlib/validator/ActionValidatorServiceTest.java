@@ -1,4 +1,4 @@
-package com.tinlib.action.validator;
+package com.tinlib.validator;
 
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
@@ -7,6 +7,7 @@ import com.firebase.client.Firebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
+import com.tinlib.validator.ActionValidatorService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -46,6 +47,51 @@ public class ActionValidatorServiceTest extends TinTestCase {
         game.setCurrentPlayerNumber(1);
         assertFalse(validator.canAddCommand(VIEWER_ID, game.build(),
             TestUtils.newEmptyAction(game.getId()).build(), command));
+
+        finished();
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testDefaultActionValidatorCanSetCommand() {
+    beginAsyncTestBlock();
+    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(TestHelper helper) {
+        ActionValidatorService validator = new ActionValidatorService(helper.injector());
+        Command command = Command.newBuilder().build();
+        Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newEmptyAction(GAME_ID).build(), command, 0));
+
+        game.setIsGameOver(true);
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, 0));
+
+        game.setIsGameOver(false);
+        game.clearCurrentPlayerNumber();
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, 0));
+
+        game.setCurrentPlayerNumber(1);
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, 0));
+
+        game.setCurrentPlayerNumber(0);
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, 2));
+
+        game.setCurrentPlayerNumber(0);
+        assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, -1));
+
+        game.setCurrentPlayerNumber(0);
+        assertTrue(validator.canSetCommand(VIEWER_ID, game.build(),
+            TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build(), command, 0));
 
         finished();
       }
