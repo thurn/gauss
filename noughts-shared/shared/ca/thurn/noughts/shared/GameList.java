@@ -24,7 +24,7 @@ public class GameList implements ChildEventListener {
   GameList(String userId, FirebaseReferences firebaseReferences) {
     this.userId = userId;
     this.firebaseReferences = firebaseReferences;
-    firebaseReferences.userGamesReference().addChildEventListener(this);
+    firebaseReferences.userGames().addChildEventListener(this);
   }
 
   /**

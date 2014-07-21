@@ -221,8 +221,8 @@ public class TestHelper {
       references = null;
     }
     if (gameId != null) {
-      (new CurrentGame(injector)).loadGame(gameId);
-      new CurrentAction(injector);
+      (new CurrentGameService(injector)).loadGame(gameId);
+      new CurrentActionService(injector);
     }
   }
 

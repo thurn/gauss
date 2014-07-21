@@ -80,12 +80,15 @@ public class AddCommandService {
         analyticsService.trackEvent("setCommand",
             ImmutableMap.of("command", command.toString(), "index", index + ""));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_CHANGED, null);
+        bus.produce(TinMessages.COMMAND_CHANGED, IndexCommand.newBuilder()
+            .setCommand(action.getCommand(index))
+            .setIndex(index)
+            .build());
       }
 
       @Override
       public void onError(String viewerId, FirebaseError error) {
-        errorService.error("Error adding command '%s'. %s", command, error);
+        errorService.error("Error setting command '%s' at index '%s'. %s", command, index, error);
       }
     });
   }

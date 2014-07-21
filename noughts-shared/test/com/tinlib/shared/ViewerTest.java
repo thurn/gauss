@@ -36,10 +36,10 @@ public class ViewerTest extends TinTestCase {
             assertEquals("gameId", references.gameReference("gameId").getName());
             assertEquals("games", references.gameReference("games").getParent().getName());
 
-            assertEquals("games", references.userGamesReference().getName());
-            assertEquals("viewerKey", references.userGamesReference().getParent().getName());
+            assertEquals("games", references.userGames().getName());
+            assertEquals("viewerKey", references.userGames().getParent().getName());
             assertEquals("users",
-                references.userGamesReference().getParent().getParent().getName());
+                references.userGames().getParent().getParent().getName());
 
             assertEquals("submittedActionList",
                 references.gameSubmittedActionsReference("gameId").getName());
@@ -78,10 +78,10 @@ public class ViewerTest extends TinTestCase {
             assertEquals("gameId", references.gameReference("gameId").getName());
             assertEquals("games", references.gameReference("games").getParent().getName());
 
-            assertEquals("games", references.userGamesReference().getName());
-            assertEquals("facebookId", references.userGamesReference().getParent().getName());
+            assertEquals("games", references.userGames().getName());
+            assertEquals("facebookId", references.userGames().getParent().getName());
             assertEquals("facebookUsers",
-                references.userGamesReference().getParent().getParent().getName());
+                references.userGames().getParent().getParent().getName());
             finished();
           }
         }

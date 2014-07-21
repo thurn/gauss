@@ -390,16 +390,8 @@ public abstract class Entity<T extends Entity<T>> {
 
   @Override
   public boolean equals(Object object) {
-    if (this == object) {
-      return true;
-    }
-    if (object == null) {
-      return false;
-    }
-    if (getClass() != object.getClass()) {
-      return false;
-    }
-    Entity<?> other = (Entity<?>)object;
-    return serialize().equals(other.serialize());
+    if (this == object) return true;
+    if (object == null || !(object instanceof Entity)) return false;
+    return serialize().equals(((Entity<?>)object).serialize());
   }
 }

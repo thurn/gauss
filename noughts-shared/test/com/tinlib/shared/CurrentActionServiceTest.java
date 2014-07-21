@@ -11,13 +11,12 @@ import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CurrentActionTest extends TinTestCase {
+public class CurrentActionServiceTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -33,7 +32,7 @@ public class CurrentActionTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        final CurrentAction currentAction = new CurrentAction(helper.injector());
+        final CurrentActionService currentActionService = new CurrentActionService(helper.injector());
 
         helper.bus().once(TinMessages.CURRENT_ACTION, new Subscriber1<Action>() {
           @Override
@@ -67,7 +66,7 @@ public class CurrentActionTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        CurrentAction currentAction = new CurrentAction(helper.injector());
+        CurrentActionService currentActionService = new CurrentActionService(helper.injector());
         helper.bus().produce(TinMessages.CURRENT_GAME_ID, GAME_ID);
       }
     });

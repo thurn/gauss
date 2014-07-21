@@ -1,6 +1,6 @@
 package com.tinlib.shared;
 
-import com.tinlib.generated.Action;
+import com.tinlib.generated.Game;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -12,8 +12,7 @@ import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber2;
 
 /**
- * Service for broadcasting updates about the state of the player's current
- * action within the current game.
+ * Service for broadcasting updates about the state of the current game.
  *
  * <h1>Dependencies</h1>
  * <ul>
@@ -30,11 +29,12 @@ import com.tinlib.message.Subscriber2;
  *
  * <h1>Output Messages</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinMessages#CURRENT_ACTION}</li>
+ *   <li>{@link com.tinlib.core.TinMessages#CURRENT_GAME_ID}</li>
+ *   <li>{@link com.tinlib.core.TinMessages#CURRENT_GAME}</li>
  * </ul>
  */
-public class CurrentAction implements Subscriber2<FirebaseReferences, String> {
-  public static final String LISTENER_KEY = "tin.CurrentAction";
+public class CurrentGameService implements Subscriber2<FirebaseReferences, String> {
+  public static final String LISTENER_KEY = "tin.CurrentGame";
 
   private final Bus bus;
   private final ErrorService errorService;
@@ -42,30 +42,40 @@ public class CurrentAction implements Subscriber2<FirebaseReferences, String> {
 
   private String gameId;
 
-  public CurrentAction(Injector injector) {
+  public CurrentGameService(Injector injector) {
     bus = injector.get(TinKeys.BUS);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     listenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
     bus.await(TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME_ID, this);
   }
 
+  /**
+   * Loads the game with the given game ID, making it the new current game.
+   * Broadcasts the TinMessages.CURRENT_GAME_ID message.
+   */
+  public void loadGame(String gameId) {
+    bus.invalidate(TinMessages.CURRENT_ACTION);
+    bus.invalidate(TinMessages.CURRENT_GAME);
+    bus.produce(TinMessages.CURRENT_GAME_ID, gameId);
+  }
+
   @Override
-  public void onMessage(FirebaseReferences references, String gameId) {
-    listenerService.addValueEventListener(references.currentActionReferenceForGame(gameId),
-        LISTENER_KEY, new ValueEventListener() {
+  public void onMessage(FirebaseReferences references, final String gameId) {
+    listenerService.addValueEventListener(references.gameReference(gameId), LISTENER_KEY,
+        new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() != null) {
-          Action currentAction = Action.newDeserializer().fromDataSnapshot(dataSnapshot);
-          bus.produce(TinMessages.CURRENT_ACTION, currentAction);
+          Game currentGame = Game.newDeserializer().fromDataSnapshot(dataSnapshot);
+          bus.produce(TinMessages.CURRENT_GAME, currentGame);
         }
       }
 
       @Override
       public void onCancelled(FirebaseError firebaseError) {
-        errorService.error("Current action value listener cancelled: %s",
-            firebaseError);
+        errorService.error("Game value listener cancelled: %s", firebaseError);
       }
-    });
+    }
+    );
   }
 }

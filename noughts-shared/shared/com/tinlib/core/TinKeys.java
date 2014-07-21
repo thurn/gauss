@@ -98,4 +98,9 @@ public class TinKeys {
    * A {@link com.tinlib.time.LastModifiedService} implementation.
    */
   public static final String LAST_MODIFIED_SERVICE = "tin.LAST_MODIFIED_SERVICE";
+
+  /**
+   * A {@link com.tinlib.shared.JoinGameService} implementation.
+   */
+  public static final String JOIN_GAME_SERVICE = "tin.JOIN_GAME_SERVICE";
 }

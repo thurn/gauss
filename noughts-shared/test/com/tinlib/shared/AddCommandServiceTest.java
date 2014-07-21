@@ -6,6 +6,7 @@ import com.tinlib.core.TinMessages;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
+import com.tinlib.generated.IndexCommand;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
@@ -101,6 +102,79 @@ public class AddCommandServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         new AddCommandService(helper.injector()).addCommand(Command.newBuilder().build());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testSetCommand() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = Action.newBuilder()
+        .setGameId(GAME_ID)
+        .setPlayerNumber(0)
+        .addCommand(Command.newBuilder().setPlayerNumber(42))
+        .build();
+    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        AddCommandService addCommandService = new AddCommandService(helper.injector());
+        final Command.Builder testCommand = Command.newBuilder();
+
+        helper.bus().await(TinMessages.COMMAND_CHANGED, new Subscriber1<IndexCommand>() {
+          @Override
+          public void onMessage(IndexCommand indexCommand) {
+            assertEquals(testCommand.setPlayerNumber(0).build(), indexCommand.getCommand());
+            assertEquals(0, indexCommand.getIndex());
+            Action expected = testAction.toBuilder()
+                .setCommand(0, testCommand.setPlayerNumber(0))
+                .build();
+            helper.assertCurrentActionEquals(expected, FINISHED);
+          }
+        });
+
+        addCommandService.setCommand(0, testCommand.build());
+      }
+    });
+    endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
+  }
+
+  @Test
+  public void testSetCommandIllegal() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
+    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build());
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testSetCommandFirebaseError() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
+    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+        "games/" + GAME_ID + "/currentAction", "runTransaction"));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build());
       }
     });
     endAsyncTestBlock();

@@ -18,7 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CurrentGameTest extends TinTestCase {
+public class CurrentGameServiceTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -36,7 +36,7 @@ public class CurrentGameTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        final CurrentGame currentGame = new CurrentGame(helper.injector());
+        final CurrentGameService currentGameService = new CurrentGameService(helper.injector());
         helper.bus().once(TinMessages.CURRENT_GAME_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String currentGameId) {
@@ -56,7 +56,7 @@ public class CurrentGameTest extends TinTestCase {
             new Firebase.CompletionListener() {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            currentGame.loadGame(GAME_ID);
+            currentGameService.loadGame(GAME_ID);
           }
         });
       }
@@ -80,8 +80,8 @@ public class CurrentGameTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        CurrentGame currentGame = new CurrentGame(helper.injector());
-        currentGame.loadGame(GAME_ID);
+        CurrentGameService currentGameService = new CurrentGameService(helper.injector());
+        currentGameService.loadGame(GAME_ID);
       }
     });
     endAsyncTestBlock();

@@ -88,9 +88,8 @@ public final class TinMessages {
 
   /**
    * Fired when a command is changed. The value will be a
-   * {@link com.tinlib.util.Pair} where the first element is the index at which
-   * the command was changed and the second element is the new value of the
-   * command.
+   * {@link com.tinlib.generated.IndexCommand} with the changed command and
+   * its index.
    */
   public static final String COMMAND_CHANGED = "tin.COMMAND_CHANGED";
 
@@ -99,4 +98,10 @@ public final class TinMessages {
    * {@link com.tinlib.generated.Game}.
    */
   public static final String GAME_CREATED = "tin.GAME_CREATED";
+
+  /**
+   * Fired when the user's account is upgraded to Facebook. No associated
+   * value.
+   */
+  public static final String ACCOUNT_UPGRADED_TO_FACEBOOK = "tin.ACCOUNT_UPGRADED_TO_FACEBOOK";
 }
