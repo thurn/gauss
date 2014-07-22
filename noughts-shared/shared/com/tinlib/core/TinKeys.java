@@ -95,12 +95,27 @@ public class TinKeys {
   public static final String TIME_SERVICE = "tin.TIME_SERVICE";
 
   /**
-   * A {@link com.tinlib.time.LastModifiedService} implementation.
+   * The {@link com.tinlib.time.LastModifiedService}.
    */
   public static final String LAST_MODIFIED_SERVICE = "tin.LAST_MODIFIED_SERVICE";
 
   /**
-   * A {@link com.tinlib.shared.JoinGameService} implementation.
+   * The {@link com.tinlib.shared.JoinGameService}.
    */
   public static final String JOIN_GAME_SERVICE = "tin.JOIN_GAME_SERVICE";
+
+  /**
+   * The {@link com.tinlib.shared.CurrentGameService}.
+   */
+  public static final String CURRENT_GAME_SERVICE = "tin.CURRENT_GAME_SERVICE";
+
+  /**
+   * {@link com.tinlib.validator.JoinGameValidatorService}
+   */
+  public static final String JOIN_GAME_VALIDATOR_SERVICE = "tin.JOIN_GAME_VALIDATOR_SERVICE";
+
+  /**
+   * Multikey for {@link com.tinlib.validator.JoinGameValidator} interfaces.
+   */
+  public static final String JOIN_GAME_VALIDATORS = "tin.JOIN_GAME_VALIDATORS";
 }

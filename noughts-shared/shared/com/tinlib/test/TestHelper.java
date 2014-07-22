@@ -52,6 +52,7 @@ public class TestHelper {
     private Action action;
     private String gameId;
     private LastModifiedService lastModifiedService;
+    private JoinGameService joinGameService;
 
     private Builder(TinTestCase testCase) {
       this.testCase = testCase;
@@ -112,6 +113,10 @@ public class TestHelper {
       this.lastModifiedService = lastModifiedService;
     }
 
+    public void setJoinGameService(JoinGameService joinGameService) {
+      this.joinGameService = joinGameService;
+    }
+
     public void runTest(final Test test) {
       if (firebase == null) {
         throw new RuntimeException("setFirebase() is required.");
@@ -127,7 +132,7 @@ public class TestHelper {
 
       final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
           errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
-          gameOverService, nextPlayerService, lastModifiedService);
+          gameOverService, nextPlayerService, lastModifiedService, joinGameService);
       testCase.setTestHelper(testHelper);
       if (game == null) {
         test.run(testHelper);
@@ -171,7 +176,8 @@ public class TestHelper {
       final TimeService timeService,
       final GameOverService gameOverService,
       final NextPlayerService nextPlayerService,
-      final LastModifiedService lastModifiedService) {
+      final LastModifiedService lastModifiedService,
+      final JoinGameService joinGameService) {
     injector = OverridingInjector.newOverridingInjector(new TinModule(), new Module() {
       @Override
       public void configure(Binder binder) {
@@ -206,6 +212,10 @@ public class TestHelper {
         if (lastModifiedService != null) {
           binder.bindSingletonKey(TinKeys.LAST_MODIFIED_SERVICE,
               Initializers.returnValue(lastModifiedService));
+        }
+        if (joinGameService != null) {
+          binder.bindSingletonKey(TinKeys.JOIN_GAME_SERVICE,
+              Initializers.returnValue(joinGameService));
         }
       }
     });
@@ -274,6 +284,23 @@ public class TestHelper {
       @Override
       public void onCancelled(FirebaseError firebaseError) {
         fail("assertCurrentActionEquals listener cancelled.");
+      }
+    });
+  }
+
+  public void assertRequestIdEquals(String requestId, final String gameId,
+      final Runnable runnable) {
+    references().requestReference(requestId).addListenerForSingleValueEvent(
+        new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        assertEquals(gameId, dataSnapshot.getValue());
+        runnable.run();
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        fail("assertRequestIdEquals listener cancelled");
       }
     });
   }

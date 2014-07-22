@@ -1,5 +1,7 @@
 package com.tinlib.core;
 
+import com.tinlib.shared.CurrentGameService;
+import com.tinlib.shared.JoinGameService;
 import com.tinlib.validator.ActionValidatorService;
 import com.tinlib.validator.DefaultActionValidator;
 import com.tinlib.analytics.AnalyticsService;
@@ -12,6 +14,8 @@ import com.tinlib.push.PushNotificationService;
 import com.tinlib.shared.GameMutator;
 import com.tinlib.shared.KeyedListenerService;
 import com.tinlib.time.LastModifiedService;
+import com.tinlib.validator.DefaultJoinGameValidator;
+import com.tinlib.validator.JoinGameValidatorService;
 
 public class TinModule implements Module {
   @Override
@@ -66,5 +70,25 @@ public class TinModule implements Module {
         return new LastModifiedService(injector);
       }
     });
+    binder.bindSingletonKey(TinKeys.JOIN_GAME_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new JoinGameService(injector);
+      }
+    });
+    binder.bindSingletonKey(TinKeys.CURRENT_GAME_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new CurrentGameService(injector);
+      }
+    });
+    binder.bindSingletonKey(TinKeys.JOIN_GAME_VALIDATOR_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new JoinGameValidatorService(injector);
+      }
+    });
+    binder.multibindKey(TinKeys.JOIN_GAME_VALIDATORS,
+        Initializers.returnValue(new DefaultJoinGameValidator()));
   }
 }

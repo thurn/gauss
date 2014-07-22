@@ -100,6 +100,12 @@ public final class TinMessages {
   public static final String GAME_CREATED = "tin.GAME_CREATED";
 
   /**
+   * Fired when the user joins a game. The value will be
+   * {@link com.tinlib.generated.Game} they joined.
+   */
+  public static final String GAME_JOINED = "tin.GAME_JOINED";
+
+  /**
    * Fired when the user's account is upgraded to Facebook. No associated
    * value.
    */
