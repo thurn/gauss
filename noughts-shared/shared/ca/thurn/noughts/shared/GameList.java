@@ -13,7 +13,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.tinlib.shared.FirebaseReferences;
+import com.tinlib.services.FirebaseReferences;
 
 public class GameList implements ChildEventListener {
   private final FirebaseReferences firebaseReferences;

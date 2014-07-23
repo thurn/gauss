@@ -6,8 +6,8 @@ import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.shared.FirebaseReferences;
-import com.tinlib.shared.GameMutator;
+import com.tinlib.services.FirebaseReferences;
+import com.tinlib.services.GameMutator;
 
 public class LastModifiedService {
   private final GameMutator gameMutator;
@@ -23,13 +23,12 @@ public class LastModifiedService {
   public void updateLastModified(final String gameId) {
     gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
-      public void mutate(String viewerId, Action currentAction, Game.Builder game) {
+      public void mutate(String viewerId, Game.Builder game) {
         game.setLastModified(timeService.currentTimeMillis());
       }
 
       @Override
-      public void onComplete(String viewerId, FirebaseReferences references, Action currentAction,
-                             Game game) {
+      public void onComplete(String viewerId, FirebaseReferences references, Game game) {
       }
 
       @Override

@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
@@ -49,8 +49,7 @@ public class NewGameServiceTest extends TinTestCase {
   }
 
   private void runNewGameTest(final boolean localMultiplayer) {
-    int numFinishedCalls = localMultiplayer ? 2 : 3;
-    beginAsyncTestBlock(numFinishedCalls);
+    beginAsyncTestBlock(2);
     TestHelper.Builder builder = newTestHelper();
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.runTest(new TestHelper.Test() {
@@ -72,8 +71,9 @@ public class NewGameServiceTest extends TinTestCase {
                 .build();
             assertEquals(expected, game);
             helper.assertGameEquals(expected, FINISHED);
-            helper.assertCurrentActionEquals(Actions.newEmptyAction(GAME_ID), FINISHED);
-            if (!localMultiplayer) {
+            if (localMultiplayer) {
+              finished();
+            } else {
               helper.assertRequestIdEquals(REQUEST_ID, GAME_ID, FINISHED);
             }
           }
@@ -107,12 +107,6 @@ public class NewGameServiceTest extends TinTestCase {
   public void testSetGameFirebaseError() {
     runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "setValue"));
-  }
-
-  @Test
-  public void testSetActionFirebaseError() {
-    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
-        "games/" + GAME_ID + "/currentAction", "setValue"));
   }
 
   @Test

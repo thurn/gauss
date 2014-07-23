@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinMessages;
@@ -31,6 +31,7 @@ public class ProfileServiceTest extends TinTestCase {
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setGame(testGame);
+    builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
@@ -74,6 +75,7 @@ public class ProfileServiceTest extends TinTestCase {
       }
     });
     builder.setGame(testGame);
+    builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
@@ -102,6 +104,7 @@ public class ProfileServiceTest extends TinTestCase {
       }
     });
     builder.setGame(testGame);
+    builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {

@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.util;
 
 import com.google.common.collect.Lists;
 import com.tinlib.generated.*;
@@ -43,11 +43,12 @@ public class Games {
 
   /**
    * @param game A game.
-   * @return True if this game has a current player ID.
+   * @return True if this game has a current player.
    */
-  public static boolean hasCurrentPlayerId(Game game) {
+  public static boolean hasCurrentPlayer(Game game) {
     return game.hasCurrentPlayerNumber() &&
-        game.getCurrentPlayerNumber() < game.getPlayerCount();
+        game.getCurrentPlayerNumber() < game.getPlayerCount() &&
+        game.getPlayer(game.getCurrentPlayerNumber()) != null;
   }
 
   /**
@@ -56,7 +57,7 @@ public class Games {
    *     player.
    */
   public static String currentPlayerId(Game game) {
-    if (!Games.hasCurrentPlayerId(game)) {
+    if (!Games.hasCurrentPlayer(game)) {
       throw new IllegalArgumentException("Game does not have a current player");
     }
     return game.getPlayer(game.getCurrentPlayerNumber());
@@ -64,7 +65,7 @@ public class Games {
 
   public static boolean isCurrentPlayer(String viewerId, Game game) {
     if (game.getIsGameOver()) return false;
-    return hasCurrentPlayerId(game) && currentPlayerId(game).equals(viewerId);
+    return hasCurrentPlayer(game) && currentPlayerId(game).equals(viewerId);
   }
 
   /**

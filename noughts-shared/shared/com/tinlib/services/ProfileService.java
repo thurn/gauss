@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
@@ -13,6 +13,7 @@ import com.tinlib.error.ErrorService;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber2;
+import com.tinlib.util.Games;
 
 public class ProfileService implements Subscriber2<String, Game> {
   private final Bus bus;
@@ -31,7 +32,7 @@ public class ProfileService implements Subscriber2<String, Game> {
   public void setProfileForViewer(final Profile profile) {
     gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
-      public void mutate(String viewerId, Action currentAction, Game.Builder game) {
+      public void mutate(String viewerId, Game.Builder game) {
         if (game.getIsLocalMultiplayer()) {
           throw new TinException(
               "Can't setProfileForViewer for local multiplayer game %s", game);
@@ -41,8 +42,7 @@ public class ProfileService implements Subscriber2<String, Game> {
       }
 
       @Override
-      public void onComplete(String viewerId, FirebaseReferences references, Action currentAction,
-          Game game) {
+      public void onComplete(String viewerId, FirebaseReferences references, Game game) {
         analyticsService.trackEvent("Set viewer profile",
             ImmutableMap.of("gameId", game.getId(), "viewerId", viewerId,
                 "profile", profile.toString()));

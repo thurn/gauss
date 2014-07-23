@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.util;
 
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;

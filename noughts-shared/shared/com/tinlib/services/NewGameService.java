@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
@@ -16,14 +16,12 @@ import com.tinlib.generated.Profile;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber2;
-import com.tinlib.message.Subscriber3;
 import com.tinlib.time.TimeService;
 
 import java.util.List;
 
 public class NewGameService {
   private static final String GAME_VALUE_SET = "NewGameService.GAME_VALUE_SET";
-  private static final String ACTION_VALUE_SET = "NewGameService.ACTION_VALUE_SET";
   private static final String REQUEST_ID_SET = "NewGameService.REQUEST_ID_SET";
 
   public class NewGameBuilder {
@@ -102,14 +100,12 @@ public class NewGameService {
         game.setLastModified(timeService.currentTimeMillis());
         game.setIsGameOver(false);
 
-        bus.once(GAME_VALUE_SET, ACTION_VALUE_SET, REQUEST_ID_SET,
-            new Subscriber3<Object, Object, Object>() {
+        bus.once(GAME_VALUE_SET, REQUEST_ID_SET, new Subscriber2<Object, Object>() {
           @Override
-          public void onMessage(Object v1, Object v2, Object v3) {
+          public void onMessage(Object v1, Object v2) {
             // TODO: Improve the bus API to support this use-case more cleanly
             // Somehow kill the once() if an error happens
             bus.invalidate(GAME_VALUE_SET);
-            bus.invalidate(ACTION_VALUE_SET);
             bus.invalidate(REQUEST_ID_SET);
 
             analyticsService.trackEvent("makeNewGame", ImmutableMap.of(
@@ -122,7 +118,6 @@ public class NewGameService {
         );
 
         setGameValue(firebaseReferences, game.build());
-        setCurrentAction(firebaseReferences, gameId);
         setRequestId(firebaseReferences, requestId, gameId);
       }
     });
@@ -146,21 +141,6 @@ public class NewGameService {
     } else {
       bus.produce(REQUEST_ID_SET);
     }
-  }
-
-  private void setCurrentAction(FirebaseReferences firebaseReferences, final String gameId) {
-    firebaseReferences.currentActionReferenceForGame(gameId).setValue(
-        Actions.newEmptyAction(gameId).serialize(), new CompletionListener() {
-      @Override
-      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-        if (firebaseError != null) {
-          errorService.error("Error setting new current action for game '%s'. $s", gameId,
-              firebaseError);
-        } else {
-          bus.produce(ACTION_VALUE_SET);
-        }
-      }
-    });
   }
 
   private void setGameValue(FirebaseReferences firebaseReferences, final Game game) {

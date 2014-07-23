@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinMessages;
@@ -12,7 +12,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ViewerTest extends TinTestCase {
+public class ViewerServiceTest extends TinTestCase {
   @org.junit.Test
   public void testSetViewerAnonymousId() {
     beginAsyncTestBlock(2);
@@ -21,7 +21,7 @@ public class ViewerTest extends TinTestCase {
     helper.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        Viewer viewer = new Viewer(helper.injector());
+        ViewerService viewerService = new ViewerService(helper.injector());
 
         helper.bus().once(TinMessages.VIEWER_ID, new Subscriber1<String>() {
           @Override
@@ -50,7 +50,7 @@ public class ViewerTest extends TinTestCase {
           }
             }
         );
-        viewer.setViewerAnonymousId("viewerId", "viewerKey");
+        viewerService.setViewerAnonymousId("viewerId", "viewerKey");
       }
     });
     endAsyncTestBlock();
@@ -64,7 +64,7 @@ public class ViewerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        Viewer viewer = new Viewer(helper.injector());
+        ViewerService viewerService = new ViewerService(helper.injector());
         helper.bus().once(TinMessages.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
@@ -86,7 +86,7 @@ public class ViewerTest extends TinTestCase {
           }
         }
         );
-        viewer.setViewerFacebookId("facebookId");
+        viewerService.setViewerFacebookId("facebookId");
       }
     });
     endAsyncTestBlock();

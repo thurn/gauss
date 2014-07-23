@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.google.common.base.Optional;

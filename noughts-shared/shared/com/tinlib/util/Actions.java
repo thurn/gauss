@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.util;
 
 import com.tinlib.generated.Action;
 

@@ -14,7 +14,7 @@ import com.tinlib.error.ErrorHandler;
 import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
 import com.tinlib.push.PushNotificationHandler;
-import com.tinlib.shared.*;
+import com.tinlib.services.*;
 import com.tinlib.time.LastModifiedService;
 import com.tinlib.time.TimeService;
 import org.mockito.Matchers;
@@ -137,19 +137,20 @@ public class TestHelper {
       if (game == null) {
         test.run(testHelper);
       } else {
-        if (action == null) {
-          action = Action.newBuilder().setGameId(game.getId()).build();
-        }
         references.gameReference(game.getId()).setValue(game.serialize(), new CompletionListener() {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            references.currentActionReferenceForGame(game.getId()).setValue(action.serialize(),
-                new CompletionListener() {
-              @Override
-              public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                test.run(testHelper);
-              }
-            });
+            if (action == null) {
+              test.run(testHelper);
+            } else {
+              references.currentActionReferenceForGame(game.getId()).setValue(action.serialize(),
+                  new CompletionListener() {
+                @Override
+                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                  test.run(testHelper);
+                }
+              });
+            }
           }
         });
       }
@@ -221,10 +222,10 @@ public class TestHelper {
     });
     if (viewerId != null && viewerKey != null) {
       if (facebook) {
-        (new Viewer(injector)).setViewerFacebookId(viewerId);
+        (new ViewerService(injector)).setViewerFacebookId(viewerId);
         references = FirebaseReferences.facebook(viewerId, firebase);
       } else {
-        (new Viewer(injector)).setViewerAnonymousId(viewerId, viewerKey);
+        (new ViewerService(injector)).setViewerAnonymousId(viewerId, viewerKey);
         references = FirebaseReferences.anonymous(viewerKey, firebase);
       }
     } else {

@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
-import com.tinlib.shared.Games;
+import com.tinlib.util.Games;
 import com.tinlib.inject.Injector;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.push.PushNotificationService;
@@ -142,7 +142,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
    */
   public boolean isCurrentPlayer(Game game) {
     if (game.getIsGameOver()) return false;
-    return Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId);
+    return Games.hasCurrentPlayer(game) && Games.currentPlayerId(game).equals(userId);
   }
 
   /**

@@ -5,7 +5,7 @@ import com.jayway.awaitility.Awaitility;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.message.Bus;
-import com.tinlib.shared.*;
+import com.tinlib.services.*;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -53,6 +53,8 @@ public abstract class TinTestCase {
 
   @Before
   public final void tinSetUp() {
+    numFinishes.set(0);
+    finished.set(false);
     beginAsyncTestBlock();
     setUp(finishedRunnable);
     endAsyncTestBlock();

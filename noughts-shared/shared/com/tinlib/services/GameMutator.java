@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinKeys;
@@ -9,17 +9,15 @@ import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber3;
-import com.tinlib.message.Subscriber4;
 
 /**
  * Service for mutating games and their current actions.
  */
 public class GameMutator {
   public static interface GameMutation {
-    public void mutate(String viewerId, Action currentAction, Game.Builder game);
+    public void mutate(String viewerId, Game.Builder game);
 
-    public void onComplete(String viewerId, FirebaseReferences references, Action action,
-        Game game);
+    public void onComplete(String viewerId, FirebaseReferences references, Game game);
 
     public void onError(String viewerId, FirebaseError error);
   }
@@ -44,20 +42,20 @@ public class GameMutator {
    */
   public void mutateCurrentGame(final GameMutation mutation) {
     bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME_ID,
-        TinMessages.CURRENT_ACTION, new Subscriber4<String, FirebaseReferences, String, Action>() {
+        new Subscriber3<String, FirebaseReferences, String>() {
       @Override
       public void onMessage(final String viewerId, final FirebaseReferences references,
-          final String currentGameId, final Action currentAction) {
+          final String currentGameId) {
         EntityMutator.mutateEntity(references.gameReference(currentGameId), Game.newDeserializer(),
             new EntityMutator.Mutation<Game, Game.Builder>() {
           @Override
           public void mutate(Game.Builder builder) {
-            mutation.mutate(viewerId, currentAction, builder);
+            mutation.mutate(viewerId, builder);
           }
 
           @Override
           public void onComplete(Game game) {
-            mutation.onComplete(viewerId, references, currentAction, game);
+            mutation.onComplete(viewerId, references, game);
           }
 
           @Override

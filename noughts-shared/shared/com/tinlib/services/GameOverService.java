@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.google.common.base.Optional;
 import com.tinlib.generated.Action;

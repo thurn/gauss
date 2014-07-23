@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
@@ -38,10 +38,9 @@ public class GameMutatorTest extends TinTestCase {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
-          public void mutate(String viewerId, Action currentAction, Game.Builder game) {
+          public void mutate(String viewerId, Game.Builder game) {
             assertEquals(VIEWER_ID, viewerId);
             assertEquals(testGame, game.build());
-            assertEquals(testAction, currentAction);
             game.setIsGameOver(true);
             game.setCurrentPlayerNumber(507);
             game.addVictor(11);
@@ -49,9 +48,8 @@ public class GameMutatorTest extends TinTestCase {
 
           @Override
           public void onComplete(String viewerId, FirebaseReferences references,
-              Action currentAction, Game game) {
+              Game game) {
             assertEquals(VIEWER_ID, viewerId);
-            assertEquals(testAction, currentAction);
             assertTrue(game.getIsGameOver());
             assertEquals(507, game.getCurrentPlayerNumber());
             assertEquals(11, game.getVictor(0));
@@ -83,12 +81,12 @@ public class GameMutatorTest extends TinTestCase {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
-          public void mutate(String viewerId, Action currentAction, Game.Builder game) {
+          public void mutate(String viewerId, Game.Builder game) {
           }
 
           @Override
           public void onComplete(String viewerId, FirebaseReferences references,
-              Action currentAction, Game game) {
+              Game game) {
             fail("onComplete called when error expected");
           }
 

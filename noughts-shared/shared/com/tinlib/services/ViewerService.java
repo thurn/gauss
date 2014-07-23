@@ -1,4 +1,4 @@
-package com.tinlib.shared;
+package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinKeys;
@@ -23,7 +23,7 @@ import java.util.Map;
  *   <li>{@link com.tinlib.core.TinMessages#VIEWER_ID}</li>
  * </ul>
  */
-public class Viewer {
+public class ViewerService {
   public static interface Function {
     public void apply(Map<String, Object> map, String viewerId, FirebaseReferences references);
   }
@@ -31,7 +31,7 @@ public class Viewer {
   private final Bus bus;
   private final Firebase firebase;
 
-  public Viewer(Injector injector) {
+  public ViewerService(Injector injector) {
     bus = injector.get(TinKeys.BUS);
     firebase = injector.get(TinKeys.FIREBASE);
   }

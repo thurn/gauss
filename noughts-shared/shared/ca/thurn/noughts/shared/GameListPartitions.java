@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import com.tinlib.shared.Games;
+import com.tinlib.util.Games;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -49,7 +49,7 @@ public class GameListPartitions implements Exportable {
       return GameListSection.GAME_OVER;
     }
     if (game.getIsLocalMultiplayer() ||
-        (Games.hasCurrentPlayerId(game) && Games.currentPlayerId(game).equals(userId))) {
+        (Games.hasCurrentPlayer(game) && Games.currentPlayerId(game).equals(userId))) {
       return GameListSection.YOUR_TURN;
     } else {
       return GameListSection.THEIR_TURN;
