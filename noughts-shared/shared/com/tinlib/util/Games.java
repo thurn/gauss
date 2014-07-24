@@ -48,7 +48,7 @@ public class Games {
   public static boolean hasCurrentPlayer(Game game) {
     return game.hasCurrentPlayerNumber() &&
         game.getCurrentPlayerNumber() < game.getPlayerCount() &&
-        game.getPlayer(game.getCurrentPlayerNumber()) != null;
+        !game.getPlayer(game.getCurrentPlayerNumber()).equals("");
   }
 
   /**

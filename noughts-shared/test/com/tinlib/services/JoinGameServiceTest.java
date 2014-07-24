@@ -40,6 +40,9 @@ public class JoinGameServiceTest extends TinTestCase {
     beginAsyncTestBlock(2);
     runTestJoinGame(false /* fromRequestId */);
     endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    verify(mockPushNotificationHandler, times(1)).registerForPushNotifications(eq(GAME_ID), eq(1));
   }
 
   @Test
@@ -54,6 +57,9 @@ public class JoinGameServiceTest extends TinTestCase {
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    verify(mockPushNotificationHandler, times(1)).registerForPushNotifications(eq(GAME_ID), eq(1));
   }
 
   private void runTestJoinGame(final boolean fromRequestId) {
@@ -84,10 +90,6 @@ public class JoinGameServiceTest extends TinTestCase {
         }
       }
     });
-    endAsyncTestBlock();
-
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
-    verify(mockPushNotificationHandler, times(1)).registerForPushNotifications(eq(GAME_ID), eq(1));
   }
 
   @Test
@@ -141,6 +143,25 @@ public class JoinGameServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
         joinGameService.joinGame(1, GAME_ID, Optional.of(testProfile));
+      }
+    });
+    endAsyncTestBlock();
+  }
+
+  @Test
+  public void testJoinGameFirebaseRequestsError() {
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
+    final Profile testProfile = Profile.newBuilder().setName("Name").build();
+    TestHelper.Builder builder = newTestHelper(testGame);
+    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+        "firebaseio-demo.com/requests", "addListenerForSingleValueEvent"));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        joinGameService.joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile));
       }
     });
     endAsyncTestBlock();

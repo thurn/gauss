@@ -9,7 +9,7 @@ import java.util.*;
 import com.tinlib.entities.Entity;
 
 /**
- * A command and its associated index
+ * A command and its associated index.
  */
 public final class IndexCommand extends Entity<IndexCommand> {
   /**

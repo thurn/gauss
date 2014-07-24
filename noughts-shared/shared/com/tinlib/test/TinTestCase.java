@@ -1,11 +1,8 @@
 package com.tinlib.test;
 
-import com.firebase.client.Firebase;
 import com.jayway.awaitility.Awaitility;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.error.ErrorHandler;
-import com.tinlib.message.Bus;
-import com.tinlib.services.*;
 import org.junit.After;
 import org.junit.Before;
 import org.mockito.Mock;
@@ -34,12 +31,6 @@ public abstract class TinTestCase {
 
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);
-  private final Runnable finishedRunnable = new Runnable() {
-    @Override
-    public void run() {
-      finished();
-    }
-  };
   private TestHelper testHelper;
 
   @Mock
@@ -47,45 +38,25 @@ public abstract class TinTestCase {
   @Mock
   protected AnalyticsHandler mockAnalyticsHandler;
 
-  protected Bus bus;
-  protected KeyedListenerService keyedListenerService;
-  protected final Firebase firebase = new Firebase("https://tintest.firebaseio-demo.com");
-
   @Before
   public final void tinSetUp() {
     numFinishes.set(0);
     finished.set(false);
-    beginAsyncTestBlock();
-    setUp(finishedRunnable);
-    endAsyncTestBlock();
   }
 
   @After
   public final void tinTearDown() {
     beginAsyncTestBlock();
-    tearDown(new Runnable() {
-      @Override
-      public void run() {
-        if (testHelper != null) {
-          testHelper.cleanUp(finishedRunnable);
-        } else {
-          finished();
-        }
-      }
-    });
+    if (testHelper != null) {
+      testHelper.cleanUp(FINISHED);
+    } else {
+      finished();
+    }
     endAsyncTestBlock();
   }
 
   public void setTestHelper(TestHelper testHelper) {
     this.testHelper = testHelper;
-  }
-
-  public void setUp(Runnable done) {
-    done.run();
-  }
-
-  public void tearDown(Runnable done) {
-    done.run();
   }
 
   public void beginAsyncTestBlock() {
@@ -98,7 +69,6 @@ public abstract class TinTestCase {
 
   public void endAsyncTestBlock() {
     Awaitility.await("Waiting for call to finished()").untilTrue(finished);
-    finished.set(false);
   }
 
   /**

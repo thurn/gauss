@@ -132,7 +132,7 @@ public class NewGameService {
         public void onComplete(FirebaseError firebaseError, Firebase firebase) {
           if (firebaseError != null) {
             errorService.error("Error associating request ID '%s' with game '%s'. %s",
-                requestId, gameId, firebaseError);
+                requestId.get(), gameId, firebaseError);
           } else {
             bus.produce(REQUEST_ID_SET);
           }

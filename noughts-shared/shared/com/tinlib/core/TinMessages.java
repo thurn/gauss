@@ -8,7 +8,7 @@ public final class TinMessages {
   public static final String ERROR = "tin.ERROR";
 
   /**
-   * A {@link com.tinlib.shared.FirebaseReferences} instance configured with the ID of the
+   * A {@link com.tinlib.services.FirebaseReferences} instance configured with the ID of the
    * current viewer.
    */
   public static final String FIREBASE_REFERENCES = "tin.FIREBASE_REFERENCES";
@@ -110,4 +110,23 @@ public final class TinMessages {
    * value.
    */
   public static final String ACCOUNT_UPGRADED_TO_FACEBOOK = "tin.ACCOUNT_UPGRADED_TO_FACEBOOK";
+
+  /**
+   * Fired when a game is added to the game list. The value will be the
+   * {@link com.tinlib.generated.IndexPath} at which the game was added.
+   */
+  public static final String GAME_LIST_ADD = "tin.GAME_LIST_ADD";
+
+  /**
+   * Fired when a game in the game list is changed. The value will be a
+   * {@link com.tinlib.generated.GameListUpdate} containing the location in the
+   * list to move a row from and the location in the list to move the row to.
+   */
+  public static final String GAME_LIST_MOVE = "tin.GAME_LIST_CHANGE";
+
+  /**
+   * Fired when a game in the game list is removed. The value will be the
+   * {@link com.tinlib.generated.IndexPath} at which the game was removed.
+   */
+  public static final String GAME_LIST_REMOVE = "tin.GAME_LIST_REMOVE";
 }

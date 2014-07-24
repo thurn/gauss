@@ -267,7 +267,7 @@
     "type":"entity",
     "name":"IndexCommand",
     "package":"com.tinlib.generated",
-    "desc":"A command and its associated index",
+    "desc":"A command and its associated index.",
     "fields":[
       {
         "name":"command",
@@ -278,6 +278,42 @@
         "name":"index",
         "type":"Integer",
         "desc":"The command's index."
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"IndexPath",
+    "package":"com.tinlib.generated",
+    "desc":"A list section and row number.",
+    "fields":[
+      {
+        "name":"section",
+        "type":"Integer",
+        "desc":"The list section"
+      },
+      {
+        "name":"row",
+        "type":"Integer",
+        "desc":"The row number within the section"
+      }
+    ]
+  },
+  {
+    "type":"entity",
+    "name":"GameListUpdate",
+    "package":"com.tinlib.generated",
+    "desc":"A row movement within the game list.",
+    "fields":[
+      {
+        "name":"from",
+        "type":"IndexPath",
+        "desc":"The source of the row move."
+      },
+      {
+        "name":"to",
+        "type":"IndexPath",
+        "desc":"The destination of the row move."
       }
     ]
   }
