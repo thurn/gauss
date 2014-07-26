@@ -324,7 +324,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
         }
         gameListener.onProfileRequired(gameId, name);
       }
-      if (oldGame == null || Games.differentStatus(game, oldGame)) {
+      if (oldGame == null /*|| Games.differentStatus(game, oldGame)*/) {
         gameListener.onGameStatusChanged(Games.gameStatus(game));
       }
     }

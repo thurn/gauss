@@ -29,7 +29,7 @@ public class TinKeys {
   public static final String FIREBASE = "tin.FIREBASE";
 
   /**
-   * A {@link com.tinlib.shared.KeyedListenerService} instance, used to unregister listeners.
+   * A {@link com.tinlib.services.KeyedListenerService} instance, used to unregister listeners.
    */
   public static final String KEYED_LISTENER_SERVICE = "tin.KEYED_LISTENER_SERVICE";
 
@@ -59,7 +59,7 @@ public class TinKeys {
   public static final String PUSH_NOTIFICATION_HANDLERS = "tin.PUSH_NOTIFICATION_HANDLERS";
 
   /**
-   * A {@link com.tinlib.shared.GameMutator} for mutating games and their current actions.
+   * A {@link com.tinlib.services.GameMutator} for mutating games and their current actions.
    */
   public static final String GAME_MUTATOR = "tin.GAME_MUTATOR";
 
@@ -80,12 +80,12 @@ public class TinKeys {
   public static final String ACTION_VALIDATORS = "tin.ACTION_VALIDATORS";
 
   /**
-   * A {@link com.tinlib.shared.GameOverService} implementation.
+   * A {@link com.tinlib.services.GameOverService} implementation.
    */
   public static final String GAME_OVER_SERVICE = "tin.GAME_OVER_SERVICE";
 
   /**
-   * A {@link com.tinlib.shared.NextPlayerService} implementation.
+   * A {@link com.tinlib.services.NextPlayerService} implementation.
    */
   public static final String NEXT_PLAYER_SERVICE = "tin.NEXT_PLAYER_SERVICE";
 
@@ -100,12 +100,12 @@ public class TinKeys {
   public static final String LAST_MODIFIED_SERVICE = "tin.LAST_MODIFIED_SERVICE";
 
   /**
-   * The {@link com.tinlib.shared.JoinGameService}.
+   * The {@link com.tinlib.services.JoinGameService}.
    */
   public static final String JOIN_GAME_SERVICE = "tin.JOIN_GAME_SERVICE";
 
   /**
-   * The {@link com.tinlib.shared.CurrentGameService}.
+   * The {@link com.tinlib.services.CurrentGameService}.
    */
   public static final String CURRENT_GAME_SERVICE = "tin.CURRENT_GAME_SERVICE";
 
@@ -118,4 +118,9 @@ public class TinKeys {
    * Multikey for {@link com.tinlib.validator.JoinGameValidator} interfaces.
    */
   public static final String JOIN_GAME_VALIDATORS = "tin.JOIN_GAME_VALIDATORS";
+
+  /**
+   * {@link com.tinlib.services.ViewerService}
+   */
+  public static final String VIEWER_SERVICE = "tin.VIEWER_SERVICE";
 }

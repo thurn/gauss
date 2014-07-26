@@ -2,6 +2,7 @@ package com.tinlib.test;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.ValueEventListener;
+import com.google.common.collect.Maps;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
@@ -53,6 +54,7 @@ public class TestHelper {
     private String gameId;
     private LastModifiedService lastModifiedService;
     private JoinGameService joinGameService;
+    private final Map<String, Object> instanceMap = Maps.newHashMap();
 
     private Builder(TinTestCase testCase) {
       this.testCase = testCase;
@@ -117,6 +119,10 @@ public class TestHelper {
       this.joinGameService = joinGameService;
     }
 
+    public void bindInstance(String key, Object value) {
+      instanceMap.put(key, value);
+    }
+
     public void runTest(final Test test) {
       if (firebase == null) {
         throw new RuntimeException("setFirebase() is required.");
@@ -132,7 +138,7 @@ public class TestHelper {
 
       final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
           errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
-          gameOverService, nextPlayerService, lastModifiedService, joinGameService);
+          gameOverService, nextPlayerService, lastModifiedService, joinGameService, instanceMap);
       testCase.setTestHelper(testHelper);
       if (game == null) {
         test.run(testHelper);
@@ -178,7 +184,8 @@ public class TestHelper {
       final GameOverService gameOverService,
       final NextPlayerService nextPlayerService,
       final LastModifiedService lastModifiedService,
-      final JoinGameService joinGameService) {
+      final JoinGameService joinGameService,
+      final Map<String, Object> instanceMap) {
     injector = OverridingInjector.newOverridingInjector(new TinModule(), new Module() {
       @Override
       public void configure(Binder binder) {
@@ -217,6 +224,9 @@ public class TestHelper {
         if (joinGameService != null) {
           binder.bindSingletonKey(TinKeys.JOIN_GAME_SERVICE,
               Initializers.returnValue(joinGameService));
+        }
+        for (Map.Entry<String, Object> entry : instanceMap.entrySet()) {
+          binder.bindSingletonKey(entry.getKey(), Initializers.returnValue(entry.getValue()));
         }
       }
     });

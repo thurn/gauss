@@ -30,6 +30,11 @@ public class GameList {
   public static final int GAME_OVER_SECTION = 2;
   public static final int NUM_SECTIONS = 3;
 
+  public static int[] allSections() {
+    return new int[] {GameList.YOUR_GAMES_SECTION, GameList.THEIR_GAMES_SECTION,
+        GameList.GAME_OVER_SECTION};
+  }
+
   private class GameChildListener implements ChildEventListener {
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
@@ -112,22 +117,20 @@ public class GameList {
         new GameChildListener());
   }
 
+  public Game getGame(int section, int row) {
+    return gameListForSection(section).get(row);
+  }
+
   public GameListEntry getGameListEntry(int section, int row) {
-    listLock.lock();
-    try {
-      return Games.gameListEntry(timeService, gameListForSection(section).get(row), viewerId);
-    } finally {
-      listLock.unlock();
-    }
+    return Games.gameListEntry(timeService, getGame(section, row), viewerId);
   }
 
   public int gameCountForSection(int section) {
-    listLock.lock();
-    try {
-      return gameListForSection(section).size();
-    } finally {
-      listLock.unlock();
-    }
+    return gameListForSection(section).size();
+  }
+
+  public Lock getListLock() {
+    return listLock;
   }
 
   public String nameForSection(int section) {
@@ -152,12 +155,12 @@ public class GameList {
       case GAME_OVER_SECTION:
         return gameOver;
       default:
-        throw new TinException("Unknown game list section '%s'", section);
+        throw errorService.newTinException("Unknown game list section '%s'", section);
     }
   }
 
   private Optional<IndexPath> findGame(String gameId) {
-    for (int section : new int[] {YOUR_GAMES_SECTION, THEIR_GAMES_SECTION, GAME_OVER_SECTION}) {
+    for (int section : allSections()) {
       Optional<IndexPath> result = findGameInSection(gameId, section);
       if (result.isPresent()) return result;
     }
@@ -194,7 +197,7 @@ public class GameList {
 
   private int rowForGame(List<Game> gameList, Game game) {
     int row = 0;
-    while (gameList.get(row).getLastModified() > game.getLastModified()) {
+    while (row < gameList.size() && gameList.get(row).getLastModified() > game.getLastModified()) {
       row++;
     }
     return row;

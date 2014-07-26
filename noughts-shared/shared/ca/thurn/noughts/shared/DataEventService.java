@@ -165,9 +165,9 @@ public class DataEventService {
 
       @Override
       public void onUpdate(Game game, Game oldGame) {
-        if (Games.differentStatus(oldGame, game)) {
+        /*if (Games.differentStatus(oldGame, game)) {
           listener.onUpdate(Games.gameStatus(game));
-        }
+        }*/
       }
     });
   }

@@ -14,8 +14,8 @@ import java.util.Map;
  * listener will be removed.
  */
 public class KeyedListenerService {
-  Map<String, Runnable> valueUnsubscribers = Maps.newHashMap();
-  Map<String, Runnable> childUnsubscribers = Maps.newHashMap();
+  private Map<String, Runnable> valueUnsubscribers = Maps.newHashMap();
+  private Map<String, Runnable> childUnsubscribers = Maps.newHashMap();
 
   /**
    * Adds a keyed ValueEventListener as in

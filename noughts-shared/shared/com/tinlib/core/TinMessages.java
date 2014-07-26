@@ -129,4 +129,10 @@ public final class TinMessages {
    * {@link com.tinlib.generated.IndexPath} at which the game was removed.
    */
   public static final String GAME_LIST_REMOVE = "tin.GAME_LIST_REMOVE";
+
+  /**
+   * Fired with a {@link com.tinlib.services.GameList} for the viewer whenever
+   * the viewer changes.
+   */
+  public static final String GAME_LIST = "tin.GAME_LIST";
 }

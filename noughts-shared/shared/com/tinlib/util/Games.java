@@ -328,18 +328,6 @@ public class Games {
   }
 
   /**
-   * @param old Previous game state.
-   * @param next New game state.
-   * @return True if the two game states have different "status" (different
-   *     player's turn, game is over, etc).
-   */
-  public static boolean differentStatus(Game old, Game next) {
-    return (old.hasIsGameOver() && next.hasIsGameOver() && old.getIsGameOver() != next.getIsGameOver()) ||
-        (old.hasCurrentPlayerNumber() && next.hasCurrentPlayerNumber() &&
-            old.getCurrentPlayerNumber() != next.getCurrentPlayerNumber());
-  }
-
-  /**
    * @param game A game.
    * @return True if the viewer is a player in this game and does not have a
    *     profile yet.

@@ -42,4 +42,9 @@ public class ErrorService {
       handler.error(message, args);
     }
   }
+
+  public TinException newTinException(String message, Object... args) {
+    error(message, args);
+    return new TinException(message, args);
+  }
 }

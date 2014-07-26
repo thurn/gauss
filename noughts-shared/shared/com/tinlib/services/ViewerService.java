@@ -42,6 +42,9 @@ public class ViewerService {
    * viewer.
    */
   public void setViewerAnonymousId(String viewerId, String viewerKey) {
+    bus.invalidate(TinMessages.FIREBASE_REFERENCES);
+    bus.invalidate(TinMessages.VIEWER_ID);
+
     bus.produce(TinMessages.FIREBASE_REFERENCES, FirebaseReferences.anonymous(viewerKey, firebase));
     bus.produce(TinMessages.VIEWER_ID, viewerId);
   }
@@ -51,6 +54,9 @@ public class ViewerService {
    * ID.
    */
   public void setViewerFacebookId(String facebookId) {
+    bus.invalidate(TinMessages.FIREBASE_REFERENCES);
+    bus.invalidate(TinMessages.VIEWER_ID);
+
     bus.produce(TinMessages.FIREBASE_REFERENCES, FirebaseReferences.facebook(facebookId, firebase));
     bus.produce(TinMessages.VIEWER_ID, facebookId);
   }
