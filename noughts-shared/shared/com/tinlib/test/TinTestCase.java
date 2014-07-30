@@ -1,11 +1,9 @@
 package com.tinlib.test;
 
 import com.jayway.awaitility.Awaitility;
-import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.error.ErrorHandler;
 import org.junit.After;
 import org.junit.Before;
-import org.mockito.Mock;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,14 +13,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.*;
 
 public abstract class TinTestCase {
-  public Runnable FINISHED = new Runnable() {
+  public final Runnable FINISHED = new Runnable() {
     @Override
     public void run() {
       finished();
     }
   };
 
-  public ErrorHandler FINISHED_ERROR_HANDLER = new ErrorHandler() {
+  public final ErrorHandler FINISHED_ERROR_HANDLER = new ErrorHandler() {
     @Override
     public void error(String message, Object[] args) {
       finished();
@@ -32,11 +30,6 @@ public abstract class TinTestCase {
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);
   private TestHelper testHelper;
-
-  @Mock
-  protected ErrorHandler mockErrorHandler;
-  @Mock
-  protected AnalyticsHandler mockAnalyticsHandler;
 
   @Before
   public final void tinSetUp() {

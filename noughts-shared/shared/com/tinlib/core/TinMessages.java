@@ -135,4 +135,10 @@ public final class TinMessages {
    * the viewer changes.
    */
   public static final String GAME_LIST = "tin.GAME_LIST";
+
+  /**
+   * Fired when the viewer resigns from a game. The value will be the
+   * {@link com.tinlib.generated.Game} which the viewer resigned from.
+   */
+  public static final String GAME_RESIGNED = "GAME_RESIGNED";
 }
