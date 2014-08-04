@@ -77,8 +77,8 @@ public class ResignGameService {
           }
         });
 
-        references.currentActionReferenceForGame(gameId).setValue(Actions.newEmptyAction(gameId),
-            new Firebase.CompletionListener() {
+        references.currentActionReferenceForGame(gameId).setValue(
+            Actions.newEmptyAction(gameId).serialize(), new Firebase.CompletionListener() {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
             if (firebaseError != null) {
