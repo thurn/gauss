@@ -37,13 +37,7 @@ public class AddCommandService {
     gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
       @Override
       public void mutate(String viewerId, Action.Builder action, Game currentGame) {
-        if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {
-          throw new TinException("Can't add command '%s' to action '%s'", command, action);
-        }
-        int player = currentGame.getCurrentPlayerNumber();
-        action.clearFutureCommandList();
-        action.addCommand(command.toBuilder().setPlayerNumber(player));
-        action.setPlayerNumber(player);
+        addCommandToAction(actionValidatorService, viewerId, currentGame, action, command);
       }
 
       @Override
@@ -91,5 +85,16 @@ public class AddCommandService {
         errorService.error("Error setting command '%s' at index '%s'. %s", command, index, error);
       }
     });
+  }
+
+  static void addCommandToAction(ActionValidatorService actionValidatorService,
+      String viewerId, Game currentGame, Action.Builder action, Command command) {
+    if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {
+      throw new TinException("Can't add command '%s' to action '%s'", command, action);
+    }
+    int player = currentGame.getCurrentPlayerNumber();
+    action.clearFutureCommandList();
+    action.addCommand(command.toBuilder().setPlayerNumber(player));
+    action.setPlayerNumber(player);
   }
 }

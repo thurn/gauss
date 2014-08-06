@@ -34,7 +34,7 @@ public class FirebaseReferences {
   }
 
   public Firebase gameSubmittedActionsReference(String gameId) {
-    return gameReference(gameId).child("submittedActionList");
+    return gameReference(gameId).child("submittedAction");
   }
 
   public Firebase userGames() {
@@ -51,7 +51,7 @@ public class FirebaseReferences {
   }
 
   public Firebase commandsReferenceForCurrentAction(String gameId) {
-    return currentActionReferenceForGame(gameId).child("commandList");
+    return currentActionReferenceForGame(gameId).child("command");
   }
 
   public Firebase requestReference(String requestId) {

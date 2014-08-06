@@ -1,6 +1,5 @@
 package com.tinlib.services;
 
-import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
@@ -17,6 +16,7 @@ import com.tinlib.generated.IndexPath;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.time.TimeService;
+import com.tinlib.util.AbstractChildEventListener;
 import com.tinlib.util.Games;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class GameList {
         GameList.GAME_OVER_SECTION};
   }
 
-  private class GameChildListener implements ChildEventListener {
+  private class GameChildListener extends AbstractChildEventListener {
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
       String gameId = dataSnapshot.getName();
@@ -69,9 +69,6 @@ public class GameList {
     }
 
     @Override
-    public void onChildChanged(DataSnapshot dataSnapshot, String previous) {}
-
-    @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
       listLock.lock();
       try {
@@ -85,9 +82,6 @@ public class GameList {
         listLock.unlock();
       }
     }
-
-    @Override
-    public void onChildMoved(DataSnapshot dataSnapshot, String previous) {}
 
     @Override
     public void onCancelled(FirebaseError firebaseError) {
