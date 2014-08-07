@@ -125,4 +125,9 @@ public class TinKeys {
    * {@link com.tinlib.services.ViewerService}
    */
   public static final String VIEWER_SERVICE = id("tin.VIEWER_SERVICE");
+
+  /**
+   * {@link com.tinlib.services.GameStateListener}
+   */
+  public static final String GAME_STATE_LISTENER = id("tin.GAME_STATE_LISTENER");
 }

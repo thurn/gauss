@@ -112,7 +112,7 @@ public class NewGameService {
                 "players", players.toString(), "profiles", profiles.toString(),
                 "gameId", gameId, "localMultiplayer", localMultiplayer + ""));
             joinGameService.joinGame(viewerPlayerNumber, gameId, Optional.<Profile>absent());
-            bus.produce(TinMessages.GAME_CREATED, game.build());
+            bus.produce(TinMessages.CREATE_GAME_COMPLETED, game.build());
           }
             }
         );

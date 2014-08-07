@@ -230,6 +230,7 @@ public class TestHelper {
         }
       }
     });
+    injector.get(TinKeys.GAME_STATE_LISTENER); // TODO: Make this not necessary
     if (viewerId != null && viewerKey != null) {
       if (facebook) {
         (new ViewerService(injector)).setViewerFacebookId(viewerId);

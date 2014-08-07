@@ -68,7 +68,7 @@ public class JoinGameService {
                 "gameId", gameId,
                 "profile", profile.toString()));
             pushNotificationService.registerForPushNotifications(gameId, playerNumber);
-            bus.produce(TinMessages.GAME_JOINED, game);
+            bus.produce(TinMessages.JOIN_GAME_COMPLETED, game);
           }
         });
 

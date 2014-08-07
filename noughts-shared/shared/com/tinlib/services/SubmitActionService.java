@@ -88,7 +88,7 @@ public class SubmitActionService {
                           "viewerId", viewerId, "gameId", game.getId());
                       analyticsService.trackEvent("submitCurrentAction", dimensions);
                       sendNotificationOnActionSubmitted(viewerId, game);
-                      bus.produce(TinMessages.ACTION_SUBMITTED);
+                      bus.produce(TinMessages.SUBMIT_ACTION_COMPLETED);
                     }
                   }
                 }

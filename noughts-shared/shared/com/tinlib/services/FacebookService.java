@@ -49,7 +49,7 @@ public class FacebookService {
         analyticsService.trackEvent("upgradeAccountToFacebook",
             ImmutableMap.of("facebookId", facebookId));
         viewerService.setViewerFacebookId(facebookId);
-        bus.produce(TinMessages.ACCOUNT_UPGRADED_TO_FACEBOOK);
+        bus.produce(TinMessages.ACCOUNT_UPGRADE_COMPLETED);
       }
     });
 

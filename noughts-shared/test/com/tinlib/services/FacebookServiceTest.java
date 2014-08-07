@@ -50,7 +50,7 @@ public class FacebookServiceTest extends TinTestCase {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());
-            helper.bus().once(TinMessages.ACCOUNT_UPGRADED_TO_FACEBOOK, new Subscriber0() {
+            helper.bus().once(TinMessages.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
               @Override
               public void onMessage() {
                 FirebaseReferences facebookReferences =

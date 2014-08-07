@@ -40,7 +40,7 @@ public class ResignGameService {
         bus.invalidate(ACTION_CLEARED);
 
         analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
-        bus.produce(TinMessages.GAME_RESIGNED, game);
+        bus.produce(TinMessages.RESIGN_GAME_COMPLETED, game);
       }
     });
 

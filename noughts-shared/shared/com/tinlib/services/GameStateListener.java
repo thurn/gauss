@@ -1,22 +1,25 @@
 package com.tinlib.services;
 
-import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinKeys;
+import com.tinlib.core.TinMessages;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
-import com.tinlib.generated.IndexCommand;
 import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber3;
+import com.tinlib.util.AbstractChildEventListener;
 
 import static com.tinlib.util.Identifiers.id;
 
 public class GameStateListener {
-  public static final String ACTIONS_LISTENER_KEY = id("GameStateListener.ACTIONS_LISTENER_KEY");
-  public static final String COMMANDS_LISTENER_KEY = id("GameStateListener.COMMANDS_LISTENER_KEY");
+  public static final String ACTIONS_LISTENER_KEY =
+      id("GameStateListener.ACTIONS_LISTENER_KEY");
+  public static final String COMMANDS_LISTENER_KEY =
+      id("GameStateListener.COMMANDS_LISTENER_KEY");
+  public static final String FUTURE_COMMANDS_LISTENER_KEY =
+      id("GameStateListener.FUTURE_COMMANDS_LISTENER_KEY");
 
   private class Listener implements Subscriber3<String, FirebaseReferences, String> {
     @Override
@@ -27,49 +30,65 @@ public class GameStateListener {
       keyedListenerService.addChildEventListener(
           references.commandsReferenceForCurrentAction(currentGameId),
           COMMANDS_LISTENER_KEY, new CommandListener());
+      keyedListenerService.addChildEventListener(
+          references.futureCommandsReferenceForCurrentAction(currentGameId),
+          FUTURE_COMMANDS_LISTENER_KEY, new FutureCommandListener());
     }
   }
 
   private class ActionListener extends AbstractChildEventListener {
-    @Override
-    public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
-      bus.produce("TinMessages.ACTION_ADDED",
-          Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+    private ActionListener() {
+      super(errorService, "ActionListener");
     }
 
     @Override
-    public void onCancelled(FirebaseError firebaseError) {
-      errorService.error("ActionListener cancelled. %s", firebaseError);
+    public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
+      Action action = Action.newDeserializer().fromDataSnapshot(dataSnapshot);
+      bus.produce(TinMessages.ACTION_SUBMITTED, action);
+      System.out.println(">>>>>>>>>>>>>> ACTION_SUBMITTED " + action);
+      for (Command command : action.getCommandList()) {
+        bus.produce(TinMessages.COMMAND_SUBMITTED, command);
+        System.out.println(">>>>>>>>>>>>>> COMMAND_SUBMITTED " + command);
+      }
     }
   }
 
   private class CommandListener extends AbstractChildEventListener {
+    private CommandListener() {
+      super(errorService, "CommandListener");
+    }
+
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
-      fireMessage("TinMessages.COMMAND_ADDED", dataSnapshot);
+      int index = Integer.parseInt(dataSnapshot.getName());
+      bus.produce(TinMessages.COMMAND_ADDED,
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
+      System.out.println(">>>>>>>>>>>>>> COMMAND_ADDED " +
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String previous) {
-      fireMessage("TinMessages.COMMAND_CHANGED", dataSnapshot);
-    }
-
-    @Override
-    public void onChildRemoved(DataSnapshot dataSnapshot) {
-      fireMessage("TinMessages.COMMAND_REMOVED", dataSnapshot);
-    }
-
-    @Override
-    public void onCancelled(FirebaseError firebaseError) {
-      errorService.error("CommandListener cancelled. %s", firebaseError);
-    }
-
-    private void fireMessage(String message, DataSnapshot dataSnapshot) {
       int index = Integer.parseInt(dataSnapshot.getName());
-      bus.produce(message, IndexCommand.newBuilder()
-          .setIndex(index)
-          .setCommand(Command.newDeserializer().fromDataSnapshot(dataSnapshot))
-          .build());
+      bus.produce(TinMessages.COMMAND_CHANGED,
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
+      System.out.println(">>>>>>>>>>>>> COMMAND_CHANGED " +
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
+    }
+  }
+
+  private class FutureCommandListener extends AbstractChildEventListener {
+    private FutureCommandListener() {
+      super(errorService, "FutureCommandListener");
+    }
+
+    @Override
+    public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
+      int index = Integer.parseInt(dataSnapshot.getName());
+      bus.produce(TinMessages.COMMAND_UNDONE,
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
+      System.out.println(">>>>>>>>>>>>>> COMMAND_UNDONE " +
+          Command.newDeserializer().fromDataSnapshot(dataSnapshot));
     }
   }
 
@@ -81,5 +100,7 @@ public class GameStateListener {
     bus = injector.get(TinKeys.BUS);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     keyedListenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
+    bus.await(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES,
+        TinMessages.CURRENT_GAME_ID, new Listener());
   }
 }

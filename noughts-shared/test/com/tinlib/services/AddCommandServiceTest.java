@@ -48,7 +48,7 @@ public class AddCommandServiceTest extends TinTestCase {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
         final Command.Builder testCommand = Command.newBuilder();
 
-        helper.bus().await(TinMessages.COMMAND_ADDED, new Subscriber1<Command>() {
+        helper.bus().await(TinMessages.COMMAND_ADD_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testCommand.setPlayerNumber(0).build(), command);
@@ -124,7 +124,7 @@ public class AddCommandServiceTest extends TinTestCase {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
         final Command.Builder testCommand = Command.newBuilder();
 
-        helper.bus().await(TinMessages.COMMAND_CHANGED, new Subscriber1<IndexCommand>() {
+        helper.bus().await(TinMessages.COMMAND_CHANGE_COMPLETED, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
             assertEquals(testCommand.setPlayerNumber(0).build(), indexCommand.getCommand());

@@ -60,7 +60,7 @@ public class SubmitActionServiceTest extends TinTestCase {
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinMessages.ACTION_SUBMITTED, new Subscriber0() {
+        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
           helper.assertGameEquals(expectedGame, FINISHED);
@@ -103,7 +103,7 @@ public class SubmitActionServiceTest extends TinTestCase {
             .setIsGameOver(true)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinMessages.ACTION_SUBMITTED, new Subscriber0() {
+        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
             helper.assertGameEquals(expectedGame, FINISHED);

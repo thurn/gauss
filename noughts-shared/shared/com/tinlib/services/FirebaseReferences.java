@@ -54,6 +54,9 @@ public class FirebaseReferences {
     return currentActionReferenceForGame(gameId).child("command");
   }
 
+  public Firebase futureCommandsReferenceForCurrentAction(String gameId) {
+    return currentActionReferenceForGame(gameId).child("futureCommand");
+  }
   public Firebase requestReference(String requestId) {
     return firebase.child("requests").child("r" + requestId);
   }

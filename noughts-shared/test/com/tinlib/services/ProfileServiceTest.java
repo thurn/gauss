@@ -46,7 +46,7 @@ public class ProfileServiceTest extends TinTestCase {
             profileService.setProfileForViewer(testProfile);
           }
         });
-        helper.bus().once(TinMessages.COMPLETED_VIEWER_PROFILE, new Subscriber1<Profile>() {
+        helper.bus().once(TinMessages.VIEWER_PROFILE, new Subscriber1<Profile>() {
           @Override
           public void onMessage(Profile completedViewerProfile) {
             assertEquals(testProfile, completedViewerProfile);

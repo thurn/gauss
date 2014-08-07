@@ -62,56 +62,56 @@ public final class TinMessages {
    * <p>This message is never fired when the current game is a local
    * multiplayer game, or when the game is over.</p>
    */
-  public static final String COMPLETED_VIEWER_PROFILE = id("tin.COMPLETED_VIEWER_PROFILE");
+  public static final String VIEWER_PROFILE = id("tin.VIEWER_PROFILE");
 
   /**
    * Fired when an action is submitted. The value will be the just-submitted
    * {@link com.tinlib.generated.Action}.
    */
-  public static final String ACTION_SUBMITTED = id("tin.ACTION_SUBMITTED");
+  public static final String SUBMIT_ACTION_COMPLETED = id("tin.SUBMIT_ACTION_COMPLETED");
 
   /**
    * Fired when a command is undone. The value will be the undone
    * {@link com.tinlib.generated.Command}.
    */
-  public static final String COMMAND_UNDONE = id("tin.COMMAND_UNDONE");
+  public static final String COMMAND_UNDO_COMPLETED = id("tin.COMMAND_UNDO_COMPLETED");
 
   /**
    * Fired when a command is redone. The value will be the redone
    * {@link com.tinlib.generated.Command}.
    */
-  public static final String COMMAND_REDONE = id("tin.COMMAND_REDONE");
+  public static final String COMMAD_REDO_COMPLETED = id("tin.COMMAD_REDO_COMPLETED");
 
   /**
    * Fired when a command is added. The value will be the newly-added
    * {@link com.tinlib.generated.Command}.
    */
-  public static final String COMMAND_ADDED = id("tin.COMMAND_ADDED");
+  public static final String COMMAND_ADD_COMPLETED = id("tin.COMMAND_ADD_COMPLETED");
 
   /**
    * Fired when a command is changed. The value will be a
    * {@link com.tinlib.generated.IndexCommand} with the changed command and
    * its index.
    */
-  public static final String COMMAND_CHANGED = id("tin.COMMAND_CHANGED");
+  public static final String COMMAND_CHANGE_COMPLETED = id("tin.COMMAND_CHANGE_COMPLETED");
 
   /**
    * Fired when a new game is created. The value will be the newly-created
    * {@link com.tinlib.generated.Game}.
    */
-  public static final String GAME_CREATED = id("tin.GAME_CREATED");
+  public static final String CREATE_GAME_COMPLETED = id("tin.CREATE_GAME_COMPLETED");
 
   /**
    * Fired when the user joins a game. The value will be
    * {@link com.tinlib.generated.Game} they joined.
    */
-  public static final String GAME_JOINED = id("tin.GAME_JOINED");
+  public static final String JOIN_GAME_COMPLETED = id("tin.JOIN_GAME_COMPLETED");
 
   /**
    * Fired when the user's account is upgraded to Facebook. No associated
    * value.
    */
-  public static final String ACCOUNT_UPGRADED_TO_FACEBOOK = id("tin.ACCOUNT_UPGRADED_TO_FACEBOOK");
+  public static final String ACCOUNT_UPGRADE_COMPLETED = id("tin.ACCOUNT_UPGRADE_COMPLETED");
 
   /**
    * Fired when a game is added to the game list. The value will be the
@@ -142,11 +142,54 @@ public final class TinMessages {
    * Fired when the viewer resigns from a game. The value will be the
    * {@link com.tinlib.generated.Game} which the viewer resigned from.
    */
-  public static final String GAME_RESIGNED = id("tin.GAME_RESIGNED");
+  public static final String RESIGN_GAME_COMPLETED = id("tin.RESIGN_GAME_COMPLETED");
 
   /**
    * Fired when the viewer archives a game which has ended. The value will
    * be the ID of the archived game.
    */
-  public static final String GAME_ARCHIVED = id("tin.GAME_ARCHIVED");
+  public static final String ARCHIVE_GAME_COMPLETED = id("tin.ARCHIVE_GAME_COMPLETED");
+
+  /**
+   * Fired when a proposed command is added by the viewer. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the added command and
+   * the index at which is was added.
+   */
+  public static final String COMMAND_ADDED = id("tin.COMMAND_ADDED");
+
+  /**
+   * Fired when a command is part of an action submitted by any player. Note
+   * that even the viewer's own commands may not show up via
+   * {@link TinMessages#COMMAND_ADDED} first because it is possible to add
+   * commands directly at submit time. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the newly submitted
+   * command.
+   */
+  public static final String COMMAND_SUBMITTED = id("tin.COMMAND_SUBMITTED");
+
+  /**
+   * Fired when a command is undone by the viewer. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the command which
+   * was undone and the index it formerly occupied.
+   */
+  public static final String COMMAND_UNDONE = id("tin.COMMAND_UNDONE");
+
+  /**
+   * Fired when the value of one of the viewer's proposed commands changes. The
+   * value will be an {@link com.tinlib.generated.IndexCommand} containing the
+   * changed command.
+   */
+  public static final String COMMAND_CHANGED = id("tin.COMMAND_CHANGED");
+
+  /**
+   * Fired when a new submitted action is added to the current game. The value
+   * will by the {@link com.tinlib.generated.Action} which was submitted.
+   */
+  public static final String ACTION_SUBMITTED = id("tin.ACTION_SUBMITTED");
+
+  /**
+   * Fired when the current game is ended. The value will be the
+   * {@link com.tinlib.generated.Game} which has just ended.
+   */
+  public static final String GAME_OVER = id("tin.GAME_OVER");
 }

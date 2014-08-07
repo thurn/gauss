@@ -45,7 +45,7 @@ public class AddCommandService {
           Game currentGame) {
         analyticsService.trackEvent("addCommand", ImmutableMap.of("command", command.toString()));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_ADDED, action.getCommand(action.getCommandCount() - 1));
+        bus.produce(TinMessages.COMMAND_ADD_COMPLETED, action.getCommand(action.getCommandCount() - 1));
       }
 
       @Override
@@ -74,7 +74,7 @@ public class AddCommandService {
         analyticsService.trackEvent("setCommand",
             ImmutableMap.of("command", command.toString(), "index", index + ""));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_CHANGED, IndexCommand.newBuilder()
+        bus.produce(TinMessages.COMMAND_CHANGE_COMPLETED, IndexCommand.newBuilder()
             .setCommand(action.getCommand(index))
             .setIndex(index)
             .build());

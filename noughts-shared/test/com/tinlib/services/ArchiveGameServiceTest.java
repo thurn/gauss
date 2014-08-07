@@ -13,7 +13,6 @@ import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
-import com.tinlib.time.TimeService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -22,7 +21,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ArchiveGameServiceTest extends TinTestCase {
@@ -44,7 +42,7 @@ public class ArchiveGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
-        helper.bus().once(TinMessages.GAME_ARCHIVED, new Subscriber1<String>() {
+        helper.bus().once(TinMessages.ARCHIVE_GAME_COMPLETED, new Subscriber1<String>() {
           @Override
           public void onMessage(String gameId) {
             assertEquals(GAME_ID, gameId);

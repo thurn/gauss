@@ -55,7 +55,7 @@ public class UndoService {
           Game currentGame) {
         analyticsService.trackEvent("Undo");
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_UNDONE,
+        bus.produce(TinMessages.COMMAND_UNDO_COMPLETED,
             action.getFutureCommand(action.getFutureCommandCount() - 1));
       }
 
@@ -82,7 +82,7 @@ public class UndoService {
                              Game currentGame) {
         analyticsService.trackEvent("Redo");
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_REDONE,
+        bus.produce(TinMessages.COMMAD_REDO_COMPLETED,
             action.getCommand(action.getCommandCount() - 1));
       }
 

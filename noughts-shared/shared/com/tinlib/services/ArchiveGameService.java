@@ -33,7 +33,7 @@ public class ArchiveGameService {
             if (firebaseError != null) {
               errorService.error("Error archiving game '%s'. %s", gameId, firebaseError);
             } else {
-              bus.produce(TinMessages.GAME_ARCHIVED, gameId);
+              bus.produce(TinMessages.ARCHIVE_GAME_COMPLETED, gameId);
             }
           }
         });

@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nullable;
 
+import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import com.tinlib.util.Games;
 import com.tinlib.inject.Injector;
 import com.tinlib.analytics.AnalyticsService;
@@ -19,7 +20,6 @@ import org.timepedia.exporter.client.NoExport;
 
 import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;
 import ca.thurn.gwtcompat.client.AtomicInteger;
-import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
