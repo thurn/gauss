@@ -36,6 +36,10 @@ public class GameList {
   }
 
   private class GameChildListener extends AbstractChildEventListener {
+    private GameChildListener() {
+      super(errorService, "GameChildListener");
+    }
+
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String previous) {
       String gameId = dataSnapshot.getName();
@@ -81,11 +85,6 @@ public class GameList {
       } finally {
         listLock.unlock();
       }
-    }
-
-    @Override
-    public void onCancelled(FirebaseError firebaseError) {
-      errorService.error("GameChildListener cancelled. %s", firebaseError);
     }
   }
 
