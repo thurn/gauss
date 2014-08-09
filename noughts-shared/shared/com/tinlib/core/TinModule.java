@@ -93,10 +93,10 @@ public class TinModule implements Module {
         return new ViewerService(injector);
       }
     });
-    binder.bindSingletonKey(TinKeys.GAME_STATE_LISTENER, new Initializer() {
+    binder.bindSingletonKey(TinKeys.COMMAND_LISTENER, new Initializer() {
       @Override
       public Object initialize(Injector injector) {
-        return new GameStateListener(injector);
+        return new CommandListener(injector);
       }
     });
   }

@@ -107,6 +107,7 @@ public class UndoServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID)
+        .setPlayerNumber(0)
         .addFutureCommand(Command.newBuilder().setPlayerNumber(0).build())
         .build();
     TestHelper.Builder builder = newTestHelper(testGame, testAction);
@@ -116,7 +117,7 @@ public class UndoServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         UndoService undoService = new UndoService(helper.injector());
 
-        helper.bus().await(TinMessages.COMMAD_REDO_COMPLETED, new Subscriber1<Command>() {
+        helper.bus().await(TinMessages.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testAction.getFutureCommand(0), command);

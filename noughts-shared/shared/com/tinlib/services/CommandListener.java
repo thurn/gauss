@@ -15,6 +15,7 @@ public class CommandListener {
 
   public CommandListener(Injector injector) {
     bus = injector.get(TinKeys.BUS);
+    listen();
   }
 
   private void listen() {

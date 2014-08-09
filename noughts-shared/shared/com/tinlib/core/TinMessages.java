@@ -80,7 +80,7 @@ public final class TinMessages {
    * Fired when a command is redone. The value will be the redone
    * {@link com.tinlib.generated.Command}.
    */
-  public static final String COMMAD_REDO_COMPLETED = id("tin.COMMAD_REDO_COMPLETED");
+  public static final String COMMAND_REDO_COMPLETED = id("tin.COMMAND_REDO_COMPLETED");
 
   /**
    * Fired when a command is added. The value will be the newly-added

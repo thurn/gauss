@@ -1,6 +1,7 @@
 package com.tinlib.services;
 
 import com.firebase.client.FirebaseError;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
@@ -15,6 +16,8 @@ import com.tinlib.inject.Injector;
 import com.tinlib.message.Bus;
 import com.tinlib.time.LastModifiedService;
 import com.tinlib.validator.ActionValidatorService;
+
+import java.util.List;
 
 public class AddCommandService {
   private final Bus bus;
@@ -37,7 +40,8 @@ public class AddCommandService {
     gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
       @Override
       public void mutate(String viewerId, Action.Builder action, Game currentGame) {
-        addCommandToAction(actionValidatorService, viewerId, currentGame, action, command);
+        addCommandsToAction(actionValidatorService, viewerId, currentGame, action,
+            ImmutableList.of(command));
       }
 
       @Override
@@ -45,7 +49,8 @@ public class AddCommandService {
           Game currentGame) {
         analyticsService.trackEvent("addCommand", ImmutableMap.of("command", command.toString()));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_ADD_COMPLETED, action.getCommand(action.getCommandCount() - 1));
+        bus.produce(TinMessages.COMMAND_ADD_COMPLETED,
+            action.getCommand(action.getCommandCount() - 1));
       }
 
       @Override
@@ -87,14 +92,16 @@ public class AddCommandService {
     });
   }
 
-  static void addCommandToAction(ActionValidatorService actionValidatorService,
-      String viewerId, Game currentGame, Action.Builder action, Command command) {
-    if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {
-      throw new TinException("Can't add command '%s' to action '%s'", command, action);
-    }
+  static void addCommandsToAction(ActionValidatorService actionValidatorService,
+      String viewerId, Game currentGame, Action.Builder action, List<Command> commands) {
     int player = currentGame.getCurrentPlayerNumber();
+    for (Command command : commands) {
+      if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {
+        throw new TinException("Can't add command '%s' to action '%s'", command, action);
+      }
+      action.addCommand(command.toBuilder().setPlayerNumber(player));
+    }
     action.clearFutureCommandList();
-    action.addCommand(command.toBuilder().setPlayerNumber(player));
     action.setPlayerNumber(player);
   }
 }

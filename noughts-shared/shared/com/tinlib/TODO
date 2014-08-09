@@ -1,0 +1,29 @@
+Injector
+  - consider making singleton keys the default
+  - make it possible to bind a "listener" type class eagerly
+  - maybe make eager initialization the default/only option?
+  - tests
+
+Bus
+  - Improve the system for waiting on multiple internal keys, which sometimes have no associated object
+  - Bring back the post/produce distinction
+  - Handle invalidations better -- if you're waiting to fire a one-off action and the game_id changes,
+    you need to abort that, not fire with the new game id
+  - Handle errors better when you're waiting on multiple keys
+  - tests
+
+TestHelper
+  - Just use bindInstance directly
+  - Figure out a better system for cleanup logic
+  - Figure out why tests sometimes fail together but pass in isolation
+  - tests
+
+EntityGenerator
+  - Integrate it with the build process
+  - Add support for extensions
+  - Add support for packages
+  - Generally clean up the code
+  - tests
+
+GameList
+  - Rewrite the tests to rely less on storing junk in class fields
