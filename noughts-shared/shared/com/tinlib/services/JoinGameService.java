@@ -29,7 +29,7 @@ public class JoinGameService {
 
   private final Bus bus;
   private final ErrorService errorService;
-  private final CurrentGameService currentGameService;
+  private final CurrentGameListener currentGameListener;
   private final AnalyticsService analyticsService;
   private final PushNotificationService pushNotificationService;
   private final JoinGameValidatorService joinGameValidatorService;
@@ -38,7 +38,7 @@ public class JoinGameService {
   public JoinGameService(Injector injector) {
     bus = injector.get(TinKeys.BUS);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
-    currentGameService = injector.get(TinKeys.CURRENT_GAME_SERVICE);
+    currentGameListener = injector.get(TinKeys.CURRENT_GAME_SERVICE);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
     pushNotificationService = injector.get(TinKeys.PUSH_NOTIFICATION_SERVICE);
     joinGameValidatorService = injector.get(TinKeys.JOIN_GAME_VALIDATOR_SERVICE);
@@ -47,7 +47,7 @@ public class JoinGameService {
 
   public void joinGame(final int playerNumber, final String gameId,
       final Optional<Profile> profile) {
-    currentGameService.loadGame(gameId);
+    currentGameListener.loadGame(gameId);
     bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME,
         new Subscriber3<String, FirebaseReferences, Game>() {
       @Override

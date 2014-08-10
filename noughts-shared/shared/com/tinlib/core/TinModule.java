@@ -76,7 +76,7 @@ public class TinModule implements Module {
     binder.bindSingletonKey(TinKeys.CURRENT_GAME_SERVICE, new Initializer() {
       @Override
       public Object initialize(Injector injector) {
-        return new CurrentGameService(injector);
+        return new CurrentGameListener(injector);
       }
     });
     binder.bindSingletonKey(TinKeys.JOIN_GAME_VALIDATOR_SERVICE, new Initializer() {

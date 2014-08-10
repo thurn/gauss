@@ -107,7 +107,7 @@ public class TinKeys {
   public static final String JOIN_GAME_SERVICE = id("tin.JOIN_GAME_SERVICE");
 
   /**
-   * The {@link com.tinlib.services.CurrentGameService}.
+   * The {@link com.tinlib.services.CurrentGameListener}.
    */
   public static final String CURRENT_GAME_SERVICE = id("tin.CURRENT_GAME_SERVICE");
 

@@ -9,11 +9,11 @@ import com.tinlib.message.Bus;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.util.Games;
 
-public class GameStatusService {
+public class GameStatusListener {
   private final Bus bus;
   private GameStatus lastStatus;
 
-  public GameStatusService(Injector injector) {
+  public GameStatusListener(Injector injector) {
     bus = injector.get(TinKeys.BUS);
     bus.await(TinMessages.CURRENT_GAME, new Subscriber1<Game>() {
       @Override

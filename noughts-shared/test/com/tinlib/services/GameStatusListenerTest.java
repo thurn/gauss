@@ -15,7 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GameStatusServiceTest extends TinTestCase {
+public class GameStatusListenerTest extends TinTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -36,7 +36,7 @@ public class GameStatusServiceTest extends TinTestCase {
             finished();
           }
         });
-        GameStatusService gameStatusService = new GameStatusService(helper.injector());
+        GameStatusListener gameStatusListener = new GameStatusListener(helper.injector());
         helper.bus().produce(TinMessages.CURRENT_GAME, testGame);
       }
     });

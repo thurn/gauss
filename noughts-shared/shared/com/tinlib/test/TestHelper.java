@@ -243,8 +243,8 @@ public class TestHelper {
       references = null;
     }
     if (gameId != null) {
-      (new CurrentGameService(injector)).loadGame(gameId);
-      new CurrentActionService(injector);
+      (new CurrentGameListener(injector)).loadGame(gameId);
+      new CurrentActionListener(injector);
     }
   }
 
