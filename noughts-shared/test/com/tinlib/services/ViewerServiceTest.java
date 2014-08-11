@@ -41,9 +41,9 @@ public class ViewerServiceTest extends TinTestCase {
             assertEquals("users",
                 references.userGames().getParent().getParent().getName());
 
-            assertEquals("submittedActionList",
+            assertEquals("submittedAction",
                 references.gameSubmittedActionsReference("gameId").getName());
-            assertEquals("commandList",
+            assertEquals("command",
                 references.commandsReferenceForCurrentAction("gameId").getName());
             assertEquals("r123", references.requestReference("123").getName());
             finished();

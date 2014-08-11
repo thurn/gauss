@@ -127,7 +127,12 @@ public class TinKeys {
   public static final String VIEWER_SERVICE = id("tin.VIEWER_SERVICE");
 
   /**
-   * {@link com.tinlib.services.GameStateListener}
+   * {@link com.tinlib.services.CommandListener}
    */
   public static final String COMMAND_LISTENER = id("tin.COMMAND_LISTENER");
+
+  /**
+   * {@link com.tinlib.services.GameOverListener}
+   */
+  public static final String GAME_OVER_LISTENER = id("tin.GAME_OVER_LISTENER");
 }

@@ -99,5 +99,11 @@ public class TinModule implements Module {
         return new CommandListener(injector);
       }
     });
+    binder.bindSingletonKey(TinKeys.GAME_OVER_LISTENER, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new GameOverListener(injector);
+      }
+    });
   }
 }

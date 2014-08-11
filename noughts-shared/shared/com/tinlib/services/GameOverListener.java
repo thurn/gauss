@@ -13,6 +13,7 @@ public class GameOverListener {
 
   public GameOverListener(Injector injector) {
     bus = injector.get(TinKeys.BUS);
+    listen();
   }
 
   private void listen() {
