@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 /**
  * Class which associates an action with a given heuristic score.

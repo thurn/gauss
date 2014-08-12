@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 import ca.thurn.gwtcompat.client.AsyncOperation;
 import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;

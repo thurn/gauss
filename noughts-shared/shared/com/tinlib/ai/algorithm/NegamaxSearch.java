@@ -1,10 +1,10 @@
-package ca.thurn.uct.algorithm;
+package com.tinlib.ai.algorithm;
 
-import ca.thurn.uct.core.ActionScore;
-import ca.thurn.uct.core.AgentEvaluator;
-import ca.thurn.uct.core.AsynchronousAgent;
-import ca.thurn.uct.core.Evaluator;
-import ca.thurn.uct.core.State;
+import com.tinlib.ai.ActionScore;
+import com.tinlib.ai.AgentEvaluator;
+import com.tinlib.ai.AsynchronousAgent;
+import com.tinlib.ai.Evaluator;
+import com.tinlib.ai.State;
 
 /**
  * An agent which selects an action via the Negamax search algorithm.

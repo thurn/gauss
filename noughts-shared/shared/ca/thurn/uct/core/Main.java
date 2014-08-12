@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import com.google.gwt.core.shared.GwtIncompatible;
+import com.tinlib.ai.*;
 
 /**
  * A helper class for running games & sets of games between multiple Agents.

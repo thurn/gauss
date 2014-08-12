@@ -1,13 +1,13 @@
-package ca.thurn.uct.algorithm;
+package com.tinlib.ai.algorithm;
 
 import java.util.Random;
 
-import ca.thurn.uct.core.ActionScore;
-import ca.thurn.uct.core.ActionTree;
-import ca.thurn.uct.core.AsynchronousAgent;
-import ca.thurn.uct.core.Evaluator;
-import ca.thurn.uct.core.State;
-import ca.thurn.uct.core.WinLossEvaluator;
+import com.tinlib.ai.ActionScore;
+import com.tinlib.ai.ActionTree;
+import com.tinlib.ai.AsynchronousAgent;
+import com.tinlib.ai.Evaluator;
+import com.tinlib.ai.State;
+import com.tinlib.ai.WinLossEvaluator;
 
 /**
  * An agent which selects actions based on the UCT algorithm described in the

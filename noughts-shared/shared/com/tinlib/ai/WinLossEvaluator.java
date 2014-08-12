@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 /**
  * An {@link Evaluator} which solely evaluates a state based on whether or not

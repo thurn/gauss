@@ -10,8 +10,8 @@ import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import ca.thurn.uct.core.Copyable;
-import ca.thurn.uct.core.Player;
-import ca.thurn.uct.core.State;
+import com.tinlib.ai.Player;
+import com.tinlib.ai.State;
 
 /**
  * State for a game of Tic Tac Toe.

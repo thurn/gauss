@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 /**
  * An Agent is any entity capable of analyzing a given game state and selecting

@@ -1,4 +1,6 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
+
+import ca.thurn.uct.core.Copyable;
 
 import java.util.Iterator;
 

@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 /**
  * Constants representing different players in a game.

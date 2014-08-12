@@ -25,8 +25,8 @@ import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.generated.Pronoun;
-import ca.thurn.uct.algorithm.MonteCarloSearch;
-import ca.thurn.uct.core.ActionScore;
+import com.tinlib.ai.algorithm.MonteCarloSearch;
+import com.tinlib.ai.ActionScore;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;

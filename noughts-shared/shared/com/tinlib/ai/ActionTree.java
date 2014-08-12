@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai;
 
 import java.util.HashMap;
 import java.util.Map;
