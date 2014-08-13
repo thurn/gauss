@@ -10,8 +10,7 @@ import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import ca.thurn.uct.core.Copyable;
-import com.tinlib.ai.Player;
-import com.tinlib.ai.State;
+import com.tinlib.ai.core.State;
 
 /**
  * State for a game of Tic Tac Toe.
@@ -125,7 +124,7 @@ public class ComputerState implements State {
    * {@inheritDoc}
    */
   @Override
-  public State copy() {
+  public ComputerState copy() {
     if (actions == null) {
       return new ComputerState();
     }
@@ -136,9 +135,9 @@ public class ComputerState implements State {
    * {@inheritDoc}
    */
   @Override
-  public State initializeFrom(Copyable state) {
+  public State initializeFrom(Object state) {
     if (state instanceof ComputerState) {
-      ComputerState copy = (ComputerState)state.copy();
+      ComputerState copy = ((ComputerState)state).copy();
       this.board = copy.board;
       this.currentPlayer = copy.currentPlayer;
       this.actions = copy.actions;

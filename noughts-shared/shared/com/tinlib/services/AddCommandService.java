@@ -40,8 +40,7 @@ public class AddCommandService {
     gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
       @Override
       public void mutate(String viewerId, Action.Builder action, Game currentGame) {
-        addCommandsToAction(actionValidatorService, viewerId, currentGame, action,
-            ImmutableList.of(command));
+        addCommandsToAction(viewerId, currentGame, action, ImmutableList.of(command));
       }
 
       @Override
@@ -92,8 +91,8 @@ public class AddCommandService {
     });
   }
 
-  static void addCommandsToAction(ActionValidatorService actionValidatorService,
-      String viewerId, Game currentGame, Action.Builder action, List<Command> commands) {
+  public void addCommandsToAction(String viewerId, Game currentGame, Action.Builder action,
+      List<Command> commands) {
     int player = currentGame.getCurrentPlayerNumber();
     for (Command command : commands) {
       if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {

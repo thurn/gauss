@@ -1,4 +1,4 @@
-package com.tinlib.ai;
+package com.tinlib.ai.core;
 
 /**
  * An Agent is any entity capable of analyzing a given game state and selecting
@@ -18,8 +18,8 @@ public interface Agent {
    *     score for this action, where a higher number indicates a better action
    *     for the player.
    */
-  public ActionScore pickActionBlocking(int player, State rootNode);
-  
+  public ActionScore pickAction(int player, State rootNode);
+
   /**
    * @return A copy of the null-initialized state object this agent wishes
    *     to use for its internal state representation.

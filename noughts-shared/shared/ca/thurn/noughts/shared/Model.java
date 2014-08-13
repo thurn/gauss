@@ -18,7 +18,6 @@ import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
 import org.timepedia.exporter.client.NoExport;
 
-import ca.thurn.gwtcompat.client.AsyncOperation.OnComplete;
 import ca.thurn.gwtcompat.client.AtomicInteger;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
@@ -26,7 +25,6 @@ import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.generated.Pronoun;
 import com.tinlib.ai.algorithm.MonteCarloSearch;
-import com.tinlib.ai.ActionScore;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -777,18 +775,18 @@ public class Model extends AbstractChildEventListener implements Exportable {
         .setNumSimulations(numSimulations)
         .build();
     int player = computerState.convertPlayerNumber(game.getCurrentPlayerNumber());
-    agent.beginAsynchronousSearch(player, computerState, new OnComplete<ActionScore>() {
-      @Override
-      public void onComplete(ActionScore result) {
-        Command command = computerState.longToCommand(result.getAction());
-        addCommandAndSubmit(gameId, command, new OnMutationCompleted() {
-          @Override
-          public void onMutationCompleted(Game game) {
-            isComputerThinking = false;
-          }
-        });
-      }
-    });
+//    agent.beginAsynchronousSearch(player, computerState, new OnComplete<ActionScore>() {
+//      @Override
+//      public void onComplete(ActionScore result) {
+//        Command command = computerState.longToCommand(result.getAction());
+//        addCommandAndSubmit(gameId, command, new OnMutationCompleted() {
+//          @Override
+//          public void onMutationCompleted(Game game) {
+//            isComputerThinking = false;
+//          }
+//        });
+//      }
+//    });
   }
 
   /**

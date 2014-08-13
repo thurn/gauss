@@ -1,4 +1,4 @@
-package com.tinlib.ai;
+package com.tinlib.ai.core;
 
 
 /**
@@ -25,7 +25,7 @@ public class AgentEvaluator implements Evaluator {
       return state.getWinner() == player ? 1.0 : -1.0;
     } else {
       State represented = agent.getStateRepresentation().initializeFrom(state);
-      return agent.pickActionBlocking(player, represented).getScore();
+      return agent.pickAction(player, represented).getScore();
     }
   }
 

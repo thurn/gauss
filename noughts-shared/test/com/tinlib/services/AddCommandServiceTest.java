@@ -180,6 +180,11 @@ public class AddCommandServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
+  @Test
+  public void testAddCommandsToAction() {
+    
+  }
+
   private TestHelper.Builder newTestHelper(Game testGame, Action testAction) {
     TestHelper.Builder builder = TestHelper.newBuilder(this);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);

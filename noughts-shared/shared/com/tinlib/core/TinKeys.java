@@ -135,4 +135,26 @@ public class TinKeys {
    * {@link com.tinlib.services.GameOverListener}
    */
   public static final String GAME_OVER_LISTENER = id("tin.GAME_OVER_LISTENER");
+
+  /**
+   * {@link com.tinlib.services.SubmittedActionListener}
+   */
+  public static final String SUBMITTED_ACTION_LISTENER = id("tin.SUBMITTED_ACTION_LISTENER");
+
+  /**
+   * {@link com.tinlib.services.SubmitActionService}
+   */
+  public static final String SUBMIT_ACTION_SERVICE = id("tin.SUBMIT_ACTION_SERVICE");
+
+  /**
+   * {@link com.tinlib.services.AddCommandService}
+   */
+  public static final String ADD_COMMAND_SERVICE = id("ADD_COMMAND_SERVICE");
+
+  /**
+   * {@link com.tinlib.ai.service.AIProvider}
+   */
+  public static final String AI_PROVIDER = id("tin.AI_PROVIDER");
+
+  public static final String AI_ACTION_ADAPTER = id("tin.AI_ACTION_ADAPTER");
 }

@@ -8,8 +8,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import ca.thurn.noughts.shared.Player;
 import com.google.gwt.core.shared.GwtIncompatible;
-import com.tinlib.ai.*;
+import com.tinlib.ai.core.ActionScore;
+import com.tinlib.ai.core.Agent;
+import com.tinlib.ai.core.State;
 
 /**
  * A helper class for running games & sets of games between multiple Agents.
@@ -134,19 +137,8 @@ public class Main {
         System.out.println(canonicalState);
       }
       Agent agent = agentMap.get(canonicalState.getCurrentPlayer());
-      long action;
-      if (agent instanceof AsynchronousAgent) {
-        AsynchronousAgent async = (AsynchronousAgent)agent;
-        ActionScore pair = async.pickActionBlocking(canonicalState.getCurrentPlayer(),
-            async.getStateRepresentation().initializeFrom(canonicalState));
-        if (pair == null) {
-          throw new RuntimeException("Agent " + async + " needed more time.");
-        }
-        action = pair.getAction();
-      } else {
-        action = agent.pickActionBlocking(canonicalState.getCurrentPlayer(),
-            agent.getStateRepresentation().initializeFrom(canonicalState)).getAction();
-      }
+      long action = agent.pickAction(canonicalState.getCurrentPlayer(),
+          agent.getStateRepresentation().initializeFrom(canonicalState)).getAction();
       if (isInteractive) {
         System.out.println(agent + " picked action " + canonicalState.actionToString(action));
       }

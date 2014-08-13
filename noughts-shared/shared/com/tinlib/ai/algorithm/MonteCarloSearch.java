@@ -3,17 +3,13 @@ package com.tinlib.ai.algorithm;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tinlib.ai.ActionScore;
-import com.tinlib.ai.AsynchronousAgent;
-import com.tinlib.ai.Evaluator;
-import com.tinlib.ai.State;
-import com.tinlib.ai.WinLossEvaluator;
+import com.tinlib.ai.core.*;
 
 /**
  * An agent which picks actions by running repeated random simulations from
  * the current state and returning the one that had the best average outcome.
  */
-public class MonteCarloSearch extends AsynchronousAgent {
+public class MonteCarloSearch implements Agent {
 
   /**
    * Builder for MonteCarloSearch.
@@ -99,14 +95,6 @@ public class MonteCarloSearch extends AsynchronousAgent {
   private final int maxDepth;
   private final Evaluator evaluator;
 
-  /**
-   * Field-initializing constructor.
-   *
-   * @param stateRepresentation
-   * @param numSimulations
-   * @param maxDepth
-   * @param evaluator
-   */
   private MonteCarloSearch(State stateRepresentation, int numSimulations, double discountRate,
       int maxDepth, Evaluator evaluator) {
     this.stateRepresentation = stateRepresentation;
@@ -128,22 +116,9 @@ public class MonteCarloSearch extends AsynchronousAgent {
    * {@inheritDoc}
    */
   @Override
-  public ActionScore pickActionBlocking(int player, State root) {
-    Map<Long, Double> actionRewards = new HashMap<Long, Double>();
+  public ActionScore pickAction(int player, State root) {
+    Map<Long, Double> actionRewards = new HashMap<>();
     return runSimulations(player, root, actionRewards, numSimulations);
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("MonteCarloSearch [numSimulations=");
-    builder.append(numSimulations);
-    builder.append(", discountRate=");
-    builder.append(discountRate);
-    builder.append(", maxDepth=");
-    builder.append(maxDepth);
-    builder.append("]");
-    return builder.toString();
   }
 
   /**

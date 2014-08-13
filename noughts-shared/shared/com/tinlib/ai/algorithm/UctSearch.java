@@ -2,18 +2,13 @@ package com.tinlib.ai.algorithm;
 
 import java.util.Random;
 
-import com.tinlib.ai.ActionScore;
-import com.tinlib.ai.ActionTree;
-import com.tinlib.ai.AsynchronousAgent;
-import com.tinlib.ai.Evaluator;
-import com.tinlib.ai.State;
-import com.tinlib.ai.WinLossEvaluator;
+import com.tinlib.ai.core.*;
 
 /**
  * An agent which selects actions based on the UCT algorithm described in the
  * 2006 paper "Bandit based Monte-Carlo Planning" by Kocsis and Szepesvari.
  */
-public class UctSearch extends AsynchronousAgent {
+public class UctSearch implements Agent {
 
   /**
     * This exploration bias value, 1/sqrt(2), was shown by Kocsis and
@@ -57,7 +52,7 @@ public class UctSearch extends AsynchronousAgent {
     }
 
     /**
-     * @param numSimluations Number of simulations to run before picking the
+     * @param numSimulations Number of simulations to run before picking the
      *     best action from the root node. Default value: 100000.
      * @return this.
      */
@@ -155,7 +150,7 @@ public class UctSearch extends AsynchronousAgent {
    * {@inheritDoc}
    */
   @Override
-  public ActionScore pickActionBlocking(int player, State root) {
+  public ActionScore pickAction(int player, State root) {
     ActionTree actionTree = new ActionTree();
     return runSimulations(player, root, actionTree, numSimulations);
   }
@@ -257,7 +252,7 @@ public class UctSearch extends AsynchronousAgent {
    *     position.
    * @param reward The reward associated with this position.
    */
-  private void updateTree(ActionTree actionTree, final double reward) {;
+  private void updateTree(ActionTree actionTree, final double reward) {
     actionTree.incrementNumVisits();
     actionTree.addReward(reward);
   }
@@ -326,20 +321,5 @@ public class UctSearch extends AsynchronousAgent {
     }
     return (2.0 * explorationBias *
         Math.sqrt(Math.log(visitsToState) / visitsToAction));
-  }
-
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("UctSearch [numSimulations=");
-    builder.append(numSimulations);
-    builder.append(", explorationBias=");
-    builder.append(explorationBias);
-    builder.append(", discountRate=");
-    builder.append(discountRate);
-    builder.append(", maxDepth=");
-    builder.append(maxDepth);
-    builder.append("]");
-    return builder.toString();
   }
 }

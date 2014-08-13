@@ -232,6 +232,7 @@ public class TestHelper {
     });
     injector.get(TinKeys.COMMAND_LISTENER); // TODO: Make this not necessary
     injector.get(TinKeys.GAME_OVER_LISTENER);
+    injector.get(TinKeys.SUBMITTED_ACTION_LISTENER);
     if (viewerId != null && viewerKey != null) {
       if (facebook) {
         (new ViewerService(injector)).setViewerFacebookId(viewerId);

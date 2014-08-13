@@ -1,6 +1,4 @@
-package com.tinlib.ai;
-
-import ca.thurn.uct.core.Copyable;
+package com.tinlib.ai.core;
 
 import java.util.Iterator;
 
@@ -13,8 +11,7 @@ import java.util.Iterator;
  * have only one public constructor: a zero-argument one which performs no
  * work and null-initializes the state.
  */
-public interface State extends Copyable {
-  
+public interface State {
   /**
    * An iterator over the actions available from a state in an undefined order.
    */
@@ -36,7 +33,6 @@ public interface State extends Copyable {
    * Adapter class to convert an Iterable<Long> into an ActionIterator.
    */
   public static class ActionIteratorFromIterable implements ActionIterator {
-    
     private final Iterator<Long> iterator;
     
     /**
@@ -98,8 +94,8 @@ public interface State extends Copyable {
    * performed action as an argument.
    * 
    * @param action The action to undo.
-   * @param undoToken The undo token returned from
-   *     {@link State#undo(long, long)} when this action was performed.
+   * @param undoToken The undo token returned from {@link State#perform(long)}
+   *     when this action was performed.
    */
   public void undo(long action, long undoToken);
   
@@ -125,7 +121,7 @@ public interface State extends Copyable {
    * @param state The object to initialize this state from.
    * @return this.
    */
-  public State initializeFrom(Copyable state);
+  public State initializeFrom(Object state);
  
   /**
    * @return True if there are no more actions possible from this state (the

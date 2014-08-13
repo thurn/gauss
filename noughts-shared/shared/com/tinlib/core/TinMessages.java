@@ -183,7 +183,8 @@ public final class TinMessages {
 
   /**
    * Fired when a new submitted action is added to the current game. The value
-   * will by the {@link com.tinlib.generated.Action} which was submitted.
+   * will be the {@link com.tinlib.generated.Game} with the newly-submitted
+   * action.
    */
   public static final String ACTION_SUBMITTED = id("tin.ACTION_SUBMITTED");
 

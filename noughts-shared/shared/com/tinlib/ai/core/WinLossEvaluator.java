@@ -1,4 +1,4 @@
-package com.tinlib.ai;
+package com.tinlib.ai.core;
 
 /**
  * An {@link Evaluator} which solely evaluates a state based on whether or not

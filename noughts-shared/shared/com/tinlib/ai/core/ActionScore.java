@@ -1,4 +1,4 @@
-package com.tinlib.ai;
+package com.tinlib.ai.core;
 
 /**
  * Class which associates an action with a given heuristic score.

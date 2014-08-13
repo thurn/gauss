@@ -1,15 +1,11 @@
 package com.tinlib.ai.algorithm;
 
-import com.tinlib.ai.ActionScore;
-import com.tinlib.ai.AgentEvaluator;
-import com.tinlib.ai.AsynchronousAgent;
-import com.tinlib.ai.Evaluator;
-import com.tinlib.ai.State;
+import com.tinlib.ai.core.*;
 
 /**
  * An agent which selects an action via the Negamax search algorithm.
  */
-public class NegamaxSearch extends AsynchronousAgent {
+public class NegamaxSearch implements Agent {
 
   /**
    * Builder for NegamaxSearch.
@@ -52,7 +48,7 @@ public class NegamaxSearch extends AsynchronousAgent {
      * @param evaluator Function to use to evaluate the quality of nodes in
      *     the search tree once the depth limit is hit. Default value is an
      *     {@link AgentEvaluator} based on a {@link MonteCarloSearch} agent.
-     * @return
+     * @return this.
      */
     public Builder setEvaluator(Evaluator evaluator) {
       this.evaluator = evaluator;
@@ -82,7 +78,7 @@ public class NegamaxSearch extends AsynchronousAgent {
    * {@inheritDoc}
    */
   @Override
-  public ActionScore pickActionBlocking(int player, State rootNode) {
+  public ActionScore pickAction(int player, State rootNode) {
     return search(player, rootNode, searchDepth, Double.NEGATIVE_INFINITY,
         Double.POSITIVE_INFINITY);
   }
@@ -103,9 +99,6 @@ public class NegamaxSearch extends AsynchronousAgent {
    * @param maxDepth The maximum depth to search to in the game tree.
    * @param alpha The minimum known score that the maximizing player can get.
    * @param beta The maximum known score that the minimizing player can get.
-   * @param thread Optionally, the thread this search is running on, so the
-   *     algorithm can check for interrupts and terminate. Pass null to
-   *     disable this functionality.
    * @return An ActionScore pair consisting of the best action for the player
    *     to take and the heuristic score associated with this action.
    */
@@ -136,16 +129,4 @@ public class NegamaxSearch extends AsynchronousAgent {
     }
     return new ActionScore(bestAction, bestValue);
   }
-
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("NegamaxSearch [searchDepth=");
-    builder.append(searchDepth);
-    builder.append(", evaluator=");
-    builder.append(evaluator);
-    builder.append("]");
-    return builder.toString();
-  }
-
 }

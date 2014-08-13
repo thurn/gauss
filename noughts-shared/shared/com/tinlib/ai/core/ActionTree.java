@@ -1,4 +1,4 @@
-package com.tinlib.ai;
+package com.tinlib.ai.core;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +17,7 @@ public class ActionTree {
    * Constructs a new ActionTree root node.
    */
   public ActionTree() {
-    this.children = new HashMap<Long, ActionTree>();
+    this.children = new HashMap<>();
   }
   
   /**

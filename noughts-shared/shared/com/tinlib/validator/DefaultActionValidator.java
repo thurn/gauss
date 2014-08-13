@@ -23,6 +23,8 @@ public class DefaultActionValidator implements ActionValidator {
   @Override
   public boolean canSubmitAction(String viewerId, Game game, Action currentAction) {
     if (game.getIsGameOver() || !Games.hasCurrentPlayer(game)) return false;
+    if (!currentAction.getGameId().equals(game.getId())) return false;
+    if (currentAction.getIsSubmitted()) return false;
     if (currentAction.getCommandCount() == 0) return false;
     return Games.currentPlayerId(game).equals(viewerId);
   }

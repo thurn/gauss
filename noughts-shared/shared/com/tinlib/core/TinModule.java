@@ -105,5 +105,23 @@ public class TinModule implements Module {
         return new GameOverListener(injector);
       }
     });
+    binder.bindSingletonKey(TinKeys.SUBMITTED_ACTION_LISTENER, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new SubmittedActionListener(injector);
+      }
+    });
+    binder.bindSingletonKey(TinKeys.ADD_COMMAND_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new AddCommandService(injector);
+      }
+    });
+    binder.bindSingletonKey(TinKeys.SUBMIT_ACTION_SERVICE, new Initializer() {
+      @Override
+      public Object initialize(Injector injector) {
+        return new SubmitActionService(injector);
+      }
+    });
   }
 }

@@ -23,7 +23,7 @@ public class SubmittedActionListener {
         if (lastGame != null && currentGame.getId().equals(lastGame.getId())) {
           for (int i = lastGame.getSubmittedActionCount();
                i < currentGame.getSubmittedActionCount(); ++i) {
-            bus.produce(TinMessages.ACTION_SUBMITTED, currentGame.getSubmittedAction(i));
+            bus.produce(TinMessages.ACTION_SUBMITTED, currentGame);
           }
         }
         lastGame = currentGame;
