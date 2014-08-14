@@ -1,6 +1,7 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
+import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.core.TinMessages;
 import com.tinlib.generated.Action;
@@ -17,6 +18,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -61,7 +64,7 @@ public class AddCommandServiceTest extends TinTestCase {
           }
         });
 
-       addCommandService.addCommand(testCommand.build());
+        addCommandService.addCommand(testCommand.build());
       }
     });
     endAsyncTestBlock();
@@ -182,7 +185,24 @@ public class AddCommandServiceTest extends TinTestCase {
 
   @Test
   public void testAddCommandsToAction() {
-    
+    beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
+    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        AddCommandService addCommandService = new AddCommandService(helper.injector());
+        Action.Builder action = TestUtils.newEmptyAction(GAME_ID);
+        List<Command> commands = ImmutableList.of(Command.newBuilder().setPlayerNumber(12).build());
+        addCommandService.addCommandsToAction(VIEWER_ID, testGame, action, commands);
+        assertEquals(1, action.build().getCommandCount());
+        assertEquals(0, action.build().getCommand(0).getPlayerNumber());
+        finished();
+      }
+    });
+    endAsyncTestBlock();
   }
 
   private TestHelper.Builder newTestHelper(Game testGame, Action testAction) {

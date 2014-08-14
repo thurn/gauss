@@ -43,7 +43,7 @@ public class SubmitActionServiceTest extends TinTestCase {
   private TimeService mockTimeService;
 
   @Test
-  public void testSubmitActionSuccess() {
+  public void testSubmitCurrentAction() {
     beginAsyncTestBlock(2);
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
@@ -84,11 +84,10 @@ public class SubmitActionServiceTest extends TinTestCase {
   }
 
   @Test
-  public void testSubmitActionEndsGame() {
+  public void testSubmitCurrentActionEndsGame() {
     beginAsyncTestBlock(2);
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
-    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
-        .build();
+    final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
     TestHelper.Builder builder = newBuilder(testGame, testAction);
     builder.runTest(new TestHelper.Test() {
       @Override
@@ -122,6 +121,47 @@ public class SubmitActionServiceTest extends TinTestCase {
 
     TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
     TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "Game over");
+  }
+
+  @Test
+  public void testSubmitAction() {
+    beginAsyncTestBlock(2);
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
+    TestHelper.Builder builder = newBuilder(testGame, testAction);
+    builder.runTest(new TestHelper.Test() {
+      @Override
+      public void run(final TestHelper helper) {
+        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        Action action = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
+
+        final Game expectedGame = testGame.toBuilder()
+            .addSubmittedAction(action.toBuilder().setIsSubmitted(true))
+            .setLastModified(456L)
+            .setCurrentPlayerNumber(1)
+            .build();
+        final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
+        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+          @Override
+          public void onMessage() {
+            helper.assertGameEquals(expectedGame, FINISHED);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED);
+          }
+        });
+
+        when(mockTimeService.currentTimeMillis()).thenReturn(456L);
+        when(mockGameOverService.computeVictors(eq(testGame), eq(action)))
+            .thenReturn(Optional.<List<Integer>>absent());
+        when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(action)))
+            .thenReturn(1);
+
+        submitService.submitAction(action);
+      }
+    });
+    endAsyncTestBlock();
+
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
   }
 
   @Test
