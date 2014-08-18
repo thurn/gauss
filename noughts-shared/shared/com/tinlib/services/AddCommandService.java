@@ -96,7 +96,7 @@ public class AddCommandService {
     int player = currentGame.getCurrentPlayerNumber();
     for (Command command : commands) {
       if (!actionValidatorService.canAddCommand(viewerId, currentGame, action.build(), command)) {
-        throw new TinException("Can't add command '%s' to action '%s'", command, action);
+        throw new TinException("Can't add command '%s' to action '%s'", command, action.build());
       }
       action.addCommand(command.toBuilder().setPlayerNumber(player));
     }

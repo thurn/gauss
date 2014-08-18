@@ -117,6 +117,16 @@ public class ActionValidatorServiceTest extends TinTestCase {
         assertTrue(validator.canSubmitAction(VIEWER_ID, game.build(),
             currentAction.build()));
 
+        currentAction.setGameId("foo");
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+        currentAction.setGameId(GAME_ID);
+
+        currentAction.setIsSubmitted(true);
+        assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
+            currentAction.build()));
+        currentAction.setIsSubmitted(false);
+
         game.setIsGameOver(true);
         assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
             currentAction.build()));
