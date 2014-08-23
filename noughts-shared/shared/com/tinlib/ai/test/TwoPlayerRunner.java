@@ -1,4 +1,4 @@
-package ca.thurn.uct.core;
+package com.tinlib.ai.test;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,21 +8,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import ca.thurn.noughts.shared.Player;
-import com.google.gwt.core.shared.GwtIncompatible;
-import com.tinlib.ai.core.ActionScore;
 import com.tinlib.ai.core.Agent;
 import com.tinlib.ai.core.State;
 
 /**
- * A helper class for running games & sets of games between multiple Agents.
+ * A helper class for running games & sets of games between two Agents.
  */
-@GwtIncompatible
-public class Main {
+public class TwoPlayerRunner {
+  private final static int PLAYER_ONE = 0;
+  private final static int PLAYER_TWO = 1;
+
   private final List<Agent> agents;
   private final State initialState;
   private final Random random = new Random();
-  private State canonicalState;
 
   /**
    * Constructs a new Main instance.
@@ -34,7 +32,7 @@ public class Main {
    *     the responsibility of the caller to ensure that this state is in the
    *     appropriate initial state for this game.
    */
-  public Main(List<Agent> agents, State canonicalState) {
+  public TwoPlayerRunner(List<Agent> agents, State canonicalState) {
     this.agents = agents;
     this.initialState = canonicalState;
   }
@@ -51,11 +49,11 @@ public class Main {
   public void runTournament(int tournamentSize, long perMoveTimeBudget)
       throws InterruptedException {
     long startTime = System.currentTimeMillis();
-    Map<Agent, Integer> wins = new HashMap<Agent, Integer>();
+    Map<Agent, Integer> wins = new HashMap<>();
     int draws = 0;
 
     for (int i = 0; i < tournamentSize; ++i) {
-      Map<Integer, Agent> agentMap = new HashMap<Integer, Agent>();
+      Map<Integer, Agent> agentMap = new HashMap<>();
       int black = random.nextInt(agents.size());
       int red = random.nextInt(agents.size());
       while (red == black) {
@@ -63,23 +61,23 @@ public class Main {
       }
       Agent agent1 = agents.get(black);
       Agent agent2 = agents.get(red);
-      agentMap.put(Player.PLAYER_ONE, agent1);
-      agentMap.put(Player.PLAYER_TWO, agent2);
+      agentMap.put(PLAYER_ONE, agent1);
+      agentMap.put(PLAYER_TWO, agent2);
       int winner = playGame(agentMap, false /* isInteractive */, perMoveTimeBudget);
       System.out.print(".");
-      if (winner == Player.PLAYER_ONE) {
+      if (winner == PLAYER_ONE) {
         if (wins.containsKey(agent1)) {
           wins.put(agent1, wins.get(agent1) + 1);
         } else {
           wins.put(agent1, 1);
         }
-      } else if (winner == Player.PLAYER_TWO) {
+      } else if (winner == PLAYER_TWO) {
         if (wins.containsKey(agent2)) {
           wins.put(agent2, wins.get(agent2) + 1);
         } else {
           wins.put(agent2, 1);
         }
-      } else if (winner == 0) {
+      } else if (winner == -1) {
         draws++;
       }
 
@@ -107,11 +105,11 @@ public class Main {
    * @throws InterruptedException
    */
   public void runMatch(long perMoveTimeBudget) throws InterruptedException {
-    final Map<Integer, Agent> agentMap = new HashMap<Integer, Agent>();
-    agentMap.put(Player.PLAYER_ONE, agents.get(0));
-    agentMap.put(Player.PLAYER_TWO, agents.get(1));
+    final Map<Integer, Agent> agentMap = new HashMap<>();
+    agentMap.put(PLAYER_ONE, agents.get(0));
+    agentMap.put(PLAYER_TWO, agents.get(1));
     int winner = playGame(agentMap, true /* isInteractive */, perMoveTimeBudget);
-    if (winner != 0) {
+    if (winner != -1) {
       System.out.println(agentMap.get(winner) + " wins!");
     } else {
       System.out.println("Game drawn.");
@@ -131,7 +129,7 @@ public class Main {
    */
   private int playGame(Map<Integer, Agent> agentMap, boolean isInteractive,
       long perMoveTimeBudget) throws InterruptedException {
-    canonicalState = initialState.copy();
+    State canonicalState = initialState.copy();
     while (!canonicalState.isTerminal()) {
       if (isInteractive) {
         System.out.println(canonicalState);

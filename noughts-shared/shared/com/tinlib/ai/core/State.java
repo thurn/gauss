@@ -131,7 +131,7 @@ public interface State {
   
   /**
    * @return The Player who won the game in this state. If there is no
-   *     winner (the game is a draw, not yet over, etc), returns 0.
+   *     winner (the game is a draw, not yet over, etc), returns -1.
    */
   public int getWinner();
 
@@ -139,21 +139,21 @@ public interface State {
    * @return The Player whose turn it is in this state.
    */
   public int getCurrentPlayer();
-  
+
   /**
    * @param player A player.
    * @return The player who will follow the provided player in the game's turn
    *     sequence.
    */
   public int playerAfter(int player);
-  
+
   /**
    * @param player A player.
    * @return The player who is before the provided player in the game's turn
    *     sequence.
    */
   public int playerBefore(int player);
-  
+
   /**
    * @param action One of this state's actions.
    * @return A String representation of this action.
