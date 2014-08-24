@@ -3,32 +3,37 @@ package com.tinlib.ai.algorithm;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tinlib.ai.core.*;
+import com.tinlib.ai.core.ActionScore;
+import com.tinlib.ai.core.Agent;
+import com.tinlib.ai.core.AsynchronousAgent;
+import com.tinlib.ai.core.Evaluator;
+import com.tinlib.ai.core.State;
+import com.tinlib.ai.core.WinLossEvaluator;
 
 /**
  * An agent which picks actions by running repeated random simulations from
  * the current state and returning the one that had the best average outcome.
  */
-public class MonteCarloSearch implements Agent {
-
+public class MonteCarloSearch implements Agent, AsynchronousAgent {
+  
   /**
    * Builder for MonteCarloSearch.
    */
   public static class Builder {
     private final State stateRepresentation;
-
+    
     private int numSimulations = 100000;
 
     private int maxDepth = 500;
-
-    private double discountRate = 1.0;
-
+    
+    private double discountRate = 1.0; 
+    
     private Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
     }
-
+    
     private Evaluator evaluator = new WinLossEvaluator();
-
+    
     /**
      * @return A new MonteCarloSearch instance.
      */
@@ -39,14 +44,16 @@ public class MonteCarloSearch implements Agent {
 
     /**
      * @param numSimulations Number of simulations to run before picking the
-     *     best action from the root node. Default value: 100000.
+     *     best action from the root node. In asynchronous mode, this
+     *     represents the MAXIMUM number of simulations that will be run.
+     *     Default value: 100000.
      * @return this.
      */
     public Builder setNumSimulations(int numSimulations) {
       this.numSimulations = numSimulations;
       return this;
     }
-
+    
     /**
      * @param discountRate The rate at which rewards should be discounted in
      *     the future, used to compute the present value of future rewards.
@@ -80,7 +87,7 @@ public class MonteCarloSearch implements Agent {
       return this;
     }
   }
-
+  
   /**
    * @param stateRepresentation State representation to use.
    * @return A new Builder for a MonteCarloSearch agent.
@@ -89,11 +96,13 @@ public class MonteCarloSearch implements Agent {
     return new Builder(stateRepresentation);
   }
 
-  private final State stateRepresentation;
+  private final State stateRepresentation;  
   private final int numSimulations;
   private final double discountRate;
   private final int maxDepth;
   private final Evaluator evaluator;
+  private volatile ActionScore asyncResult;
+  private Thread workerThread;
 
   private MonteCarloSearch(State stateRepresentation, int numSimulations, double discountRate,
       int maxDepth, Evaluator evaluator) {
@@ -116,11 +125,50 @@ public class MonteCarloSearch implements Agent {
    * {@inheritDoc}
    */
   @Override
-  public ActionScore pickAction(int player, State root) {
+  public ActionScore pickActionBlocking(int player, State root) {
     Map<Long, Double> actionRewards = new HashMap<>();
     return runSimulations(player, root, actionRewards, numSimulations);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public synchronized void beginAsynchronousSearch(final int player, final State root) {
+    workerThread = (new Thread() {
+      @Override
+      public void run() {
+        Map<Long, Double> actionRewards = new HashMap<>();
+        int simulationCount = 0;
+        // Allow for fine-grained control over the number of simulations.
+        int simulationIncrement = numSimulations > 1000 ? 1000 : 1; 
+        while (!isInterrupted()) {
+          if (simulationCount < numSimulations) {
+            asyncResult = runSimulations(player, root, actionRewards, simulationIncrement);
+            simulationCount += simulationIncrement;
+          }
+        }
+      }
+    });
+    workerThread.start();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public synchronized ActionScore getAsynchronousSearchResult() {
+    workerThread.interrupt();
+    workerThread = null;
+    return asyncResult;
+  }
+  
+  @Override
+  public String toString() {
+    return "MonteCarloSearch [numSimulations=" + numSimulations + ", discountRate=" +
+        discountRate + ", maxDepth=" + maxDepth + "]";
+  }
+  
   /**
    * Run random simulations, updating actionRewards with the results.
    *

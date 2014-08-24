@@ -112,7 +112,8 @@ public class AIServiceTest extends TinTestCase {
             .thenReturn(Optional.<List<Integer>>absent());
         when(mockNextPlayerService.nextPlayerNumber(eq(testGame), any(Action.class)))
             .thenReturn(0);
-        when(mockAgent.pickAction(eq(1), eq(mockState))).thenReturn(new ActionScore(ACTION, 1.0));
+        when(mockAgent.pickActionBlocking(eq(1), eq(mockState)))
+            .thenReturn(new ActionScore(ACTION, 1.0));
         helper.bus().produce(TinMessages.ACTION_SUBMITTED, testGame);
       }
     });

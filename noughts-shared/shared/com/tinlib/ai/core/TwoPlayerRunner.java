@@ -1,4 +1,4 @@
-package com.tinlib.ai.test;
+package com.tinlib.ai.core;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,16 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import com.tinlib.ai.core.Agent;
-import com.tinlib.ai.core.State;
-
 /**
- * A helper class for running games & sets of games between two Agents.
+ * A helper class for running games & sets of games between multiple Agents.
  */
 public class TwoPlayerRunner {
-  private final static int PLAYER_ONE = 0;
-  private final static int PLAYER_TWO = 1;
-
   private final List<Agent> agents;
   private final State initialState;
   private final Random random = new Random();
@@ -36,7 +30,7 @@ public class TwoPlayerRunner {
     this.agents = agents;
     this.initialState = canonicalState;
   }
-
+  
   /**
    * Run a series of matches between the agents, selected at random, and then
    * report the results.
@@ -44,7 +38,7 @@ public class TwoPlayerRunner {
    * @param tournamentSize The number of matches to run.
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
-   * @throws InterruptedException
+   * @throws InterruptedException 
    */
   public void runTournament(int tournamentSize, long perMoveTimeBudget)
       throws InterruptedException {
@@ -61,61 +55,61 @@ public class TwoPlayerRunner {
       }
       Agent agent1 = agents.get(black);
       Agent agent2 = agents.get(red);
-      agentMap.put(PLAYER_ONE, agent1);
-      agentMap.put(PLAYER_TWO, agent2);
+      agentMap.put(0, agent1);
+      agentMap.put(1, agent2);
       int winner = playGame(agentMap, false /* isInteractive */, perMoveTimeBudget);
       System.out.print(".");
-      if (winner == PLAYER_ONE) {
+      if (winner == 0) {
         if (wins.containsKey(agent1)) {
           wins.put(agent1, wins.get(agent1) + 1);
         } else {
           wins.put(agent1, 1);
         }
-      } else if (winner == PLAYER_TWO) {
+      } else if (winner == 1) {
         if (wins.containsKey(agent2)) {
           wins.put(agent2, wins.get(agent2) + 1);
         } else {
           wins.put(agent2, 1);
         }
-      } else if (winner == -1) {
+      } else if (winner == State.NO_WINNER) {
         draws++;
       }
 
       if (i >= 10 && i % (tournamentSize / 10) == 0) {
         // Print intermediate results
-        printTournamentResults(wins, draws);
+        printTournamentResults(wins, draws);        
       }
     }
-
+    
     printTournamentResults(wins, draws);
-
+    
     long duration = System.currentTimeMillis() - startTime;
     String elapsed = new SimpleDateFormat("mm:ss").format(new Date(duration));
     String perTournament = new SimpleDateFormat("mm:ss").format(new Date(duration / tournamentSize));
-    System.out.println("Tournament finished in " + elapsed + " (" + perTournament +
-        " per tournament)");
+    System.out.println("Tournament finished in " + elapsed + " (" + perTournament + 
+        " per tournament)");    
   }
-
+  
   /**
    * Run a single match between the first two provided agents, printing out the
    * current game state between each move.
-   *
+   * 
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
-   * @throws InterruptedException
+   * @throws InterruptedException 
    */
   public void runMatch(long perMoveTimeBudget) throws InterruptedException {
     final Map<Integer, Agent> agentMap = new HashMap<>();
-    agentMap.put(PLAYER_ONE, agents.get(0));
-    agentMap.put(PLAYER_TWO, agents.get(1));
+    agentMap.put(0, agents.get(0));
+    agentMap.put(1, agents.get(1));
     int winner = playGame(agentMap, true /* isInteractive */, perMoveTimeBudget);
-    if (winner != -1) {
+    if (winner != State.NO_WINNER) {
       System.out.println(agentMap.get(winner) + " wins!");
     } else {
       System.out.println("Game drawn.");
     }
   }
-
+  
   /**
    * Play a match between the supplied agents.
    *
@@ -125,7 +119,7 @@ public class TwoPlayerRunner {
    *     information.
    * @return The winner of the game as defined by the canonical state's
    *     {@link State#getWinner()} method.
-   * @throws InterruptedException
+   * @throws InterruptedException 
    */
   private int playGame(Map<Integer, Agent> agentMap, boolean isInteractive,
       long perMoveTimeBudget) throws InterruptedException {
@@ -135,8 +129,21 @@ public class TwoPlayerRunner {
         System.out.println(canonicalState);
       }
       Agent agent = agentMap.get(canonicalState.getCurrentPlayer());
-      long action = agent.pickAction(canonicalState.getCurrentPlayer(),
-          agent.getStateRepresentation().initializeFrom(canonicalState)).getAction();
+      long action;
+      if (agent instanceof AsynchronousAgent) {
+        AsynchronousAgent async = (AsynchronousAgent)agent;
+        async.beginAsynchronousSearch(canonicalState.getCurrentPlayer(),
+            async.getStateRepresentation().initializeFrom(canonicalState));
+        Thread.sleep(perMoveTimeBudget);
+        ActionScore pair = async.getAsynchronousSearchResult();
+        if (pair == null) {
+          throw new RuntimeException("Agent " + async + " needed more time.");
+        }
+        action = pair.getAction();
+      } else {
+        action = agent.pickActionBlocking(canonicalState.getCurrentPlayer(),
+            agent.getStateRepresentation().initializeFrom(canonicalState)).getAction();
+      }
       if (isInteractive) {
         System.out.println(agent + " picked action " + canonicalState.actionToString(action));
       }
@@ -147,7 +154,7 @@ public class TwoPlayerRunner {
     }
     return canonicalState.getWinner();
   }
-
+  
   /**
    * Prints out the results of a tournament.
    *
@@ -161,5 +168,5 @@ public class TwoPlayerRunner {
     }
     System.out.println(draws + " draws");
   }
-
+  
 }

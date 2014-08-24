@@ -1,12 +1,16 @@
 package com.tinlib.ai.algorithm;
 
-import com.tinlib.ai.core.*;
+import com.tinlib.ai.core.ActionScore;
+import com.tinlib.ai.core.AgentEvaluator;
+import com.tinlib.ai.core.AsynchronousAgent;
+import com.tinlib.ai.core.Evaluator;
+import com.tinlib.ai.core.State;
 
 /**
  * An agent which selects an action via the Negamax search algorithm.
  */
-public class NegamaxSearch implements Agent {
-
+public class NegamaxSearch implements AsynchronousAgent {
+  
   /**
    * Builder for NegamaxSearch.
    */
@@ -14,17 +18,16 @@ public class NegamaxSearch implements Agent {
     private final State stateRepresentation;
     private int searchDepth = 5;
     private Evaluator evaluator;
-
+    
     /**
      * Constructor.
-     *
+     * 
      * @param stateRepresentation State representation to employ.
      */
     public Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
       this.evaluator = new AgentEvaluator(
-          MonteCarloSearch.builder(stateRepresentation)
-              .setNumSimulations(500).setDiscountRate(0.9).build());
+          MonteCarloSearch.builder(stateRepresentation).setNumSimulations(500).setDiscountRate(0.9).build(), 0L);
     }
 
     /**
@@ -33,7 +36,7 @@ public class NegamaxSearch implements Agent {
     public NegamaxSearch build() {
       return new NegamaxSearch(stateRepresentation, searchDepth, evaluator);
     }
-
+    
     /**
      * @param searchDepth Depth to search to before evaluating nodes in the
      *     search tree. Default value: 5.
@@ -43,7 +46,7 @@ public class NegamaxSearch implements Agent {
       this.searchDepth = searchDepth;
       return this;
     }
-
+    
     /**
      * @param evaluator Function to use to evaluate the quality of nodes in
      *     the search tree once the depth limit is hit. Default value is an
@@ -53,9 +56,9 @@ public class NegamaxSearch implements Agent {
     public Builder setEvaluator(Evaluator evaluator) {
       this.evaluator = evaluator;
       return this;
-    }
+    }    
   }
-
+  
   /**
    * @param stateRepresentation State representation to employ.
    * @return A new builder for NegamaxSearch agents.
@@ -63,11 +66,13 @@ public class NegamaxSearch implements Agent {
   public static Builder builder(State stateRepresentation) {
     return new Builder(stateRepresentation);
   }
-
+  
   private final State stateRepresentation;
   private final int searchDepth;
   private final Evaluator evaluator;
-
+  private volatile ActionScore asyncResult;
+  private Thread workerThread;  
+  
   private NegamaxSearch(State stateRepresentation, int searchDepth, Evaluator evaluator) {
     this.stateRepresentation = stateRepresentation;
     this.searchDepth = searchDepth;
@@ -78,7 +83,7 @@ public class NegamaxSearch implements Agent {
    * {@inheritDoc}
    */
   @Override
-  public ActionScore pickAction(int player, State rootNode) {
+  public ActionScore pickActionBlocking(int player, State rootNode) {
     return search(player, rootNode, searchDepth, Double.NEGATIVE_INFINITY,
         Double.POSITIVE_INFINITY);
   }
@@ -91,9 +96,31 @@ public class NegamaxSearch implements Agent {
     return stateRepresentation.copy();
   }
 
+  @Override
+  public void beginAsynchronousSearch(final int player, final State root) {
+    workerThread = (new Thread() {
+      @Override
+      public void run() {
+        int searchDepth = 1;
+        while (!isInterrupted()) {
+          asyncResult = search(player, root.copy(), searchDepth++, Double.NEGATIVE_INFINITY,
+              Double.POSITIVE_INFINITY);
+        }
+      }
+    });
+    workerThread.start();        
+  }
+
+  @Override
+  public ActionScore getAsynchronousSearchResult() {
+    workerThread.interrupt();
+    workerThread = null;
+    return asyncResult;
+  }
+  
   /**
    * Search for the best action to take for the provided player.
-   *
+   * 
    * @param player The player to find an action for.
    * @param state The root state for the search.
    * @param maxDepth The maximum depth to search to in the game tree.
@@ -102,8 +129,7 @@ public class NegamaxSearch implements Agent {
    * @return An ActionScore pair consisting of the best action for the player
    *     to take and the heuristic score associated with this action.
    */
-  private ActionScore search(int player, State state, int maxDepth, double alpha,
-      double beta) {
+  private ActionScore search(int player, State state, int maxDepth, double alpha, double beta) {
     if (state.isTerminal() || maxDepth == 0) {
       return new ActionScore(-1, evaluator.evaluate(player, state.copy()));
     }
@@ -123,10 +149,16 @@ public class NegamaxSearch implements Agent {
       if (value > alpha) {
         alpha = value;
       }
-      if (alpha >= beta) {
+      if (alpha >= beta) {        
         break;
       }
     }
     return new ActionScore(bestAction, bestValue);
   }
+
+  @Override
+  public String toString() {
+    return "NegamaxSearch [searchDepth=" + searchDepth + ", evaluator=" + evaluator + "]";
+  }
+
 }

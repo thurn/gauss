@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.tinlib.ai.core.State;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import ca.thurn.uct.core.Copyable;
-import com.tinlib.ai.core.State;
 
 /**
  * State for a game of Tic Tac Toe.

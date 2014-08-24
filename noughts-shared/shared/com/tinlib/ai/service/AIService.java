@@ -45,7 +45,8 @@ public class AIService {
         State state = aiProvider.provideState(profile);
         state.initializeFrom(currentGame);
         Agent agent = aiProvider.provideAgent(profile);
-        ActionScore actionScore = agent.pickAction(currentGame.getCurrentPlayerNumber(), state);
+        ActionScore actionScore = agent.pickActionBlocking(currentGame.getCurrentPlayerNumber(),
+            state);
         List<Command> commands = aiActionAdapter.adaptAction(actionScore.getAction());
         Action.Builder action = Actions.newEmptyAction(currentGame.getId()).toBuilder();
         addCommandService.addCommandsToAction(viewerId, currentGame, action, commands);

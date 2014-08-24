@@ -2,6 +2,8 @@ package com.tinlib.ai.core;
 
 import java.util.Iterator;
 
+
+
 /**
  * Represents the game state of a given game. A state is responsible for
  * tracking whose turn it is, what actions have been taken, and if anybody has
@@ -12,6 +14,8 @@ import java.util.Iterator;
  * work and null-initializes the state.
  */
 public interface State {
+  public static final int NO_WINNER = -1;
+  
   /**
    * An iterator over the actions available from a state in an undefined order.
    */
@@ -33,6 +37,7 @@ public interface State {
    * Adapter class to convert an Iterable<Long> into an ActionIterator.
    */
   public static class ActionIteratorFromIterable implements ActionIterator {
+    
     private final Iterator<Long> iterator;
     
     /**
@@ -94,8 +99,8 @@ public interface State {
    * performed action as an argument.
    * 
    * @param action The action to undo.
-   * @param undoToken The undo token returned from {@link State#perform(long)}
-   *     when this action was performed.
+   * @param undoToken The undo token returned from {@link State#perform(long)} when this action
+   *     was performed.
    */
   public void undo(long action, long undoToken);
   
@@ -128,10 +133,10 @@ public interface State {
    *     game has ended).
    */
   public boolean isTerminal();
-  
+
   /**
    * @return The Player who won the game in this state. If there is no
-   *     winner (the game is a draw, not yet over, etc), returns -1.
+   *     winner (the game is a draw, not yet over, etc), returns {@link State#NO_WINNER}.
    */
   public int getWinner();
 
@@ -139,21 +144,21 @@ public interface State {
    * @return The Player whose turn it is in this state.
    */
   public int getCurrentPlayer();
-
+  
   /**
    * @param player A player.
    * @return The player who will follow the provided player in the game's turn
    *     sequence.
    */
   public int playerAfter(int player);
-
+  
   /**
    * @param player A player.
    * @return The player who is before the provided player in the game's turn
    *     sequence.
    */
   public int playerBefore(int player);
-
+  
   /**
    * @param action One of this state's actions.
    * @return A String representation of this action.

@@ -11,7 +11,7 @@ public class WinLossEvaluator implements Evaluator {
   @Override
   public double evaluate(int player, State state) {
     int winner = state.getWinner();
-    if (winner == -1) {
+    if (winner == State.NO_WINNER) {
       return 0.0;
     } else {
       return winner == player ? 1.0 : -1.0;

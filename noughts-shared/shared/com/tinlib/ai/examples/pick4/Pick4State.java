@@ -1,11 +1,11 @@
-package com.tinlib.ai.test;
+package com.tinlib.ai.examples.pick4;
 
 import com.google.common.collect.ImmutableList;
 import com.tinlib.ai.core.State;
 
 import java.util.Random;
 
-public class TestState implements State {
+public class Pick4State implements State {
   private int currentPlayer;
   private long lastAction;
 
@@ -40,8 +40,8 @@ public class TestState implements State {
   }
 
   @Override
-  public State copy() {
-    TestState result = new TestState();
+  public Pick4State copy() {
+    Pick4State result = new Pick4State();
     result.lastAction = lastAction;
     result.currentPlayer = currentPlayer;
     return result;
@@ -49,19 +49,19 @@ public class TestState implements State {
 
   @Override
   public State initializeFrom(Object state) {
-    lastAction = ((TestState)state).lastAction;
-    currentPlayer = ((TestState)state).currentPlayer;
+    lastAction = ((Pick4State)state).lastAction;
+    currentPlayer = ((Pick4State)state).currentPlayer;
     return this;
   }
 
   @Override
   public boolean isTerminal() {
-    return lastAction == 5L;
+    return lastAction == 4L;
   }
 
   @Override
   public int getWinner() {
-    return isTerminal() ? currentPlayer : -1;
+    return isTerminal() ? playerBefore(currentPlayer) : -1;
   }
 
   @Override
