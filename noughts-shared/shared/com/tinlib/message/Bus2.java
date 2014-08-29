@@ -11,27 +11,27 @@ public interface Bus2 {
 
   public Unsubscriber await(Subscriber0 subscriber, String... keys);
 
-  public Unsubscriber await(Subscriber1 subscriber, String... keys);
+  public <A> Unsubscriber await(Subscriber1<A> subscriber, String... keys);
 
-  public Unsubscriber await(Subscriber2 subscriber, String... keys);
+  public <A,B> Unsubscriber await(Subscriber2<A,B> subscriber, String... keys);
 
-  public Unsubscriber await(Subscriber3 subscriber, String... keys);
+  public <A,B,C> Unsubscriber await(Subscriber3<A,B,C> subscriber, String... keys);
 
-  public Unsubscriber await(Subscriber4 subscriber, String... keys);
+  public <A,B,C,D> Unsubscriber await(Subscriber4<A,B,C,D> subscriber, String... keys);
 
-  public Unsubscriber await(Subscriber5 subscriber, String... keys);
+  public <A,B,C,D,E> Unsubscriber await(Subscriber5<A,B,C,D,E> subscriber, String... keys);
 
   public void once(Subscriber0 subscriber, String... keys);
 
-  public void once(Subscriber1 subscriber, String... keys);
+  public <A> void once(Subscriber1 subscriber, String... keys);
 
-  public void once(Subscriber2 subscriber, String... keys);
+  public <A,B> void once(Subscriber2<A,B> subscriber, String... keys);
 
-  public void once(Subscriber3 subscriber, String... keys);
+  public <A,B,C> void once(Subscriber3<A,B,C> subscriber, String... keys);
 
-  public void once(Subscriber4 subscriber, String... keys);
+  public <A,B,C,D> void once(Subscriber4<A,B,C,D> subscriber, String... keys);
 
-  public void once(Subscriber5 subscriber, String... keys);
+  public <A,B,C,D,E> void once(Subscriber5<A,B,C,D,E> subscriber, String... keys);
 
   /**
    * Indicates an error has occurred with the provided key. All Subscribers
