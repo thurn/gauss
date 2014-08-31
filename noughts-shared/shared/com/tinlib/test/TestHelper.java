@@ -14,6 +14,7 @@ import com.tinlib.core.TinModule;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.inject.*;
 import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.services.*;
 import com.tinlib.time.LastModifiedService;
@@ -252,6 +253,10 @@ public class TestHelper {
 
   public Bus bus() {
     return injector.get(TinKeys.BUS);
+  }
+
+  public Bus2 bus2() {
+    return injector.get(TinKeys.BUS2);
   }
 
   public KeyedListenerService getKeyedListenerService() {

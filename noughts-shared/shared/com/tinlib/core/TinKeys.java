@@ -15,6 +15,12 @@ public class TinKeys {
   public static final String BUS = id("tin.BUS");
 
   /**
+   * A {@link com.tinlib.message.Bus2} for coordinating messages. Refer to
+   * {@link TinMessages} for documentation on possible messages.
+   */
+  public static final String BUS2 = id("tin.BUS2");
+
+  /**
    * A {@link com.tinlib.error.ErrorService} instance for reporting errors.
    */
   public static final String ERROR_SERVICE = id("tin.ERROR_SERVICE");

@@ -19,6 +19,7 @@ public class TinModule implements Module {
   public void configure(Binder binder) {
     binder.bindSingletonKey(TinKeys.BUS,
         Initializers.returnValue(Buses.newBus()));
+    binder.bindSingletonKey(TinKeys.BUS2, Initializers.returnValue(Buses.newBus2()));
     binder.bindSingletonKey(TinKeys.KEYED_LISTENER_SERVICE,
         Initializers.returnValue(new KeyedListenerService()));
     binder.bindSingletonKey(TinKeys.GAME_MUTATOR, new Initializer() {
