@@ -6,7 +6,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
@@ -14,7 +14,7 @@ import com.tinlib.generated.GameListEntry;
 import com.tinlib.generated.GameListUpdate;
 import com.tinlib.generated.IndexPath;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.AbstractChildEventListener;
 import com.tinlib.util.Games;
@@ -54,11 +54,11 @@ public class GameList {
             IndexPath destination = destinationForGame(game);
             if (location.isPresent()) {
               moveGame(location.get(), destination, game);
-              bus.produce(TinMessages.GAME_LIST_MOVE,
+              bus.produce(TinMessages2.GAME_LIST_MOVE,
                   GameListUpdate.newBuilder().setFrom(location.get()).setTo(destination).build());
             } else {
               addGame(destination, game);
-              bus.produce(TinMessages.GAME_LIST_ADD, destination);
+              bus.produce(TinMessages2.GAME_LIST_ADD, destination);
             }
           } finally {
             listLock.unlock();
@@ -80,7 +80,7 @@ public class GameList {
         Optional<IndexPath> location = findGame(gameId);
         if (location.isPresent()) {
           removeGame(location.get());
-          bus.produce(TinMessages.GAME_LIST_REMOVE, location.get());
+          bus.produce(TinMessages2.GAME_LIST_REMOVE, location.get());
         }
       } finally {
         listLock.unlock();
@@ -92,7 +92,7 @@ public class GameList {
   private final List<Game> yourTurn = Lists.newArrayList();
   private final List<Game> theirTurn = Lists.newArrayList();
   private final List<Game> gameOver = Lists.newArrayList();
-  private final Bus bus;
+  private final Bus2 bus;
   private final ErrorService errorService;
   private final KeyedListenerService keyedListenerService;
   private final TimeService timeService;
@@ -100,7 +100,7 @@ public class GameList {
   private final String viewerId;
 
   public GameList(Injector injector, String viewerId, FirebaseReferences references) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     keyedListenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
     timeService = injector.get(TinKeys.TIME_SERVICE);

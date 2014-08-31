@@ -10,19 +10,47 @@ import java.util.Map;
 import java.util.Set;
 
 public class Bus2Impl implements Bus2 {
-  private static interface OnMessage {
-    void onMessage(ImmutableMap<Key<?>, Object> map);
+  private static class Value<T> {
+    private final T value;
+    private final List<Key<?>> dependencies;
+
+    public Value(T value, List<Key<?>> dependencies) {
+      this.value = value;
+      this.dependencies = dependencies;
+    }
+  }
+
+  private class ProductionImpl implements Production {
+    private final Map<Key<?>,Value<?>> values = Maps.newHashMap();
+
+    @Override
+    public <T> Production addKey(Key<T> key, T value, Key<?>... dependencies) {
+      Preconditions.checkNotNull(value);
+      values.put(key, new Value<>(value, Arrays.asList(dependencies)));
+      return this;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public void produce() {
+      for (Key<?> key : values.keySet()) {
+        setProducedValue(key, values.get(key).value, values.get(key).dependencies);
+      }
+      for (Key<?> key : values.keySet()) {
+        fireHandlers((Key<Object>)key, Optional.of(values.get(key).value));
+      }
+    }
   }
 
   private class MessageHandler {
-    private final List<Key<?>> keys;
+    private final ImmutableList<Key<?>> keys;
     private final Map<Key<?>, Optional<?>> requirements = Maps.newHashMap();
     private final boolean once;
-    private final OnMessage onMessage;
+    private final SubscriberX subscriberX;
 
-    public MessageHandler(boolean once, List<Key<?>> keys, OnMessage onMessage) {
+    public MessageHandler(boolean once, ImmutableList<Key<?>> keys, SubscriberX subscriberX) {
       this.once = once;
-      this.onMessage = onMessage;
+      this.subscriberX = subscriberX;
       this.keys = keys;
 
       for (Key<?> key : keys) {
@@ -32,7 +60,7 @@ public class Bus2Impl implements Bus2 {
       }
 
       if (allSatisfied()) {
-        onMessage.onMessage(realizeMap());
+        subscriberX.onMessage(realizeMap());
       }
 
       if (!(allSatisfied() && once)) {
@@ -45,7 +73,7 @@ public class Bus2Impl implements Bus2 {
     public <T> void handle(Key<T> key, Optional<T> object) {
       requirements.put(key, object);
       if (allSatisfied()) {
-        onMessage.onMessage(realizeMap());
+        subscriberX.onMessage(realizeMap());
         if (once) {
           createUnsubscriber().unsubscribe();
         }
@@ -82,6 +110,7 @@ public class Bus2Impl implements Bus2 {
   }
 
   private final SetMultimap<Key<?>, MessageHandler> messageHandlers = HashMultimap.create();
+  private final SetMultimap<Key<?>, Key<?>> derivedKeys = HashMultimap.create();
   private final Map<Key<?>, Object> producedValues = Maps.newHashMap();
 
   @Override
@@ -96,9 +125,27 @@ public class Bus2Impl implements Bus2 {
   }
 
   @Override
-  public <T> void produce(Key<T> key, T value) {
+  public <T> void produce(Key<T> key, T value, Key<?>... dependencies) {
     Preconditions.checkNotNull(value);
+    setProducedValue(key, value, Arrays.asList(dependencies));
     fireHandlers(key, Optional.of(value));
+  }
+
+  @Override
+  public Production newProduction() {
+    return new ProductionImpl();
+  }
+
+  private void setProducedValue(Key<?> key, Object value, List<Key<?>> dependencies) {
+    for (Key<?> derived : derivedKeys.get(key)) {
+      producedValues.remove(derived);
+    }
+
+    producedValues.put(key, value);
+
+    for (Key<?> dependency : dependencies) {
+      derivedKeys.put(dependency, key);
+    }
   }
 
   private <T> void fireHandlers(Key<T> key, Optional<T> value) {
@@ -109,75 +156,60 @@ public class Bus2Impl implements Bus2 {
   }
 
   @Override
-  public <T> void invalidate(Key<T> key) {
-
-  }
-
-  @Override
   public Unsubscriber await(final Subscriber0 subscriber, Key<?>... keys) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */, keyList(keys),
-        new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage();
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(keys));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A> Unsubscriber await(final Subscriber1<A> subscriber, final Key<A> one, Key<?>... rest) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */, keyList(rest, one),
-        new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one));
+        subscriber.onMessage((A) map.get(one));
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(rest, one));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B> Unsubscriber await(final Subscriber2<A, B> subscriber, final Key<A> one,
       final Key<B> two, Key<?>... rest) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */, keyList(rest, one, two),
-        new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two));
+        subscriber.onMessage((A) map.get(one), (B) map.get(two));
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(rest, one, two));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B, C> Unsubscriber await(final Subscriber3<A, B, C> subscriber, final Key<A> one,
       final Key<B> two, final Key<C> three, Key<?>... rest) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */,
-        keyList(rest, one, two, three), new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three));
+        subscriber.onMessage((A) map.get(one), (B) map.get(two), (C) map.get(three));
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(rest, one, two, three));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B, C, D> Unsubscriber await(final Subscriber4<A, B, C, D> subscriber, final Key<A> one,
       final Key<B> two, final Key<C> three, final Key<D> four, Key<?>... rest) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */,
-        keyList(rest, one, two, three, four), new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four));
+        subscriber.onMessage((A) map.get(one), (B) map.get(two), (C) map.get(three), (D) map.get(four));
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(rest, one, two, three, four));
   }
 
   @Override
@@ -185,108 +217,106 @@ public class Bus2Impl implements Bus2 {
   public <A, B, C, D, E> Unsubscriber await(final Subscriber5<A, B, C, D, E> subscriber,
       final Key<A> one, final Key<B> two, final Key<C> three, final Key<D> four, final Key<E> five,
       Key<?>... rest) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */,
-        keyList(rest, one, two, three, four, five), new OnMessage() {
+    return await(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four),
-            (E)map.get(five));
+        subscriber.onMessage((A) map.get(one), (B) map.get(two), (C) map.get(three), (D) map.get(four),
+            (E) map.get(five));
       }
-    });
-    return messageHandler.createUnsubscriber();
+    }, keyList(rest, one, two, three, four, five));
   }
 
   @Override
-  public Unsubscriber await(SubscriberX subscriber, Key<?> keys) {
-    return null;
+  public Unsubscriber await(SubscriberX subscriber, ImmutableList<Key<?>> keys) {
+    MessageHandler messageHandler = new MessageHandler(false /* once */, keys, subscriber);
+    return messageHandler.createUnsubscriber();
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public void once(final Subscriber0 subscriber, Key<?>... keys) {
-    new MessageHandler(true /* once */, keyList(keys), new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage();
       }
-    });
+    }, keyList(keys));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A> void once(final Subscriber1<A> subscriber, final Key<A> one, Key<?>... rest) {
-    new MessageHandler(true /* once */, keyList(rest, one), new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage((A)map.get(one));
       }
-    });
+    }, keyList(rest, one));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B> void once(final Subscriber2<A, B> subscriber, final Key<A> one, final Key<B> two,
       Key<?>... rest) {
-    new MessageHandler(true /* once */, keyList(rest, one, two), new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage((A)map.get(one), (B)map.get(two));
       }
-    });
+    }, keyList(rest, one, two));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B, C> void once(final Subscriber3<A, B, C> subscriber, final Key<A> one,
       final Key<B> two, final Key<C> three, Key<?>... rest) {
-    new MessageHandler(true /* once */, keyList(rest, one, two, three), new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three));
       }
-    });
+    }, keyList(rest, one, two, three));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B, C, D> void once(final Subscriber4<A, B, C, D> subscriber, final Key<A> one,
       final Key<B> two, final Key<C> three, final Key<D> four, Key<?>... rest) {
-    new MessageHandler(true /* once */, keyList(rest, one, two, three, four), new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four));
       }
-    });
+    }, keyList(rest, one, two, three, four));
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <A, B, C, D, E> void once(final Subscriber5<A, B, C, D, E> subscriber, final Key<A> one,
       final Key<B> two, final Key<C> three, final Key<D> four, final Key<E> five, Key<?>... rest) {
-    new MessageHandler(true /* once */, keyList(rest, one, two, three, four, five),
-        new OnMessage() {
+    once(new SubscriberX() {
       @Override
       public void onMessage(ImmutableMap<Key<?>, Object> map) {
         subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four),
             (E)map.get(five));
       }
-    });
+    }, keyList(rest, one, two, three, four, five));
   }
 
   @Override
-  public void once(SubscriberX subscriber, List<Key<?>> keys) {
-
+  public void once(SubscriberX subscriber, ImmutableList<Key<?>> keys) {
+    new MessageHandler(true /* once */,  keys, subscriber);
   }
 
-  private List<Key<?>> keyList(Key<?>[] rest, Key<?>... keys) {
-    List<Key<?>> result = Lists.newArrayList();
+  private ImmutableList<Key<?>> keyList(Key<?>[] rest, Key<?>... keys) {
+    ImmutableList.Builder<Key<?>> result = ImmutableList.builder();
     result.addAll(Arrays.asList(rest));
     result.addAll(Arrays.asList(keys));
-    return result;
+    return result.build();
   }
 
   @Override
-  public <T> void error(Key<T> key, String errorMessage) {
-
+  public <T> void fail(Key<T> key) {
+    messageHandlers.removeAll(key);
   }
 }

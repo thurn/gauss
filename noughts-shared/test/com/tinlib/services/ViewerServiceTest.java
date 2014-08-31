@@ -1,14 +1,13 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TinTestCase;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -23,14 +22,14 @@ public class ViewerServiceTest extends TinTestCase {
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
 
-        helper.bus().once(TinMessages.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus2().once(new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("viewerId", viewerId);
             finished();
           }
-        });
-        helper.bus().once(TinMessages.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        }, TinMessages2.VIEWER_ID);
+        helper.bus2().once(new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());
@@ -48,8 +47,7 @@ public class ViewerServiceTest extends TinTestCase {
             assertEquals("r123", references.requestReference("123").getName());
             finished();
           }
-            }
-        );
+        }, TinMessages2.FIREBASE_REFERENCES);
         viewerService.setViewerAnonymousId("viewerId", "viewerKey");
       }
     });
@@ -65,14 +63,14 @@ public class ViewerServiceTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
-        helper.bus().once(TinMessages.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus2().once(new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("facebookId", viewerId);
             finished();
           }
-        });
-        helper.bus().once(TinMessages.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        }, TinMessages2.VIEWER_ID);
+        helper.bus2().once(new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());
@@ -84,8 +82,7 @@ public class ViewerServiceTest extends TinTestCase {
                 references.userGames().getParent().getParent().getName());
             finished();
           }
-        }
-        );
+        }, TinMessages2.FIREBASE_REFERENCES);
         viewerService.setViewerFacebookId("facebookId");
       }
     });

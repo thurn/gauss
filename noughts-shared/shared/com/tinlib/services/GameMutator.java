@@ -2,12 +2,12 @@ package com.tinlib.services;
 
 import com.firebase.client.FirebaseError;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber3;
 
 /**
@@ -31,18 +31,17 @@ public class GameMutator {
     public void onError(String viewerId, FirebaseError error);
   }
 
-  private final Bus bus;
+  private final Bus2 bus;
 
   public GameMutator(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
   }
 
   /**
    * Applies the provided entity mutation to the current game.
    */
   public void mutateCurrentGame(final GameMutation mutation) {
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME_ID,
-        new Subscriber3<String, FirebaseReferences, String>() {
+    bus.once(new Subscriber3<String, FirebaseReferences, String>() {
       @Override
       public void onMessage(final String viewerId, final FirebaseReferences references,
           final String currentGameId) {
@@ -64,15 +63,14 @@ public class GameMutator {
           }
         });
       }
-    });
+    }, TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID);
   }
 
   /**
    * Applies the provided entity mutation to the current action of the current game.
    */
   public void mutateCurrentAction(final ActionMutation mutation) {
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME,
-        new Subscriber3<String, FirebaseReferences, Game>() {
+    bus.once(new Subscriber3<String, FirebaseReferences, Game>() {
       @Override
       public void onMessage(final String viewerId, final FirebaseReferences references,
           final Game currentGame) {
@@ -94,6 +92,6 @@ public class GameMutator {
           }
         });
       }
-    });
+    }, TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME);
   }
 }

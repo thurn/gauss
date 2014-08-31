@@ -3,7 +3,7 @@ package com.tinlib.services;
 import com.firebase.client.Firebase;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
@@ -51,7 +51,7 @@ public class AddCommandServiceTest extends TinTestCase {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
         final Command.Builder testCommand = Command.newBuilder();
 
-        helper.bus().await(TinMessages.COMMAND_ADD_COMPLETED, new Subscriber1<Command>() {
+        helper.bus2().await(new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testCommand.setPlayerNumber(0).build(), command);
@@ -62,7 +62,7 @@ public class AddCommandServiceTest extends TinTestCase {
                 .build();
             helper.assertCurrentActionEquals(expected, FINISHED);
           }
-        });
+        }, TinMessages2.COMMAND_ADD_COMPLETED);
 
         addCommandService.addCommand(testCommand.build());
       }
@@ -127,7 +127,7 @@ public class AddCommandServiceTest extends TinTestCase {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
         final Command.Builder testCommand = Command.newBuilder();
 
-        helper.bus().await(TinMessages.COMMAND_CHANGE_COMPLETED, new Subscriber1<IndexCommand>() {
+        helper.bus2().await(new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
             assertEquals(testCommand.setPlayerNumber(0).build(), indexCommand.getCommand());
@@ -137,7 +137,7 @@ public class AddCommandServiceTest extends TinTestCase {
                 .build();
             helper.assertCurrentActionEquals(expected, FINISHED);
           }
-        });
+        }, TinMessages2.COMMAND_CHANGE_COMPLETED);
 
         addCommandService.setCommand(0, testCommand.build());
       }

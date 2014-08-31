@@ -1,14 +1,14 @@
 package com.tinlib.services;
 
-import com.tinlib.generated.Game;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
+import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber2;
 
 /**
@@ -36,17 +36,17 @@ import com.tinlib.message.Subscriber2;
 public class CurrentGameListener implements Subscriber2<FirebaseReferences, String> {
   public static final String LISTENER_KEY = "tin.CurrentGame";
 
-  private final Bus bus;
+  private final Bus2 bus;
   private final ErrorService errorService;
   private final KeyedListenerService listenerService;
 
   private String gameId;
 
   public CurrentGameListener(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     listenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
-    bus.await(TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME_ID, this);
+    bus.await(this, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID);
   }
 
   /**
@@ -54,9 +54,7 @@ public class CurrentGameListener implements Subscriber2<FirebaseReferences, Stri
    * Broadcasts the TinMessages.CURRENT_GAME_ID message.
    */
   public void loadGame(String gameId) {
-    bus.invalidate(TinMessages.CURRENT_ACTION);
-    bus.invalidate(TinMessages.CURRENT_GAME);
-    bus.produce(TinMessages.CURRENT_GAME_ID, gameId);
+    bus.produce(TinMessages2.CURRENT_GAME_ID, gameId);
   }
 
   @Override
@@ -67,7 +65,7 @@ public class CurrentGameListener implements Subscriber2<FirebaseReferences, Stri
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() != null) {
           Game currentGame = Game.newDeserializer().fromDataSnapshot(dataSnapshot);
-          bus.produce(TinMessages.CURRENT_GAME, currentGame);
+          bus.produce(TinMessages2.CURRENT_GAME, currentGame, TinMessages2.CURRENT_GAME_ID);
         }
       }
 
@@ -75,7 +73,6 @@ public class CurrentGameListener implements Subscriber2<FirebaseReferences, Stri
       public void onCancelled(FirebaseError firebaseError) {
         errorService.error("Game value listener cancelled: %s", firebaseError);
       }
-    }
-    );
+    });
   }
 }

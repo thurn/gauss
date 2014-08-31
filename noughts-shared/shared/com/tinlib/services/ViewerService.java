@@ -2,9 +2,9 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 
 import java.util.Map;
 
@@ -28,11 +28,11 @@ public class ViewerService {
     public void apply(Map<String, Object> map, String viewerId, FirebaseReferences references);
   }
 
-  private final Bus bus;
+  private final Bus2 bus;
   private final Firebase firebase;
 
   public ViewerService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     firebase = injector.get(TinKeys.FIREBASE);
   }
 
@@ -42,11 +42,10 @@ public class ViewerService {
    * viewer.
    */
   public void setViewerAnonymousId(String viewerId, String viewerKey) {
-    bus.invalidate(TinMessages.FIREBASE_REFERENCES);
-    bus.invalidate(TinMessages.VIEWER_ID);
-
-    bus.produce(TinMessages.FIREBASE_REFERENCES, FirebaseReferences.anonymous(viewerKey, firebase));
-    bus.produce(TinMessages.VIEWER_ID, viewerId);
+    bus.newProduction()
+        .addKey(TinMessages2.VIEWER_ID, viewerId)
+        .addKey(TinMessages2.FIREBASE_REFERENCES, FirebaseReferences.anonymous(viewerKey, firebase))
+        .produce();
   }
 
   /**
@@ -54,10 +53,9 @@ public class ViewerService {
    * ID.
    */
   public void setViewerFacebookId(String facebookId) {
-    bus.invalidate(TinMessages.FIREBASE_REFERENCES);
-    bus.invalidate(TinMessages.VIEWER_ID);
-
-    bus.produce(TinMessages.FIREBASE_REFERENCES, FirebaseReferences.facebook(facebookId, firebase));
-    bus.produce(TinMessages.VIEWER_ID, facebookId);
+    bus.newProduction()
+        .addKey(TinMessages2.VIEWER_ID, facebookId)
+        .addKey(TinMessages2.FIREBASE_REFERENCES, FirebaseReferences.facebook(facebookId, firebase))
+        .produce();
   }
 }

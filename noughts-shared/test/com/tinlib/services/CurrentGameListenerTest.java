@@ -1,5 +1,6 @@
 package com.tinlib.services;
 
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -37,20 +38,20 @@ public class CurrentGameListenerTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         final CurrentGameListener currentGameListener = new CurrentGameListener(helper.injector());
-        helper.bus().once(TinMessages.CURRENT_GAME_ID, new Subscriber1<String>() {
+        helper.bus2().once(new Subscriber1<String>() {
           @Override
           public void onMessage(String currentGameId) {
             assertEquals(GAME_ID, currentGameId);
             finished();
           }
-        });
-        helper.bus().once(TinMessages.CURRENT_GAME, new Subscriber1<Game>() {
+        }, TinMessages2.CURRENT_GAME_ID);
+        helper.bus2().once(new Subscriber1<Game>() {
           @Override
           public void onMessage(Game currentGame) {
             assertEquals(testGame, currentGame);
             finished();
           }
-        });
+        }, TinMessages2.CURRENT_GAME);
 
         helper.references().gameReference(GAME_ID).setValue(testGame.serialize(),
             new Firebase.CompletionListener() {

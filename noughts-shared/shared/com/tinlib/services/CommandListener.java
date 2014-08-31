@@ -1,25 +1,25 @@
 package com.tinlib.services;
 
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.IndexCommand;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber1;
 
 public class CommandListener {
-  private final Bus bus;
+  private final Bus2 bus;
   private Action lastAction;
 
   public CommandListener(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     listen();
   }
 
   private void listen() {
-    bus.await(TinMessages.CURRENT_ACTION, new Subscriber1<Action>() {
+    bus.await(new Subscriber1<Action>() {
       @Override
       public void onMessage(Action newAction) {
         // Actions without a player number are newly-created.
@@ -28,14 +28,14 @@ public class CommandListener {
           if (lastAction.getCommandCount() > newAction.getCommandCount()) {
             int index = lastAction.getCommandCount() - 1;
             while (index >= newAction.getCommandCount()) {
-              bus.produce(TinMessages.COMMAND_UNDONE,
+              bus.post(TinMessages2.COMMAND_UNDONE,
                   newIndexCommand(index, lastAction.getCommand(index)));
               index--;
             }
           } else if (lastAction.getCommandCount() < newAction.getCommandCount()) {
             int index = newAction.getCommandCount() - 1;
             while (index >= lastAction.getCommandCount()) {
-              bus.produce(TinMessages.COMMAND_ADDED,
+              bus.post(TinMessages2.COMMAND_ADDED,
                   newIndexCommand(index, newAction.getCommand(index)));
               index--;
             }
@@ -44,14 +44,14 @@ public class CommandListener {
           int minCount = Math.min(lastAction.getCommandCount(), newAction.getCommandCount());
           for (int i = 0; i < minCount; ++i) {
             if (!lastAction.getCommand(i).equals(newAction.getCommand(i))) {
-              bus.produce(TinMessages.COMMAND_CHANGED,
+              bus.post(TinMessages2.COMMAND_CHANGED,
                   newIndexCommand(i, newAction.getCommand(i)));
             }
           }
         }
         lastAction = newAction;
       }
-    });
+    }, TinMessages2.CURRENT_ACTION);
   }
 
   private IndexCommand newIndexCommand(int index, Command command) {

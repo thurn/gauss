@@ -1,14 +1,14 @@
 package com.tinlib.services;
 
-import com.tinlib.generated.Action;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
+import com.tinlib.generated.Action;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber2;
 
 /**
@@ -36,17 +36,17 @@ import com.tinlib.message.Subscriber2;
 public class CurrentActionListener implements Subscriber2<FirebaseReferences, String> {
   public static final String LISTENER_KEY = "tin.CurrentAction";
 
-  private final Bus bus;
+  private final Bus2 bus;
   private final ErrorService errorService;
   private final KeyedListenerService listenerService;
 
   private String gameId;
 
   public CurrentActionListener(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     listenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
-    bus.await(TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME_ID, this);
+    bus.await(this, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class CurrentActionListener implements Subscriber2<FirebaseReferences, St
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() != null) {
           Action currentAction = Action.newDeserializer().fromDataSnapshot(dataSnapshot);
-          bus.produce(TinMessages.CURRENT_ACTION, currentAction);
+          bus.produce(TinMessages2.CURRENT_ACTION, currentAction, TinMessages2.CURRENT_GAME_ID);
         }
       }
 
