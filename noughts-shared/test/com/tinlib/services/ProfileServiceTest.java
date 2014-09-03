@@ -1,7 +1,7 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.ImageString;
@@ -31,7 +31,6 @@ public class ProfileServiceTest extends TinTestCase {
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setGame(testGame);
-    builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
@@ -39,14 +38,7 @@ public class ProfileServiceTest extends TinTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        helper.bus().once(TinMessages.PROFILE_REQUIRED, new Subscriber1<Profile>() {
-          @Override
-          public void onMessage(Profile profile) {
-            assertEquals(testGame.getProfile(0), profile);
-            profileService.setProfileForViewer(testProfile);
-          }
-        });
-        helper.bus().once(TinMessages.VIEWER_PROFILE, new Subscriber1<Profile>() {
+        helper.bus2().once(TinMessages2.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
           @Override
           public void onMessage(Profile completedViewerProfile) {
             assertEquals(testProfile, completedViewerProfile);
@@ -54,6 +46,7 @@ public class ProfileServiceTest extends TinTestCase {
             helper.assertGameEquals(expected, FINISHED);
           }
         });
+        profileService.setProfileForViewer(testProfile);
       }
     });
     endAsyncTestBlock();
@@ -109,7 +102,7 @@ public class ProfileServiceTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         ProfileService profileService = new ProfileService(helper.injector());
-        final Profile testProfile = TestUtils.newTestProfile()
+        Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
         profileService.setProfileForViewer(testProfile);

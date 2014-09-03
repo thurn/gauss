@@ -23,7 +23,7 @@ public class ArchiveGameService{
   }
 
   public void archiveGame(final String gameId) {
-    bus.once(new Subscriber1<FirebaseReferences>() {
+    bus.once(TinMessages2.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
       @Override
       public void onMessage(FirebaseReferences references) {
         references.userReferenceForGame(gameId).removeValue(new Firebase.CompletionListener() {
@@ -33,11 +33,11 @@ public class ArchiveGameService{
             if (firebaseError != null) {
               errorService.error("Error archiving game '%s'. %s", gameId, firebaseError);
             } else {
-              bus.produce(TinMessages2.ARCHIVE_GAME_COMPLETED, gameId);
+              bus.post(TinMessages2.ARCHIVE_GAME_COMPLETED, gameId);
             }
           }
         });
       }
-    }, TinMessages2.FIREBASE_REFERENCES);
+    });
   }
 }

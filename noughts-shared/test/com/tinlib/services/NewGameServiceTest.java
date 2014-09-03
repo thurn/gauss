@@ -4,7 +4,7 @@ import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.message.Subscriber1;
@@ -57,7 +57,7 @@ public class NewGameServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         NewGameService newGameService = new NewGameService(helper.injector());
 
-        helper.bus().await(TinMessages.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus2().await(TinMessages2.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             final Game expected = Game.newBuilder()

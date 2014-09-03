@@ -6,13 +6,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.time.TimeService;
@@ -23,7 +23,7 @@ import com.tinlib.validator.ActionValidatorService;
 import java.util.List;
 
 public class SubmitActionService {
-  private final Bus bus;
+  private final Bus2 bus;
   private final ActionValidatorService validatorService;
   private final ErrorService errorService;
   private final PushNotificationService pushNotificationService;
@@ -34,7 +34,7 @@ public class SubmitActionService {
   private final TimeService timeService;
 
   public SubmitActionService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     validatorService = injector.get(TinKeys.ACTION_VALIDATOR_SERVICE);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     pushNotificationService = injector.get(TinKeys.PUSH_NOTIFICATION_SERVICE);
@@ -46,7 +46,7 @@ public class SubmitActionService {
   }
 
   public void submitCurrentAction() {
-    bus.once(TinMessages.CURRENT_ACTION, new Subscriber1<Action>() {
+    bus.once(TinMessages2.CURRENT_ACTION, new Subscriber1<Action>() {
       @Override
       public void onMessage(final Action currentAction) {
         submitAction(currentAction);
@@ -95,7 +95,7 @@ public class SubmitActionService {
                       "viewerId", viewerId, "gameId", game.getId());
                   analyticsService.trackEvent("submitCurrentAction", dimensions);
                   sendNotificationOnActionSubmitted(viewerId, game);
-                  bus.produce(TinMessages.SUBMIT_ACTION_COMPLETED);
+                  bus.post(TinMessages2.SUBMIT_ACTION_COMPLETED);
                 }
               }
             }

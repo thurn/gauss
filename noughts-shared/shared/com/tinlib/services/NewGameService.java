@@ -10,20 +10,17 @@ import com.google.common.collect.Lists;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
 import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
-import com.tinlib.message.Subscriber2;
+import com.tinlib.message.*;
 import com.tinlib.time.TimeService;
 
 import java.util.List;
 
 public class NewGameService {
-  private static final String GAME_VALUE_SET = "NewGameService.GAME_VALUE_SET";
-  private static final String REQUEST_ID_SET = "NewGameService.REQUEST_ID_SET";
-
   public class NewGameBuilder {
     private final String gameId;
     private final boolean localMultiplayer;
@@ -62,14 +59,14 @@ public class NewGameService {
     }
   }
 
-  private final Bus bus;
+  private final Bus2 bus;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
   private final TimeService timeService;
   private final JoinGameService joinGameService;
 
   public NewGameService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
     timeService = injector.get(TinKeys.TIME_SERVICE);
@@ -87,7 +84,10 @@ public class NewGameService {
   private void makeNewGame(final int viewerPlayerNumber, final List<String> players,
       final List<Profile> profiles, final String gameId, final Optional<String> requestId,
       final boolean localMultiplayer) {
-    bus.await(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES,
+    final Key<Void> gameValueSet = Keys.createVoidKey("gameValueSet");
+    final Key<Void> requestIdSet = Keys.createVoidKey("requestIdSet");
+
+    bus.await(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(String viewerId, final FirebaseReferences firebaseReferences) {
@@ -100,31 +100,25 @@ public class NewGameService {
         game.setLastModified(timeService.currentTimeMillis());
         game.setIsGameOver(false);
 
-        bus.once(GAME_VALUE_SET, REQUEST_ID_SET, new Subscriber2<Object, Object>() {
+        bus.once(ImmutableList.<Key<?>>of(gameValueSet, requestIdSet), new Subscriber0() {
           @Override
-          public void onMessage(Object v1, Object v2) {
-            // TODO: Improve the bus API to support this use-case more cleanly
-            // Somehow kill the once() if an error happens
-            bus.invalidate(GAME_VALUE_SET);
-            bus.invalidate(REQUEST_ID_SET);
-
+          public void onMessage() {
             analyticsService.trackEvent("makeNewGame", ImmutableMap.of(
                 "players", players.toString(), "profiles", profiles.toString(),
                 "gameId", gameId, "localMultiplayer", localMultiplayer + ""));
             joinGameService.joinGame(viewerPlayerNumber, gameId, Optional.<Profile>absent());
-            bus.produce(TinMessages.CREATE_GAME_COMPLETED, game.build());
+            bus.post(TinMessages2.CREATE_GAME_COMPLETED, game.build());
           }
-            }
-        );
+        });
 
-        setGameValue(firebaseReferences, game.build());
-        setRequestId(firebaseReferences, requestId, gameId);
+        setGameValue(gameValueSet, firebaseReferences, game.build());
+        setRequestId(requestIdSet, firebaseReferences, requestId, gameId);
       }
     });
   }
 
-  private void setRequestId(FirebaseReferences firebaseReferences, final Optional<String> requestId,
-      final String gameId) {
+  private void setRequestId(final Key<Void> requestIdSet, FirebaseReferences firebaseReferences,
+      final Optional<String> requestId, final String gameId) {
     if (requestId.isPresent()) {
       firebaseReferences.requestReference(requestId.get()).setValue(gameId,
           new CompletionListener() {
@@ -133,17 +127,19 @@ public class NewGameService {
           if (firebaseError != null) {
             errorService.error("Error associating request ID '%s' with game '%s'. %s",
                 requestId.get(), gameId, firebaseError);
+            bus.fail(requestIdSet);
           } else {
-            bus.produce(REQUEST_ID_SET);
+            bus.post(requestIdSet);
           }
         }
       });
     } else {
-      bus.produce(REQUEST_ID_SET);
+      bus.post(requestIdSet);
     }
   }
 
-  private void setGameValue(FirebaseReferences firebaseReferences, final Game game) {
+  private void setGameValue(final Key<Void> gameValueSet, FirebaseReferences firebaseReferences,
+      final Game game) {
     firebaseReferences.gameReference(game.getId()).setValue(game.serialize(),
         new CompletionListener() {
       @Override
@@ -151,8 +147,9 @@ public class NewGameService {
         if (firebaseError != null) {
           errorService.error("Error setting value of new game for game '%s'. %s", game.getId(),
               firebaseError);
+          bus.fail(gameValueSet);
         } else {
-          bus.produce(GAME_VALUE_SET);
+          bus.post(gameValueSet);
         }
       }
     });

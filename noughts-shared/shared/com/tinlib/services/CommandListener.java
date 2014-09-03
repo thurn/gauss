@@ -19,7 +19,7 @@ public class CommandListener {
   }
 
   private void listen() {
-    bus.await(new Subscriber1<Action>() {
+    bus.await(TinMessages2.CURRENT_ACTION, new Subscriber1<Action>() {
       @Override
       public void onMessage(Action newAction) {
         // Actions without a player number are newly-created.
@@ -51,7 +51,7 @@ public class CommandListener {
         }
         lastAction = newAction;
       }
-    }, TinMessages2.CURRENT_ACTION);
+    });
   }
 
   private IndexCommand newIndexCommand(int index, Command command) {

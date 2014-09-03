@@ -34,13 +34,13 @@ public class CurrentActionListenerTest extends TinTestCase {
       public void run(TestHelper helper) {
         final CurrentActionListener currentActionListener =
             new CurrentActionListener(helper.injector());
-        helper.bus2().once(new Subscriber1<Action>() {
+        helper.bus2().once(TinMessages2.CURRENT_ACTION, new Subscriber1<Action>() {
           @Override
           public void onMessage(Action currentAction) {
             assertEquals(testAction, currentAction);
             finished();
           }
-        }, TinMessages2.CURRENT_ACTION);
+        });
 
         helper.references().currentActionReferenceForGame(GAME_ID).setValue(
             testAction.serialize());

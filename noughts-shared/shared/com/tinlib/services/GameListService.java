@@ -11,12 +11,13 @@ public class GameListService {
 
   public GameListService(final Injector injector) {
     bus = injector.get(TinKeys.BUS2);
-    bus.await(new Subscriber2<String, FirebaseReferences>() {
+    bus.await(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES,
+        new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(String viewerId, FirebaseReferences firebaseReferences) {
         bus.produce(TinMessages2.GAME_LIST, new GameList(injector, viewerId, firebaseReferences),
             TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES);
       }
-    }, TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES);
+    });
   }
 }

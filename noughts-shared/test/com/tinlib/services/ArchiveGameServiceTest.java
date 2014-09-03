@@ -42,7 +42,7 @@ public class ArchiveGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
-        helper.bus2().once(new Subscriber1<String>() {
+        helper.bus2().once(TinMessages2.ARCHIVE_GAME_COMPLETED, new Subscriber1<String>() {
           @Override
           public void onMessage(String gameId) {
             assertEquals(GAME_ID, gameId);
@@ -60,7 +60,7 @@ public class ArchiveGameServiceTest extends TinTestCase {
               }
             });
           }
-        }, TinMessages2.ARCHIVE_GAME_COMPLETED);
+        });
         archiveGameService.archiveGame(GAME_ID);
       }
     });

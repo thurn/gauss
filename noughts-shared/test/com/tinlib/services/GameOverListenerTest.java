@@ -1,8 +1,7 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages;
-import com.tinlib.generated.Command;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber1;
 import com.tinlib.test.TestHelper;
@@ -28,15 +27,15 @@ public class GameOverListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus().once(TinMessages.GAME_OVER, new Subscriber1<Game>() {
+        helper.bus2().once(TinMessages2.GAME_OVER, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             assertEquals(testGame.setIsGameOver(true).build(), game);
             finished();
           }
         });
-        helper.bus().produce(TinMessages.CURRENT_GAME, testGame.build());
-        helper.bus().produce(TinMessages.CURRENT_GAME, testGame.setIsGameOver(true).build());
+        helper.bus2().produce(TinMessages2.CURRENT_GAME, testGame.build());
+        helper.bus2().produce(TinMessages2.CURRENT_GAME, testGame.setIsGameOver(true).build());
       }
     });
     endAsyncTestBlock();

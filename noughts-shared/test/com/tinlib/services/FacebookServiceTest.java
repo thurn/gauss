@@ -5,7 +5,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber0;
@@ -46,11 +46,11 @@ public class FacebookServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus().once(TinMessages.GAME_LIST_ADD, new Subscriber0() {
+        helper.bus2().once(TinMessages2.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());
-            helper.bus().once(TinMessages.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
+            helper.bus2().once(TinMessages2.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
               @Override
               public void onMessage() {
                 FirebaseReferences facebookReferences =
@@ -73,7 +73,7 @@ public class FacebookServiceTest extends TinTestCase {
                   }
                 });
 
-                helper.bus().once(TinMessages.VIEWER_ID, new Subscriber1<String>() {
+                helper.bus2().once(TinMessages2.VIEWER_ID, new Subscriber1<String>() {
                   @Override
                   public void onMessage(String viewerId) {
                     assertEquals(FACEBOOK_ID, viewerId);
@@ -121,7 +121,7 @@ public class FacebookServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus().once(TinMessages.GAME_LIST_ADD, new Subscriber0() {
+        helper.bus2().once(TinMessages2.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());

@@ -54,11 +54,11 @@ public class GameList {
             IndexPath destination = destinationForGame(game);
             if (location.isPresent()) {
               moveGame(location.get(), destination, game);
-              bus.produce(TinMessages2.GAME_LIST_MOVE,
+              bus.post(TinMessages2.GAME_LIST_MOVE,
                   GameListUpdate.newBuilder().setFrom(location.get()).setTo(destination).build());
             } else {
               addGame(destination, game);
-              bus.produce(TinMessages2.GAME_LIST_ADD, destination);
+              bus.post(TinMessages2.GAME_LIST_ADD, destination);
             }
           } finally {
             listLock.unlock();
@@ -80,7 +80,7 @@ public class GameList {
         Optional<IndexPath> location = findGame(gameId);
         if (location.isPresent()) {
           removeGame(location.get());
-          bus.produce(TinMessages2.GAME_LIST_REMOVE, location.get());
+          bus.post(TinMessages2.GAME_LIST_REMOVE, location.get());
         }
       } finally {
         listLock.unlock();

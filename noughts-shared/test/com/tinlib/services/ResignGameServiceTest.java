@@ -2,7 +2,7 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber1;
@@ -41,7 +41,7 @@ public class ResignGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         ResignGameService resignGameService = new ResignGameService(helper.injector());
-        helper.bus().once(TinMessages.RESIGN_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus2().once(TinMessages2.RESIGN_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             Game expected = testGame.toBuilder()

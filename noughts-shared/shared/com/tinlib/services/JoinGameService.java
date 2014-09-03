@@ -5,18 +5,16 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
-import com.tinlib.message.Subscriber1;
-import com.tinlib.message.Subscriber2;
-import com.tinlib.message.Subscriber3;
+import com.tinlib.message.*;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.util.Actions;
 import com.tinlib.util.ListUtil;
@@ -24,10 +22,7 @@ import com.tinlib.util.Profiles;
 import com.tinlib.validator.JoinGameValidatorService;
 
 public class JoinGameService {
-  private static final String PLAYER_ADDED = "JoinGameService.PLAYER_ADDED";
-  private static final String ACTION_ADDED = "JoinGameService.ACTION_ADDED";
-
-  private final Bus bus;
+  private final Bus2 bus;
   private final ErrorService errorService;
   private final CurrentGameListener currentGameListener;
   private final AnalyticsService analyticsService;
@@ -36,7 +31,7 @@ public class JoinGameService {
   private final GameMutator gameMutator;
 
   public JoinGameService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     currentGameListener = injector.get(TinKeys.CURRENT_GAME_SERVICE);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
@@ -47,8 +42,11 @@ public class JoinGameService {
 
   public void joinGame(final int playerNumber, final String gameId,
       final Optional<Profile> profile) {
+    final Key<Game> playerAdded = Keys.createKey(Game.class);
+    final Key<Void> actionAdded = Keys.createVoidKey();
+
     currentGameListener.loadGame(gameId);
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.CURRENT_GAME,
+    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME,
         new Subscriber3<String, FirebaseReferences, Game>() {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references, Game game) {
@@ -57,18 +55,15 @@ public class JoinGameService {
           return;
         }
 
-        bus.once(PLAYER_ADDED, ACTION_ADDED, new Subscriber2<Game, Boolean>() {
+        bus.once(playerAdded, ImmutableList.<Key<?>>of(actionAdded), new Subscriber1<Game>() {
           @Override
-          public void onMessage(Game game, Boolean actionAdded) {
-            bus.invalidate(PLAYER_ADDED);
-            bus.invalidate(ACTION_ADDED);
-
+          public void onMessage(Game game) {
             analyticsService.trackEvent("joinGame", ImmutableMap.of(
                 "playerNumber", playerNumber + "",
                 "gameId", gameId,
                 "profile", profile.toString()));
             pushNotificationService.registerForPushNotifications(gameId, playerNumber);
-            bus.produce(TinMessages.JOIN_GAME_COMPLETED, game);
+            bus.post(TinMessages2.JOIN_GAME_COMPLETED, game);
           }
         });
 
@@ -84,7 +79,7 @@ public class JoinGameService {
 
           @Override
           public void onComplete(String viewerId, FirebaseReferences references, Game game) {
-            bus.produce(PLAYER_ADDED, game);
+            bus.post(playerAdded, game);
           }
 
           @Override
@@ -102,7 +97,7 @@ public class JoinGameService {
               errorService.error("Error with viewer '%s' adding current action to game '%s'. %s",
                   viewerId, gameId, firebaseError);
             } else {
-              bus.produce(ACTION_ADDED);
+              bus.post(actionAdded);
             }
           }
         });
@@ -112,7 +107,7 @@ public class JoinGameService {
 
   public void joinGameFromRequestId(final int playerNumber, final String requestId,
       final Optional<Profile> profile) {
-    bus.once(TinMessages.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+    bus.once(TinMessages2.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
       @Override
       public void onMessage(FirebaseReferences references) {
         references.requestReference(requestId).addListenerForSingleValueEvent(

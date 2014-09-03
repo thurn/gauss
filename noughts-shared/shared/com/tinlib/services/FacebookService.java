@@ -4,27 +4,23 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
-import com.tinlib.message.Subscriber2;
-import com.tinlib.message.Subscriber3;
+import com.tinlib.message.*;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FacebookService {
-  private static final String GAMES_MIGRATED = "FacebookService.GAMES_MIGRATED";
-  private static final String ACTIONS_MIGRATED = "FacebookService.ACTIONS_MIGRATED";
-
-  private final Bus bus;
+  private final Bus2 bus;
   private final Firebase firebase;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
@@ -32,7 +28,7 @@ public class FacebookService {
   private final AtomicInteger numGameMigrations = new AtomicInteger();
 
   public FacebookService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     firebase = injector.get(TinKeys.FIREBASE);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
@@ -40,35 +36,35 @@ public class FacebookService {
   }
 
   public void upgradeAccountToFacebook(final String facebookId) {
-    bus.once(GAMES_MIGRATED, ACTIONS_MIGRATED, new Subscriber2<Object, Object>() {
-      @Override
-      public void onMessage(Object v1, Object v2) {
-        bus.invalidate(GAMES_MIGRATED);
-        bus.invalidate(ACTIONS_MIGRATED);
+    final Key<Void> gamesMigrated = Keys.createVoidKey();
+    final Key<Void> actionsMigrated = Keys.createVoidKey();
 
+    bus.once(ImmutableList.<Key<?>>of(gamesMigrated, actionsMigrated), new Subscriber0() {
+      @Override
+      public void onMessage() {
         analyticsService.trackEvent("upgradeAccountToFacebook",
             ImmutableMap.of("facebookId", facebookId));
         viewerService.setViewerFacebookId(facebookId);
-        bus.produce(TinMessages.ACCOUNT_UPGRADE_COMPLETED);
+        bus.post(TinMessages2.ACCOUNT_UPGRADE_COMPLETED);
       }
     });
 
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES, TinMessages.GAME_LIST,
+    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.GAME_LIST,
         new Subscriber3<String, FirebaseReferences, GameList>() {
       @Override
       public void onMessage(String viewerId, FirebaseReferences references, GameList gameList) {
-        migrateGames(viewerId, facebookId, gameList, references);
-        migrateActions(facebookId, references);
+        migrateGames(gamesMigrated, viewerId, facebookId, gameList, references);
+        migrateActions(actionsMigrated, facebookId, references);
       }
     });
   }
 
-  private void migrateGames(String oldViewerId, String facebookId, GameList gameList,
+  private void migrateGames(Key<Void> key, String oldViewerId, String facebookId, GameList gameList,
       FirebaseReferences references) {
     Set<String> gameIds = allKnownGameIds(gameList);
     numGameMigrations.set(gameIds.size());
     for(String gameId : gameIds) {
-      migrateGame(oldViewerId, facebookId, gameId, references);
+      migrateGame(key, oldViewerId, facebookId, gameId, references);
     }
   }
 
@@ -87,8 +83,8 @@ public class FacebookService {
     }
   }
 
-  private void migrateGame(final String oldViewerId, final String newViewerId, final String gameId,
-      FirebaseReferences references) {
+  private void migrateGame(final Key<Void> gamesMigrated, final String oldViewerId,
+      final String newViewerId, final String gameId, FirebaseReferences references) {
     EntityMutator.mutateEntity(references.gameReference(gameId), Game.newDeserializer(),
         new EntityMutator.Mutation<Game, Game.Builder>() {
           @Override
@@ -103,7 +99,7 @@ public class FacebookService {
           @Override
           public void onComplete(Game entity) {
             if (numGameMigrations.decrementAndGet() == 0) {
-              bus.produce(GAMES_MIGRATED);
+              bus.post(gamesMigrated);
             }
           }
 
@@ -111,12 +107,14 @@ public class FacebookService {
           public void onError(FirebaseError error, boolean committed) {
             errorService.error("Error migrating game '%s' from viewer '%s' to viewer '%s'. %s",
                 gameId, oldViewerId, newViewerId, error);
+            bus.fail(gamesMigrated);
           }
         }
     );
   }
 
-  private void migrateActions(final String facebookId, FirebaseReferences references) {
+  private void migrateActions(final Key<Void> actionsMigrated, final String facebookId,
+      FirebaseReferences references) {
     references.userGames().addListenerForSingleValueEvent(new ValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
@@ -127,8 +125,9 @@ public class FacebookService {
             if (firebaseError != null) {
               errorService.error("Error setting the userGames value for viewer '%s'. %s",
                   facebookId, firebaseError);
+              bus.fail(actionsMigrated);
             } else {
-              bus.produce(ACTIONS_MIGRATED);
+              bus.post(actionsMigrated);
             }
           }
         });

@@ -2,49 +2,46 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
-import com.tinlib.message.Subscriber2;
+import com.tinlib.message.*;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Actions;
 
 public class ResignGameService {
-  private static final String GAME_UPDATED = "ResignGameService.GAME_UPDATED";
-  private static final String ACTION_CLEARED = "ResignGameService.ACTION_CLEARED";
-
-  private final Bus bus;
+  private final Bus2 bus;
   private final TimeService timeService;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
 
   public ResignGameService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     timeService = injector.get(TinKeys.TIME_SERVICE);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
   }
 
   public void resignGame(final String gameId) {
-    bus.once(GAME_UPDATED, ACTION_CLEARED, new Subscriber2<Game, Object>() {
-      @Override
-      public void onMessage(Game game, Object v2) {
-        bus.invalidate(GAME_UPDATED);
-        bus.invalidate(ACTION_CLEARED);
+    final Key<Game> gameUpdated = Keys.createKey(Game.class, "gameUpdated");
+    final Key<Void> actionCleared = Keys.createVoidKey("actionCleared");
 
+    bus.once(gameUpdated, ImmutableList.<Key<?>>of(actionCleared), new Subscriber1<Game>() {
+      @Override
+      public void onMessage(Game game) {
         analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
-        bus.produce(TinMessages.RESIGN_GAME_COMPLETED, game);
+        bus.produce(TinMessages2.RESIGN_GAME_COMPLETED, game);
       }
     });
 
-    bus.once(TinMessages.VIEWER_ID, TinMessages.FIREBASE_REFERENCES,
+    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references) {
@@ -67,13 +64,14 @@ public class ResignGameService {
 
           @Override
           public void onComplete(Game game) {
-            bus.produce(GAME_UPDATED, game);
+            bus.post(gameUpdated, game);
           }
 
           @Override
           public void onError(FirebaseError error, boolean committed) {
             errorService.error("Error with viewer '%s' resigning game '%s'. %s", viewerId, gameId,
                 error);
+            bus.fail(gameUpdated);
           }
         });
 
@@ -84,8 +82,9 @@ public class ResignGameService {
             if (firebaseError != null) {
               errorService.error("Error with viewer '%s' resigning game '%s' - unable to clear " +
                   "current action. %s", viewerId, gameId, firebaseError);
+              bus.fail(actionCleared);
             } else {
-              bus.produce(ACTION_CLEARED);
+              bus.post(actionCleared);
             }
           }
         });

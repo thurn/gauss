@@ -1,31 +1,30 @@
 package com.tinlib.services;
 
-import com.tinlib.error.TinException;
-import com.tinlib.generated.Game;
-import com.tinlib.generated.Profile;
 import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.error.ErrorService;
+import com.tinlib.error.TinException;
+import com.tinlib.generated.Game;
+import com.tinlib.generated.Profile;
 import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.message.Bus2;
 import com.tinlib.message.Subscriber2;
 import com.tinlib.util.Games;
 
-public class ProfileService implements Subscriber2<String, Game> {
-  private final Bus bus;
+public class ProfileService {
+  private final Bus2 bus;
   private final GameMutator gameMutator;
   private final AnalyticsService analyticsService;
   private final ErrorService errorService;
 
   public ProfileService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
+    bus = injector.get(TinKeys.BUS2);
     gameMutator = injector.get(TinKeys.GAME_MUTATOR);
     analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
-    bus.await(TinMessages.VIEWER_ID, TinMessages.CURRENT_GAME, this);
   }
 
   public void setProfileForViewer(final Profile profile) {
@@ -45,6 +44,7 @@ public class ProfileService implements Subscriber2<String, Game> {
         analyticsService.trackEvent("Set viewer profile",
             ImmutableMap.of("gameId", game.getId(), "viewerId", viewerId,
                 "profile", profile.toString()));
+        bus.post(TinMessages2.SET_PROFILE_COMPLETED, profile);
       }
 
       @Override
@@ -52,22 +52,5 @@ public class ProfileService implements Subscriber2<String, Game> {
         errorService.error("Error setting profile for viewer %s. Error: %s", viewerId, error);
       }
     });
-  }
-
-  @Override
-  public void onMessage(String viewerId, Game currentGame) {
-    if (currentGame.getIsLocalMultiplayer() || currentGame.getIsGameOver() ||
-        !currentGame.getPlayerList().contains(viewerId)) {
-      return;
-    }
-    Profile profile = currentGame.getProfile(Games.playerNumberForPlayerId(currentGame, viewerId));
-    // For now, a profile is defined as "completed" if it has an image selected.
-    if (!profile.hasImageString()) {
-      bus.invalidate(TinMessages.VIEWER_PROFILE);
-      bus.produce(TinMessages.PROFILE_REQUIRED, profile);
-    } else {
-      bus.invalidate(TinMessages.PROFILE_REQUIRED);
-      bus.produce(TinMessages.VIEWER_PROFILE, profile);
-    }
   }
 }

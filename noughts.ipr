@@ -82,6 +82,7 @@
     <dictionary name="dthurn">
       <words>
         <w>multiplayer</w>
+        <w>unsubscribe</w>
       </words>
     </dictionary>
   </component>

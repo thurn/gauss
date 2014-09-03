@@ -4,7 +4,7 @@ import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinMessages2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.message.Subscriber0;
@@ -60,7 +60,7 @@ public class SubmitActionServiceTest extends TinTestCase {
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+        helper.bus2().once(TinMessages2.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
           helper.assertGameEquals(expectedGame, FINISHED);
@@ -102,7 +102,7 @@ public class SubmitActionServiceTest extends TinTestCase {
             .setIsGameOver(true)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+        helper.bus2().once(TinMessages2.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
             helper.assertGameEquals(expectedGame, FINISHED);
@@ -141,7 +141,7 @@ public class SubmitActionServiceTest extends TinTestCase {
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinMessages.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+        helper.bus2().once(TinMessages2.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
             helper.assertGameEquals(expectedGame, FINISHED);

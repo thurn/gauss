@@ -46,7 +46,7 @@ public class CurrentActionListener implements Subscriber2<FirebaseReferences, St
     bus = injector.get(TinKeys.BUS2);
     errorService = injector.get(TinKeys.ERROR_SERVICE);
     listenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
-    bus.await(this, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID);
+    bus.await(TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID, this);
   }
 
   @Override

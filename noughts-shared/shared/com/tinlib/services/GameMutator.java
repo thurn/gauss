@@ -41,7 +41,8 @@ public class GameMutator {
    * Applies the provided entity mutation to the current game.
    */
   public void mutateCurrentGame(final GameMutation mutation) {
-    bus.once(new Subscriber3<String, FirebaseReferences, String>() {
+    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID,
+        new Subscriber3<String, FirebaseReferences, String>() {
       @Override
       public void onMessage(final String viewerId, final FirebaseReferences references,
           final String currentGameId) {
@@ -63,14 +64,15 @@ public class GameMutator {
           }
         });
       }
-    }, TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID);
+    });
   }
 
   /**
    * Applies the provided entity mutation to the current action of the current game.
    */
   public void mutateCurrentAction(final ActionMutation mutation) {
-    bus.once(new Subscriber3<String, FirebaseReferences, Game>() {
+    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME,
+        new Subscriber3<String, FirebaseReferences, Game>() {
       @Override
       public void onMessage(final String viewerId, final FirebaseReferences references,
           final Game currentGame) {
@@ -92,6 +94,6 @@ public class GameMutator {
           }
         });
       }
-    }, TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME);
+    });
   }
 }
