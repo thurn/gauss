@@ -1,12 +1,12 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.ImageString;
 import com.tinlib.generated.Profile;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
@@ -38,7 +38,7 @@ public class ProfileServiceTest extends TinTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        helper.bus2().once(TinMessages2.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
+        helper.bus2().once(TinKeys.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
           @Override
           public void onMessage(Profile completedViewerProfile) {
             assertEquals(testProfile, completedViewerProfile);

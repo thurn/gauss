@@ -9,18 +9,18 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.*;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.*;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class FacebookService {
-  private final Bus2 bus;
+  private final Bus bus;
   private final Firebase firebase;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
@@ -28,11 +28,11 @@ public class FacebookService {
   private final AtomicInteger numGameMigrations = new AtomicInteger();
 
   public FacebookService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    firebase = injector.get(TinKeys.FIREBASE);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    viewerService = injector.get(TinKeys.VIEWER_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    firebase = injector.get(TinKeys2.FIREBASE);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    viewerService = injector.get(TinKeys2.VIEWER_SERVICE);
   }
 
   public void upgradeAccountToFacebook(final String facebookId) {
@@ -45,11 +45,11 @@ public class FacebookService {
         analyticsService.trackEvent("upgradeAccountToFacebook",
             ImmutableMap.of("facebookId", facebookId));
         viewerService.setViewerFacebookId(facebookId);
-        bus.post(TinMessages2.ACCOUNT_UPGRADE_COMPLETED);
+        bus.post(TinKeys.ACCOUNT_UPGRADE_COMPLETED);
       }
     });
 
-    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES, TinMessages2.GAME_LIST,
+    bus.once(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES, TinKeys.GAME_LIST,
         new Subscriber3<String, FirebaseReferences, GameList>() {
       @Override
       public void onMessage(String viewerId, FirebaseReferences references, GameList gameList) {

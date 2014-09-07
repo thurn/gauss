@@ -3,14 +3,14 @@ package com.tinlib.services;
 import com.firebase.client.FirebaseError;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
 import com.tinlib.time.LastModifiedService;
 import com.tinlib.util.Games;
 
@@ -22,11 +22,11 @@ public class UndoService {
   private final LastModifiedService lastModifiedService;
 
   public UndoService(Injector injector) {
-    bus = injector.get(TinKeys.BUS);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    gameMutator = injector.get(TinKeys.GAME_MUTATOR);
-    lastModifiedService = injector.get(TinKeys.LAST_MODIFIED_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    lastModifiedService = injector.get(TinKeys2.LAST_MODIFIED_SERVICE);
   }
 
   public boolean canUndo(String viewerId, Game game, Action currentAction) {
@@ -55,7 +55,7 @@ public class UndoService {
           Game currentGame) {
         analyticsService.trackEvent("Undo");
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_UNDO_COMPLETED,
+        bus.post(TinKeys.COMMAND_UNDO_COMPLETED,
             action.getFutureCommand(action.getFutureCommandCount() - 1));
       }
 
@@ -82,7 +82,7 @@ public class UndoService {
                              Game currentGame) {
         analyticsService.trackEvent("Redo");
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.produce(TinMessages.COMMAND_REDO_COMPLETED,
+        bus.post(TinKeys.COMMAND_REDO_COMPLETED,
             action.getCommand(action.getCommandCount() - 1));
       }
 

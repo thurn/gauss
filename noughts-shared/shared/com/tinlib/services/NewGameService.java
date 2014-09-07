@@ -9,13 +9,12 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.*;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.*;
 import com.tinlib.time.TimeService;
 
 import java.util.List;
@@ -59,18 +58,18 @@ public class NewGameService {
     }
   }
 
-  private final Bus2 bus;
+  private final Bus bus;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
   private final TimeService timeService;
   private final JoinGameService joinGameService;
 
   public NewGameService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    timeService = injector.get(TinKeys.TIME_SERVICE);
-    joinGameService = injector.get(TinKeys.JOIN_GAME_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    timeService = injector.get(TinKeys2.TIME_SERVICE);
+    joinGameService = injector.get(TinKeys2.JOIN_GAME_SERVICE);
   }
 
   public NewGameBuilder newGameBuilder(String gameId) {
@@ -87,7 +86,7 @@ public class NewGameService {
     final Key<Void> gameValueSet = Keys.createVoidKey("gameValueSet");
     final Key<Void> requestIdSet = Keys.createVoidKey("requestIdSet");
 
-    bus.await(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES,
+    bus.await(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(String viewerId, final FirebaseReferences firebaseReferences) {
@@ -107,7 +106,7 @@ public class NewGameService {
                 "players", players.toString(), "profiles", profiles.toString(),
                 "gameId", gameId, "localMultiplayer", localMultiplayer + ""));
             joinGameService.joinGame(viewerPlayerNumber, gameId, Optional.<Profile>absent());
-            bus.post(TinMessages2.CREATE_GAME_COMPLETED, game.build());
+            bus.post(TinKeys.CREATE_GAME_COMPLETED, game.build());
           }
         });
 

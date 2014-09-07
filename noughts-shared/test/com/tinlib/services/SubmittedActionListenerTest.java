@@ -1,10 +1,10 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
@@ -29,15 +29,15 @@ public class SubmittedActionListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinMessages2.ACTION_SUBMITTED, new Subscriber1<Game>() {
+        helper.bus2().once(TinKeys.ACTION_SUBMITTED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             assertEquals(testGame.toBuilder().addSubmittedAction(testAction).build(), game);
             finished();
           }
         });
-        helper.bus2().produce(TinMessages2.CURRENT_GAME, testGame);
-        helper.bus2().produce(TinMessages2.CURRENT_GAME,
+        helper.bus2().produce(TinKeys.CURRENT_GAME, testGame);
+        helper.bus2().produce(TinKeys.CURRENT_GAME,
             testGame.toBuilder().addSubmittedAction(testAction).build());
       }
     });

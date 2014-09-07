@@ -5,14 +5,14 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.GameListEntry;
 import com.tinlib.generated.GameListUpdate;
 import com.tinlib.generated.IndexPath;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.*;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Procedure;
@@ -75,7 +75,7 @@ public class GameListServiceTest extends TinTestCase {
       public void run(IndexPath indexPath) {
         valueListener.onDataChange(new FakeDataSnapshot(
             testGame.toBuilder().setIsGameOver(true).build().serialize(), GAME_ID));
-        testHelper.bus2().once(TinMessages2.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
+        testHelper.bus2().once(TinKeys.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
           @Override
           public void onMessage(GameListUpdate update) {
             IndexPath expectedFrom = IndexPath.newBuilder()
@@ -103,7 +103,7 @@ public class GameListServiceTest extends TinTestCase {
       @Override
       public void run(final IndexPath indexPath) {
         childListener.onChildRemoved(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-        testHelper.bus2().once(TinMessages2.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
+        testHelper.bus2().once(TinKeys.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
           @Override
           public void onMessage(IndexPath removePath) {
             assertEquals(indexPath, removePath);
@@ -185,12 +185,12 @@ public class GameListServiceTest extends TinTestCase {
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "addValueEventListener"));
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.bindInstance(TinKeys.KEYED_LISTENER_SERVICE, keyedListenerService);
+    builder.bindInstance(TinKeys2.KEYED_LISTENER_SERVICE, keyedListenerService);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().await(TinMessages2.GAME_LIST, new Subscriber1<GameList>() {
+        helper.bus2().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
             childListener = keyedListenerService.getChildEventListenerForKey(GameList.LISTENER_KEY);
@@ -208,13 +208,13 @@ public class GameListServiceTest extends TinTestCase {
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setErrorHandler(mockErrorHandler);
     builder.setTimeService(mockTimeService);
-    builder.bindInstance(TinKeys.KEYED_LISTENER_SERVICE, keyedListenerService);
+    builder.bindInstance(TinKeys2.KEYED_LISTENER_SERVICE, keyedListenerService);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
         testHelper = helper;
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().await(TinMessages2.GAME_LIST, new Subscriber1<GameList>() {
+        helper.bus2().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
             gameList = list;
@@ -223,7 +223,7 @@ public class GameListServiceTest extends TinTestCase {
             valueListener =
                 keyedListenerService.getValueEventListenerForKey(GameList.LISTENER_KEY + GAME_ID);
             valueListener.onDataChange(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-            helper.bus2().once(TinMessages2.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
+            helper.bus2().once(TinKeys.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
               @Override
               public void onMessage(IndexPath indexPath) {
                 onComplete.run(indexPath);

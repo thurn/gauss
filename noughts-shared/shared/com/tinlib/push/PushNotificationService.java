@@ -1,7 +1,7 @@
 package com.tinlib.push;
 
-import com.tinlib.core.TinKeys;
-import com.tinlib.inject.Injector;
+import com.tinlib.core.TinKeys2;
+import com.tinlib.infuse.Injector;
 
 import java.util.Set;
 
@@ -9,7 +9,7 @@ public class PushNotificationService {
   private final Set<PushNotificationHandler> pushNotificationHandlers;
 
   public PushNotificationService(Injector injector) {
-    pushNotificationHandlers = injector.getMultiple(TinKeys.PUSH_NOTIFICATION_HANDLERS);
+    pushNotificationHandlers = injector.getMultiple(TinKeys2.PUSH_NOTIFICATION_HANDLERS);
   }
 
   public void registerForPushNotifications(String gameId, int playerNumber) {

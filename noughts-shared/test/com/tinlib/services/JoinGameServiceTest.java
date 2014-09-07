@@ -4,10 +4,10 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.common.base.Optional;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
@@ -71,7 +71,7 @@ public class JoinGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        helper.bus2().await(TinMessages2.JOIN_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus2().await(TinKeys.JOIN_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             final Game expected = testGame.toBuilder()

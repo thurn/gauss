@@ -3,18 +3,17 @@ package com.tinlib.test;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.ValueEventListener;
 import com.google.common.collect.Maps;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinKeys;
 import com.tinlib.core.TinModule;
 import com.tinlib.error.ErrorHandler;
-import com.tinlib.inject.*;
-import com.tinlib.message.Bus;
-import com.tinlib.message.Bus2;
+import com.tinlib.infuse.*;
+import com.tinlib.convey.Bus;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.services.*;
 import com.tinlib.time.LastModifiedService;
@@ -191,39 +190,39 @@ public class TestHelper {
       @Override
       public void configure(Binder binder) {
         if (firebase != null) {
-          binder.bindSingletonKey(TinKeys.FIREBASE,
+          binder.bindSingletonKey(TinKeys2.FIREBASE,
               Initializers.returnValue(firebase));
         }
         if (errorHandler != null) {
-          binder.multibindKey(TinKeys.ERROR_HANDLERS,
+          binder.multibindKey(TinKeys2.ERROR_HANDLERS,
               Initializers.returnValue(errorHandler));
         }
         if (analyticsHandler != null) {
-          binder.multibindKey(TinKeys.ANALYTICS_HANDLERS,
+          binder.multibindKey(TinKeys2.ANALYTICS_HANDLERS,
               Initializers.returnValue(analyticsHandler));
         }
         if (pushNotificationHandler != null) {
-          binder.multibindKey(TinKeys.PUSH_NOTIFICATION_HANDLERS,
+          binder.multibindKey(TinKeys2.PUSH_NOTIFICATION_HANDLERS,
               Initializers.returnValue(pushNotificationHandler));
         }
         if (timeService != null) {
-          binder.bindSingletonKey(TinKeys.TIME_SERVICE,
+          binder.bindSingletonKey(TinKeys2.TIME_SERVICE,
               Initializers.returnValue(timeService));
         }
         if (gameOverService != null) {
-          binder.bindSingletonKey(TinKeys.GAME_OVER_SERVICE,
+          binder.bindSingletonKey(TinKeys2.GAME_OVER_SERVICE,
               Initializers.returnValue(gameOverService));
         }
         if (nextPlayerService != null) {
-          binder.bindSingletonKey(TinKeys.NEXT_PLAYER_SERVICE,
+          binder.bindSingletonKey(TinKeys2.NEXT_PLAYER_SERVICE,
               Initializers.returnValue(nextPlayerService));
         }
         if (lastModifiedService != null) {
-          binder.bindSingletonKey(TinKeys.LAST_MODIFIED_SERVICE,
+          binder.bindSingletonKey(TinKeys2.LAST_MODIFIED_SERVICE,
               Initializers.returnValue(lastModifiedService));
         }
         if (joinGameService != null) {
-          binder.bindSingletonKey(TinKeys.JOIN_GAME_SERVICE,
+          binder.bindSingletonKey(TinKeys2.JOIN_GAME_SERVICE,
               Initializers.returnValue(joinGameService));
         }
         for (Map.Entry<String, Object> entry : instanceMap.entrySet()) {
@@ -231,9 +230,9 @@ public class TestHelper {
         }
       }
     });
-    injector.get(TinKeys.COMMAND_LISTENER); // TODO: Make this not necessary
-    injector.get(TinKeys.GAME_OVER_LISTENER);
-    injector.get(TinKeys.SUBMITTED_ACTION_LISTENER);
+    injector.get(TinKeys2.COMMAND_LISTENER); // TODO: Make this not necessary
+    injector.get(TinKeys2.GAME_OVER_LISTENER);
+    injector.get(TinKeys2.SUBMITTED_ACTION_LISTENER);
     if (viewerId != null && viewerKey != null) {
       if (facebook) {
         (new ViewerService(injector)).setViewerFacebookId(viewerId);
@@ -251,20 +250,16 @@ public class TestHelper {
     }
   }
 
-  public Bus bus() {
-    return injector.get(TinKeys.BUS);
-  }
-
-  public Bus2 bus2() {
-    return injector.get(TinKeys.BUS2);
+  public Bus bus2() {
+    return injector.get(TinKeys2.BUS2);
   }
 
   public KeyedListenerService getKeyedListenerService() {
-    return injector.get(TinKeys.KEYED_LISTENER_SERVICE);
+    return injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
   }
 
   public Firebase firebase() {
-    return injector.get(TinKeys.FIREBASE);
+    return injector.get(TinKeys2.FIREBASE);
   }
 
   public FirebaseReferences references() {
@@ -326,7 +321,6 @@ public class TestHelper {
 
   public void cleanUp(final Runnable done) {
     getKeyedListenerService().unregisterAll();
-    bus().clearAll();
     firebase().removeValue(new CompletionListener() {
       @Override
       public void onComplete(FirebaseError firebaseError, Firebase firebase) {

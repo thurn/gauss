@@ -1,11 +1,10 @@
 package com.tinlib.time;
 
 import com.firebase.client.FirebaseError;
-import com.tinlib.core.TinKeys;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
-import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.inject.Injector;
+import com.tinlib.infuse.Injector;
 import com.tinlib.services.FirebaseReferences;
 import com.tinlib.services.GameMutator;
 
@@ -15,9 +14,9 @@ public class LastModifiedService {
   private final ErrorService errorService;
 
   public LastModifiedService(Injector injector) {
-    gameMutator = injector.get(TinKeys.GAME_MUTATOR);
-    timeService = injector.get(TinKeys.TIME_SERVICE);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
+    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    timeService = injector.get(TinKeys2.TIME_SERVICE);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
   }
 
   public void updateLastModified(final String gameId) {

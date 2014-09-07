@@ -4,27 +4,26 @@ import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus2;
-import com.tinlib.message.Subscriber2;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
 import com.tinlib.util.Games;
 
 public class ProfileService {
-  private final Bus2 bus;
+  private final Bus bus;
   private final GameMutator gameMutator;
   private final AnalyticsService analyticsService;
   private final ErrorService errorService;
 
   public ProfileService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    gameMutator = injector.get(TinKeys.GAME_MUTATOR);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
   }
 
   public void setProfileForViewer(final Profile profile) {
@@ -44,7 +43,7 @@ public class ProfileService {
         analyticsService.trackEvent("Set viewer profile",
             ImmutableMap.of("gameId", game.getId(), "viewerId", viewerId,
                 "profile", profile.toString()));
-        bus.post(TinMessages2.SET_PROFILE_COMPLETED, profile);
+        bus.post(TinKeys.SET_PROFILE_COMPLETED, profile);
       }
 
       @Override

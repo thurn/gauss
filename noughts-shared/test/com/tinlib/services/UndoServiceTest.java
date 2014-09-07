@@ -2,11 +2,11 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
@@ -44,7 +44,7 @@ public class UndoServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         UndoService undoService = new UndoService(helper.injector());
 
-        helper.bus().await(TinMessages.COMMAND_UNDO_COMPLETED, new Subscriber1<Command>() {
+        helper.bus2().await(TinKeys.COMMAND_UNDO_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testAction.getCommand(0), command);
@@ -117,7 +117,7 @@ public class UndoServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         UndoService undoService = new UndoService(helper.injector());
 
-        helper.bus().await(TinMessages.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
+        helper.bus2().await(TinKeys.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testAction.getFutureCommand(0), command);

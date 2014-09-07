@@ -1,9 +1,9 @@
 package com.tinlib.time;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages;
+import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Game;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
@@ -13,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -39,7 +38,7 @@ public class LastModifiedServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
         when(mockTimeService.currentTimeMillis()).thenReturn(789L);
-        helper.bus().await(TinMessages.CURRENT_GAME, new Subscriber1<Game>() {
+        helper.bus2().await(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game currentGame) {
             System.out.println("message " + currentGame);

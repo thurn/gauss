@@ -1,10 +1,10 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
@@ -34,7 +34,7 @@ public class CurrentActionListenerTest extends TinTestCase {
       public void run(TestHelper helper) {
         final CurrentActionListener currentActionListener =
             new CurrentActionListener(helper.injector());
-        helper.bus2().once(TinMessages2.CURRENT_ACTION, new Subscriber1<Action>() {
+        helper.bus2().once(TinKeys.CURRENT_ACTION, new Subscriber1<Action>() {
           @Override
           public void onMessage(Action currentAction) {
             assertEquals(testAction, currentAction);
@@ -44,7 +44,7 @@ public class CurrentActionListenerTest extends TinTestCase {
 
         helper.references().currentActionReferenceForGame(GAME_ID).setValue(
             testAction.serialize());
-        helper.bus2().produce(TinMessages2.CURRENT_GAME_ID, GAME_ID);
+        helper.bus2().produce(TinKeys.CURRENT_GAME_ID, GAME_ID);
       }
     });
     endAsyncTestBlock();
@@ -67,7 +67,7 @@ public class CurrentActionListenerTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         CurrentActionListener currentActionListener = new CurrentActionListener(helper.injector());
-        helper.bus2().produce(TinMessages2.CURRENT_GAME_ID, GAME_ID);
+        helper.bus2().produce(TinKeys.CURRENT_GAME_ID, GAME_ID);
       }
     });
     endAsyncTestBlock();

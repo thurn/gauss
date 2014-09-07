@@ -1,7 +1,7 @@
 package com.tinlib.error;
 
-import com.tinlib.inject.Injector;
-import com.tinlib.core.TinKeys;
+import com.tinlib.core.TinKeys2;
+import com.tinlib.infuse.Injector;
 
 import java.util.Set;
 
@@ -10,8 +10,8 @@ import java.util.Set;
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinKeys#BUS}</li>
- *   <li>{@link com.tinlib.core.TinKeys#ANALYTICS_SERVICE}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#BUS}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#ANALYTICS_SERVICE}</li>
  * </ul>
  *
  * <h1>Output Messages</h1>
@@ -23,7 +23,7 @@ public class ErrorService {
   private final Set<ErrorHandler> errorHandlers;
 
   public ErrorService(Injector injector) {
-    errorHandlers = injector.getMultiple(TinKeys.ERROR_HANDLERS);
+    errorHandlers = injector.getMultiple(TinKeys2.ERROR_HANDLERS);
   }
 
   /**

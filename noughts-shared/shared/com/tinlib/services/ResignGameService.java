@@ -6,27 +6,27 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.*;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.*;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Actions;
 
 public class ResignGameService {
-  private final Bus2 bus;
+  private final Bus bus;
   private final TimeService timeService;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
 
   public ResignGameService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    timeService = injector.get(TinKeys.TIME_SERVICE);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    timeService = injector.get(TinKeys2.TIME_SERVICE);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
   }
 
   public void resignGame(final String gameId) {
@@ -37,11 +37,11 @@ public class ResignGameService {
       @Override
       public void onMessage(Game game) {
         analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
-        bus.produce(TinMessages2.RESIGN_GAME_COMPLETED, game);
+        bus.produce(TinKeys.RESIGN_GAME_COMPLETED, game);
       }
     });
 
-    bus.once(TinMessages2.VIEWER_ID, TinMessages2.FIREBASE_REFERENCES,
+    bus.once(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references) {

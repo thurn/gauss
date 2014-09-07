@@ -1,8 +1,8 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinMessages2;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.core.TinKeys;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TinTestCase;
 import org.junit.runner.RunWith;
@@ -22,14 +22,14 @@ public class ViewerServiceTest extends TinTestCase {
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
 
-        helper.bus2().once(TinMessages2.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus2().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("viewerId", viewerId);
             finished();
           }
         });
-        helper.bus2().once(TinMessages2.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        helper.bus2().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());
@@ -63,14 +63,14 @@ public class ViewerServiceTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
-        helper.bus2().once(TinMessages2.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus2().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("facebookId", viewerId);
             finished();
           }
         });
-        helper.bus2().once(TinMessages2.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        helper.bus2().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());

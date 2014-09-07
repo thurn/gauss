@@ -1,166 +1,206 @@
 package com.tinlib.core;
 
-import static com.tinlib.util.Identifiers.id;
+import com.tinlib.generated.*;
+import com.tinlib.convey.Key;
+import com.tinlib.convey.Keys;
+import com.tinlib.services.FirebaseReferences;
+import com.tinlib.services.GameList;
 
-/**
- * Keys which various components of Tin expect to be able to inject via
- * {@link com.tinlib.inject.Injector#get(String)}. Some are bound to default
- * values by {@link TinModule}, others must be bound by clients.
- */
-public class TinKeys {
+public final class TinKeys {
   /**
-   * A {@link com.tinlib.message.Bus} for coordinating messages. Refer to
-   * {@link TinMessages} for documentation on possible messages.
+   * A {@link com.tinlib.services.FirebaseReferences} instance configured with the ID of the
+   * current viewer.
    */
-  public static final String BUS = id("tin.BUS");
-
-  /**
-   * A {@link com.tinlib.message.Bus2} for coordinating messages. Refer to
-   * {@link TinMessages} for documentation on possible messages.
-   */
-  public static final String BUS2 = id("tin.BUS2");
+  public static final Key<FirebaseReferences> FIREBASE_REFERENCES =
+      Keys.createKey(FirebaseReferences.class, "FIREBASE_REFERENCES");
 
   /**
-   * A {@link com.tinlib.error.ErrorService} instance for reporting errors.
+   * A String with the ID of the current viewer.
    */
-  public static final String ERROR_SERVICE = id("tin.ERROR_SERVICE");
+  public static final Key<String> VIEWER_ID =
+      Keys.createKey(String.class, "VIEWER_ID");
 
   /**
-   * A multibinding key for {@link com.tinlib.error.ErrorHandler} implementations. Each Handler
-   * will be called by {@link com.tinlib.error.ErrorService} when an error occurs.
+   * Fired when the user requests to load a game. The value will be a String
+   * with the ID of the game.
    */
-  public static final String ERROR_HANDLERS = id("tin.ERROR_HANDLERS");
+  public static final Key<String> CURRENT_GAME_ID =
+      Keys.createKey(String.class, "CURRENT_GAME_ID");
 
   /**
-   * A {@link com.firebase.client.Firebase} database instance.
+   * The current {@link com.tinlib.generated.Game}
    */
-  public static final String FIREBASE = id("tin.FIREBASE");
+  public static final Key<Game> CURRENT_GAME =
+      Keys.createKey(Game.class, "CURRENT_GAME");
 
   /**
-   * A {@link com.tinlib.services.KeyedListenerService} instance, used to unregister listeners.
+   * The current {@link com.tinlib.generated.Action} of the current
+   * game.
    */
-  public static final String KEYED_LISTENER_SERVICE = id("tin.KEYED_LISTENER_SERVICE");
+  public static final Key<Action> CURRENT_ACTION =
+      Keys.createKey(Action.class, "CURRENT_ACTION");
 
   /**
-   * An {@link com.tinlib.analytics.AnalyticsService} instance, used to track user events.
+   * The {@link com.tinlib.generated.GameStatus} of the current
+   * game, fired whenever the game status changes.
    */
-  public static final String ANALYTICS_SERVICE = id("tin.ANALYTICS_SERVICE");
+  public static final Key<GameStatus> GAME_STATUS =
+      Keys.createKey(GameStatus.class, "GAME_STATUS");
 
   /**
-   * A multibinding key for {@link com.tinlib.analytics.AnalyticsHandler}
-   * implementations. Each Handler will be called by
-   * {@link com.tinlib.analytics.AnalyticsService} in turn.
+   * Fired when the user has successfully updated their profile. The value will
+   * be the new value of their profile
    */
-  public static final String ANALYTICS_HANDLERS = id("tin.ANALYTICS_HANDLERS");
+  public static final Key<Profile> SET_PROFILE_COMPLETED =
+      Keys.createKey(Profile.class, "SET_PROFILE_COMPLETED");
 
   /**
-   * A {@link com.tinlib.push.PushNotificationService} instance, used to send push
-   * notifications.
+   * Fired when an action is submitted. The value will be the just-submitted
+   * {@link com.tinlib.generated.Action}.
    */
-  public static final String PUSH_NOTIFICATION_SERVICE = id("tin.PUSH_NOTIFICATION_SERVICE");
+  public static final Key<Action> SUBMIT_ACTION_COMPLETED =
+      Keys.createKey(Action.class, "SUBMIT_ACTION_COMPLETED");
 
   /**
-   * A multibinding key for {@link com.tinlib.push.PushNotificationHandler}
-   * implementations. Each Handler will be called by
-   * {@link com.tinlib.push.PushNotificationService} in turn.
+   * Fired when a command is undone. The value will be the undone
+   * {@link com.tinlib.generated.Command}.
    */
-  public static final String PUSH_NOTIFICATION_HANDLERS = id("tin.PUSH_NOTIFICATION_HANDLERS");
+  public static final Key<Command> COMMAND_UNDO_COMPLETED =
+      Keys.createKey(Command.class, "COMMAND_UNDO_COMPLETED");
 
   /**
-   * A {@link com.tinlib.services.GameMutator} for mutating games and their current actions.
+   * Fired when a command is redone. The value will be the redone
+   * {@link com.tinlib.generated.Command}.
    */
-  public static final String GAME_MUTATOR = id("tin.GAME_MUTATOR");
+  public static final Key<Command> COMMAND_REDO_COMPLETED =
+      Keys.createKey(Command.class, "COMMAND_REDO_COMPLETED");
 
   /**
-   * A {@link com.tinlib.validator.ActionValidatorService} which you can ask to
-   * check the legality of game actions by referring to the
-   * {@link com.tinlib.validator.ActionValidator} instances bound to the
-   * {@link TinKeys#ACTION_VALIDATORS} key.
+   * Fired when a command is added. The value will be the newly-added
+   * {@link com.tinlib.generated.Command}.
    */
-  public static final String ACTION_VALIDATOR_SERVICE = id("tin.ACTION_VALIDATOR_SERVICE");
+  public static final Key<Command> COMMAND_ADD_COMPLETED =
+      Keys.createKey(Command.class, "COMMAND_ADD_COMPLETED");
 
   /**
-   * A multibinding key for {@link com.tinlib.validator.ActionValidator} instances
-   * which will be consulted in turn by
-   * {@link com.tinlib.validator.ActionValidatorService} to determine whether game
-   * actions are legal.
+   * Fired when a command is changed. The value will be a
+   * {@link com.tinlib.generated.IndexCommand} with the changed command and
+   * its index.
    */
-  public static final String ACTION_VALIDATORS = id("tin.ACTION_VALIDATORS");
+  public static final Key<IndexCommand> COMMAND_CHANGE_COMPLETED =
+      Keys.createKey(IndexCommand.class, "COMMAND_CHANGE_COMPLETED");
 
   /**
-   * A {@link com.tinlib.services.GameOverService} implementation.
+   * Fired when a new game is created. The value will be the newly-created
+   * {@link com.tinlib.generated.Game}.
    */
-  public static final String GAME_OVER_SERVICE = id("tin.GAME_OVER_SERVICE");
+  public static final Key<Game> CREATE_GAME_COMPLETED =
+      Keys.createKey(Game.class, "CREATE_GAME_COMPLETED");
 
   /**
-   * A {@link com.tinlib.services.NextPlayerService} implementation.
+   * Fired when the user joins a game. The value will be
+   * {@link com.tinlib.generated.Game} they joined.
    */
-  public static final String NEXT_PLAYER_SERVICE = id("tin.NEXT_PLAYER_SERVICE");
+  public static final Key<Game> JOIN_GAME_COMPLETED =
+      Keys.createKey(Game.class, "JOIN_GAME_COMPLETED");
 
   /**
-   * A {@link com.tinlib.time.TimeService} implementation.
+   * Fired when the user's account is upgraded to Facebook. No associated
+   * value.
    */
-  public static final String TIME_SERVICE = id("tin.TIME_SERVICE");
+  public static final Key<Void> ACCOUNT_UPGRADE_COMPLETED =
+      Keys.createVoidKey("ACCOUNT_UPGRADE_COMPLETED");
 
   /**
-   * The {@link com.tinlib.time.LastModifiedService}.
+   * Fired when a game is added to the game list. The value will be the
+   * {@link com.tinlib.generated.IndexPath} at which the game was added.
    */
-  public static final String LAST_MODIFIED_SERVICE = id("tin.LAST_MODIFIED_SERVICE");
+  public static final Key<IndexPath> GAME_LIST_ADD =
+      Keys.createKey(IndexPath.class, "GAME_LIST_ADD");
 
   /**
-   * The {@link com.tinlib.services.JoinGameService}.
+   * Fired when a game in the game list is changed. The value will be a
+   * {@link com.tinlib.generated.GameListUpdate} containing the location in the
+   * list to move a row from and the location in the list to move the row to.
    */
-  public static final String JOIN_GAME_SERVICE = id("tin.JOIN_GAME_SERVICE");
+  public static final Key<GameListUpdate> GAME_LIST_MOVE =
+      Keys.createKey(GameListUpdate.class, "GAME_LIST_MOVE");
 
   /**
-   * The {@link com.tinlib.services.CurrentGameListener}.
+   * Fired when a game in the game list is removed. The value will be the
+   * {@link com.tinlib.generated.IndexPath} at which the game was removed.
    */
-  public static final String CURRENT_GAME_SERVICE = id("tin.CURRENT_GAME_SERVICE");
+  public static final Key<IndexPath> GAME_LIST_REMOVE =
+      Keys.createKey(IndexPath.class, "GAME_LIST_REMOVE");
 
   /**
-   * {@link com.tinlib.validator.JoinGameValidatorService}
+   * Fired with a {@link com.tinlib.services.GameList} for the viewer whenever
+   * the viewer changes.
    */
-  public static final String JOIN_GAME_VALIDATOR_SERVICE = id("tin.JOIN_GAME_VALIDATOR_SERVICE");
+  public static final Key<GameList> GAME_LIST =
+      Keys.createKey(GameList.class, "GAME_LIST");
 
   /**
-   * Multikey for {@link com.tinlib.validator.JoinGameValidator} interfaces.
+   * Fired when the viewer resigns from a game. The value will be the
+   * {@link com.tinlib.generated.Game} which the viewer resigned from.
    */
-  public static final String JOIN_GAME_VALIDATORS = id("tin.JOIN_GAME_VALIDATORS");
+  public static final Key<Game> RESIGN_GAME_COMPLETED =
+      Keys.createKey(Game.class, "RESIGN_GAME_COMPLETED");
 
   /**
-   * {@link com.tinlib.services.ViewerService}
+   * Fired when the viewer archives a game which has ended. The value will
+   * be the ID of the archived game.
    */
-  public static final String VIEWER_SERVICE = id("tin.VIEWER_SERVICE");
+  public static final Key<String> ARCHIVE_GAME_COMPLETED =
+      Keys.createKey(String.class, "ARCHIVE_GAME_COMPLETED");
 
   /**
-   * {@link com.tinlib.services.CommandListener}
+   * Fired when a proposed command is added by the viewer. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the added command and
+   * the index at which is was added.
    */
-  public static final String COMMAND_LISTENER = id("tin.COMMAND_LISTENER");
+  public static final Key<IndexCommand> COMMAND_ADDED =
+      Keys.createKey(IndexCommand.class, "COMMAND_ADDED");
 
   /**
-   * {@link com.tinlib.services.GameOverListener}
+   * Fired when a command is part of an action submitted by any player. Note
+   * that even the viewer's own commands may not show up via
+   * {@link TinKeys#COMMAND_ADDED} first because it is possible to add
+   * commands directly at submit time. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the newly submitted
+   * command.
    */
-  public static final String GAME_OVER_LISTENER = id("tin.GAME_OVER_LISTENER");
+  public static final Key<IndexCommand> COMMAND_SUBMITTED =
+      Keys.createKey(IndexCommand.class, "COMMAND_SUBMITTED");
 
   /**
-   * {@link com.tinlib.services.SubmittedActionListener}
+   * Fired when a command is undone by the viewer. The value will be an
+   * {@link com.tinlib.generated.IndexCommand} containing the command which
+   * was undone and the index it formerly occupied.
    */
-  public static final String SUBMITTED_ACTION_LISTENER = id("tin.SUBMITTED_ACTION_LISTENER");
+  public static final Key<IndexCommand> COMMAND_UNDONE =
+      Keys.createKey(IndexCommand.class, "COMMAND_UNDONE");
 
   /**
-   * {@link com.tinlib.services.SubmitActionService}
+   * Fired when the value of one of the viewer's proposed commands changes. The
+   * value will be an {@link com.tinlib.generated.IndexCommand} containing the
+   * changed command.
    */
-  public static final String SUBMIT_ACTION_SERVICE = id("tin.SUBMIT_ACTION_SERVICE");
+  public static final Key<IndexCommand> COMMAND_CHANGED =
+      Keys.createKey(IndexCommand.class, "COMMAND_CHANGED");
 
   /**
-   * {@link com.tinlib.services.AddCommandService}
+   * Fired when a new submitted action is added to the current game. The value
+   * will be the {@link com.tinlib.generated.Game} with the newly-submitted
+   * action.
    */
-  public static final String ADD_COMMAND_SERVICE = id("ADD_COMMAND_SERVICE");
+  public static final Key<Game> ACTION_SUBMITTED =
+      Keys.createKey(Game.class, "ACTION_SUBMITTED");
 
   /**
-   * {@link com.tinlib.ai.service.AIProvider}
+   * Fired when the current game is ended. The value will be the
+   * {@link com.tinlib.generated.Game} which has just ended.
    */
-  public static final String AI_PROVIDER = id("tin.AI_PROVIDER");
-
-  public static final String AI_ACTION_ADAPTER = id("tin.AI_ACTION_ADAPTER");
+  public static final Key<Game> GAME_OVER =
+      Keys.createKey(Game.class, "GAME_OVER");
 }

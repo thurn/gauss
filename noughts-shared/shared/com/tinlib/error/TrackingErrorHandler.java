@@ -1,15 +1,15 @@
 package com.tinlib.error;
 
 import com.google.common.collect.ImmutableMap;
-import com.tinlib.inject.Injector;
+import com.tinlib.core.TinKeys2;
+import com.tinlib.infuse.Injector;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.core.TinKeys;
 
 public class TrackingErrorHandler implements ErrorHandler {
   private final AnalyticsService analyticsService;
 
   public TrackingErrorHandler(Injector injector) {
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
   }
 
   @Override

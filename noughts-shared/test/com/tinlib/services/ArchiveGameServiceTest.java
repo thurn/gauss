@@ -5,10 +5,10 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
@@ -42,7 +42,7 @@ public class ArchiveGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
-        helper.bus2().once(TinMessages2.ARCHIVE_GAME_COMPLETED, new Subscriber1<String>() {
+        helper.bus2().once(TinKeys.ARCHIVE_GAME_COMPLETED, new Subscriber1<String>() {
           @Override
           public void onMessage(String gameId) {
             assertEquals(GAME_ID, gameId);

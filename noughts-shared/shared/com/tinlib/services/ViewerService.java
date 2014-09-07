@@ -2,9 +2,9 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus2;
+import com.tinlib.core.TinKeys2;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
 
 import java.util.Map;
 
@@ -13,8 +13,8 @@ import java.util.Map;
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinKeys#BUS}</li>
- *   <li>{@link com.tinlib.core.TinKeys#FIREBASE}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#BUS}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#FIREBASE}</li>
  * </ul>
  *
  * <h1>Output Messages</h1>
@@ -28,12 +28,12 @@ public class ViewerService {
     public void apply(Map<String, Object> map, String viewerId, FirebaseReferences references);
   }
 
-  private final Bus2 bus;
+  private final Bus bus;
   private final Firebase firebase;
 
   public ViewerService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    firebase = injector.get(TinKeys.FIREBASE);
+    bus = injector.get(TinKeys2.BUS2);
+    firebase = injector.get(TinKeys2.FIREBASE);
   }
 
   /**
@@ -43,8 +43,8 @@ public class ViewerService {
    */
   public void setViewerAnonymousId(String viewerId, String viewerKey) {
     bus.newProduction()
-        .addKey(TinMessages2.VIEWER_ID, viewerId)
-        .addKey(TinMessages2.FIREBASE_REFERENCES, FirebaseReferences.anonymous(viewerKey, firebase))
+        .addKey(TinKeys.VIEWER_ID, viewerId)
+        .addKey(TinKeys.FIREBASE_REFERENCES, FirebaseReferences.anonymous(viewerKey, firebase))
         .produce();
   }
 
@@ -54,8 +54,8 @@ public class ViewerService {
    */
   public void setViewerFacebookId(String facebookId) {
     bus.newProduction()
-        .addKey(TinMessages2.VIEWER_ID, facebookId)
-        .addKey(TinMessages2.FIREBASE_REFERENCES, FirebaseReferences.facebook(facebookId, firebase))
+        .addKey(TinKeys.VIEWER_ID, facebookId)
+        .addKey(TinKeys.FIREBASE_REFERENCES, FirebaseReferences.facebook(facebookId, firebase))
         .produce();
   }
 }

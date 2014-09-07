@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
 import com.tinlib.util.Games;
-import com.tinlib.inject.Injector;
+import com.tinlib.infuse.Injector;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.push.PushNotificationService;
 import org.timepedia.exporter.client.Export;
@@ -24,7 +24,7 @@ import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.generated.Pronoun;
-import com.tinlib.ai.algorithm.MonteCarloSearch;
+import com.tinlib.jgail.algorithm.MonteCarloSearch;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;

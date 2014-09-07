@@ -5,22 +5,22 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.IndexCommand;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus2;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
 import com.tinlib.time.LastModifiedService;
 import com.tinlib.validator.ActionValidatorService;
 
 import java.util.List;
 
 public class AddCommandService {
-  private final Bus2 bus;
+  private final Bus bus;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
   private final GameMutator gameMutator;
@@ -28,12 +28,12 @@ public class AddCommandService {
   private final ActionValidatorService actionValidatorService;
 
   public AddCommandService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    gameMutator = injector.get(TinKeys.GAME_MUTATOR);
-    lastModifiedService = injector.get(TinKeys.LAST_MODIFIED_SERVICE);
-    actionValidatorService = injector.get(TinKeys.ACTION_VALIDATOR_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    lastModifiedService = injector.get(TinKeys2.LAST_MODIFIED_SERVICE);
+    actionValidatorService = injector.get(TinKeys2.ACTION_VALIDATOR_SERVICE);
   }
 
   public void addCommand(final Command command) {
@@ -48,7 +48,7 @@ public class AddCommandService {
           Game currentGame) {
         analyticsService.trackEvent("addCommand", ImmutableMap.of("command", command.toString()));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.post(TinMessages2.COMMAND_ADD_COMPLETED,
+        bus.post(TinKeys.COMMAND_ADD_COMPLETED,
             action.getCommand(action.getCommandCount() - 1));
       }
 
@@ -78,7 +78,7 @@ public class AddCommandService {
         analyticsService.trackEvent("setCommand",
             ImmutableMap.of("command", command.toString(), "index", index + ""));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.post(TinMessages2.COMMAND_CHANGE_COMPLETED, IndexCommand.newBuilder()
+        bus.post(TinKeys.COMMAND_CHANGE_COMPLETED, IndexCommand.newBuilder()
             .setCommand(action.getCommand(index))
             .setIndex(index)
             .build());

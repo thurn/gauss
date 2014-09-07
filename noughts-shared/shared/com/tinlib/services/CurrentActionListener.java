@@ -4,12 +4,12 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Action;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus2;
-import com.tinlib.message.Subscriber2;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber2;
 
 /**
  * Service for broadcasting updates about the state of the player's current
@@ -17,9 +17,9 @@ import com.tinlib.message.Subscriber2;
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinKeys#BUS}</li>
- *   <li>{@link com.tinlib.core.TinKeys#ERROR_SERVICE}</li>
- *   <li>{@link com.tinlib.core.TinKeys#KEYED_LISTENER_SERVICE}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#BUS}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#ERROR_SERVICE}</li>
+ *   <li>{@link com.tinlib.core.TinKeys2#KEYED_LISTENER_SERVICE}</li>
  * </ul>
  *
  * <h1>Input Messages</h1>
@@ -36,17 +36,17 @@ import com.tinlib.message.Subscriber2;
 public class CurrentActionListener implements Subscriber2<FirebaseReferences, String> {
   public static final String LISTENER_KEY = "tin.CurrentAction";
 
-  private final Bus2 bus;
+  private final Bus bus;
   private final ErrorService errorService;
   private final KeyedListenerService listenerService;
 
   private String gameId;
 
   public CurrentActionListener(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    listenerService = injector.get(TinKeys.KEYED_LISTENER_SERVICE);
-    bus.await(TinMessages2.FIREBASE_REFERENCES, TinMessages2.CURRENT_GAME_ID, this);
+    bus = injector.get(TinKeys2.BUS2);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    listenerService = injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
+    bus.await(TinKeys.FIREBASE_REFERENCES, TinKeys.CURRENT_GAME_ID, this);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class CurrentActionListener implements Subscriber2<FirebaseReferences, St
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() != null) {
           Action currentAction = Action.newDeserializer().fromDataSnapshot(dataSnapshot);
-          bus.produce(TinMessages2.CURRENT_ACTION, currentAction, TinMessages2.CURRENT_GAME_ID);
+          bus.produce(TinKeys.CURRENT_ACTION, currentAction, TinKeys.CURRENT_GAME_ID);
         }
       }
 

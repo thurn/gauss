@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -23,12 +24,14 @@ public abstract class Entity<T extends Entity<T>> {
 
     @SuppressWarnings("unchecked")
     public T fromDataSnapshot(DataSnapshot snapshot) {
+      Preconditions.checkNotNull(snapshot.getValue());
       Map<String, Object> map = (Map<String, Object>)snapshot.getValue();
       return deserialize(map);
     }
 
     @SuppressWarnings("unchecked")
     public T fromMutableData(MutableData data) {
+      Preconditions.checkNotNull(data.getValue());
       Map<String, Object> map = (Map<String, Object>)data.getValue();
       return deserialize(map);
     }

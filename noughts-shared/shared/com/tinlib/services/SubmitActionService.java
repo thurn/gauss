@@ -6,14 +6,14 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinMessages2;
+import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.inject.Injector;
-import com.tinlib.message.Bus2;
-import com.tinlib.message.Subscriber1;
+import com.tinlib.infuse.Injector;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Actions;
@@ -23,7 +23,7 @@ import com.tinlib.validator.ActionValidatorService;
 import java.util.List;
 
 public class SubmitActionService {
-  private final Bus2 bus;
+  private final Bus bus;
   private final ActionValidatorService validatorService;
   private final ErrorService errorService;
   private final PushNotificationService pushNotificationService;
@@ -34,19 +34,19 @@ public class SubmitActionService {
   private final TimeService timeService;
 
   public SubmitActionService(Injector injector) {
-    bus = injector.get(TinKeys.BUS2);
-    validatorService = injector.get(TinKeys.ACTION_VALIDATOR_SERVICE);
-    errorService = injector.get(TinKeys.ERROR_SERVICE);
-    pushNotificationService = injector.get(TinKeys.PUSH_NOTIFICATION_SERVICE);
-    analyticsService = injector.get(TinKeys.ANALYTICS_SERVICE);
-    nextPlayerService = injector.get(TinKeys.NEXT_PLAYER_SERVICE);
-    gameOverService = injector.get(TinKeys.GAME_OVER_SERVICE);
-    gameMutator = injector.get(TinKeys.GAME_MUTATOR);
-    timeService = injector.get(TinKeys.TIME_SERVICE);
+    bus = injector.get(TinKeys2.BUS2);
+    validatorService = injector.get(TinKeys2.ACTION_VALIDATOR_SERVICE);
+    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    pushNotificationService = injector.get(TinKeys2.PUSH_NOTIFICATION_SERVICE);
+    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    nextPlayerService = injector.get(TinKeys2.NEXT_PLAYER_SERVICE);
+    gameOverService = injector.get(TinKeys2.GAME_OVER_SERVICE);
+    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    timeService = injector.get(TinKeys2.TIME_SERVICE);
   }
 
   public void submitCurrentAction() {
-    bus.once(TinMessages2.CURRENT_ACTION, new Subscriber1<Action>() {
+    bus.once(TinKeys.CURRENT_ACTION, new Subscriber1<Action>() {
       @Override
       public void onMessage(final Action currentAction) {
         submitAction(currentAction);
@@ -95,7 +95,7 @@ public class SubmitActionService {
                       "viewerId", viewerId, "gameId", game.getId());
                   analyticsService.trackEvent("submitCurrentAction", dimensions);
                   sendNotificationOnActionSubmitted(viewerId, game);
-                  bus.post(TinMessages2.SUBMIT_ACTION_COMPLETED);
+                  bus.post(TinKeys.SUBMIT_ACTION_COMPLETED);
                 }
               }
             }
