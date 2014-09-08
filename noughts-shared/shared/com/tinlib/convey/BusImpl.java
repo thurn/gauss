@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class BusImpl implements Bus {
+class BusImpl implements Bus {
   private static class Value<T> {
     private final T value;
     private final List<Key<?>> dependencies;
@@ -47,8 +47,6 @@ public class BusImpl implements Bus {
     private final boolean once;
     private final Subscriber subscriber;
 
-    private boolean fired = false;
-
     public MessageHandler(boolean once, ImmutableList<Key<?>> keys, Subscriber subscriber) {
       this.once = once;
       this.subscriber = subscriber;
@@ -61,7 +59,6 @@ public class BusImpl implements Bus {
       }
 
       if (allSatisfied()) {
-        fired = true;
         subscriber.onMessage(realizeMap());
       }
 
@@ -75,10 +72,6 @@ public class BusImpl implements Bus {
     public <T> Optional<Unsubscriber> handle(Key<T> key, Optional<T> object) {
       requirements.put(key, object);
       if (allSatisfied()) {
-        if (fired && once) {
-          throw new RuntimeException("handling a once() key twice! " + this);
-        }
-        fired = true;
         subscriber.onMessage(realizeMap());
         return once ? Optional.of(createUnsubscriber()) : Optional.<Unsubscriber>absent();
       }
@@ -139,10 +132,15 @@ public class BusImpl implements Bus {
     return new ProductionImpl();
   }
 
-  private synchronized void setProducedValue(Key<?> key, Object value, List<Key<?>> dependencies) {
+  private void invalidate(Key<?> key) {
     for (Key<?> derived : derivedKeys.get(key)) {
-      producedValues.remove(derived);
+      invalidate(derived);
     }
+    producedValues.remove(key);
+  }
+
+  private synchronized void setProducedValue(Key<?> key, Object value, List<Key<?>> dependencies) {
+    invalidate(key);
 
     producedValues.put(key, value);
 

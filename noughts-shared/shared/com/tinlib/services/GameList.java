@@ -100,7 +100,7 @@ public class GameList {
   private final String viewerId;
 
   public GameList(Injector injector, String viewerId, FirebaseReferences references) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     keyedListenerService = injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
     timeService = injector.get(TinKeys2.TIME_SERVICE);

@@ -75,7 +75,7 @@ public class GameListServiceTest extends TinTestCase {
       public void run(IndexPath indexPath) {
         valueListener.onDataChange(new FakeDataSnapshot(
             testGame.toBuilder().setIsGameOver(true).build().serialize(), GAME_ID));
-        testHelper.bus2().once(TinKeys.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
+        testHelper.bus().once(TinKeys.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
           @Override
           public void onMessage(GameListUpdate update) {
             IndexPath expectedFrom = IndexPath.newBuilder()
@@ -103,7 +103,7 @@ public class GameListServiceTest extends TinTestCase {
       @Override
       public void run(final IndexPath indexPath) {
         childListener.onChildRemoved(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-        testHelper.bus2().once(TinKeys.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
+        testHelper.bus().once(TinKeys.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
           @Override
           public void onMessage(IndexPath removePath) {
             assertEquals(indexPath, removePath);
@@ -190,7 +190,7 @@ public class GameListServiceTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
+        helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
             childListener = keyedListenerService.getChildEventListenerForKey(GameList.LISTENER_KEY);
@@ -214,7 +214,7 @@ public class GameListServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         testHelper = helper;
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
+        helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
             gameList = list;
@@ -223,7 +223,7 @@ public class GameListServiceTest extends TinTestCase {
             valueListener =
                 keyedListenerService.getValueEventListenerForKey(GameList.LISTENER_KEY + GAME_ID);
             valueListener.onDataChange(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-            helper.bus2().once(TinKeys.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
+            helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
               @Override
               public void onMessage(IndexPath indexPath) {
                 onComplete.run(indexPath);

@@ -46,11 +46,11 @@ public class FacebookServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
+        helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());
-            helper.bus2().once(TinKeys.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
+            helper.bus().once(TinKeys.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
               @Override
               public void onMessage() {
                 FirebaseReferences facebookReferences =
@@ -73,7 +73,7 @@ public class FacebookServiceTest extends TinTestCase {
                   }
                 });
 
-                helper.bus2().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
+                helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
                   @Override
                   public void onMessage(String viewerId) {
                     assertEquals(FACEBOOK_ID, viewerId);
@@ -121,7 +121,7 @@ public class FacebookServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
-        helper.bus2().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
+        helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());

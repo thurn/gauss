@@ -32,7 +32,7 @@ public class ViewerService {
   private final Firebase firebase;
 
   public ViewerService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     firebase = injector.get(TinKeys2.FIREBASE);
   }
 

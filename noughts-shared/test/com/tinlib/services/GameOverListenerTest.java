@@ -27,15 +27,15 @@ public class GameOverListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.GAME_OVER, new Subscriber1<Game>() {
+        helper.bus().once(TinKeys.GAME_OVER, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             assertEquals(testGame.setIsGameOver(true).build(), game);
             finished();
           }
         });
-        helper.bus2().produce(TinKeys.CURRENT_GAME, testGame.build());
-        helper.bus2().produce(TinKeys.CURRENT_GAME, testGame.setIsGameOver(true).build());
+        helper.bus().produce(TinKeys.CURRENT_GAME, testGame.build());
+        helper.bus().produce(TinKeys.CURRENT_GAME, testGame.setIsGameOver(true).build());
       }
     });
     endAsyncTestBlock();

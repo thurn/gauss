@@ -93,7 +93,7 @@ public class AIServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         AIService aiService = new AIService(helper.injector());
-        helper.bus2().await(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+        helper.bus().await(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
             Game expectedGame = testGame.toBuilder()
@@ -114,7 +114,7 @@ public class AIServiceTest extends TinTestCase {
             .thenReturn(0);
         when(mockAgent.pickActionBlocking(eq(1), eq(mockState)))
             .thenReturn(new ActionScore(ACTION, 1.0));
-        helper.bus2().produce(TinKeys.ACTION_SUBMITTED, testGame);
+        helper.bus().produce(TinKeys.ACTION_SUBMITTED, testGame);
       }
     });
     endAsyncTestBlock();

@@ -14,7 +14,7 @@ public class CommandListener {
   private Action lastAction;
 
   public CommandListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     listen();
   }
 

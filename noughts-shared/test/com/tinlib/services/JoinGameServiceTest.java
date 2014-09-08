@@ -71,7 +71,7 @@ public class JoinGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        helper.bus2().await(TinKeys.JOIN_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus().await(TinKeys.JOIN_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             final Game expected = testGame.toBuilder()

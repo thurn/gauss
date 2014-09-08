@@ -27,7 +27,7 @@ public class CommandListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.COMMAND_ADDED, new Subscriber1<IndexCommand>() {
+        helper.bus().once(TinKeys.COMMAND_ADDED, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
             IndexCommand expected = IndexCommand.newBuilder()
@@ -38,11 +38,11 @@ public class CommandListenerTest extends TinTestCase {
             finished();
           }
         });
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .setPlayerNumber(0)
                 .build());
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .addCommand(testCommand)
                 .setPlayerNumber(0)
@@ -61,7 +61,7 @@ public class CommandListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.COMMAND_CHANGED, new Subscriber1<IndexCommand>() {
+        helper.bus().once(TinKeys.COMMAND_CHANGED, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
             IndexCommand expected = IndexCommand.newBuilder()
@@ -72,12 +72,12 @@ public class CommandListenerTest extends TinTestCase {
             finished();
           }
         });
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .setPlayerNumber(0)
                 .addCommand(testCommand.toBuilder().setPlayerNumber(12))
                 .build());
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .addCommand(testCommand)
                 .setPlayerNumber(0)
@@ -96,7 +96,7 @@ public class CommandListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.COMMAND_UNDONE, new Subscriber1<IndexCommand>() {
+        helper.bus().once(TinKeys.COMMAND_UNDONE, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
             IndexCommand expected = IndexCommand.newBuilder()
@@ -107,12 +107,12 @@ public class CommandListenerTest extends TinTestCase {
             finished();
           }
         });
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .setPlayerNumber(0)
                 .addCommand(testCommand)
                 .build());
-        helper.bus2().produce(TinKeys.CURRENT_ACTION,
+        helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .setPlayerNumber(0)
                 .build());

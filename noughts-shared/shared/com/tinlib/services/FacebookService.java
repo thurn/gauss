@@ -28,7 +28,7 @@ public class FacebookService {
   private final AtomicInteger numGameMigrations = new AtomicInteger();
 
   public FacebookService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     firebase = injector.get(TinKeys2.FIREBASE);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);

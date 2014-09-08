@@ -250,8 +250,8 @@ public class TestHelper {
     }
   }
 
-  public Bus bus2() {
-    return injector.get(TinKeys2.BUS2);
+  public Bus bus() {
+    return injector.get(TinKeys2.BUS);
   }
 
   public KeyedListenerService getKeyedListenerService() {

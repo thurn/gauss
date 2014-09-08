@@ -44,7 +44,7 @@ public class UndoServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         UndoService undoService = new UndoService(helper.injector());
 
-        helper.bus2().await(TinKeys.COMMAND_UNDO_COMPLETED, new Subscriber1<Command>() {
+        helper.bus().await(TinKeys.COMMAND_UNDO_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testAction.getCommand(0), command);
@@ -117,7 +117,7 @@ public class UndoServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         UndoService undoService = new UndoService(helper.injector());
 
-        helper.bus2().await(TinKeys.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
+        helper.bus().await(TinKeys.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
           @Override
           public void onMessage(Command command) {
             assertEquals(testAction.getFutureCommand(0), command);

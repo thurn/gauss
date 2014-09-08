@@ -34,7 +34,7 @@ public class GameMutator {
   private final Bus bus;
 
   public GameMutator(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
   }
 
   /**

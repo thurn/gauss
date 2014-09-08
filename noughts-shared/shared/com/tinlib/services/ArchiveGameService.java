@@ -17,7 +17,7 @@ public class ArchiveGameService{
   private final AnalyticsService analyticsService;
 
   public ArchiveGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
   }

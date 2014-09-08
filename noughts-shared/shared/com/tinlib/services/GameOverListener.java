@@ -12,7 +12,7 @@ public class GameOverListener {
   private Game previousGame;
 
   public GameOverListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     listen();
   }
 

@@ -34,7 +34,7 @@ public class SubmitActionService {
   private final TimeService timeService;
 
   public SubmitActionService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     validatorService = injector.get(TinKeys2.ACTION_VALIDATOR_SERVICE);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     pushNotificationService = injector.get(TinKeys2.PUSH_NOTIFICATION_SERVICE);

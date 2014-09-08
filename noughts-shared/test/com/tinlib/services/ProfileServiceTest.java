@@ -38,7 +38,7 @@ public class ProfileServiceTest extends TinTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        helper.bus2().once(TinKeys.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
+        helper.bus().once(TinKeys.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
           @Override
           public void onMessage(Profile completedViewerProfile) {
             assertEquals(testProfile, completedViewerProfile);

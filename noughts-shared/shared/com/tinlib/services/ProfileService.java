@@ -20,7 +20,7 @@ public class ProfileService {
   private final ErrorService errorService;
 
   public ProfileService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);

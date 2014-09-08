@@ -26,7 +26,7 @@ public class AIService {
   private final SubmitActionService submitActionService;
 
   public AIService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     aiProvider = injector.get(TinKeys2.AI_PROVIDER);
     aiActionAdapter = injector.get(TinKeys2.AI_ACTION_ADAPTER);
     addCommandService = injector.get(TinKeys2.ADD_COMMAND_SERVICE);

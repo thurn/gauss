@@ -12,7 +12,7 @@ public class SubmittedActionListener {
   private Game lastGame;
 
   public SubmittedActionListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     listen();
   }
 

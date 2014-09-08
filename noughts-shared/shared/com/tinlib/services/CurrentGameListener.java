@@ -43,7 +43,7 @@ public class CurrentGameListener implements Subscriber2<FirebaseReferences, Stri
   private String gameId;
 
   public CurrentGameListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     listenerService = injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
     bus.await(TinKeys.FIREBASE_REFERENCES, TinKeys.CURRENT_GAME_ID, this);

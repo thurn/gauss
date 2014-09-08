@@ -14,7 +14,7 @@ public class GameStatusListener {
   private GameStatus lastStatus;
 
   public GameStatusListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     bus.await(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
       @Override
       public void onMessage(Game currentGame) {

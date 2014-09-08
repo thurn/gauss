@@ -37,14 +37,14 @@ public class CurrentGameListenerTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         final CurrentGameListener currentGameListener = new CurrentGameListener(helper.injector());
-        helper.bus2().once(TinKeys.CURRENT_GAME_ID, new Subscriber1<String>() {
+        helper.bus().once(TinKeys.CURRENT_GAME_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String currentGameId) {
             assertEquals(GAME_ID, currentGameId);
             finished();
           }
         });
-        helper.bus2().once(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
+        helper.bus().once(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game currentGame) {
             assertEquals(testGame, currentGame);

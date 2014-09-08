@@ -41,7 +41,7 @@ public class ResignGameServiceTest extends TinTestCase {
       @Override
       public void run(final TestHelper helper) {
         ResignGameService resignGameService = new ResignGameService(helper.injector());
-        helper.bus2().once(TinKeys.RESIGN_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus().once(TinKeys.RESIGN_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             Game expected = testGame.toBuilder()

@@ -17,7 +17,7 @@ import com.tinlib.validator.JoinGameValidatorService;
 public class TinModule implements Module {
   @Override
   public void configure(Binder binder) {
-    binder.bindSingletonKey(TinKeys2.BUS2, Initializers.returnValue(Buses.newBus2()));
+    binder.bindSingletonKey(TinKeys2.BUS, Initializers.returnValue(Buses.newBus()));
     binder.bindSingletonKey(TinKeys2.KEYED_LISTENER_SERVICE,
         Initializers.returnValue(new KeyedListenerService()));
     binder.bindSingletonKey(TinKeys2.GAME_MUTATOR, new Initializer() {

@@ -29,7 +29,7 @@ public class GameStatusListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.GAME_STATUS, new Subscriber1<GameStatus>() {
+        helper.bus().once(TinKeys.GAME_STATUS, new Subscriber1<GameStatus>() {
           @Override
           public void onMessage(GameStatus gameStatus) {
             assertEquals(0, gameStatus.getStatusPlayer());
@@ -37,7 +37,7 @@ public class GameStatusListenerTest extends TinTestCase {
           }
         });
         GameStatusListener gameStatusListener = new GameStatusListener(helper.injector());
-        helper.bus2().produce(TinKeys.CURRENT_GAME, testGame);
+        helper.bus().produce(TinKeys.CURRENT_GAME, testGame);
       }
     });
     endAsyncTestBlock();

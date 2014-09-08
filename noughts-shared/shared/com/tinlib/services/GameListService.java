@@ -10,7 +10,7 @@ public class GameListService {
   private final Bus bus;
 
   public GameListService(final Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     bus.await(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override

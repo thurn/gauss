@@ -57,7 +57,7 @@ public class NewGameServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         NewGameService newGameService = new NewGameService(helper.injector());
 
-        helper.bus2().await(TinKeys.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
+        helper.bus().await(TinKeys.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             final Game expected = Game.newBuilder()

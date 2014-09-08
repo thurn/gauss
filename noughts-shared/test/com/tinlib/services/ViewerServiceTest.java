@@ -22,14 +22,14 @@ public class ViewerServiceTest extends TinTestCase {
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
 
-        helper.bus2().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("viewerId", viewerId);
             finished();
           }
         });
-        helper.bus2().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        helper.bus().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());
@@ -63,14 +63,14 @@ public class ViewerServiceTest extends TinTestCase {
       @Override
       public void run(TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
-        helper.bus2().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
+        helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {
             assertEquals("facebookId", viewerId);
             finished();
           }
         });
-        helper.bus2().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+        helper.bus().once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
           @Override
           public void onMessage(FirebaseReferences references) {
             assertEquals("gameId", references.gameReference("gameId").getName());

@@ -23,7 +23,7 @@ public class ResignGameService {
   private final AnalyticsService analyticsService;
 
   public ResignGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     timeService = injector.get(TinKeys2.TIME_SERVICE);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);

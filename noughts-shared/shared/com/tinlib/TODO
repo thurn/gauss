@@ -12,6 +12,10 @@ Bus
   - Handle errors better when you're waiting on multiple keys
   - tests
 
+TinTestCase
+  - Abstract it away from TestHelper & tin in general
+  - Add a way to register for before and after events
+
 TestHelper
   - Just use bindInstance directly
   - Figure out a better system for cleanup logic

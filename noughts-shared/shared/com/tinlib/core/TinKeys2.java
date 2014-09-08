@@ -12,7 +12,7 @@ public class TinKeys2 {
    * A {@link com.tinlib.convey.Bus} for coordinating messages. Refer to
    * {@link TinKeys} for documentation on possible messages.
    */
-  public static final String BUS2 = id("tin.BUS2");
+  public static final String BUS = id("tin.BUS");
 
   /**
    * A {@link com.tinlib.error.ErrorService} instance for reporting errors.

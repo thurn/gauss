@@ -65,7 +65,7 @@ public class NewGameService {
   private final JoinGameService joinGameService;
 
   public NewGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
     timeService = injector.get(TinKeys2.TIME_SERVICE);

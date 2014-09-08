@@ -38,7 +38,7 @@ public class LastModifiedServiceTest extends TinTestCase {
       public void run(final TestHelper helper) {
         LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
         when(mockTimeService.currentTimeMillis()).thenReturn(789L);
-        helper.bus2().await(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
+        helper.bus().await(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game currentGame) {
             System.out.println("message " + currentGame);

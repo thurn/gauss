@@ -22,7 +22,7 @@ public class UndoService {
   private final LastModifiedService lastModifiedService;
 
   public UndoService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
     gameMutator = injector.get(TinKeys2.GAME_MUTATOR);

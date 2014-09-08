@@ -31,7 +31,7 @@ public class JoinGameService {
   private final GameMutator gameMutator;
 
   public JoinGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS2);
+    bus = injector.get(TinKeys2.BUS);
     errorService = injector.get(TinKeys2.ERROR_SERVICE);
     currentGameListener = injector.get(TinKeys2.CURRENT_GAME_SERVICE);
     analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);

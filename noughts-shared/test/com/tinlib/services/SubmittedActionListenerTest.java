@@ -29,15 +29,15 @@ public class SubmittedActionListenerTest extends TinTestCase {
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
-        helper.bus2().once(TinKeys.ACTION_SUBMITTED, new Subscriber1<Game>() {
+        helper.bus().once(TinKeys.ACTION_SUBMITTED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {
             assertEquals(testGame.toBuilder().addSubmittedAction(testAction).build(), game);
             finished();
           }
         });
-        helper.bus2().produce(TinKeys.CURRENT_GAME, testGame);
-        helper.bus2().produce(TinKeys.CURRENT_GAME,
+        helper.bus().produce(TinKeys.CURRENT_GAME, testGame);
+        helper.bus().produce(TinKeys.CURRENT_GAME,
             testGame.toBuilder().addSubmittedAction(testAction).build());
       }
     });
