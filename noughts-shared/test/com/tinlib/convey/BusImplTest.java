@@ -192,8 +192,3 @@ public class BusImplTest {
     bus.produce(intKey, 22);
   }
 }
-
-// Test invalidation
-// Test indirect invalidation
-// Do a test with the map-based Subscriber
-// Do a test with fail()

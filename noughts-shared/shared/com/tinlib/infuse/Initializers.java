@@ -2,12 +2,12 @@ package com.tinlib.infuse;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class Initializers {
-  public static Initializer returnValue(final Object object) {
+public final class Initializers {
+  public static <T> Initializer<T> returnValue(final T object) {
     checkNotNull(object);
-    return new Initializer() {
+    return new Initializer<T>() {
       @Override
-      public Object initialize(Injector injector) {
+      public T initialize(Injector injector) {
         return object;
       }
     };

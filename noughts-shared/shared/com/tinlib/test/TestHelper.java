@@ -194,15 +194,15 @@ public class TestHelper {
               Initializers.returnValue(firebase));
         }
         if (errorHandler != null) {
-          binder.multibindKey(TinKeys2.ERROR_HANDLERS,
+          binder.multibindClass(TinKeys2.ERROR_HANDLERS,
               Initializers.returnValue(errorHandler));
         }
         if (analyticsHandler != null) {
-          binder.multibindKey(TinKeys2.ANALYTICS_HANDLERS,
+          binder.multibindClass(TinKeys2.ANALYTICS_HANDLERS,
               Initializers.returnValue(analyticsHandler));
         }
         if (pushNotificationHandler != null) {
-          binder.multibindKey(TinKeys2.PUSH_NOTIFICATION_HANDLERS,
+          binder.multibindClass(TinKeys2.PUSH_NOTIFICATION_HANDLERS,
               Initializers.returnValue(pushNotificationHandler));
         }
         if (timeService != null) {

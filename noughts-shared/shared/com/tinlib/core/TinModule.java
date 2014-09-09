@@ -44,13 +44,13 @@ public class TinModule implements Module {
         return new ErrorService(injector);
       }
     });
-    binder.multibindKey(TinKeys2.ERROR_HANDLERS, new Initializer() {
+    binder.multibindClass(TinKeys2.ERROR_HANDLERS, new Initializer() {
       @Override
       public Object initialize(Injector injector) {
         return new TrackingErrorHandler(injector);
       }
     });
-    binder.multibindKey(TinKeys2.ERROR_HANDLERS,
+    binder.multibindClass(TinKeys2.ERROR_HANDLERS,
         Initializers.returnValue(new PrintlnErrorHandler()));
     binder.bindSingletonKey(TinKeys2.ACTION_VALIDATOR_SERVICE, new Initializer() {
       @Override
@@ -58,7 +58,7 @@ public class TinModule implements Module {
         return new ActionValidatorService(injector);
       }
     });
-    binder.multibindKey(TinKeys2.ACTION_VALIDATORS,
+    binder.multibindClass(TinKeys2.ACTION_VALIDATORS,
         Initializers.returnValue(new DefaultActionValidator()));
     binder.bindSingletonKey(TinKeys2.LAST_MODIFIED_SERVICE, new Initializer() {
       @Override
@@ -84,7 +84,7 @@ public class TinModule implements Module {
         return new JoinGameValidatorService(injector);
       }
     });
-    binder.multibindKey(TinKeys2.JOIN_GAME_VALIDATORS,
+    binder.multibindClass(TinKeys2.JOIN_GAME_VALIDATORS,
         Initializers.returnValue(new DefaultJoinGameValidator()));
     binder.bindSingletonKey(TinKeys2.VIEWER_SERVICE, new Initializer() {
       @Override

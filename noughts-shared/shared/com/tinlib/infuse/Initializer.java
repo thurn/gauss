@@ -1,5 +1,5 @@
 package com.tinlib.infuse;
 
-public interface Initializer {
-  public Object initialize(Injector injector);
+public interface Initializer<T> {
+  public T initialize(Injector injector);
 }

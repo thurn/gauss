@@ -1,9 +1,9 @@
 package com.tinlib.infuse;
 
-import java.util.Set;
+import com.google.common.collect.ImmutableSet;
 
 public interface Injector {
-  public <T> T get(String key);
+  public <T> T get(Class<T> classObject);
 
-  public <T> Set<T> getMultiple(String key);
+  public <T> ImmutableSet<T> getMultiple(Class<T> classObject);
 }
