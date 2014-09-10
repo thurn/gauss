@@ -26,10 +26,21 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 public class TestHelper {
+  private static class TestInputsModule implements Module {
+    @Override
+    public void configure(Binder binder) {
+      binder.bindClass(NextPlayerService.class,
+          Initializers.returnValue(mock(NextPlayerService.class)));
+      binder.bindClass(GameOverService.class,
+          Initializers.returnValue(mock(GameOverService.class)));
+    }
+  }
+
   public static interface Test {
     public void run(TestHelper helper);
   }
@@ -187,7 +198,8 @@ public class TestHelper {
       final LastModifiedService lastModifiedService,
       final JoinGameService joinGameService,
       final ClassToInstanceMap<Object> classToInstanceMap) {
-    injector = Injectors.newOverridingTestInjector(new TinModule(), new Module() {
+    injector = Injectors.newOverridingTestInjector(new TinModule(), new TestInputsModule(),
+        new Module() {
       @Override
       public void configure(Binder binder) {
         if (firebase != null) {

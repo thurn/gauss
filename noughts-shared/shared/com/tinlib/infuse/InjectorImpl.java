@@ -24,14 +24,12 @@ class InjectorImpl implements Binder, Injector {
       module.configure(this);
     }
 
-    for (Map.Entry<Class<?>, Initializer<?>> entry : initializers.entrySet()) {
-      valueCache.put(entry.getKey(), entry.getValue().initialize(this));
+    for (Class<?> key : initializers.keySet()) {
+      get(key);
     }
 
     for (Class<?> key : multiInitializers.keySet()) {
-      for (Initializer<?> initializer : multiInitializers.get(key)) {
-        multivalueCache.put(key, initializer.initialize(this));
-      }
+      getMultiple(key);
     }
   }
 
@@ -78,13 +76,11 @@ class InjectorImpl implements Binder, Injector {
   @Override
   @SuppressWarnings("unchecked")
   public <T> ImmutableSet<T> getMultiple(Class<T> classObject) {
-    if (multivalueCache.containsKey(classObject)) {
-      return ImmutableSet.copyOf((Set<T>) multivalueCache.get(classObject));
-    } else {
+    if (!multivalueCache.containsKey(classObject)) {
       for (Initializer<?> initializer : multiInitializers.get(classObject)) {
         multivalueCache.put(classObject, initializer.initialize(this));
       }
-      return ImmutableSet.copyOf((Set<T>) multivalueCache.get(classObject));
     }
+    return ImmutableSet.copyOf((Set<T>) multivalueCache.get(classObject));
   }
 }

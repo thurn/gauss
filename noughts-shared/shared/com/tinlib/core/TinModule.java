@@ -3,6 +3,8 @@ package com.tinlib.core;
 import com.tinlib.convey.Bus;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.services.*;
+import com.tinlib.time.DefaultTimeService;
+import com.tinlib.time.TimeService;
 import com.tinlib.validator.*;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.error.ErrorService;
@@ -122,5 +124,7 @@ public class TinModule implements Module {
         return new SubmitActionService(injector);
       }
     });
+    binder.bindClass(TimeService.class,
+        Initializers.<TimeService>returnValue(new DefaultTimeService()));
   }
 }
