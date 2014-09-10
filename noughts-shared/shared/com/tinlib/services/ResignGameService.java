@@ -5,14 +5,13 @@ import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.*;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.*;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Actions;
 
@@ -23,10 +22,10 @@ public class ResignGameService {
   private final AnalyticsService analyticsService;
 
   public ResignGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    timeService = injector.get(TinKeys2.TIME_SERVICE);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    bus = injector.get(Bus.class);
+    timeService = injector.get(TimeService.class);
+    errorService = injector.get(ErrorService.class);
+    analyticsService = injector.get(AnalyticsService.class);
   }
 
   public void resignGame(final String gameId) {

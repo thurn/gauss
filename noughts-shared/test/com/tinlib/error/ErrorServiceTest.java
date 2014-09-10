@@ -2,8 +2,6 @@ package com.tinlib.error;
 
 import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.error.ErrorHandler;
-import com.tinlib.error.ErrorService;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;

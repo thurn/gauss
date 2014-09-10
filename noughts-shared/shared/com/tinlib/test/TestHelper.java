@@ -2,8 +2,8 @@ package com.tinlib.test;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.ValueEventListener;
-import com.google.common.collect.Maps;
-import com.tinlib.core.TinKeys2;
+import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.MutableClassToInstanceMap;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
@@ -54,7 +54,8 @@ public class TestHelper {
     private String gameId;
     private LastModifiedService lastModifiedService;
     private JoinGameService joinGameService;
-    private final Map<String, Object> instanceMap = Maps.newHashMap();
+    private final ClassToInstanceMap<Object> classToInstanceMap =
+        MutableClassToInstanceMap.create();
 
     private Builder(TinTestCase testCase) {
       this.testCase = testCase;
@@ -119,8 +120,8 @@ public class TestHelper {
       this.joinGameService = joinGameService;
     }
 
-    public void bindInstance(String key, Object value) {
-      instanceMap.put(key, value);
+    public <T> void bindInstance(Class<T> key, T value) {
+      classToInstanceMap.putInstance(key, value);
     }
 
     public void runTest(final Test test) {
@@ -138,7 +139,7 @@ public class TestHelper {
 
       final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
           errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
-          gameOverService, nextPlayerService, lastModifiedService, joinGameService, instanceMap);
+          gameOverService, nextPlayerService, lastModifiedService, joinGameService, classToInstanceMap);
       testCase.setTestHelper(testHelper);
       if (game == null) {
         test.run(testHelper);
@@ -185,54 +186,51 @@ public class TestHelper {
       final NextPlayerService nextPlayerService,
       final LastModifiedService lastModifiedService,
       final JoinGameService joinGameService,
-      final Map<String, Object> instanceMap) {
-    injector = OverridingInjector.newOverridingInjector(new TinModule(), new Module() {
+      final ClassToInstanceMap<Object> classToInstanceMap) {
+    injector = Injectors.newOverridingTestInjector(new TinModule(), new Module() {
       @Override
       public void configure(Binder binder) {
         if (firebase != null) {
-          binder.bindSingletonKey(TinKeys2.FIREBASE,
+          binder.bindClass(Firebase.class,
               Initializers.returnValue(firebase));
         }
         if (errorHandler != null) {
-          binder.multibindClass(TinKeys2.ERROR_HANDLERS,
+          binder.multibindClass(ErrorHandler.class,
               Initializers.returnValue(errorHandler));
         }
         if (analyticsHandler != null) {
-          binder.multibindClass(TinKeys2.ANALYTICS_HANDLERS,
+          binder.multibindClass(AnalyticsHandler.class,
               Initializers.returnValue(analyticsHandler));
         }
         if (pushNotificationHandler != null) {
-          binder.multibindClass(TinKeys2.PUSH_NOTIFICATION_HANDLERS,
+          binder.multibindClass(PushNotificationHandler.class,
               Initializers.returnValue(pushNotificationHandler));
         }
         if (timeService != null) {
-          binder.bindSingletonKey(TinKeys2.TIME_SERVICE,
+          binder.bindClass(TimeService.class,
               Initializers.returnValue(timeService));
         }
         if (gameOverService != null) {
-          binder.bindSingletonKey(TinKeys2.GAME_OVER_SERVICE,
+          binder.bindClass(GameOverService.class,
               Initializers.returnValue(gameOverService));
         }
         if (nextPlayerService != null) {
-          binder.bindSingletonKey(TinKeys2.NEXT_PLAYER_SERVICE,
+          binder.bindClass(NextPlayerService.class,
               Initializers.returnValue(nextPlayerService));
         }
         if (lastModifiedService != null) {
-          binder.bindSingletonKey(TinKeys2.LAST_MODIFIED_SERVICE,
+          binder.bindClass(LastModifiedService.class,
               Initializers.returnValue(lastModifiedService));
         }
         if (joinGameService != null) {
-          binder.bindSingletonKey(TinKeys2.JOIN_GAME_SERVICE,
+          binder.bindClass(JoinGameService.class,
               Initializers.returnValue(joinGameService));
         }
-        for (Map.Entry<String, Object> entry : instanceMap.entrySet()) {
-          binder.bindSingletonKey(entry.getKey(), Initializers.returnValue(entry.getValue()));
+        for (Class<?> classObject : classToInstanceMap.keySet()) {
+          bindValue(binder, classObject, classToInstanceMap.getInstance(classObject));
         }
       }
     });
-    injector.get(TinKeys2.COMMAND_LISTENER); // TODO: Make this not necessary
-    injector.get(TinKeys2.GAME_OVER_LISTENER);
-    injector.get(TinKeys2.SUBMITTED_ACTION_LISTENER);
     if (viewerId != null && viewerKey != null) {
       if (facebook) {
         (new ViewerService(injector)).setViewerFacebookId(viewerId);
@@ -250,16 +248,21 @@ public class TestHelper {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private <T> void bindValue(Binder binder, Class<?> classObject, T value) {
+    binder.bindClass((Class<T>)classObject, Initializers.returnValue(value));
+  }
+
   public Bus bus() {
-    return injector.get(TinKeys2.BUS);
+    return injector.get(Bus.class);
   }
 
   public KeyedListenerService getKeyedListenerService() {
-    return injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
+    return injector.get(KeyedListenerService.class);
   }
 
   public Firebase firebase() {
-    return injector.get(TinKeys2.FIREBASE);
+    return injector.get(Firebase.class);
   }
 
   public FirebaseReferences references() {

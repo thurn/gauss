@@ -3,34 +3,33 @@ package com.tinlib.services;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
-import com.tinlib.convey.Subscriber2;
 
 /**
  * Service for broadcasting updates about the state of the current game.
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinKeys2#BUS}</li>
- *   <li>{@link com.tinlib.core.TinKeys2#ERROR_SERVICE}</li>
- *   <li>{@link com.tinlib.core.TinKeys2#KEYED_LISTENER_SERVICE}</li>
+ *   <li>{@link Bus}</li>
+ *   <li>{@link ErrorService}</li>
+ *   <li>{@link KeyedListenerService}</li>
  * </ul>
  *
  * <h1>Input Messages</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinMessages#CURRENT_GAME_ID}</li>
- *   <li>{@link com.tinlib.core.TinMessages#FIREBASE_REFERENCES}</li>
+ *   <li>{@link TinKeys#VIEWER_ID}</li>
+ *   <li>{@link TinKeys#FIREBASE_REFERENCES}</li>
  * </ul>
  *
  * <h1>Output Messages</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinMessages#CURRENT_GAME_ID}</li>
- *   <li>{@link com.tinlib.core.TinMessages#CURRENT_GAME}</li>
+ *   <li>{@link TinKeys#CURRENT_GAME_ID}</li>
+ *   <li>{@link TinKeys#CURRENT_GAME}</li>
  * </ul>
  */
 public class CurrentGameListener implements Subscriber2<FirebaseReferences, String> {
@@ -43,9 +42,9 @@ public class CurrentGameListener implements Subscriber2<FirebaseReferences, Stri
   private String gameId;
 
   public CurrentGameListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    listenerService = injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    listenerService = injector.get(KeyedListenerService.class);
     bus.await(TinKeys.FIREBASE_REFERENCES, TinKeys.CURRENT_GAME_ID, this);
   }
 

@@ -5,15 +5,14 @@ import com.firebase.client.FirebaseError;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
-import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Actions;
@@ -34,15 +33,15 @@ public class SubmitActionService {
   private final TimeService timeService;
 
   public SubmitActionService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    validatorService = injector.get(TinKeys2.ACTION_VALIDATOR_SERVICE);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    pushNotificationService = injector.get(TinKeys2.PUSH_NOTIFICATION_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    nextPlayerService = injector.get(TinKeys2.NEXT_PLAYER_SERVICE);
-    gameOverService = injector.get(TinKeys2.GAME_OVER_SERVICE);
-    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
-    timeService = injector.get(TinKeys2.TIME_SERVICE);
+    bus = injector.get(Bus.class);
+    validatorService = injector.get(ActionValidatorService.class);
+    errorService = injector.get(ErrorService.class);
+    pushNotificationService = injector.get(PushNotificationService.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    nextPlayerService = injector.get(NextPlayerService.class);
+    gameOverService = injector.get(GameOverService.class);
+    gameMutator = injector.get(GameMutator.class);
+    timeService = injector.get(TimeService.class);
   }
 
   public void submitCurrentAction() {

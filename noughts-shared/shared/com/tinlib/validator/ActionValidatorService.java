@@ -1,6 +1,5 @@
 package com.tinlib.validator;
 
-import com.tinlib.core.TinKeys2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
@@ -12,7 +11,7 @@ public class ActionValidatorService {
   private final Set<ActionValidator> actionValidators;
 
   public ActionValidatorService(Injector injector) {
-    actionValidators = injector.getMultiple(TinKeys2.ACTION_VALIDATORS);
+    actionValidators = injector.getMultiple(ActionValidator.class);
   }
 
   public boolean canAddCommand(String viewerId, Game game, Action currentAction, Command command) {

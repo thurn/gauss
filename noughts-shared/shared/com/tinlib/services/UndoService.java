@@ -2,15 +2,14 @@ package com.tinlib.services;
 
 import com.firebase.client.FirebaseError;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
 import com.tinlib.time.LastModifiedService;
 import com.tinlib.util.Games;
 
@@ -22,11 +21,11 @@ public class UndoService {
   private final LastModifiedService lastModifiedService;
 
   public UndoService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
-    lastModifiedService = injector.get(TinKeys2.LAST_MODIFIED_SERVICE);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    gameMutator = injector.get(GameMutator.class);
+    lastModifiedService = injector.get(LastModifiedService.class);
   }
 
   public boolean canUndo(String viewerId, Game game, Action currentAction) {

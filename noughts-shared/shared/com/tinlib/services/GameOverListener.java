@@ -1,18 +1,17 @@
 package com.tinlib.services;
 
-import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
-import com.tinlib.generated.Game;
-import com.tinlib.infuse.Injector;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber1;
+import com.tinlib.core.TinKeys;
+import com.tinlib.generated.Game;
+import com.tinlib.infuse.Injector;
 
 public class GameOverListener {
   private final Bus bus;
   private Game previousGame;
 
   public GameOverListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
+    bus = injector.get(Bus.class);
     listen();
   }
 

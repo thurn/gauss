@@ -1,7 +1,6 @@
 package com.tinlib.entities;
 
 import com.firebase.client.*;
-import com.tinlib.entities.Entity;
 
 public class EntityMutator {
   public static interface Mutation<E extends Entity<E>, B extends Entity.EntityBuilder<E>> {

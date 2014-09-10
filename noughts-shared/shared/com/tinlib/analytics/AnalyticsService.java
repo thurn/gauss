@@ -1,7 +1,6 @@
 package com.tinlib.analytics;
 
 import com.google.common.collect.Maps;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.infuse.Injector;
 
 import java.util.Map;
@@ -14,7 +13,7 @@ public class AnalyticsService {
   private final Set<AnalyticsHandler> analyticsHandlers;
 
   public AnalyticsService(Injector injector) {
-    analyticsHandlers = injector.getMultiple(TinKeys2.ANALYTICS_HANDLERS);
+    analyticsHandlers = injector.getMultiple(AnalyticsHandler.class);
   }
 
   /**

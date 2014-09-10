@@ -8,13 +8,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.*;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.*;
 import com.tinlib.time.TimeService;
 
 import java.util.List;
@@ -65,11 +64,11 @@ public class NewGameService {
   private final JoinGameService joinGameService;
 
   public NewGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    timeService = injector.get(TinKeys2.TIME_SERVICE);
-    joinGameService = injector.get(TinKeys2.JOIN_GAME_SERVICE);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    timeService = injector.get(TimeService.class);
+    joinGameService = injector.get(JoinGameService.class);
   }
 
   public NewGameBuilder newGameBuilder(String gameId) {

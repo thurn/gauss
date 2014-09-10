@@ -1,20 +1,19 @@
 package com.tinlib.services;
 
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.IndexCommand;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
-import com.tinlib.convey.Subscriber1;
 
 public class CommandListener {
   private final Bus bus;
   private Action lastAction;
 
   public CommandListener(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
+    bus = injector.get(Bus.class);
     listen();
   }
 

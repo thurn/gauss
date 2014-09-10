@@ -1,17 +1,16 @@
 package com.tinlib.jgail.service;
 
-import com.tinlib.jgail.core.ActionScore;
-import com.tinlib.jgail.core.Agent;
-import com.tinlib.jgail.core.State;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
-import com.tinlib.convey.Subscriber2;
+import com.tinlib.jgail.core.ActionScore;
+import com.tinlib.jgail.core.Agent;
+import com.tinlib.jgail.core.State;
 import com.tinlib.services.AddCommandService;
 import com.tinlib.services.SubmitActionService;
 import com.tinlib.util.Actions;
@@ -26,11 +25,11 @@ public class AIService {
   private final SubmitActionService submitActionService;
 
   public AIService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    aiProvider = injector.get(TinKeys2.AI_PROVIDER);
-    aiActionAdapter = injector.get(TinKeys2.AI_ACTION_ADAPTER);
-    addCommandService = injector.get(TinKeys2.ADD_COMMAND_SERVICE);
-    submitActionService = injector.get(TinKeys2.SUBMIT_ACTION_SERVICE);
+    bus = injector.get(Bus.class);
+    aiProvider = injector.get(AIProvider.class);
+    aiActionAdapter = injector.get(AIActionAdapter.class);
+    addCommandService = injector.get(AddCommandService.class);
+    submitActionService = injector.get(SubmitActionService.class);
     listen();
   }
 

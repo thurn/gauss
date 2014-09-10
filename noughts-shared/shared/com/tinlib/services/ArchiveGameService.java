@@ -4,12 +4,11 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
-import com.tinlib.error.ErrorService;
-import com.tinlib.infuse.Injector;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber1;
+import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorService;
+import com.tinlib.infuse.Injector;
 
 public class ArchiveGameService{
   private final Bus bus;
@@ -17,9 +16,9 @@ public class ArchiveGameService{
   private final AnalyticsService analyticsService;
 
   public ArchiveGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    analyticsService = injector.get(AnalyticsService.class);
   }
 
   public void archiveGame(final String gameId) {

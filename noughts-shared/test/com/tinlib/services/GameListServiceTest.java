@@ -5,7 +5,6 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
@@ -185,7 +184,7 @@ public class GameListServiceTest extends TinTestCase {
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "addValueEventListener"));
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.bindInstance(TinKeys2.KEYED_LISTENER_SERVICE, keyedListenerService);
+    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(TestHelper helper) {
@@ -208,7 +207,7 @@ public class GameListServiceTest extends TinTestCase {
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setErrorHandler(mockErrorHandler);
     builder.setTimeService(mockTimeService);
-    builder.bindInstance(TinKeys2.KEYED_LISTENER_SERVICE, keyedListenerService);
+    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {

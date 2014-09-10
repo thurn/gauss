@@ -1,10 +1,9 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
-import com.tinlib.infuse.Injector;
 import com.tinlib.convey.Bus;
+import com.tinlib.core.TinKeys;
+import com.tinlib.infuse.Injector;
 
 import java.util.Map;
 
@@ -13,14 +12,14 @@ import java.util.Map;
  *
  * <h1>Dependencies</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinKeys2#BUS}</li>
- *   <li>{@link com.tinlib.core.TinKeys2#FIREBASE}</li>
+ *   <li>{@link Bus}</li>
+ *   <li>{@link Firebase}</li>
  * </ul>
  *
  * <h1>Output Messages</h1>
  * <ul>
- *   <li>{@link com.tinlib.core.TinMessages#FIREBASE_REFERENCES}</li>
- *   <li>{@link com.tinlib.core.TinMessages#VIEWER_ID}</li>
+ *   <li>{@link TinKeys#FIREBASE_REFERENCES}</li>
+ *   <li>{@link TinKeys#VIEWER_ID}</li>
  * </ul>
  */
 public class ViewerService {
@@ -32,8 +31,8 @@ public class ViewerService {
   private final Firebase firebase;
 
   public ViewerService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    firebase = injector.get(TinKeys2.FIREBASE);
+    bus = injector.get(Bus.class);
+    firebase = injector.get(Firebase.class);
   }
 
   /**

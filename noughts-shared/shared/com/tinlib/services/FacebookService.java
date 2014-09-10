@@ -8,13 +8,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.*;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.*;
 
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -28,11 +27,11 @@ public class FacebookService {
   private final AtomicInteger numGameMigrations = new AtomicInteger();
 
   public FacebookService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    firebase = injector.get(TinKeys2.FIREBASE);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    viewerService = injector.get(TinKeys2.VIEWER_SERVICE);
+    bus = injector.get(Bus.class);
+    firebase = injector.get(Firebase.class);
+    errorService = injector.get(ErrorService.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    viewerService = injector.get(ViewerService.class);
   }
 
   public void upgradeAccountToFacebook(final String facebookId) {

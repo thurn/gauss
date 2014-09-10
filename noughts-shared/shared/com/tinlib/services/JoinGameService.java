@@ -8,13 +8,12 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.*;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.*;
 import com.tinlib.push.PushNotificationService;
 import com.tinlib.util.Actions;
 import com.tinlib.util.ListUtil;
@@ -31,13 +30,13 @@ public class JoinGameService {
   private final GameMutator gameMutator;
 
   public JoinGameService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    currentGameListener = injector.get(TinKeys2.CURRENT_GAME_SERVICE);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    pushNotificationService = injector.get(TinKeys2.PUSH_NOTIFICATION_SERVICE);
-    joinGameValidatorService = injector.get(TinKeys2.JOIN_GAME_VALIDATOR_SERVICE);
-    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    currentGameListener = injector.get(CurrentGameListener.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    pushNotificationService = injector.get(PushNotificationService.class);
+    joinGameValidatorService = injector.get(JoinGameValidatorService.class);
+    gameMutator = injector.get(GameMutator.class);
   }
 
   public void joinGame(final int playerNumber, final String gameId,

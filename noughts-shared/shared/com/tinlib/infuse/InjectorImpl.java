@@ -4,11 +4,13 @@ import com.google.common.collect.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class InjectorImpl implements Binder, Injector {
   private final Map<Class<?>, Initializer<?>> initializers = Maps.newHashMap();
   private final SetMultimap<Class<?>, Initializer<?>> multiInitializers = HashMultimap.create();
-  private final ImmutableMap<Class<?>, ?> classMap;
+  private final Map<Class<?>, Object> valueCache = Maps.newHashMap();
+  private final SetMultimap<Class<?>, Object> multivalueCache = HashMultimap.create();
   private final boolean allowDuplicates;
 
   InjectorImpl(List<Module> modules) {
@@ -22,26 +24,25 @@ class InjectorImpl implements Binder, Injector {
       module.configure(this);
     }
 
-    ImmutableMap.Builder<Class<?>, Object> classMapBuilder = ImmutableMap.builder();
     for (Map.Entry<Class<?>, Initializer<?>> entry : initializers.entrySet()) {
-      classMapBuilder.put(entry.getKey(), entry.getValue().initialize(this));
+      valueCache.put(entry.getKey(), entry.getValue().initialize(this));
     }
 
     for (Class<?> key : multiInitializers.keySet()) {
-      ImmutableSet.Builder<?> set = ImmutableSet.builder();
       for (Initializer<?> initializer : multiInitializers.get(key)) {
-        set.add(initializer.initialize(this));
+        multivalueCache.put(key, initializer.initialize(this));
       }
-      classMapBuilder.put(key, set.build());
     }
-    classMap = classMapBuilder.build();
   }
 
   @Override
   public <T> void bindClass(Class<T> classObject, Initializer<T> initializer) {
-    if ((initializers.containsKey(classObject) || multiInitializers.containsKey(classObject))
-        && !allowDuplicates) {
+    if (initializers.containsKey(classObject) && !allowDuplicates) {
       throw new RuntimeException("Attempted to bind previously bound class " + classObject);
+    }
+    if (multiInitializers.containsKey(classObject)) {
+      throw new RuntimeException("Attempted to single bind previously multibound class "
+          + classObject);
     }
     initializers.put(classObject, initializer);
   }
@@ -49,7 +50,8 @@ class InjectorImpl implements Binder, Injector {
   @Override
   public <T> void multibindClass(Class<T> classObject, Initializer<T> initializer) {
     if (initializers.containsKey(classObject)) {
-      throw new RuntimeException("Attempted to multibind previously bound class " + classObject);
+      throw new RuntimeException("Attempted to multibind previously single-bound class "
+          + classObject);
     }
     multiInitializers.put(classObject, initializer);
   }
@@ -62,8 +64,12 @@ class InjectorImpl implements Binder, Injector {
   @Override
   @SuppressWarnings("unchecked")
   public <T> T get(Class<T> classObject) {
-    if (classMap.containsKey(classObject)) {
-      return (T)classMap.get(classObject);
+    if (valueCache.containsKey(classObject)) {
+      return (T) valueCache.get(classObject);
+    } else if (initializers.containsKey(classObject)) {
+      T result = (T) initializers.get(classObject).initialize(this);
+      valueCache.put(classObject, result);
+      return result;
     } else {
       throw new RuntimeException("No instance bound for class " + classObject);
     }
@@ -72,10 +78,13 @@ class InjectorImpl implements Binder, Injector {
   @Override
   @SuppressWarnings("unchecked")
   public <T> ImmutableSet<T> getMultiple(Class<T> classObject) {
-    if (classMap.containsKey(classObject)) {
-      return (ImmutableSet<T>)classMap.get(classObject);
+    if (multivalueCache.containsKey(classObject)) {
+      return ImmutableSet.copyOf((Set<T>) multivalueCache.get(classObject));
     } else {
-      throw new RuntimeException("No instance multibound for class " + classObject);
+      for (Initializer<?> initializer : multiInitializers.get(classObject)) {
+        multivalueCache.put(classObject, initializer.initialize(this));
+      }
+      return ImmutableSet.copyOf((Set<T>) multivalueCache.get(classObject));
     }
   }
 }

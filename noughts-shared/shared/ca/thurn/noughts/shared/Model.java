@@ -112,7 +112,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
     this.isFacebookUser = isFacebookUser;
     this.firebase = new Firebase(firebaseUrl);
     this.pushNotificationService = pushNotificationService;
-    this.analyticsService = (AnalyticsService)injector.get("AnalyticsService");
+    this.analyticsService = (AnalyticsService)injector.get(AnalyticsService.class);
     valueEventListeners = new HashMap<String, ValueEventListener>();
     gameUpdateListeners = new HashMap<String, GameUpdateListener>();
     commandUpdateListeners = new HashMap<String, CommandUpdateListener>();

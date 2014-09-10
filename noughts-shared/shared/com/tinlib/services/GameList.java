@@ -5,8 +5,8 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
@@ -14,7 +14,6 @@ import com.tinlib.generated.GameListEntry;
 import com.tinlib.generated.GameListUpdate;
 import com.tinlib.generated.IndexPath;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.AbstractChildEventListener;
 import com.tinlib.util.Games;
@@ -100,10 +99,10 @@ public class GameList {
   private final String viewerId;
 
   public GameList(Injector injector, String viewerId, FirebaseReferences references) {
-    bus = injector.get(TinKeys2.BUS);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
-    keyedListenerService = injector.get(TinKeys2.KEYED_LISTENER_SERVICE);
-    timeService = injector.get(TinKeys2.TIME_SERVICE);
+    bus = injector.get(Bus.class);
+    errorService = injector.get(ErrorService.class);
+    keyedListenerService = injector.get(KeyedListenerService.class);
+    timeService = injector.get(TimeService.class);
     this.viewerId = viewerId;
     this.firebaseReferences = references;
     keyedListenerService.addChildEventListener(references.userGames(), LISTENER_KEY,

@@ -3,14 +3,13 @@ package com.tinlib.services;
 import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
+import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
 import com.tinlib.util.Games;
 
 public class ProfileService {
@@ -20,10 +19,10 @@ public class ProfileService {
   private final ErrorService errorService;
 
   public ProfileService(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
-    gameMutator = injector.get(TinKeys2.GAME_MUTATOR);
-    analyticsService = injector.get(TinKeys2.ANALYTICS_SERVICE);
-    errorService = injector.get(TinKeys2.ERROR_SERVICE);
+    bus = injector.get(Bus.class);
+    gameMutator = injector.get(GameMutator.class);
+    analyticsService = injector.get(AnalyticsService.class);
+    errorService = injector.get(ErrorService.class);
   }
 
   public void setProfileForViewer(final Profile profile) {

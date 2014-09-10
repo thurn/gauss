@@ -1,14 +1,13 @@
 package com.tinlib.services;
 
 import com.firebase.client.FirebaseError;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber3;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;
-import com.tinlib.convey.Bus;
-import com.tinlib.convey.Subscriber3;
 
 /**
  * Service for mutating games and their current actions.
@@ -34,7 +33,7 @@ public class GameMutator {
   private final Bus bus;
 
   public GameMutator(Injector injector) {
-    bus = injector.get(TinKeys2.BUS);
+    bus = injector.get(Bus.class);
   }
 
   /**

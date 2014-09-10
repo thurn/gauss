@@ -3,16 +3,15 @@ package com.tinlib.jgail.service;
 import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.tinlib.jgail.core.ActionScore;
-import com.tinlib.jgail.core.Agent;
-import com.tinlib.jgail.core.State;
+import com.tinlib.convey.Subscriber0;
 import com.tinlib.core.TinKeys;
-import com.tinlib.core.TinKeys2;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.convey.Subscriber0;
+import com.tinlib.jgail.core.ActionScore;
+import com.tinlib.jgail.core.Agent;
+import com.tinlib.jgail.core.State;
 import com.tinlib.services.GameOverService;
 import com.tinlib.services.NextPlayerService;
 import com.tinlib.test.TestHelper;
@@ -87,8 +86,8 @@ public class AIServiceTest extends TinTestCase {
     builder.setGameOverService(mockGameOverService);
     builder.setNextPlayerService(mockNextPlayerService);
     builder.setTimeService(mockTimeService);
-    builder.bindInstance(TinKeys2.AI_PROVIDER, new MockAIProvider());
-    builder.bindInstance(TinKeys2.AI_ACTION_ADAPTER, new TestActionAdapter());
+    builder.bindInstance(AIProvider.class, new MockAIProvider());
+    builder.bindInstance(AIActionAdapter.class, new TestActionAdapter());
     builder.runTest(new TestHelper.Test() {
       @Override
       public void run(final TestHelper helper) {
