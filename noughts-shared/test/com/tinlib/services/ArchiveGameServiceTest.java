@@ -5,14 +5,14 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -23,7 +23,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ArchiveGameServiceTest extends TinTestCase {
+public class ArchiveGameServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -36,9 +36,9 @@ public class ArchiveGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    Firebase firebase = new Firebase(TestHelper.FIREBASE_URL);
-    TestHelper.Builder builder = newTestHelper(firebase, testGame, testAction);
-    builder.runTest(new TestHelper.Test() {
+    Firebase firebase = new Firebase(TestHelperTwo.FIREBASE_URL);
+    TestConfiguration config = newTestConfig(firebase, testGame, testAction).build();
+    TestHelper.runTest(this, config, new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
@@ -66,7 +66,7 @@ public class ArchiveGameServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
   }
 
   @Test
@@ -74,11 +74,13 @@ public class ArchiveGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    Firebase firebase = new ErroringFirebase(TestHelper.FIREBASE_URL, VIEWER_KEY + "/games",
+    Firebase firebase = new ErroringFirebase(TestHelperTwo.FIREBASE_URL, VIEWER_KEY + "/games",
         "removeValue");
-    TestHelper.Builder builder = newTestHelper(firebase, testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(firebase, testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
@@ -88,13 +90,14 @@ public class ArchiveGameServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper(Firebase firebase, Game testGame, Action testAction) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+  private TestConfiguration.Builder newTestConfig(Firebase firebase, Game testGame,
+      Action testAction) {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setFirebase(firebase);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
+    builder.setCurrentGame(testGame);
     builder.setCurrentAction(testAction);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
+    builder.multibindInstance(AnalyticsHandler.class, mockAnalyticsHandler);
     return builder;
   }
 

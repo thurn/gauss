@@ -48,6 +48,7 @@ public class ResignGameService {
             new EntityMutator.Mutation<Game, Game.Builder>() {
           @Override
           public void mutate(Game.Builder game) {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> MUTATE");
             if (game.getIsGameOver() || !game.getPlayerList().contains(viewerId)) {
               throw new TinException("Viewer '%s' cannot resign game '%s'", viewerId, gameId);
             }
@@ -63,11 +64,13 @@ public class ResignGameService {
 
           @Override
           public void onComplete(Game game) {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> ON COMPLETE");
             bus.post(gameUpdated, game);
           }
 
           @Override
           public void onError(FirebaseError error, boolean committed) {
+            System.out.println(">>>>>>>>>>>>>>>>>>>>> ON ERROR");
             errorService.error("Error with viewer '%s' resigning game '%s'. %s", viewerId, gameId,
                 error);
             bus.fail(gameUpdated);
@@ -79,10 +82,12 @@ public class ResignGameService {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
             if (firebaseError != null) {
+              System.out.println(">>>>>>>>>>>>>>>>>>>>> CLEAR SUCCESS");
               errorService.error("Error with viewer '%s' resigning game '%s' - unable to clear " +
                   "current action. %s", viewerId, gameId, firebaseError);
               bus.fail(actionCleared);
             } else {
+              System.out.println(">>>>>>>>>>>>>>>>>>>>> CLEAR FAILED");
               bus.post(actionCleared);
             }
           }

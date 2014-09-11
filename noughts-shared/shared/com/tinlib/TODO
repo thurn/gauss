@@ -1,17 +1,3 @@
-Injector
-  - consider making singleton keys the default
-  - make it possible to bind a "listener" type class eagerly
-  - maybe make eager initialization the default/only option?
-  - tests
-
-Bus
-  - Improve the system for waiting on multiple internal keys, which sometimes have no associated object
-  - Bring back the post/produce distinction
-  - Handle invalidations better -- if you're waiting to fire a one-off action and the game_id changes,
-    you need to abort that, not fire with the new game id
-  - Handle errors better when you're waiting on multiple keys
-  - tests
-
 TinTestCase
   - Abstract it away from TestHelper & tin in general
   - Add a way to register for before and after events

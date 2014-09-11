@@ -1,13 +1,13 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.IndexCommand;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -15,18 +15,18 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class CommandListenerTest extends TinTestCase {
+public class CommandListenerTest extends AsyncTestCase {
   private static final String GAME_ID = TestUtils.newGameId();
 
   @Test
   public void testCommandAdded() {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         helper.bus().once(TinKeys.COMMAND_ADDED, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
@@ -41,12 +41,14 @@ public class CommandListenerTest extends TinTestCase {
         helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .setPlayerNumber(0)
-                .build());
+                .build()
+        );
         helper.bus().produce(TinKeys.CURRENT_ACTION,
             TestUtils.newEmptyAction(GAME_ID)
                 .addCommand(testCommand)
                 .setPlayerNumber(0)
-                .build());
+                .build()
+        );
       }
     });
     endAsyncTestBlock();
@@ -56,11 +58,11 @@ public class CommandListenerTest extends TinTestCase {
   public void testCommandChanged() {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         helper.bus().once(TinKeys.COMMAND_CHANGED, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {
@@ -91,11 +93,11 @@ public class CommandListenerTest extends TinTestCase {
   public void testCommandUndone() {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         helper.bus().once(TinKeys.COMMAND_UNDONE, new Subscriber1<IndexCommand>() {
           @Override
           public void onMessage(IndexCommand indexCommand) {

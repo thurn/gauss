@@ -4,6 +4,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.ValueEventListener;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.error.TinException;
@@ -14,7 +15,7 @@ import com.tinlib.generated.IndexPath;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.*;
 import com.tinlib.time.TimeService;
-import com.tinlib.util.Procedure;
+import com.tinlib.defer.Procedure;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GameListServiceTest extends TinTestCase {
+public class GameListServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -160,15 +161,17 @@ public class GameListServiceTest extends TinTestCase {
   @Test
   public void testGameListChildListenerError() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setTimeService(mockTimeService);
+    builder.bindInstance(TimeService.class, mockTimeService);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "users/" + VIEWER_KEY + "/games", "addChildEventListener"));
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelper.Test() {
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
       }
     });
@@ -178,16 +181,18 @@ public class GameListServiceTest extends TinTestCase {
   @Test
   public void testGameListValueListenerError() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setTimeService(mockTimeService);
+    builder.bindInstance(TimeService.class, mockTimeService);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "addValueEventListener"));
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
     builder.bindInstance(KeyedListenerService.class, keyedListenerService);
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
         helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
@@ -202,13 +207,14 @@ public class GameListServiceTest extends TinTestCase {
   }
 
   private void addGame(final Procedure<IndexPath> onComplete) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.setErrorHandler(mockErrorHandler);
-    builder.setTimeService(mockTimeService);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
+    builder.bindInstance(TimeService.class, mockTimeService);
     builder.bindInstance(KeyedListenerService.class, keyedListenerService);
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         testHelper = helper;

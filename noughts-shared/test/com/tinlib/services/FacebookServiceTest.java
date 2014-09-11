@@ -5,16 +5,16 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber0;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
 import com.tinlib.time.TimeService;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
-public class FacebookServiceTest extends TinTestCase {
+public class FacebookServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -41,8 +41,8 @@ public class FacebookServiceTest extends TinTestCase {
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
     final Firebase firebase = new Firebase(TestHelper.FIREBASE_URL);
-    TestHelper.Builder builder = newTestHelper(firebase, testGame, testAction);
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfiguration(firebase, testGame, testAction);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
@@ -56,7 +56,7 @@ public class FacebookServiceTest extends TinTestCase {
                 FirebaseReferences facebookReferences =
                     FirebaseReferences.facebook(FACEBOOK_ID, firebase);
                 Game expectedGame = testGame.toBuilder().setPlayer(0, FACEBOOK_ID).build();
-                helper.assertGameEquals(expectedGame, FINISHED);
+                helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
 
                 facebookReferences.currentActionReferenceForGame(GAME_ID)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -115,9 +115,11 @@ public class FacebookServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(firebase, testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfiguration(firebase, testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         GameListService gameListService = new GameListService(helper.injector());
@@ -133,13 +135,14 @@ public class FacebookServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper(Firebase firebase, Game game, Action action) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
+  private TestConfiguration.Builder newTestConfiguration(Firebase firebase, Game game,
+      Action action) {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.multibindInstance(AnalyticsHandler.class, mockAnalyticsHandler);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(game);
+    builder.setCurrentGame(game);
     builder.setCurrentAction(action);
-    builder.setTimeService(mockTimeService);
+    builder.bindInstance(TimeService.class, mockTimeService);
     builder.setFirebase(firebase);
     return builder;
   }

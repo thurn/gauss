@@ -9,7 +9,7 @@ import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import com.tinlib.time.TimeService;
@@ -50,11 +50,11 @@ public class NewGameServiceTest extends TinTestCase {
 
   private void runNewGameTest(final boolean localMultiplayer) {
     beginAsyncTestBlock(2);
-    TestHelper.Builder builder = newTestHelper();
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = newTestConfig();
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         NewGameService newGameService = new NewGameService(helper.injector());
 
         helper.bus().await(TinKeys.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
@@ -99,30 +99,30 @@ public class NewGameServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockJoinGameService).joinGame(eq(0), eq(GAME_ID), eq(Optional.<Profile>absent()));
   }
 
   @Test
   public void testSetGameFirebaseError() {
-    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    runFirebaseErrorTest(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "setValue"));
   }
 
   @Test
   public void testSetRequestIdFirebaseError() {
-    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    runFirebaseErrorTest(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "requests/r" + REQUEST_ID, "setValue"));
   }
 
   private void runFirebaseErrorTest(Firebase firebase) {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = newTestHelper();
+    TestHelperTwo.Builder builder = newTestConfig();
     builder.setFirebase(firebase);
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelper.Test() {
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         NewGameService newGameService = new NewGameService(helper.injector());
         when(mockTimeService.currentTimeMillis()).thenReturn(444L);
         newGameService.newGameBuilder(GAME_ID)
@@ -136,8 +136,8 @@ public class NewGameServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper() {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+  private TestHelperTwo.Builder newTestConfig() {
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setAnalyticsHandler(mockAnalyticsHandler);
     builder.setTimeService(mockTimeService);

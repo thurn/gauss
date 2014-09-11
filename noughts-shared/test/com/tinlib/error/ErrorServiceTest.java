@@ -2,7 +2,7 @@ package com.tinlib.error;
 
 import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,8 +19,8 @@ public class ErrorServiceTest extends TinTestCase {
   @Test
   public void testError() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
     builder.setAnalyticsHandler(mockAnalyticsHandler);
     builder.setErrorHandler(new ErrorHandler() {
       @Override
@@ -29,15 +29,15 @@ public class ErrorServiceTest extends TinTestCase {
         finished();
       }
     });
-    builder.runTest(new TestHelper.Test() {
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(TestHelperTwo helper) {
         ErrorService errorService = new ErrorService(helper.injector());
         errorService.error("Error %s", "Error arg");
       }
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
   }
 }

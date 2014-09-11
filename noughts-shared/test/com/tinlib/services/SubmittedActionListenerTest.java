@@ -5,7 +5,7 @@ import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;
@@ -24,11 +24,11 @@ public class SubmittedActionListenerTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).setIsSubmitted(true).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(TestHelperTwo helper) {
         helper.bus().once(TinKeys.ACTION_SUBMITTED, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game game) {

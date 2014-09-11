@@ -3,17 +3,17 @@ package com.tinlib.services;
 import com.firebase.client.Firebase;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.IndexCommand;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
 import com.tinlib.time.LastModifiedService;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,7 +26,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AddCommandServiceTest extends TinTestCase {
+public class AddCommandServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -43,9 +43,9 @@ public class AddCommandServiceTest extends TinTestCase {
     final Action testAction = TestUtils.newEmptyAction(GAME_ID)
         .addFutureCommand(Command.newBuilder().setPlayerNumber(17).build())
         .build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
@@ -60,7 +60,7 @@ public class AddCommandServiceTest extends TinTestCase {
                 .setPlayerNumber(0)
                 .clearFutureCommandList()
                 .build();
-            helper.assertCurrentActionEquals(expected, FINISHED);
+            helper.assertCurrentActionEquals(expected, FINISHED_RUNNABLE);
           }
         });
 
@@ -69,7 +69,7 @@ public class AddCommandServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -80,10 +80,12 @@ public class AddCommandServiceTest extends TinTestCase {
         .setCurrentPlayerNumber(1)
         .build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         new AddCommandService(helper.injector()).addCommand(Command.newBuilder().build());
@@ -97,11 +99,13 @@ public class AddCommandServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         new AddCommandService(helper.injector()).addCommand(Command.newBuilder().build());
@@ -119,9 +123,9 @@ public class AddCommandServiceTest extends TinTestCase {
         .setPlayerNumber(0)
         .addCommand(Command.newBuilder().setPlayerNumber(42))
         .build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
@@ -135,7 +139,7 @@ public class AddCommandServiceTest extends TinTestCase {
             Action expected = testAction.toBuilder()
                 .setCommand(0, testCommand.setPlayerNumber(0))
                 .build();
-            helper.assertCurrentActionEquals(expected, FINISHED);
+            helper.assertCurrentActionEquals(expected, FINISHED_RUNNABLE);
           }
         });
 
@@ -144,7 +148,7 @@ public class AddCommandServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -153,10 +157,12 @@ public class AddCommandServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build());
@@ -170,11 +176,13 @@ public class AddCommandServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build());
@@ -188,9 +196,9 @@ public class AddCommandServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         AddCommandService addCommandService = new AddCommandService(helper.injector());
@@ -205,13 +213,12 @@ public class AddCommandServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper(Game testGame, Action testAction) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
-    builder.setCurrentAction(testAction);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
-    builder.setLastModifiedService(mockLastModifiedService);
-    return builder;
+  private TestConfiguration.Builder newTestConfig(Game testGame, Action testAction) {
+    return TestConfiguration.newBuilder()
+        .setAnonymousViewer(VIEWER_ID, VIEWER_KEY)
+        .setCurrentGame(testGame)
+        .setCurrentAction(testAction)
+        .multibindInstance(AnalyticsHandler.class, mockAnalyticsHandler)
+        .bindInstance(LastModifiedService.class, mockLastModifiedService);
   }
 }

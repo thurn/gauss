@@ -8,7 +8,7 @@ import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import com.tinlib.time.LastModifiedService;
@@ -37,11 +37,11 @@ public class UndoServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
 
         helper.bus().await(TinKeys.COMMAND_UNDO_COMPLETED, new Subscriber1<Command>() {
@@ -61,7 +61,7 @@ public class UndoServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -70,12 +70,12 @@ public class UndoServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
         undoService.undo();
       }
@@ -88,13 +88,13 @@ public class UndoServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
         undoService.undo();
       }
@@ -110,11 +110,11 @@ public class UndoServiceTest extends TinTestCase {
         .setPlayerNumber(0)
         .addFutureCommand(Command.newBuilder().setPlayerNumber(0).build())
         .build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
 
         helper.bus().await(TinKeys.COMMAND_REDO_COMPLETED, new Subscriber1<Command>() {
@@ -134,7 +134,7 @@ public class UndoServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -143,12 +143,12 @@ public class UndoServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
         undoService.redo();
       }
@@ -163,13 +163,13 @@ public class UndoServiceTest extends TinTestCase {
     final Action testAction = TestUtils.newEmptyAction(GAME_ID)
         .addFutureCommand(Command.newBuilder().setPlayerNumber(0).build())
         .build();
-    TestHelper.Builder builder = newTestHelper(testGame, testAction);
+    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
     builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
+    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         UndoService undoService = new UndoService(helper.injector());
         undoService.redo();
       }
@@ -177,8 +177,8 @@ public class UndoServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper(Game testGame, Action testAction) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+  private TestHelperTwo.Builder newTestConfig(Game testGame, Action testAction) {
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setGame(testGame);
     builder.setCurrentAction(testAction);

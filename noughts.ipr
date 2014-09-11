@@ -208,6 +208,19 @@
       <jarDirectory url="file://$PROJECT_DIR$/noughts-shared/lib" recursive="false" />
       <jarDirectory url="file://$PROJECT_DIR$/noughts-shared/lib" recursive="false" type="SOURCES" />
     </library>
+    <library name="org.jdeferred:jdeferred-core:1.2.1" type="repository">
+      <properties maven-id="org.jdeferred:jdeferred-core:1.2.1" />
+      <CLASSES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdeferred/jdeferred-core/1.2.1/jdeferred-core-1.2.1.jar!/" />
+        <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.2/slf4j-api-1.7.2.jar!/" />
+      </CLASSES>
+      <JAVADOC>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdeferred/jdeferred-core/1.2.1/jdeferred-core-1.2.1-javadoc.jar!/" />
+      </JAVADOC>
+      <SOURCES>
+        <root url="jar://$MAVEN_REPOSITORY$/org/jdeferred/jdeferred-core/1.2.1/jdeferred-core-1.2.1-sources.jar!/" />
+      </SOURCES>
+    </library>
     <library name="org.json:json:20140107" type="repository">
       <properties maven-id="org.json:json:20140107" />
       <CLASSES>

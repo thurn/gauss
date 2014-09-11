@@ -3,7 +3,7 @@ package com.tinlib.services;
 import com.firebase.client.Firebase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TinTestCase;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -15,11 +15,11 @@ public class ViewerServiceTest extends TinTestCase {
   @org.junit.Test
   public void testSetViewerAnonymousId() {
     beginAsyncTestBlock(2);
-    TestHelper.Builder helper = TestHelper.newBuilder(this);
-    helper.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    helper.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder helper = TestHelperTwo.newBuilder(this);
+    helper.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    helper.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(TestHelperTwo helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
 
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
@@ -57,11 +57,11 @@ public class ViewerServiceTest extends TinTestCase {
   @org.junit.Test
   public void testSetViewerFacebookId() {
     beginAsyncTestBlock(2);
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(TestHelperTwo helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override

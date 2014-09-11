@@ -4,15 +4,15 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.google.common.base.Optional;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationHandler;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
-public class JoinGameServiceTest extends TinTestCase {
+public class JoinGameServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -65,9 +65,9 @@ public class JoinGameServiceTest extends TinTestCase {
   private void runTestJoinGame(final boolean fromRequestId) {
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
-    TestHelper.Builder builder = newTestHelper(testGame);
+    TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
@@ -79,8 +79,9 @@ public class JoinGameServiceTest extends TinTestCase {
                 .addProfile(testProfile)
                 .build();
             assertEquals(expected, game);
-            helper.assertGameEquals(expected, FINISHED);
-            helper.assertCurrentActionEquals(TestUtils.newEmptyAction(GAME_ID).build(), FINISHED);
+            helper.assertGameEquals(expected, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(TestUtils.newEmptyAction(GAME_ID).build(),
+                FINISHED_RUNNABLE);
           }
         });
         if (fromRequestId) {
@@ -97,10 +98,12 @@ public class JoinGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).setIsGameOver(true).build();
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
-    TestHelper.Builder builder = newTestHelper(testGame);
+    TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelper.Test() {
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
@@ -115,11 +118,13 @@ public class JoinGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
-    TestHelper.Builder builder = newTestHelper(testGame);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    TestConfiguration.Builder builder = newTestConfig(testGame);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
@@ -134,11 +139,13 @@ public class JoinGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
-    TestHelper.Builder builder = newTestHelper(testGame);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    TestConfiguration.Builder builder = newTestConfig(testGame);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "setValue"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
@@ -153,11 +160,13 @@ public class JoinGameServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
-    TestHelper.Builder builder = newTestHelper(testGame);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
+    TestConfiguration.Builder builder = newTestConfig(testGame);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/requests", "addListenerForSingleValueEvent"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
@@ -167,12 +176,12 @@ public class JoinGameServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelper.Builder newTestHelper(Game testGame) {
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+  private TestConfiguration.Builder newTestConfig(Game testGame) {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
-    builder.setPushNotificationHandler(mockPushNotificationHandler);
+    builder.setCurrentGame(testGame);
+    builder.multibindInstance(AnalyticsHandler.class, mockAnalyticsHandler);
+    builder.multibindInstance(PushNotificationHandler.class, mockPushNotificationHandler);
     return builder;
   }
 }

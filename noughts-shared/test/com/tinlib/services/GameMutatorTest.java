@@ -1,14 +1,13 @@
 package com.tinlib.services;
 
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelper;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
+import com.tinlib.defer.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -17,7 +16,7 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GameMutatorTest extends TinTestCase {
+public class GameMutatorTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -27,14 +26,14 @@ public class GameMutatorTest extends TinTestCase {
     beginAsyncTestBlock();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
+    builder.setCurrentGame(testGame);
     builder.setCurrentAction(testAction);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
@@ -69,15 +68,15 @@ public class GameMutatorTest extends TinTestCase {
   @Test
   public void testMutateGameError() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build());
+    builder.setCurrentGame(TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build());
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
         "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
@@ -108,14 +107,14 @@ public class GameMutatorTest extends TinTestCase {
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
     final Game testGame = TestUtils.newGameWithOnePlayer(GAME_ID).build();
     final Command testCommand = Command.newBuilder().setPlayerNumber(42).build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
+    builder.setCurrentGame(testGame);
     builder.setCurrentAction(testAction);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
           @Override
@@ -148,15 +147,15 @@ public class GameMutatorTest extends TinTestCase {
   @Test
   public void testMutateCurrentActionError() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build());
+    builder.setCurrentGame(TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build());
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
-    builder.runTest(new TestHelper.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(final TestHelper helper) {
         GameMutator gameMutator = new GameMutator(helper.injector());
         gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
           @Override

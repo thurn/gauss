@@ -1,10 +1,7 @@
 package com.tinlib.validator;
 
 import com.firebase.client.Firebase;
-import com.tinlib.generated.Action;
-import com.tinlib.generated.Command;
-import com.tinlib.generated.Game;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import org.junit.Test;
@@ -21,11 +18,11 @@ public class JoinGameValidatorServiceTest extends TinTestCase {
   @Test
   public void testDefaultJoinGameValidatorCanJoinGame() {
     beginAsyncTestBlock();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.runTest(new TestHelper.Test() {
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(TestHelper helper) {
+      public void run(TestHelperTwo helper) {
         JoinGameValidatorService joinGameValidatorService =
             new JoinGameValidatorService(helper.injector());
         assertTrue(joinGameValidatorService.canJoinGame(VIEWER_ID,

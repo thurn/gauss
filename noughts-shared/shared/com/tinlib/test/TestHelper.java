@@ -1,26 +1,26 @@
 package com.tinlib.test;
 
 import com.firebase.client.DataSnapshot;
-import com.firebase.client.ValueEventListener;
-import com.google.common.collect.ClassToInstanceMap;
-import com.google.common.collect.MutableClassToInstanceMap;
-import com.tinlib.generated.Action;
-import com.tinlib.generated.Game;
 import com.firebase.client.Firebase;
-import com.firebase.client.Firebase.CompletionListener;
 import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+import com.google.common.collect.SetMultimap;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
+import com.tinlib.asynctest.CleanupFunction;
+import com.tinlib.convey.Bus;
 import com.tinlib.core.TinModule;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.generated.Action;
+import com.tinlib.generated.Game;
 import com.tinlib.infuse.*;
-import com.tinlib.convey.Bus;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.services.*;
-import com.tinlib.time.LastModifiedService;
-import com.tinlib.time.TimeService;
+import com.tinlib.defer.Procedure;
 import org.mockito.Matchers;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -30,7 +30,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class TestHelper {
+public class TestHelper implements CleanupFunction {
+  public static String FIREBASE_URL = "https://tintest.firebaseio-demo.com";
+  private final TestConfiguration testConfiguration;
+  private final Injector injector;
+
   private static class TestInputsModule implements Module {
     @Override
     public void configure(Binder binder) {
@@ -41,236 +45,102 @@ public class TestHelper {
     }
   }
 
-  public static interface Test {
-    public void run(TestHelper helper);
+  private TestHelper(AsyncTestCase testCase, TestConfiguration testConfiguration) {
+    this.testConfiguration = testConfiguration;
+    testCase.addCleanupFunction(this);
+    injector = createInjector(testConfiguration);
   }
 
-  public static class Builder {
-    private final TinTestCase testCase;
-    private FirebaseReferences references;
-    private Firebase firebase;
-    private Firebase realFirebase = new Firebase(FIREBASE_URL);
-    private TestHelper testHelper;
-    private String viewerId;
-    private String viewerKey;
-    private boolean facebook;
-    private ErrorHandler errorHandler;
-    private AnalyticsHandler analyticsHandler;
-    private PushNotificationHandler pushNotificationHandler;
-    private TimeService timeService;
-    private GameOverService gameOverService;
-    private NextPlayerService nextPlayerService;
-    private Game game;
-    private Action action;
-    private String gameId;
-    private LastModifiedService lastModifiedService;
-    private JoinGameService joinGameService;
-    private final ClassToInstanceMap<Object> classToInstanceMap =
-        MutableClassToInstanceMap.create();
-
-    private Builder(TinTestCase testCase) {
-      this.testCase = testCase;
-    }
-
-    public void setErrorHandler(ErrorHandler errorHandler) {
-      this.errorHandler = errorHandler;
-    }
-
-    public void setPushNotificationHandler(PushNotificationHandler pushNotificationHandler) {
-      this.pushNotificationHandler = pushNotificationHandler;
-    }
-
-    public void setAnalyticsHandler(AnalyticsHandler analyticsHandler) {
-      this.analyticsHandler = analyticsHandler;
-    }
-
-    public void setFirebase(Firebase firebase) {
-      this.firebase = firebase;
-    }
-
-    public void setAnonymousViewer(String viewerId, String viewerKey) {
-      this.viewerId = viewerId;
-      this.viewerKey = viewerKey;
-      this.facebook = false;
-      this.references = FirebaseReferences.anonymous(viewerKey, realFirebase);
-    }
-
-    public void setFacebookViewer(String facebookId) {
-      this.viewerId = facebookId;
-      this.viewerKey = facebookId;
-      this.facebook = true;
-      references = FirebaseReferences.facebook(facebookId, realFirebase);
-    }
-
-    public void setGame(Game game) {
-      this.game = game;
-      this.gameId = game.getId();
-    }
-
-    public void setCurrentAction(Action action) {
-      this.action = action;
-    }
-
-    public void setTimeService(TimeService timeService) {
-      this.timeService = timeService;
-    }
-
-    public void setGameOverService(GameOverService gameOverService) {
-      this.gameOverService = gameOverService;
-    }
-
-    public void setNextPlayerService(NextPlayerService nextPlayerService) {
-      this.nextPlayerService = nextPlayerService;
-    }
-
-    public void setLastModifiedService(LastModifiedService lastModifiedService) {
-      this.lastModifiedService = lastModifiedService;
-    }
-
-    public void setJoinGameService(JoinGameService joinGameService) {
-      this.joinGameService = joinGameService;
-    }
-
-    public <T> void bindInstance(Class<T> key, T value) {
-      classToInstanceMap.putInstance(key, value);
-    }
-
-    public void runTest(final Test test) {
-      if (firebase == null) {
-        throw new RuntimeException("setFirebase() is required.");
-      }
-      if (errorHandler == null) {
-        errorHandler = new ErrorHandler() {
-          @Override
-          public void error(String message, Object[] args) {
-            fail(String.format(message, args));
-          }
-        };
-      }
-
-      final TestHelper testHelper = new TestHelper(firebase, viewerId, viewerKey, facebook,
-          errorHandler, analyticsHandler, pushNotificationHandler, gameId, timeService,
-          gameOverService, nextPlayerService, lastModifiedService, joinGameService, classToInstanceMap);
-      testCase.setTestHelper(testHelper);
-      if (game == null) {
-        test.run(testHelper);
+  public static void runTest(AsyncTestCase testCase, final TestConfiguration testConfiguration,
+        final Procedure<TestHelper> test) {
+    final TestHelper helper = new TestHelper(testCase, testConfiguration);
+    if (testConfiguration.getViewerId() != null) {
+      ViewerService viewerService = helper.injector().get(ViewerService.class);
+      if (testConfiguration.isFacebook()) {
+        viewerService.setViewerFacebookId(testConfiguration.getViewerId());
       } else {
-        references.gameReference(game.getId()).setValue(game.serialize(), new CompletionListener() {
-          @Override
-          public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            if (action == null) {
-              test.run(testHelper);
-            } else {
-              references.currentActionReferenceForGame(game.getId()).setValue(action.serialize(),
-                  new CompletionListener() {
-                @Override
-                public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-                  test.run(testHelper);
-                }
-              });
-            }
-          }
-        });
+        viewerService.setViewerAnonymousId(
+            testConfiguration.getViewerId(), testConfiguration.getViewerKey());
       }
+    }
+    if (testConfiguration.getGame() == null) {
+      test.run(helper);
+    } else {
+      final FirebaseReferences firebaseReferences =
+          helper.getFirebaseReferencesWithFirebase(new Firebase(TestHelper.FIREBASE_URL));
+      final Game game = testConfiguration.getGame();
+      firebaseReferences.gameReference(game.getId()).setValue(game.serialize(),
+          new Firebase.CompletionListener() {
+        @Override
+        public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+          final CurrentGameListener currentGameListener =
+              helper.injector().get(CurrentGameListener.class);
+          if (testConfiguration.getAction() == null) {
+            currentGameListener.loadGame(game.getId());
+            test.run(helper);
+          } else {
+            Action action = testConfiguration.getAction();
+            firebaseReferences.currentActionReferenceForGame(game.getId()).setValue(
+                action.serialize(), new Firebase.CompletionListener() {
+              @Override
+              public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+                currentGameListener.loadGame(game.getId());
+                test.run(helper);
+              }
+            });
+          }
+        }
+      });
     }
   }
 
-  public static String FIREBASE_URL = "https://tintest.firebaseio-demo.com";
-
-  private final FirebaseReferences references;
-  private final Injector injector;
-
-  public static Builder newBuilder(TinTestCase testCase) {
-    return new Builder(testCase);
-  }
-
-  private TestHelper(final Firebase firebase,
-      String viewerId,
-      String viewerKey,
-      boolean facebook,
-      final ErrorHandler errorHandler,
-      final AnalyticsHandler analyticsHandler,
-      final PushNotificationHandler pushNotificationHandler,
-      String gameId,
-      final TimeService timeService,
-      final GameOverService gameOverService,
-      final NextPlayerService nextPlayerService,
-      final LastModifiedService lastModifiedService,
-      final JoinGameService joinGameService,
-      final ClassToInstanceMap<Object> classToInstanceMap) {
-    injector = Injectors.newOverridingTestInjector(new TinModule(), new TestInputsModule(),
+  private static Injector createInjector(final TestConfiguration testConfiguration) {
+    return Injectors.newOverridingTestInjector(new TinModule(), new TestInputsModule(),
         new Module() {
       @Override
       public void configure(Binder binder) {
-        if (firebase != null) {
+        if (testConfiguration.getFirebase() != null) {
           binder.bindClass(Firebase.class,
-              Initializers.returnValue(firebase));
+              Initializers.returnValue(testConfiguration.getFirebase()));
         }
-        if (errorHandler != null) {
+        if (testConfiguration.getFailOnError()) {
           binder.multibindClass(ErrorHandler.class,
-              Initializers.returnValue(errorHandler));
+              Initializers.<ErrorHandler>returnValue(new ErrorHandler() {
+            @Override
+            public void error(String message, Object[] args) {
+              fail(String.format(message, args));
+            }
+          }));
         }
-        if (analyticsHandler != null) {
-          binder.multibindClass(AnalyticsHandler.class,
-              Initializers.returnValue(analyticsHandler));
+        for (Class<?> key : testConfiguration.getClassMap().keySet()) {
+          bindValue(binder, key, testConfiguration.getClassMap().get(key));
         }
-        if (pushNotificationHandler != null) {
-          binder.multibindClass(PushNotificationHandler.class,
-              Initializers.returnValue(pushNotificationHandler));
-        }
-        if (timeService != null) {
-          binder.bindClass(TimeService.class,
-              Initializers.returnValue(timeService));
-        }
-        if (gameOverService != null) {
-          binder.bindClass(GameOverService.class,
-              Initializers.returnValue(gameOverService));
-        }
-        if (nextPlayerService != null) {
-          binder.bindClass(NextPlayerService.class,
-              Initializers.returnValue(nextPlayerService));
-        }
-        if (lastModifiedService != null) {
-          binder.bindClass(LastModifiedService.class,
-              Initializers.returnValue(lastModifiedService));
-        }
-        if (joinGameService != null) {
-          binder.bindClass(JoinGameService.class,
-              Initializers.returnValue(joinGameService));
-        }
-        for (Class<?> classObject : classToInstanceMap.keySet()) {
-          bindValue(binder, classObject, classToInstanceMap.getInstance(classObject));
+        SetMultimap<Class<?>, Object> multiClassMap = testConfiguration.getMultiClassMap();
+        for (Class<?> key : testConfiguration.getMultiClassMap().keySet()) {
+          for (Object value : multiClassMap.get(key)) {
+            multibindValue(binder, key, value);
+          }
         }
       }
     });
-    if (viewerId != null && viewerKey != null) {
-      if (facebook) {
-        (new ViewerService(injector)).setViewerFacebookId(viewerId);
-        references = FirebaseReferences.facebook(viewerId, firebase);
-      } else {
-        (new ViewerService(injector)).setViewerAnonymousId(viewerId, viewerKey);
-        references = FirebaseReferences.anonymous(viewerKey, firebase);
-      }
-    } else {
-      references = null;
-    }
-    if (gameId != null) {
-      (new CurrentGameListener(injector)).loadGame(gameId);
-      new CurrentActionListener(injector);
-    }
   }
 
   @SuppressWarnings("unchecked")
-  private <T> void bindValue(Binder binder, Class<?> classObject, T value) {
+  private static <T> void bindValue(Binder binder, Class<?> classObject, T value) {
     binder.bindClass((Class<T>)classObject, Initializers.returnValue(value));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <T> void multibindValue(Binder binder, Class<?> classObject, T value) {
+    binder.multibindClass((Class<T>)classObject, Initializers.returnValue(value));
+  }
+
+  public Injector injector() {
+    return injector;
   }
 
   public Bus bus() {
     return injector.get(Bus.class);
-  }
-
-  public KeyedListenerService getKeyedListenerService() {
-    return injector.get(KeyedListenerService.class);
   }
 
   public Firebase firebase() {
@@ -278,70 +148,66 @@ public class TestHelper {
   }
 
   public FirebaseReferences references() {
-    return references;
+    return getFirebaseReferencesWithFirebase(firebase());
   }
 
-  public Injector injector() {
-    return injector;
-  }
 
   public void assertGameEquals(final Game game, final Runnable runnable) {
     references().gameReference(game.getId()).addListenerForSingleValueEvent(
         new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        assertEquals(game, Game.newDeserializer().fromDataSnapshot(dataSnapshot));
-        runnable.run();
-      }
+          @Override
+          public void onDataChange(DataSnapshot dataSnapshot) {
+            assertEquals(game, Game.newDeserializer().fromDataSnapshot(dataSnapshot));
+            runnable.run();
+          }
 
-      @Override
-      public void onCancelled(FirebaseError firebaseError) {
-        fail("assertGameEquals listener cancelled.");
-      }
-    });
+          @Override
+          public void onCancelled(FirebaseError firebaseError) {
+            fail("assertGameEquals listener cancelled.");
+          }
+        });
   }
 
   public void assertCurrentActionEquals(final Action action, final Runnable runnable) {
     references().currentActionReferenceForGame(action.getGameId()).addListenerForSingleValueEvent(
         new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        assertEquals(action, Action.newDeserializer().fromDataSnapshot(dataSnapshot));
-        runnable.run();
-      }
+          @Override
+          public void onDataChange(DataSnapshot dataSnapshot) {
+            assertEquals(action, Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+            runnable.run();
+          }
 
-      @Override
-      public void onCancelled(FirebaseError firebaseError) {
-        fail("assertCurrentActionEquals listener cancelled.");
-      }
-    });
+          @Override
+          public void onCancelled(FirebaseError firebaseError) {
+            fail("assertCurrentActionEquals listener cancelled.");
+          }
+        });
   }
 
   public void assertRequestIdEquals(String requestId, final String gameId,
-      final Runnable runnable) {
+                                    final Runnable runnable) {
     references().requestReference(requestId).addListenerForSingleValueEvent(
         new ValueEventListener() {
-      @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {
-        assertEquals(gameId, dataSnapshot.getValue());
-        runnable.run();
-      }
+          @Override
+          public void onDataChange(DataSnapshot dataSnapshot) {
+            assertEquals(gameId, dataSnapshot.getValue());
+            runnable.run();
+          }
 
-      @Override
-      public void onCancelled(FirebaseError firebaseError) {
-        fail("assertRequestIdEquals listener cancelled");
-      }
-    });
+          @Override
+          public void onCancelled(FirebaseError firebaseError) {
+            fail("assertRequestIdEquals listener cancelled");
+          }
+        });
   }
 
-  public void cleanUp(final Runnable done) {
-    getKeyedListenerService().unregisterAll();
-    firebase().removeValue(new CompletionListener() {
+  public static ErrorHandler finishedErrorHandler(final Runnable finishedRunnable) {
+    return new ErrorHandler() {
       @Override
-      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-        done.run();
+      public void error(String message, Object[] args) {
+        finishedRunnable.run();
       }
-    });
+    };
   }
 
   public static void verifyTrackedEvent(AnalyticsHandler handler) {
@@ -349,8 +215,26 @@ public class TestHelper {
   }
 
   public static void verifyPushSent(PushNotificationHandler handler, String gameId,
-      int playerNumber, String substring) {
+                                    int playerNumber, String substring) {
     verify(handler, times(1)).sendPushNotification(eq(gameId), eq(playerNumber),
         contains(substring));
+  }
+
+  private FirebaseReferences getFirebaseReferencesWithFirebase(Firebase firebase) {
+    if (testConfiguration.isFacebook()) {
+      return FirebaseReferences.facebook(testConfiguration.getViewerId(), firebase);
+    } else {
+      return FirebaseReferences.anonymous(testConfiguration.getViewerKey(), firebase);
+    }
+  }
+
+  @Override
+  public void cleanUpAsync(final CountDownLatch countDownLatch) {
+    new Firebase(FIREBASE_URL).removeValue(new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        countDownLatch.countDown();
+      }
+    });
   }
 }

@@ -14,7 +14,7 @@ import com.tinlib.jgail.core.Agent;
 import com.tinlib.jgail.core.State;
 import com.tinlib.services.GameOverService;
 import com.tinlib.services.NextPlayerService;
-import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestHelperTwo;
 import com.tinlib.test.TestUtils;
 import com.tinlib.test.TinTestCase;
 import com.tinlib.time.TimeService;
@@ -78,8 +78,8 @@ public class AIServiceTest extends TinTestCase {
     testGameBuilder.setPlayer(1, VIEWER_ID);
     testGameBuilder.setIsLocalMultiplayer(true);
     final Game testGame = testGameBuilder.build();
-    TestHelper.Builder builder = TestHelper.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setGame(testGame);
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
@@ -88,9 +88,9 @@ public class AIServiceTest extends TinTestCase {
     builder.setTimeService(mockTimeService);
     builder.bindInstance(AIProvider.class, new MockAIProvider());
     builder.bindInstance(AIActionAdapter.class, new TestActionAdapter());
-    builder.runTest(new TestHelper.Test() {
+    builder.runTest(new TestHelperTwo.Test() {
       @Override
-      public void run(final TestHelper helper) {
+      public void run(final TestHelperTwo helper) {
         AIService aiService = new AIService(helper.injector());
         helper.bus().await(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override

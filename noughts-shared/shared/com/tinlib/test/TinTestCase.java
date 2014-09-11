@@ -29,7 +29,7 @@ public abstract class TinTestCase {
 
   private final AtomicBoolean finished = new AtomicBoolean(false);
   private final AtomicInteger numFinishes = new AtomicInteger(0);
-  private TestHelper testHelper;
+  private TestHelperTwo testHelper;
 
   @Before
   public final void tinSetUp() {
@@ -48,7 +48,7 @@ public abstract class TinTestCase {
     endAsyncTestBlock();
   }
 
-  public void setTestHelper(TestHelper testHelper) {
+  public void setTestHelper(TestHelperTwo testHelper) {
     this.testHelper = testHelper;
   }
 

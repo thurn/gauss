@@ -1,8 +1,6 @@
 package com.tinlib.services;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.Firebase;
-import com.firebase.client.ValueEventListener;
+import com.firebase.client.*;
 import com.google.common.collect.Maps;
 
 import java.util.Map;
@@ -21,9 +19,20 @@ public class KeyedListenerService {
    * Adds a keyed ValueEventListener as in
    * {@link Firebase#addValueEventListener(com.firebase.client.ValueEventListener)}.
    */
-  public void addValueEventListener(final Firebase ref, String key, ValueEventListener listener) {
+  public void addValueEventListener(final Firebase ref, String key, final ValueEventListener listener) {
     unregisterValueListener(key);
-    final ValueEventListener addedListener = ref.addValueEventListener(listener);
+    final ValueEventListener addedListener = ref.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) return;
+        listener.onDataChange(dataSnapshot);
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        listener.onCancelled(firebaseError);
+      }
+    });
     valueUnsubscribers.put(key, new Runnable() {
       @Override
       public void run() {
@@ -45,9 +54,39 @@ public class KeyedListenerService {
    * Adds a keyed ChildEventListener as in
    * {@link Firebase#addChildEventListener(com.firebase.client.ChildEventListener)}.
    */
-  public void addChildEventListener(final Firebase ref, String key, ChildEventListener listener) {
+  public void addChildEventListener(final Firebase ref, String key,
+      final ChildEventListener listener) {
     unregisterChildListener(key);
-    final ChildEventListener addedListener = ref.addChildEventListener(listener);
+    final ChildEventListener addedListener = ref.addChildEventListener(new ChildEventListener() {
+      @Override
+      public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        if (dataSnapshot.getValue() == null) return;
+        listener.onChildAdded(dataSnapshot, s);
+      }
+
+      @Override
+      public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+        if (dataSnapshot.getValue() == null) return;
+        listener.onChildChanged(dataSnapshot, s);
+      }
+
+      @Override
+      public void onChildRemoved(DataSnapshot dataSnapshot) {
+        if (dataSnapshot.getValue() == null) return;
+        listener.onChildRemoved(dataSnapshot);
+      }
+
+      @Override
+      public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+        if (dataSnapshot.getValue() == null) return;
+        listener.onChildMoved(dataSnapshot, s);
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        listener.onCancelled(firebaseError);
+      }
+    });
     childUnsubscribers.put(key, new Runnable() {
       @Override
       public void run() {
