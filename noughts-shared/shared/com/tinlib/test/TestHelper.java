@@ -16,7 +16,7 @@ import com.tinlib.generated.Game;
 import com.tinlib.infuse.*;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.services.*;
-import com.tinlib.defer.Procedure;
+import com.tinlib.util.Procedure;
 import org.mockito.Matchers;
 
 import java.util.Map;
@@ -24,8 +24,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -211,13 +210,17 @@ public class TestHelper implements CleanupFunction {
   }
 
   public static void verifyTrackedEvent(AnalyticsHandler handler) {
-    verify(handler, times(1)).trackEvent(Matchers.anyString(), Matchers.<Map<String, String>>any());
+    verify(handler, times(1)).trackEvent(anyString(), Matchers.<Map<String, String>>any());
   }
 
   public static void verifyPushSent(PushNotificationHandler handler, String gameId,
                                     int playerNumber, String substring) {
     verify(handler, times(1)).sendPushNotification(eq(gameId), eq(playerNumber),
         contains(substring));
+  }
+
+  public static void verifyErrorHandled(ErrorHandler handler) {
+    verify(handler, times(1)).error(anyString(), any(Object[].class));
   }
 
   private FirebaseReferences getFirebaseReferencesWithFirebase(Firebase firebase) {

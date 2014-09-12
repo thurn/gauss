@@ -23,10 +23,6 @@ import java.util.Map;
  * </ul>
  */
 public class ViewerService {
-  public static interface Function {
-    public void apply(Map<String, Object> map, String viewerId, FirebaseReferences references);
-  }
-
   private final Bus bus;
   private final Firebase firebase;
 

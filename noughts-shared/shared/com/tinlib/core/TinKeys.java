@@ -141,13 +141,6 @@ public final class TinKeys {
       Keys.createKey(GameList.class, "GAME_LIST");
 
   /**
-   * Fired when the viewer resigns from a game. The value will be the
-   * {@link com.tinlib.generated.Game} which the viewer resigned from.
-   */
-  public static final Key<Game> RESIGN_GAME_COMPLETED =
-      Keys.createKey(Game.class, "RESIGN_GAME_COMPLETED");
-
-  /**
    * Fired when the viewer archives a game which has ended. The value will
    * be the ID of the archived game.
    */

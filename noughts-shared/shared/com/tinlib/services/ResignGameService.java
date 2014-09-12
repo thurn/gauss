@@ -2,11 +2,14 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.google.common.collect.ImmutableList;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.convey.*;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.*;
 import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
@@ -28,27 +31,52 @@ public class ResignGameService {
     analyticsService = injector.get(AnalyticsService.class);
   }
 
-  public void resignGame(final String gameId) {
-    final Key<Game> gameUpdated = Keys.createKey(Game.class, "gameUpdated");
-    final Key<Void> actionCleared = Keys.createVoidKey("actionCleared");
-
-    bus.once(gameUpdated, ImmutableList.<Key<?>>of(actionCleared), new Subscriber1<Game>() {
-      @Override
-      public void onMessage(Game game) {
-        analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
-        bus.produce(TinKeys.RESIGN_GAME_COMPLETED, game);
-      }
-    });
+  public Promise<Game> resignGame(final String gameId) {
+    final Deferred<Game> gameUpdated = Deferreds.newDeferred();
+    final Deferred<Void> actionCleared = Deferreds.newDeferred();
 
     bus.once(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references) {
-        EntityMutator.mutateEntity(references.gameReference(gameId), Game.newDeserializer(),
-            new EntityMutator.Mutation<Game, Game.Builder>() {
+        updateGame(viewerId, references, gameId, gameUpdated);
+        clearAction(viewerId, references, gameId, actionCleared);
+      }
+    });
+
+    return Promises.awaitPair(gameUpdated, actionCleared).then(
+        new Function<Pair<Game, Void>, Game>() {
+      @Override
+      public Game apply(Pair<Game, Void> pair) {
+        analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
+        return pair.getFirst();
+      }
+    });
+  }
+
+  private void clearAction(final String viewerId, FirebaseReferences references,
+      final String gameId, final Deferred<Void> actionCleared) {
+    references.currentActionReferenceForGame(gameId).setValue(
+        Actions.newEmptyAction(gameId).serialize(), new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        if (firebaseError != null) {
+          errorService.error("Error with viewer '%s' resigning game '%s' - unable to clear " +
+              "current action. %s", viewerId, gameId, firebaseError);
+          actionCleared.fail(firebaseError.toException());
+        } else {
+          actionCleared.resolve();
+        }
+      }
+    });
+  }
+
+  private void updateGame(final String viewerId, FirebaseReferences references, final String gameId,
+        final Deferred<Game> gameUpdated) {
+    EntityMutator.mutateEntity(references.gameReference(gameId), Game.newDeserializer(),
+        new EntityMutator.Mutation<Game, Game.Builder>() {
           @Override
           public void mutate(Game.Builder game) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> MUTATE");
             if (game.getIsGameOver() || !game.getPlayerList().contains(viewerId)) {
               throw new TinException("Viewer '%s' cannot resign game '%s'", viewerId, gameId);
             }
@@ -64,35 +92,16 @@ public class ResignGameService {
 
           @Override
           public void onComplete(Game game) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> ON COMPLETE");
-            bus.post(gameUpdated, game);
+            gameUpdated.resolve(game);
           }
 
           @Override
           public void onError(FirebaseError error, boolean committed) {
-            System.out.println(">>>>>>>>>>>>>>>>>>>>> ON ERROR");
             errorService.error("Error with viewer '%s' resigning game '%s'. %s", viewerId, gameId,
                 error);
-            bus.fail(gameUpdated);
+            gameUpdated.fail(error.toException());
           }
-        });
-
-        references.currentActionReferenceForGame(gameId).setValue(
-            Actions.newEmptyAction(gameId).serialize(), new Firebase.CompletionListener() {
-          @Override
-          public void onComplete(FirebaseError firebaseError, Firebase firebase) {
-            if (firebaseError != null) {
-              System.out.println(">>>>>>>>>>>>>>>>>>>>> CLEAR SUCCESS");
-              errorService.error("Error with viewer '%s' resigning game '%s' - unable to clear " +
-                  "current action. %s", viewerId, gameId, firebaseError);
-              bus.fail(actionCleared);
-            } else {
-              System.out.println(">>>>>>>>>>>>>>>>>>>>> CLEAR FAILED");
-              bus.post(actionCleared);
-            }
-          }
-        });
-      }
-    });
+        }
+    );
   }
 }

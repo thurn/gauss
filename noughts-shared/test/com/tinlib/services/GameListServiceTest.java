@@ -15,7 +15,7 @@ import com.tinlib.generated.IndexPath;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.*;
 import com.tinlib.time.TimeService;
-import com.tinlib.defer.Procedure;
+import com.tinlib.util.Procedure;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

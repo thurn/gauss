@@ -3,14 +3,17 @@ package com.tinlib.services;
 import com.firebase.client.Firebase;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
+import com.tinlib.defer.FailureHandler;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.*;
+import com.tinlib.test.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.time.TimeService;
-import com.tinlib.defer.Procedure;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -29,6 +32,8 @@ public class ResignGameServiceTest extends AsyncTestCase {
   private AnalyticsHandler mockAnalyticsHandler;
   @Mock
   private TimeService mockTimeService;
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testResignGame() {
@@ -41,9 +46,12 @@ public class ResignGameServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         ResignGameService resignGameService = new ResignGameService(helper.injector());
-        helper.bus().once(TinKeys.RESIGN_GAME_COMPLETED, new Subscriber1<Game>() {
+
+        when(mockTimeService.currentTimeMillis()).thenReturn(777L);
+
+        resignGameService.resignGame(GAME_ID).addSuccessHandler(new SuccessHandler<Game>() {
           @Override
-          public void onMessage(Game game) {
+          public void onSuccess(Game game) {
             Game expected = testGame.toBuilder()
                 .setIsGameOver(true)
                 .clearCurrentPlayerNumber()
@@ -54,8 +62,6 @@ public class ResignGameServiceTest extends AsyncTestCase {
             helper.assertGameEquals(expected, FINISHED_RUNNABLE);
           }
         });
-        when(mockTimeService.currentTimeMillis()).thenReturn(777L);
-        resignGameService.resignGame(GAME_ID);
       }
     });
     endAsyncTestBlock();
@@ -90,16 +96,22 @@ public class ResignGameServiceTest extends AsyncTestCase {
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
     TestConfiguration.Builder builder = newTestConfig(firebase, testGame, testAction);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         ResignGameService resignGameService = new ResignGameService(helper.injector());
-        resignGameService.resignGame(GAME_ID);
+        resignGameService.resignGame(GAME_ID).addFailureHandler(new FailureHandler() {
+          @Override
+          public void onError(RuntimeException exception) {
+            finished();
+          }
+        });
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfig(Firebase firebase, Game testGame,

@@ -80,6 +80,12 @@ public class TinModule implements Module {
         return new CurrentGameListener(injector);
       }
     });
+    binder.bindClass(CurrentActionListener.class, new Initializer<CurrentActionListener>() {
+      @Override
+      public CurrentActionListener initialize(Injector injector) {
+        return new CurrentActionListener(injector);
+      }
+    });
     binder.bindClass(JoinGameValidatorService.class, new Initializer<JoinGameValidatorService>() {
       @Override
       public JoinGameValidatorService initialize(Injector injector) {

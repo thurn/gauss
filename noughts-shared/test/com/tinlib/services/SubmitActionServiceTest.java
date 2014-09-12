@@ -4,16 +4,16 @@ import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber0;
 import com.tinlib.push.PushNotificationHandler;
-import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelperTwo;
-import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.*;
 import com.tinlib.time.TimeService;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class SubmitActionServiceTest extends TinTestCase {
+public class SubmitActionServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -48,10 +48,10 @@ public class SubmitActionServiceTest extends TinTestCase {
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
         .build();
-    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
 
         final Game expectedGame = testGame.toBuilder()
@@ -63,8 +63,8 @@ public class SubmitActionServiceTest extends TinTestCase {
         helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
-          helper.assertGameEquals(expectedGame, FINISHED);
-          helper.assertCurrentActionEquals(expectedAction, FINISHED);
+          helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+          helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
           }
         });
 
@@ -79,8 +79,8 @@ public class SubmitActionServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
-    TestHelperTwo.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
   }
 
   @Test
@@ -88,10 +88,10 @@ public class SubmitActionServiceTest extends TinTestCase {
     beginAsyncTestBlock(2);
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
 
         final Game expectedGame = testGame.toBuilder()
@@ -105,8 +105,8 @@ public class SubmitActionServiceTest extends TinTestCase {
         helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
-            helper.assertGameEquals(expectedGame, FINISHED);
-            helper.assertCurrentActionEquals(expectedAction, FINISHED);
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
           }
         });
 
@@ -119,8 +119,8 @@ public class SubmitActionServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
-    TestHelperTwo.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "Game over");
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "Game over");
   }
 
   @Test
@@ -128,10 +128,10 @@ public class SubmitActionServiceTest extends TinTestCase {
     beginAsyncTestBlock(2);
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
         Action action = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
 
@@ -144,8 +144,8 @@ public class SubmitActionServiceTest extends TinTestCase {
         helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
           public void onMessage() {
-            helper.assertGameEquals(expectedGame, FINISHED);
-            helper.assertCurrentActionEquals(expectedAction, FINISHED);
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
           }
         });
 
@@ -160,8 +160,8 @@ public class SubmitActionServiceTest extends TinTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
-    TestHelperTwo.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyPushSent(mockPushNotificationHandler, GAME_ID, 1, "It's your turn");
   }
 
   @Test
@@ -169,11 +169,13 @@ public class SubmitActionServiceTest extends TinTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
-    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
         submitService.submitCurrentAction();
       }
@@ -183,13 +185,13 @@ public class SubmitActionServiceTest extends TinTestCase {
 
   @Test
   public void testSubmitActionFirebaseGameError() {
-    runFirebaseErrorTest(new ErroringFirebase(TestHelperTwo.FIREBASE_URL, "/games/" + GAME_ID,
+    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL, "/games/" + GAME_ID,
         "runTransaction"));
   }
 
   @Test
   public void testSubmitActionFirebaseActionError() {
-    runFirebaseErrorTest(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
+    runFirebaseErrorTest(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "setValue"));
   }
 
@@ -198,12 +200,14 @@ public class SubmitActionServiceTest extends TinTestCase {
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID)
         .build();
-    TestHelperTwo.Builder builder = newTestConfig(testGame, testAction);
+    TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
     builder.setFirebase(firebase);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.runTest(new TestHelperTwo.Test() {
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
@@ -216,17 +220,17 @@ public class SubmitActionServiceTest extends TinTestCase {
     endAsyncTestBlock();
   }
 
-  private TestHelperTwo.Builder newTestConfig(Game testGame, Action testAction) {
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+  private TestConfiguration.Builder newTestConfig(Game testGame, Action testAction) {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
+    builder.setCurrentGame(testGame);
     builder.setCurrentAction(testAction);
-    builder.setGameOverService(mockGameOverService);
-    builder.setNextPlayerService(mockNextPlayerService);
-    builder.setTimeService(mockTimeService);
-    builder.setAnalyticsHandler(mockAnalyticsHandler);
-    builder.setPushNotificationHandler(mockPushNotificationHandler);
+    builder.bindInstance(GameOverService.class, mockGameOverService);
+    builder.bindInstance(NextPlayerService.class, mockNextPlayerService);
+    builder.bindInstance(TimeService.class, mockTimeService);
+    builder.multibindInstance(AnalyticsHandler.class, mockAnalyticsHandler);
+    builder.multibindInstance(PushNotificationHandler.class, mockPushNotificationHandler);
     return builder;
   }
 }

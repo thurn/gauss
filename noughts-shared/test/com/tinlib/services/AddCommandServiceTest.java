@@ -13,7 +13,7 @@ import com.tinlib.generated.IndexCommand;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.*;
 import com.tinlib.time.LastModifiedService;
-import com.tinlib.defer.Procedure;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

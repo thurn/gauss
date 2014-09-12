@@ -12,7 +12,7 @@ import com.tinlib.generated.Profile;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.test.*;
-import com.tinlib.defer.Procedure;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
