@@ -28,17 +28,17 @@ public abstract class AsyncTestCase {
   private Optional<Throwable> throwableToPropagate = Optional.absent();
 
   public AsyncTestCase() {
-    this(10 /* timeoutSeconds */, true /* exitOnException */);
+    this(10 /* timeoutSeconds */);
   }
 
   public AsyncTestCase(int timeoutSeconds) {
-    this(timeoutSeconds, true /* exitOnException */);
+    this(timeoutSeconds, true /* propagateExceptions */);
   }
 
-  public AsyncTestCase(int timeoutSeconds, boolean exitOnException) {
+  public AsyncTestCase(int timeoutSeconds, boolean propagateExceptions) {
     this.timeoutSeconds = timeoutSeconds;
 
-    if (exitOnException) {
+    if (propagateExceptions) {
       Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread t, Throwable e) {

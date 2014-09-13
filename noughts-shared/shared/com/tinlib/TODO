@@ -7,6 +7,7 @@ TestHelper
   - Figure out a better system for cleanup logic
   - Figure out why tests sometimes fail together but pass in isolation
   - tests
+  - Get instances from injector instead of making them directly.
 
 EntityGenerator
   - Integrate it with the build process

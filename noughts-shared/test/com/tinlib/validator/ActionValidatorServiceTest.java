@@ -1,12 +1,14 @@
 package com.tinlib.validator;
 
+import com.firebase.client.Firebase;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
-import com.firebase.client.Firebase;
-import com.tinlib.test.TestHelperTwo;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -15,7 +17,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ActionValidatorServiceTest extends TinTestCase {
+public class ActionValidatorServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -23,11 +25,11 @@ public class ActionValidatorServiceTest extends TinTestCase {
   @Test
   public void testDefaultActionValidatorCanAddCommand() {
     beginAsyncTestBlock();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         ActionValidatorService validator = new ActionValidatorService(helper.injector());
         Command command = Command.newBuilder().build();
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
@@ -56,11 +58,11 @@ public class ActionValidatorServiceTest extends TinTestCase {
   @Test
   public void testDefaultActionValidatorCanSetCommand() {
     beginAsyncTestBlock();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         ActionValidatorService validator = new ActionValidatorService(helper.injector());
         Command command = Command.newBuilder().build();
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
@@ -101,11 +103,11 @@ public class ActionValidatorServiceTest extends TinTestCase {
   @Test
   public void testDefaultActionValidatorCanSubmitAction() {
     beginAsyncTestBlock();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         ActionValidatorService validator = new ActionValidatorService(helper.injector());
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
         assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),

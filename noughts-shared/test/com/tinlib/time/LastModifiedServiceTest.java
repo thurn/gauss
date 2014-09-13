@@ -1,22 +1,26 @@
 package com.tinlib.time;
 
 import com.firebase.client.Firebase;
-import com.tinlib.core.TinKeys;
-import com.tinlib.generated.Game;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.convey.Subscriber1;
+import com.tinlib.core.TinKeys;
+import com.tinlib.error.ErrorHandler;
+import com.tinlib.generated.Game;
 import com.tinlib.test.ErroringFirebase;
-import com.tinlib.test.TestHelperTwo;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class LastModifiedServiceTest extends TinTestCase {
+public class LastModifiedServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -26,23 +30,22 @@ public class LastModifiedServiceTest extends TinTestCase {
 
   @Test
   public void testUpdateLastModified() {
-    beginAsyncTestBlock(2);
+    beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setTimeService(mockTimeService);
-    builder.setGame(testGame);
-    builder.runTest(new TestHelperTwo.Test() {
+    builder.bindInstance(TimeService.class, mockTimeService);
+    builder.setCurrentGame(testGame);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
         when(mockTimeService.currentTimeMillis()).thenReturn(789L);
-        helper.bus().await(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
+        helper.bus().once(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
           @Override
           public void onMessage(Game currentGame) {
-            System.out.println("message " + currentGame);
-            //assertEquals(789L, currentGame.getLastModified());
+            assertEquals(789L, currentGame.getLastModified());
             finished();
           }
         });
@@ -56,16 +59,18 @@ public class LastModifiedServiceTest extends TinTestCase {
   public void testUpdateLastModifiedFirebaseError() {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setTimeService(mockTimeService);
-    builder.setGame(testGame);
-    builder.setErrorHandler(FINISHED_ERROR_HANDLER);
-    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL, "games/" + GAME_ID,
+    builder.bindInstance(TimeService.class, mockTimeService);
+    builder.setCurrentGame(testGame);
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class,
+        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL, "games/" + GAME_ID,
         "runTransaction"));
-    builder.runTest(new TestHelperTwo.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
         lastModifiedService.updateLastModified(GAME_ID);
       }

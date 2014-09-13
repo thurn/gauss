@@ -44,7 +44,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
         .addFutureCommand(Command.newBuilder().setPlayerNumber(17).build())
         .build();
     TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -69,7 +69,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -84,7 +84,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,
         TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -103,7 +103,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,
         TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
-    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
@@ -124,7 +124,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
         .addCommand(Command.newBuilder().setPlayerNumber(42))
         .build();
     TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -148,7 +148,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
     verify(mockLastModifiedService).updateLastModified(eq(GAME_ID));
   }
 
@@ -161,7 +161,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,
         TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -180,7 +180,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,
         TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
-    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "runTransaction"));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
@@ -197,7 +197,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
     TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {

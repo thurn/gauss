@@ -1,25 +1,27 @@
 package com.tinlib.services;
 
 import com.firebase.client.Firebase;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.TestHelperTwo;
-import com.tinlib.test.TinTestCase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.util.Procedure;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ViewerServiceTest extends TinTestCase {
+public class ViewerServiceTest extends AsyncTestCase {
   @org.junit.Test
   public void testSetViewerAnonymousId() {
     beginAsyncTestBlock(2);
-    TestHelperTwo.Builder helper = TestHelperTwo.newBuilder(this);
-    helper.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
-    helper.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
 
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
@@ -57,11 +59,11 @@ public class ViewerServiceTest extends TinTestCase {
   @org.junit.Test
   public void testSetViewerFacebookId() {
     beginAsyncTestBlock(2);
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
-    builder.runTest(new TestHelperTwo.Test() {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         ViewerService viewerService = new ViewerService(helper.injector());
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override

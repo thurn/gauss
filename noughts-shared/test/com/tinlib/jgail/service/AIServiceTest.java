@@ -3,6 +3,7 @@ package com.tinlib.jgail.service;
 import com.firebase.client.Firebase;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.convey.Subscriber0;
 import com.tinlib.core.TinKeys;
 import com.tinlib.generated.Action;
@@ -14,10 +15,11 @@ import com.tinlib.jgail.core.Agent;
 import com.tinlib.jgail.core.State;
 import com.tinlib.services.GameOverService;
 import com.tinlib.services.NextPlayerService;
-import com.tinlib.test.TestHelperTwo;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;
-import com.tinlib.test.TinTestCase;
 import com.tinlib.time.TimeService;
+import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -30,7 +32,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AIServiceTest extends TinTestCase {
+public class AIServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
@@ -78,19 +80,19 @@ public class AIServiceTest extends TinTestCase {
     testGameBuilder.setPlayer(1, VIEWER_ID);
     testGameBuilder.setIsLocalMultiplayer(true);
     final Game testGame = testGameBuilder.build();
-    TestHelperTwo.Builder builder = TestHelperTwo.newBuilder(this);
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setGame(testGame);
+    builder.setCurrentGame(testGame);
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
-    builder.setGameOverService(mockGameOverService);
-    builder.setNextPlayerService(mockNextPlayerService);
-    builder.setTimeService(mockTimeService);
+    builder.bindInstance(GameOverService.class, mockGameOverService);
+    builder.bindInstance(NextPlayerService.class, mockNextPlayerService);
+    builder.bindInstance(TimeService.class, mockTimeService);
     builder.bindInstance(AIProvider.class, new MockAIProvider());
     builder.bindInstance(AIActionAdapter.class, new TestActionAdapter());
-    builder.runTest(new TestHelperTwo.Test() {
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
-      public void run(final TestHelperTwo helper) {
+      public void run(final TestHelper helper) {
         AIService aiService = new AIService(helper.injector());
         helper.bus().await(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
           @Override
@@ -103,7 +105,7 @@ public class AIServiceTest extends TinTestCase {
                     .addCommand(Command.newBuilder().setPlayerNumber(1)))
                 .setCurrentPlayerNumber(0)
                 .build();
-            helper.assertGameEquals(expectedGame, FINISHED);
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
           }
         });
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);

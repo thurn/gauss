@@ -26,7 +26,7 @@ public class CurrentActionListenerTest extends AsyncTestCase {
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
 
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
@@ -53,7 +53,7 @@ public class CurrentActionListenerTest extends AsyncTestCase {
   public void testCurrentActionError() {
     beginAsyncTestBlock();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new ErroringFirebase(TestHelperTwo.FIREBASE_URL,
+    builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "addValueEventListener"));
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,

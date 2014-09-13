@@ -1,7 +1,6 @@
 package com.tinlib.util;
 
 import com.google.common.collect.Lists;
-import com.tinlib.test.TinTestCase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -11,7 +10,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ListUtilTest extends TinTestCase {
+public class ListUtilTest {
   @Test
   public void testAddOrSet() {
     List<String> list = Lists.newArrayList();

@@ -36,7 +36,7 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    Firebase firebase = new Firebase(TestHelperTwo.FIREBASE_URL);
+    Firebase firebase = new Firebase(TestHelper.FIREBASE_URL);
     TestConfiguration config = newTestConfig(firebase, testGame, testAction).build();
     TestHelper.runTest(this, config, new Procedure<TestHelper>() {
       @Override
@@ -66,7 +66,7 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
     });
     endAsyncTestBlock();
 
-    TestHelperTwo.verifyTrackedEvent(mockAnalyticsHandler);
+    TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
   }
 
   @Test
@@ -74,7 +74,7 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
-    Firebase firebase = new ErroringFirebase(TestHelperTwo.FIREBASE_URL, VIEWER_KEY + "/games",
+    Firebase firebase = new ErroringFirebase(TestHelper.FIREBASE_URL, VIEWER_KEY + "/games",
         "removeValue");
     TestConfiguration.Builder builder = newTestConfig(firebase, testGame, testAction);
     builder.setFailOnError(false);

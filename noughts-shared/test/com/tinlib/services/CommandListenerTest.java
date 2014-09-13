@@ -23,7 +23,7 @@ public class CommandListenerTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -59,7 +59,7 @@ public class CommandListenerTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -94,7 +94,7 @@ public class CommandListenerTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Command testCommand = Command.newBuilder().setPlayerNumber(44).build();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {

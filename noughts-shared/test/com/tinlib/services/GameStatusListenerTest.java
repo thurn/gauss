@@ -25,7 +25,7 @@ public class GameStatusListenerTest extends AsyncTestCase {
     beginAsyncTestBlock();
     final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setFirebase(new Firebase(TestHelperTwo.FIREBASE_URL));
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
