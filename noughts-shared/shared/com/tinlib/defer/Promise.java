@@ -15,6 +15,8 @@ public interface Promise<V> {
 
   public void addFailureHandler(FailureHandler failureHandler);
 
+  public void addFailureHandler(Runnable runnable);
+
   public void addCompletionHandler(Runnable onComplete);
 
   public State getState();

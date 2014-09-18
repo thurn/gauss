@@ -6,7 +6,7 @@ package com.tinlib.generated;
 
 import java.util.*;
 
-import com.tinlib.entities.Entity;
+import com.tinlib.beget.Entity;
 
 /**
  * A series of {@link Command}s which the user creates during their turn. At the end of a turn, the Action is submitted and it becomes the next player's turn.

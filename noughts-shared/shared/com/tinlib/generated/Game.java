@@ -6,7 +6,7 @@ package com.tinlib.generated;
 
 import java.util.*;
 
-import com.tinlib.entities.Entity;
+import com.tinlib.beget.Entity;
 
 /**
  * A single game, represented as a sequence of submitted Actions and data about the players who performed them along with general information about the current status the game.

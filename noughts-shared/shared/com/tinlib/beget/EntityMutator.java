@@ -1,4 +1,4 @@
-package com.tinlib.entities;
+package com.tinlib.beget;
 
 import com.firebase.client.*;
 

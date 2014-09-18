@@ -6,6 +6,9 @@ import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferred;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.Promise;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
@@ -35,7 +38,8 @@ public class AddCommandService {
     actionValidatorService = injector.get(ActionValidatorService.class);
   }
 
-  public void addCommand(final Command command) {
+  public Promise<Command> addCommand(final Command command) {
+    final Deferred<Command> result = Deferreds.newDeferred();
     gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
       @Override
       public void mutate(String viewerId, Action.Builder action, Game currentGame) {
@@ -47,18 +51,20 @@ public class AddCommandService {
           Game currentGame) {
         analyticsService.trackEvent("addCommand", ImmutableMap.of("command", command.toString()));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.post(TinKeys.COMMAND_ADD_COMPLETED,
-            action.getCommand(action.getCommandCount() - 1));
+        result.resolve(action.getCommand(action.getCommandCount() - 1));
       }
 
       @Override
       public void onError(String viewerId, FirebaseError error) {
-        errorService.error("Error adding command '%s'. %s", command, error);
+        result.fail(errorService.error("Error adding command '%s'. %s", command, error));
       }
     });
+
+    return result;
   }
 
-  public void setCommand(final int index, final Command command) {
+  public Promise<IndexCommand> setCommand(final int index, final Command command) {
+    final Deferred<IndexCommand> result = Deferreds.newDeferred();
     gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
       @Override
       public void mutate(String viewerId, Action.Builder action, Game currentGame) {
@@ -77,7 +83,7 @@ public class AddCommandService {
         analyticsService.trackEvent("setCommand",
             ImmutableMap.of("command", command.toString(), "index", index + ""));
         lastModifiedService.updateLastModified(action.getGameId());
-        bus.post(TinKeys.COMMAND_CHANGE_COMPLETED, IndexCommand.newBuilder()
+        result.resolve(IndexCommand.newBuilder()
             .setCommand(action.getCommand(index))
             .setIndex(index)
             .build());
@@ -85,9 +91,12 @@ public class AddCommandService {
 
       @Override
       public void onError(String viewerId, FirebaseError error) {
-        errorService.error("Error setting command '%s' at index '%s'. %s", command, index, error);
+        result.fail(errorService.error("Error setting command '%s' at index '%s'. %s", command,
+            index, error));
       }
     });
+
+    return result;
   }
 
   public void addCommandsToAction(String viewerId, Game currentGame, Action.Builder action,

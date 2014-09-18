@@ -2,6 +2,7 @@ package com.tinlib.defer;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -24,6 +25,8 @@ class DeferredImpl<V> implements Deferred<V> {
   }
 
   private void resolveOptional(Optional<V> value) {
+    Preconditions.checkArgument(this.state == State.PENDING);
+
     this.value = value;
     for (SuccessHandler<V> successHandler : successHandlers) {
       successHandler.onSuccess(value.orNull());
@@ -36,6 +39,8 @@ class DeferredImpl<V> implements Deferred<V> {
 
   @Override
   public synchronized void fail(RuntimeException exception) {
+    Preconditions.checkArgument(this.state == State.PENDING);
+
     this.exception = exception;
     for (FailureHandler failureHandler : failureHandlers) {
       failureHandler.onError(exception);
@@ -89,6 +94,16 @@ class DeferredImpl<V> implements Deferred<V> {
   }
 
   @Override
+  public void addFailureHandler(final Runnable runnable) {
+    addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        runnable.run();
+      }
+    });
+  }
+
+  @Override
   public synchronized void addCompletionHandler(Runnable onComplete) {
     if (state == State.PENDING) {
       completionHandlers.add(onComplete);
@@ -118,6 +133,22 @@ class DeferredImpl<V> implements Deferred<V> {
       }
     });
     return result;
+  }
+
+  @Override
+  public void chain(Promise<V> promise) {
+    promise.addSuccessHandler(new SuccessHandler<V>() {
+      @Override
+      public void onSuccess(V value) {
+        resolve(value);
+      }
+    });
+    promise.addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        fail(exception);
+      }
+    });
   }
 
   @Override

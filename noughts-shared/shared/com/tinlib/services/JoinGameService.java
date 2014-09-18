@@ -4,12 +4,15 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.convey.*;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber1;
+import com.tinlib.convey.Subscriber3;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.*;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
@@ -39,10 +42,10 @@ public class JoinGameService {
     gameMutator = injector.get(GameMutator.class);
   }
 
-  public void joinGame(final int playerNumber, final String gameId,
+  public Promise<Game> joinGame(final int playerNumber, final String gameId,
       final Optional<Profile> profile) {
-    final Key<Game> playerAdded = Keys.createKey(Game.class);
-    final Key<Void> actionAdded = Keys.createVoidKey();
+    final Deferred<Game> playerAdded = Deferreds.newDeferred();
+    final Deferred<Void> actionAdded = Deferreds.newDeferred();
 
     currentGameListener.loadGame(gameId);
     bus.once(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES, TinKeys.CURRENT_GAME,
@@ -50,21 +53,10 @@ public class JoinGameService {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references, Game game) {
         if (!joinGameValidatorService.canJoinGame(viewerId, game)) {
-          errorService.error("Viewer '%s' can't join game '%s'", viewerId, gameId);
+          playerAdded.fail(errorService.error("Viewer '%s' can't join game '%s'", viewerId,
+              gameId));
           return;
         }
-
-        bus.once(playerAdded, ImmutableList.<Key<?>>of(actionAdded), new Subscriber1<Game>() {
-          @Override
-          public void onMessage(Game game) {
-            analyticsService.trackEvent("joinGame", ImmutableMap.of(
-                "playerNumber", playerNumber + "",
-                "gameId", gameId,
-                "profile", profile.toString()));
-            pushNotificationService.registerForPushNotifications(gameId, playerNumber);
-            bus.post(TinKeys.JOIN_GAME_COMPLETED, game);
-          }
-        });
 
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
@@ -78,13 +70,13 @@ public class JoinGameService {
 
           @Override
           public void onComplete(String viewerId, FirebaseReferences references, Game game) {
-            bus.post(playerAdded, game);
+            playerAdded.resolve(game);
           }
 
           @Override
           public void onError(String viewerId, FirebaseError error) {
-            errorService.error("Error with viewer '%s' joining game '%s'. %s", viewerId, gameId,
-                error);
+            playerAdded.fail(errorService.error("Error with viewer '%s' joining game '%s'. %s",
+                viewerId, gameId, error));
           }
         });
 
@@ -95,17 +87,32 @@ public class JoinGameService {
             if (firebaseError != null) {
               errorService.error("Error with viewer '%s' adding current action to game '%s'. %s",
                   viewerId, gameId, firebaseError);
+              actionAdded.fail(firebaseError.toException());
             } else {
-              bus.post(actionAdded);
+              actionAdded.resolve();
             }
           }
         });
       }
     });
+
+    return Promises.awaitPair(playerAdded, actionAdded).then(
+        new Function<Pair<Game, Void>, Game>() {
+      @Override
+      public Game apply(Pair<Game, Void> pair) {
+        analyticsService.trackEvent("joinGame", ImmutableMap.of(
+            "playerNumber", playerNumber + "",
+            "gameId", gameId,
+            "profile", profile.toString()));
+        pushNotificationService.registerForPushNotifications(gameId, playerNumber);
+        return pair.getFirst();
+      }
+    });
   }
 
-  public void joinGameFromRequestId(final int playerNumber, final String requestId,
+  public Promise<Game> joinGameFromRequestId(final int playerNumber, final String requestId,
       final Optional<Profile> profile) {
+    final Deferred<Game> result = Deferreds.newDeferred();
     bus.once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
       @Override
       public void onMessage(FirebaseReferences references) {
@@ -113,16 +120,17 @@ public class JoinGameService {
             new ValueEventListener() {
           @Override
           public void onDataChange(DataSnapshot dataSnapshot) {
-            joinGame(playerNumber, (String)dataSnapshot.getValue(), profile);
+            result.chain(joinGame(playerNumber, (String)dataSnapshot.getValue(), profile));
           }
 
           @Override
           public void onCancelled(FirebaseError firebaseError) {
-            errorService.error("Error loading game ID for request ID '%s'. %s", requestId,
-                firebaseError);
+            result.fail(errorService.error("Error loading game ID for request ID '%s'. %s",
+                requestId, firebaseError));
           }
         });
       }
     });
+    return result;
   }
 }

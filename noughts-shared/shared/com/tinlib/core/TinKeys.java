@@ -76,40 +76,11 @@ public final class TinKeys {
       Keys.createKey(Command.class, "COMMAND_REDO_COMPLETED");
 
   /**
-   * Fired when a command is added. The value will be the newly-added
-   * {@link com.tinlib.generated.Command}.
-   */
-  public static final Key<Command> COMMAND_ADD_COMPLETED =
-      Keys.createKey(Command.class, "COMMAND_ADD_COMPLETED");
-
-  /**
-   * Fired when a command is changed. The value will be a
-   * {@link com.tinlib.generated.IndexCommand} with the changed command and
-   * its index.
-   */
-  public static final Key<IndexCommand> COMMAND_CHANGE_COMPLETED =
-      Keys.createKey(IndexCommand.class, "COMMAND_CHANGE_COMPLETED");
-
-  /**
    * Fired when a new game is created. The value will be the newly-created
    * {@link com.tinlib.generated.Game}.
    */
   public static final Key<Game> CREATE_GAME_COMPLETED =
       Keys.createKey(Game.class, "CREATE_GAME_COMPLETED");
-
-  /**
-   * Fired when the user joins a game. The value will be
-   * {@link com.tinlib.generated.Game} they joined.
-   */
-  public static final Key<Game> JOIN_GAME_COMPLETED =
-      Keys.createKey(Game.class, "JOIN_GAME_COMPLETED");
-
-  /**
-   * Fired when the user's account is upgraded to Facebook. No associated
-   * value.
-   */
-  public static final Key<Void> ACCOUNT_UPGRADE_COMPLETED =
-      Keys.createVoidKey("ACCOUNT_UPGRADE_COMPLETED");
 
   /**
    * Fired when a game is added to the game list. The value will be the
@@ -139,13 +110,6 @@ public final class TinKeys {
    */
   public static final Key<GameList> GAME_LIST =
       Keys.createKey(GameList.class, "GAME_LIST");
-
-  /**
-   * Fired when the viewer archives a game which has ended. The value will
-   * be the ID of the archived game.
-   */
-  public static final Key<String> ARCHIVE_GAME_COMPLETED =
-      Keys.createKey(String.class, "ARCHIVE_GAME_COMPLETED");
 
   /**
    * Fired when a proposed command is added by the viewer. The value will be an

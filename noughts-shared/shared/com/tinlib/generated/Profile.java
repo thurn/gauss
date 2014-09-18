@@ -6,7 +6,7 @@ package com.tinlib.generated;
 
 import java.util.*;
 
-import com.tinlib.entities.Entity;
+import com.tinlib.beget.Entity;
 
 /**
  * Description of a player in a game.

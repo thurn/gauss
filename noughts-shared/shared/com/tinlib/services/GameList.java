@@ -147,7 +147,7 @@ public class GameList {
       case GAME_OVER_SECTION:
         return gameOver;
       default:
-        throw errorService.newTinException("Unknown game list section '%s'", section);
+        throw errorService.error("Unknown game list section '%s'", section);
     }
   }
 

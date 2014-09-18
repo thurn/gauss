@@ -5,13 +5,15 @@ import com.firebase.client.FirebaseError;
 import com.google.common.base.Optional;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.convey.Subscriber1;
 import com.tinlib.push.PushNotificationHandler;
-import com.tinlib.test.*;
+import com.tinlib.test.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +36,8 @@ public class JoinGameServiceTest extends AsyncTestCase {
   private AnalyticsHandler mockAnalyticsHandler;
   @Mock
   private PushNotificationHandler mockPushNotificationHandler;
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testJoinGame() {
@@ -71,9 +75,9 @@ public class JoinGameServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        helper.bus().await(TinKeys.JOIN_GAME_COMPLETED, new Subscriber1<Game>() {
+        SuccessHandler<Game> successHandler = new SuccessHandler<Game>() {
           @Override
-          public void onMessage(Game game) {
+          public void onSuccess(Game game) {
             final Game expected = testGame.toBuilder()
                 .addPlayer(VIEWER_ID)
                 .addProfile(testProfile)
@@ -83,11 +87,16 @@ public class JoinGameServiceTest extends AsyncTestCase {
             helper.assertCurrentActionEquals(TestUtils.newEmptyAction(GAME_ID).build(),
                 FINISHED_RUNNABLE);
           }
-        });
+        };
+
         if (fromRequestId) {
-          joinGameService.joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile));
+          joinGameService
+              .joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile))
+              .addSuccessHandler(successHandler);
         } else {
-          joinGameService.joinGame(1, GAME_ID, Optional.of(testProfile));
+          joinGameService
+              .joinGame(1, GAME_ID, Optional.of(testProfile))
+              .addSuccessHandler(successHandler);
         }
       }
     });
@@ -101,16 +110,19 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        joinGameService.joinGame(1, GAME_ID, Optional.of(testProfile));
+        joinGameService
+            .joinGame(1, GAME_ID, Optional.of(testProfile))
+            .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   @Test
@@ -120,18 +132,21 @@ public class JoinGameServiceTest extends AsyncTestCase {
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
     TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/games/" + GAME_ID, "runTransaction"));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        joinGameService.joinGame(1, GAME_ID, Optional.of(testProfile));
+        joinGameService
+            .joinGame(1, GAME_ID, Optional.of(testProfile))
+            .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   @Test
@@ -141,18 +156,21 @@ public class JoinGameServiceTest extends AsyncTestCase {
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
     TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "games/" + GAME_ID + "/currentAction", "setValue"));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        joinGameService.joinGame(1, GAME_ID, Optional.of(testProfile));
+        joinGameService
+            .joinGame(1, GAME_ID, Optional.of(testProfile))
+            .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   @Test
@@ -162,18 +180,21 @@ public class JoinGameServiceTest extends AsyncTestCase {
     final Profile testProfile = Profile.newBuilder().setName("Name").build();
     TestConfiguration.Builder builder = newTestConfig(testGame);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.setFirebase(new ErroringFirebase(TestHelper.FIREBASE_URL,
         "firebaseio-demo.com/requests", "addListenerForSingleValueEvent"));
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         JoinGameService joinGameService = new JoinGameService(helper.injector());
-        joinGameService.joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile));
+        joinGameService
+            .joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile))
+            .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfig(Game testGame) {

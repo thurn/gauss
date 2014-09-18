@@ -4,7 +4,7 @@ import com.firebase.client.FirebaseError;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber3;
 import com.tinlib.core.TinKeys;
-import com.tinlib.entities.EntityMutator;
+import com.tinlib.beget.EntityMutator;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.Injector;

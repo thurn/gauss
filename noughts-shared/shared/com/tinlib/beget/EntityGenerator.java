@@ -1,4 +1,4 @@
-package com.tinlib.entities;
+package com.tinlib.beget;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.*;

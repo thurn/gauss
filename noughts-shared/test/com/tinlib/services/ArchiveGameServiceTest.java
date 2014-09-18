@@ -6,19 +6,19 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.*;
+import com.tinlib.test.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
@@ -30,6 +30,8 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
 
   @Mock
   private AnalyticsHandler mockAnalyticsHandler;
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testArchiveGame() {
@@ -42,10 +44,10 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
-        helper.bus().once(TinKeys.ARCHIVE_GAME_COMPLETED, new Subscriber1<String>() {
+
+        archiveGameService.archiveGame(GAME_ID).addSuccessHandler(new Runnable() {
           @Override
-          public void onMessage(String gameId) {
-            assertEquals(GAME_ID, gameId);
+          public void run() {
             helper.references().userReferenceForGame(GAME_ID).addListenerForSingleValueEvent(
                 new ValueEventListener() {
               @Override
@@ -61,7 +63,6 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
             });
           }
         });
-        archiveGameService.archiveGame(GAME_ID);
       }
     });
     endAsyncTestBlock();
@@ -78,16 +79,16 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
         "removeValue");
     TestConfiguration.Builder builder = newTestConfig(firebase, testGame, testAction);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
-        archiveGameService.archiveGame(GAME_ID);
+        archiveGameService.archiveGame(GAME_ID).addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfig(Firebase firebase, Game testGame,

@@ -34,6 +34,8 @@ public class FacebookServiceTest extends AsyncTestCase {
   AnalyticsHandler mockAnalyticsHandler;
   @Mock
   TimeService mockTimeService;
+  @Mock
+  ErrorHandler mockErrorHandler;
 
   @Test
   public void testUpgradeAccountToFacebook() {
@@ -50,9 +52,9 @@ public class FacebookServiceTest extends AsyncTestCase {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());
-            helper.bus().once(TinKeys.ACCOUNT_UPGRADE_COMPLETED, new Subscriber0() {
+            facebookService.upgradeAccountToFacebook(FACEBOOK_ID).addSuccessHandler(new Runnable() {
               @Override
-              public void onMessage() {
+              public void run() {
                 FirebaseReferences facebookReferences =
                     FirebaseReferences.facebook(FACEBOOK_ID, firebase);
                 Game expectedGame = testGame.toBuilder().setPlayer(0, FACEBOOK_ID).build();
@@ -60,18 +62,18 @@ public class FacebookServiceTest extends AsyncTestCase {
 
                 facebookReferences.currentActionReferenceForGame(GAME_ID)
                     .addListenerForSingleValueEvent(new ValueEventListener() {
-                  @Override
-                  public void onDataChange(DataSnapshot dataSnapshot) {
-                    assertEquals(testAction,
-                        Action.newDeserializer().fromDataSnapshot(dataSnapshot));
-                    finished();
-                  }
+                      @Override
+                      public void onDataChange(DataSnapshot dataSnapshot) {
+                        assertEquals(testAction,
+                            Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+                        finished();
+                      }
 
-                  @Override
-                  public void onCancelled(FirebaseError firebaseError) {
-                    fail("Current action listener cancelled.");
-                  }
-                });
+                      @Override
+                      public void onCancelled(FirebaseError firebaseError) {
+                        fail("Current action listener cancelled.");
+                      }
+                    });
 
                 helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
                   @Override
@@ -82,7 +84,6 @@ public class FacebookServiceTest extends AsyncTestCase {
                 });
               }
             });
-            facebookService.upgradeAccountToFacebook(FACEBOOK_ID);
           }
         });
       }
@@ -117,8 +118,7 @@ public class FacebookServiceTest extends AsyncTestCase {
     final Action testAction = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
     TestConfiguration.Builder builder = newTestConfiguration(firebase, testGame, testAction);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -127,12 +127,15 @@ public class FacebookServiceTest extends AsyncTestCase {
           @Override
           public void onMessage() {
             FacebookService facebookService = new FacebookService(helper.injector());
-            facebookService.upgradeAccountToFacebook(FACEBOOK_ID);
+            facebookService.upgradeAccountToFacebook(FACEBOOK_ID)
+                .addFailureHandler(FINISHED_RUNNABLE);
           }
         });
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfiguration(Firebase firebase, Game game,

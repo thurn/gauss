@@ -1,6 +1,6 @@
 package ca.thurn.noughts.shared.entities;
 
-import com.tinlib.entities.Entity;
+import com.tinlib.beget.Entity;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;

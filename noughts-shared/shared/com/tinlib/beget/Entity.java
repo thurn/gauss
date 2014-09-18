@@ -1,4 +1,4 @@
-package com.tinlib.entities;
+package com.tinlib.beget;
 
 import java.util.List;
 import java.util.Map;

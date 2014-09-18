@@ -7,6 +7,9 @@ import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferred;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.Promise;
 import com.tinlib.error.ErrorService;
 import com.tinlib.infuse.Injector;
 
@@ -21,7 +24,8 @@ public class ArchiveGameService{
     analyticsService = injector.get(AnalyticsService.class);
   }
 
-  public void archiveGame(final String gameId) {
+  public Promise<Void> archiveGame(final String gameId) {
+    final Deferred<Void> result = Deferreds.newDeferred();
     bus.once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
       @Override
       public void onMessage(FirebaseReferences references) {
@@ -30,13 +34,15 @@ public class ArchiveGameService{
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
             analyticsService.trackEvent("archiveGame", ImmutableMap.of("gameId", gameId));
             if (firebaseError != null) {
-              errorService.error("Error archiving game '%s'. %s", gameId, firebaseError);
+              result.fail(errorService.error("Error archiving game '%s'. %s", gameId,
+                  firebaseError));
             } else {
-              bus.post(TinKeys.ARCHIVE_GAME_COMPLETED, gameId);
+              result.resolve();
             }
           }
         });
       }
     });
+    return result;
   }
 }

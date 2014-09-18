@@ -6,7 +6,7 @@ package com.tinlib.generated;
 
 import java.util.*;
 
-import com.tinlib.entities.Entity;
+import com.tinlib.beget.Entity;
 
 /**
  * An atomic change that a user can make on their turn which can be independently undone.
