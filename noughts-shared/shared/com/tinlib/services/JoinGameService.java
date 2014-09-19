@@ -53,8 +53,8 @@ public class JoinGameService {
       @Override
       public void onMessage(final String viewerId, FirebaseReferences references, Game game) {
         if (!joinGameValidatorService.canJoinGame(viewerId, game)) {
-          playerAdded.fail(errorService.error("Viewer '%s' can't join game '%s'", viewerId,
-              gameId));
+          Deferreds.failAll(errorService.error("Viewer '%s' can't join game '%s'", viewerId,
+              gameId), playerAdded, actionAdded);
           return;
         }
 
@@ -96,18 +96,20 @@ public class JoinGameService {
       }
     });
 
-    return Promises.awaitPair(playerAdded, actionAdded).then(
-        new Function<Pair<Game, Void>, Game>() {
+    Promise<Pair<Game, Void>> prom = Promises.awaitPair(playerAdded, actionAdded);
+    Promise<Game> result = prom.then(
+        new Function<Pair<Game, Void>, Promise<Game>>() {
       @Override
-      public Game apply(Pair<Game, Void> pair) {
+      public Promise<Game> apply(Pair<Game, Void> pair) {
         analyticsService.trackEvent("joinGame", ImmutableMap.of(
             "playerNumber", playerNumber + "",
             "gameId", gameId,
             "profile", profile.toString()));
         pushNotificationService.registerForPushNotifications(gameId, playerNumber);
-        return pair.getFirst();
+        return Deferreds.newResolvedDeferred(pair.getFirst());
       }
     });
+    return result;
   }
 
   public Promise<Game> joinGameFromRequestId(final int playerNumber, final String requestId,
@@ -120,7 +122,7 @@ public class JoinGameService {
             new ValueEventListener() {
           @Override
           public void onDataChange(DataSnapshot dataSnapshot) {
-            result.chain(joinGame(playerNumber, (String)dataSnapshot.getValue(), profile));
+            result.chainFrom(joinGame(playerNumber, (String) dataSnapshot.getValue(), profile));
           }
 
           @Override

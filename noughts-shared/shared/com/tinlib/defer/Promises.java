@@ -44,10 +44,10 @@ public class Promises {
   @SuppressWarnings("unchecked")
   public static <A,B> Promise<Pair<A,B>> awaitPair(Promise<A> promise1,
       Promise<B> promise2) {
-    return awaitAll(promise1, promise2).then(new Function<List<Object>, Pair<A, B>>() {
+    return awaitAll(promise1, promise2).then(new Function<List<Object>, Promise<Pair<A, B>>>() {
       @Override
-      public Pair<A, B> apply(List<Object> objects) {
-        return new Pair<>((A)objects.get(0), (B)objects.get(1));
+      public Promise<Pair<A, B>> apply(List<Object> objects) {
+        return Deferreds.newResolvedDeferred(new Pair<>((A)objects.get(0), (B)objects.get(1)));
       }
     });
   }

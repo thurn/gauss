@@ -7,4 +7,22 @@ public class Deferreds {
     return new DeferredImpl<>();
   }
 
+  public static <V> Deferred<V> newResolvedDeferred(V value) {
+    DeferredImpl<V> result = new DeferredImpl<>();
+    result.resolve(value);
+    return result;
+  }
+
+  public static <V> Deferred<V> newFailedDeferred(RuntimeException exception) {
+    DeferredImpl<V> result = new DeferredImpl<>();
+    result.fail(exception);
+    return result;
+  }
+
+  public static void failAll(RuntimeException exception, Deferred<?>... deferreds) {
+    for (Deferred<?> deferred : deferreds) {
+      deferred.fail(exception);
+    }
+  }
+
 }

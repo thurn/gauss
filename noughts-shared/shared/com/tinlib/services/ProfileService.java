@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferred;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
@@ -25,7 +26,7 @@ public class ProfileService {
     errorService = injector.get(ErrorService.class);
   }
 
-  public void setProfileForViewer(final Profile profile) {
+  public Deferred<Profile> setProfileForViewer(final Profile profile) {
     gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
       public void mutate(String viewerId, Game.Builder game) {

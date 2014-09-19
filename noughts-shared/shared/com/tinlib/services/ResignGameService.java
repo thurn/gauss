@@ -44,11 +44,11 @@ public class ResignGameService {
     });
 
     return Promises.awaitPair(gameUpdated, actionCleared).then(
-        new Function<Pair<Game, Void>, Game>() {
+        new Function<Pair<Game, Void>, Promise<Game>>() {
       @Override
-      public Game apply(Pair<Game, Void> pair) {
+      public Promise<Game> apply(Pair<Game, Void> pair) {
         analyticsService.trackEvent("resignGame", ImmutableMap.of("gameId", gameId));
-        return pair.getFirst();
+        return Deferreds.newResolvedDeferred(pair.getFirst());
       }
     });
   }

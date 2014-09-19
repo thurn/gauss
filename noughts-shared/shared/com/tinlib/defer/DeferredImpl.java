@@ -5,7 +5,9 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 class DeferredImpl<V> implements Deferred<V> {
   private Promise.State state = State.PENDING;
@@ -118,12 +120,13 @@ class DeferredImpl<V> implements Deferred<V> {
   }
 
   @Override
-  public <K> Promise<K> then(final Function<V, K> function) {
+  public <K> Promise<K> then(final Function<V, Promise<K>> function) {
     final DeferredImpl<K> result = new DeferredImpl<>();
     addSuccessHandler(new SuccessHandler<V>() {
       @Override
       public void onSuccess(V value) {
-        result.resolve(function.apply(value));
+        if (value == null) throw new NullPointerException();
+        result.chainFrom(function.apply(value));
       }
     });
     addFailureHandler(new FailureHandler() {
@@ -136,7 +139,29 @@ class DeferredImpl<V> implements Deferred<V> {
   }
 
   @Override
-  public void chain(Promise<V> promise) {
+  public <K> Promise<K> then(final Callable<Promise<K>> function) {
+    final DeferredImpl<K> result = new DeferredImpl<>();
+    addSuccessHandler(new SuccessHandler<V>() {
+      @Override
+      public void onSuccess(V value) {
+        try {
+          result.chainFrom(function.call());
+        } catch (Exception exception) {
+          throw new RuntimeException(exception);
+        }
+      }
+    });
+    addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        result.fail(exception);
+      }
+    });
+    return result;
+  }
+
+  @Override
+  public void chainFrom(Promise<V> promise) {
     promise.addSuccessHandler(new SuccessHandler<V>() {
       @Override
       public void onSuccess(V value) {

@@ -48,13 +48,6 @@ public final class TinKeys {
       Keys.createKey(GameStatus.class, "GAME_STATUS");
 
   /**
-   * Fired when the user has successfully updated their profile. The value will
-   * be the new value of their profile
-   */
-  public static final Key<Profile> SET_PROFILE_COMPLETED =
-      Keys.createKey(Profile.class, "SET_PROFILE_COMPLETED");
-
-  /**
    * Fired when an action is submitted. The value will be the just-submitted
    * {@link com.tinlib.generated.Action}.
    */
@@ -74,13 +67,6 @@ public final class TinKeys {
    */
   public static final Key<Command> COMMAND_REDO_COMPLETED =
       Keys.createKey(Command.class, "COMMAND_REDO_COMPLETED");
-
-  /**
-   * Fired when a new game is created. The value will be the newly-created
-   * {@link com.tinlib.generated.Game}.
-   */
-  public static final Key<Game> CREATE_GAME_COMPLETED =
-      Keys.createKey(Game.class, "CREATE_GAME_COMPLETED");
 
   /**
    * Fired when a game is added to the game list. The value will be the

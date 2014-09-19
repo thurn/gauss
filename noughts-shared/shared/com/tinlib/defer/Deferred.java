@@ -5,7 +5,7 @@ public interface Deferred<V> extends Promise<V> {
 
   public void resolve();
 
-  public void chain(Promise<V> promise);
+  public void chainFrom(Promise<V> promise);
 
   public void fail(RuntimeException exception);
 }

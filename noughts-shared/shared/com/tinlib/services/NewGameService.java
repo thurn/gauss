@@ -8,8 +8,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.convey.*;
+import com.tinlib.convey.Bus;
+import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferred;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.Promise;
+import com.tinlib.defer.Promises;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
@@ -17,6 +22,7 @@ import com.tinlib.infuse.Injector;
 import com.tinlib.time.TimeService;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 public class NewGameService {
   public class NewGameBuilder {
@@ -52,8 +58,8 @@ public class NewGameService {
       return this;
     }
 
-    public void create() {
-      makeNewGame(playerNumber, players, profiles, gameId, requestId, localMultiplayer);
+    public Promise<Game> create() {
+      return makeNewGame(playerNumber, players, profiles, gameId, requestId, localMultiplayer);
     }
   }
 
@@ -79,13 +85,14 @@ public class NewGameService {
     return new NewGameBuilder(gameId, true /* localMultiplayer */);
   }
 
-  private void makeNewGame(final int viewerPlayerNumber, final List<String> players,
+  private Promise<Game> makeNewGame(final int viewerPlayerNumber, final List<String> players,
       final List<Profile> profiles, final String gameId, final Optional<String> requestId,
       final boolean localMultiplayer) {
-    final Key<Void> gameValueSet = Keys.createVoidKey("gameValueSet");
-    final Key<Void> requestIdSet = Keys.createVoidKey("requestIdSet");
+    final Deferred<Game> result = Deferreds.newDeferred();
+    final Deferred<Void> gameValueSet = Deferreds.newDeferred();
+    final Deferred<Void> requestIdSet = Deferreds.newDeferred();
 
-    bus.await(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
+    bus.once(TinKeys.VIEWER_ID, TinKeys.FIREBASE_REFERENCES,
         new Subscriber2<String, FirebaseReferences>() {
       @Override
       public void onMessage(String viewerId, final FirebaseReferences firebaseReferences) {
@@ -98,56 +105,55 @@ public class NewGameService {
         game.setLastModified(timeService.currentTimeMillis());
         game.setIsGameOver(false);
 
-        bus.once(ImmutableList.<Key<?>>of(gameValueSet, requestIdSet), new Subscriber0() {
-          @Override
-          public void onMessage() {
-            analyticsService.trackEvent("makeNewGame", ImmutableMap.of(
-                "players", players.toString(), "profiles", profiles.toString(),
-                "gameId", gameId, "localMultiplayer", localMultiplayer + ""));
-            joinGameService.joinGame(viewerPlayerNumber, gameId, Optional.<Profile>absent());
-            bus.post(TinKeys.CREATE_GAME_COMPLETED, game.build());
-          }
-        });
-
         setGameValue(gameValueSet, firebaseReferences, game.build());
         setRequestId(requestIdSet, firebaseReferences, requestId, gameId);
       }
     });
+
+    return Promises.awaitVoid(gameValueSet, requestIdSet).then(new Callable<Promise<Game>>() {
+      @Override
+      public Promise<Game> call() {
+        analyticsService.trackEvent("makeNewGame", ImmutableMap.of(
+            "players", players.toString(), "profiles", profiles.toString(),
+            "gameId", gameId, "localMultiplayer", localMultiplayer + ""));
+        Promise<Game> p = joinGameService.joinGame(viewerPlayerNumber, gameId, Optional.<Profile>absent());
+        return p;
+      }
+    });
   }
 
-  private void setRequestId(final Key<Void> requestIdSet, FirebaseReferences firebaseReferences,
-      final Optional<String> requestId, final String gameId) {
+  private void setRequestId(final Deferred<Void> requestIdSet,
+      FirebaseReferences firebaseReferences, final Optional<String> requestId,
+      final String gameId) {
     if (requestId.isPresent()) {
       firebaseReferences.requestReference(requestId.get()).setValue(gameId,
           new CompletionListener() {
         @Override
         public void onComplete(FirebaseError firebaseError, Firebase firebase) {
           if (firebaseError != null) {
-            errorService.error("Error associating request ID '%s' with game '%s'. %s",
-                requestId.get(), gameId, firebaseError);
-            bus.fail(requestIdSet);
+            requestIdSet.fail(errorService.error("Error associating request ID '%s' with game " +
+                "'%s'. %s", requestId.get(), gameId, firebaseError));
           } else {
-            bus.post(requestIdSet);
+            requestIdSet.resolve();
           }
         }
       });
     } else {
-      bus.post(requestIdSet);
+      requestIdSet.resolve();
     }
   }
 
-  private void setGameValue(final Key<Void> gameValueSet, FirebaseReferences firebaseReferences,
-      final Game game) {
+  private void setGameValue(final Deferred<Void> gameValueSet,
+      FirebaseReferences firebaseReferences, final Game game) {
     firebaseReferences.gameReference(game.getId()).setValue(game.serialize(),
         new CompletionListener() {
       @Override
       public void onComplete(FirebaseError firebaseError, Firebase firebase) {
         if (firebaseError != null) {
-          errorService.error("Error setting value of new game for game '%s'. %s", game.getId(),
-              firebaseError);
-          bus.fail(gameValueSet);
+          gameValueSet.fail(errorService.error("Error setting value of new game for game " +
+              "'%s'. %s", game.getId(), firebaseError));
         } else {
-          bus.post(gameValueSet);
+          gameValueSet.resolve();
         }
       }
     });

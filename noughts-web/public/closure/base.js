@@ -1661,7 +1661,7 @@ goog.base = function(me, opt_methodName, var_args) {
     }
   }
 
-  // If we did not find the caller in the prototype chain, then one of two
+  // If we did not find the caller in the prototype chainFrom, then one of two
   // things happened:
   // 1) The caller is an instance method.
   // 2) This method was not called by the right caller.

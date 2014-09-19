@@ -5,12 +5,15 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.*;
+import com.tinlib.test.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Procedure;
 import org.junit.Test;
@@ -19,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +40,8 @@ public class NewGameServiceTest extends AsyncTestCase {
   private TimeService mockTimeService;
   @Mock
   private JoinGameService mockJoinGameService;
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testNewGame() {
@@ -55,20 +60,20 @@ public class NewGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        NewGameService newGameService = new NewGameService(helper.injector());
+        final Game expected = Game.newBuilder()
+            .setId(GAME_ID)
+            .addPlayer(VIEWER_ID)
+            .addProfile(VIEWER_PROFILE)
+            .setIsLocalMultiplayer(localMultiplayer)
+            .setCurrentPlayerNumber(0)
+            .setLastModified(444L)
+            .setIsGameOver(false)
+            .build();
 
-        helper.bus().await(TinKeys.CREATE_GAME_COMPLETED, new Subscriber1<Game>() {
+        NewGameService newGameService = new NewGameService(helper.injector());
+        SuccessHandler<Game> successHandler = new SuccessHandler<Game>() {
           @Override
-          public void onMessage(Game game) {
-            final Game expected = Game.newBuilder()
-                .setId(GAME_ID)
-                .addPlayer(VIEWER_ID)
-                .addProfile(VIEWER_PROFILE)
-                .setIsLocalMultiplayer(localMultiplayer)
-                .setCurrentPlayerNumber(0)
-                .setLastModified(444L)
-                .setIsGameOver(false)
-                .build();
+          public void onSuccess(Game game) {
             assertEquals(expected, game);
             helper.assertGameEquals(expected, FINISHED_RUNNABLE);
             if (localMultiplayer) {
@@ -77,30 +82,33 @@ public class NewGameServiceTest extends AsyncTestCase {
               helper.assertRequestIdEquals(REQUEST_ID, GAME_ID, FINISHED_RUNNABLE);
             }
           }
-        });
+        };
 
         when(mockTimeService.currentTimeMillis()).thenReturn(444L);
+        when(mockJoinGameService.joinGame(eq(0), eq(GAME_ID), eq(Optional.<Profile>absent())))
+            .thenReturn(Deferreds.newResolvedDeferred(expected));
 
         if (localMultiplayer) {
           newGameService.newLocalMultiplayerGameBuilder(GAME_ID)
               .addPlayers(ImmutableList.of(VIEWER_ID))
               .addProfiles(ImmutableList.of(VIEWER_PROFILE))
               .setViewerPlayerNumber(0)
-              .create();
+              .create()
+              .addSuccessHandler(successHandler);
         } else {
           newGameService.newGameBuilder(GAME_ID)
               .addPlayers(ImmutableList.of(VIEWER_ID))
               .addProfiles(ImmutableList.of(VIEWER_PROFILE))
               .setViewerPlayerNumber(0)
               .setRequestId(REQUEST_ID)
-              .create();
+              .create()
+              .addSuccessHandler(successHandler);
         }
       }
     });
     endAsyncTestBlock();
 
     TestHelper.verifyTrackedEvent(mockAnalyticsHandler);
-    verify(mockJoinGameService).joinGame(eq(0), eq(GAME_ID), eq(Optional.<Profile>absent()));
   }
 
   @Test
@@ -120,8 +128,7 @@ public class NewGameServiceTest extends AsyncTestCase {
     TestConfiguration.Builder builder = newTestConfig();
     builder.setFirebase(firebase);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -132,10 +139,13 @@ public class NewGameServiceTest extends AsyncTestCase {
             .addProfiles(ImmutableList.of(VIEWER_PROFILE))
             .setViewerPlayerNumber(0)
             .setRequestId(REQUEST_ID)
-            .create();
+            .create()
+            .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfig() {
