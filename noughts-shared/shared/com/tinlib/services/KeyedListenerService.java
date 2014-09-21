@@ -19,7 +19,8 @@ public class KeyedListenerService {
    * Adds a keyed ValueEventListener as in
    * {@link Firebase#addValueEventListener(com.firebase.client.ValueEventListener)}.
    */
-  public void addValueEventListener(final Firebase ref, String key, final ValueEventListener listener) {
+  public void addValueEventListener(final Firebase ref, String key,
+      final ValueEventListener listener) {
     unregisterValueListener(key);
     final ValueEventListener addedListener = ref.addValueEventListener(new ValueEventListener() {
       @Override

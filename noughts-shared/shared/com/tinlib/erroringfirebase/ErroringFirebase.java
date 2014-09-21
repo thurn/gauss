@@ -1,4 +1,4 @@
-package com.tinlib.test;
+package com.tinlib.erroringfirebase;
 
 import com.firebase.client.*;
 

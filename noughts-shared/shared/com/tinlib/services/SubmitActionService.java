@@ -8,6 +8,9 @@ import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.Deferred;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.Promise;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Action;
@@ -44,16 +47,20 @@ public class SubmitActionService {
     timeService = injector.get(TimeService.class);
   }
 
-  public void submitCurrentAction() {
+  public Promise<Void> submitCurrentAction() {
+    final Deferred<Void> result = Deferreds.newDeferred();
     bus.once(TinKeys.CURRENT_ACTION, new Subscriber1<Action>() {
       @Override
       public void onMessage(final Action currentAction) {
-        submitAction(currentAction);
+        result.chainFrom(submitAction(currentAction));
       }
     });
+    return result;
   }
 
-  public void submitAction(final Action action) {
+  public Promise<Void> submitAction(final Action action) {
+    final Deferred<Void> result = Deferreds.newDeferred();
+
     gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
       @Override
       public void mutate(String viewerId, Game.Builder game) {
@@ -88,13 +95,14 @@ public class SubmitActionService {
               @Override
               public void onComplete(FirebaseError error, Firebase firebase) {
                 if (error != null) {
-                  errorService.error("Error updating current action for game. %s", error);
+                  result.fail(errorService.error("Error updating current action for game. %s",
+                      error));
                 } else {
                   ImmutableMap<String, String> dimensions = ImmutableMap.of(
                       "viewerId", viewerId, "gameId", game.getId());
                   analyticsService.trackEvent("submitCurrentAction", dimensions);
                   sendNotificationOnActionSubmitted(viewerId, game);
-                  bus.post(TinKeys.SUBMIT_ACTION_COMPLETED);
+                  result.resolve();
                 }
               }
             }
@@ -103,9 +111,11 @@ public class SubmitActionService {
 
       @Override
       public void onError(String viewerId, FirebaseError error) {
-        errorService.error("Error submitting action. %s.", error);
+        result.fail(errorService.error("Error submitting action. %s.", error));
       }
     });
+
+    return result;
   }
 
   private void sendNotificationOnActionSubmitted(String viewerId, Game game) {

@@ -10,7 +10,7 @@ import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.IndexCommand;
-import com.tinlib.test.ErroringFirebase;
+import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.test.TestConfiguration;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;

@@ -48,27 +48,6 @@ public final class TinKeys {
       Keys.createKey(GameStatus.class, "GAME_STATUS");
 
   /**
-   * Fired when an action is submitted. The value will be the just-submitted
-   * {@link com.tinlib.generated.Action}.
-   */
-  public static final Key<Action> SUBMIT_ACTION_COMPLETED =
-      Keys.createKey(Action.class, "SUBMIT_ACTION_COMPLETED");
-
-  /**
-   * Fired when a command is undone. The value will be the undone
-   * {@link com.tinlib.generated.Command}.
-   */
-  public static final Key<Command> COMMAND_UNDO_COMPLETED =
-      Keys.createKey(Command.class, "COMMAND_UNDO_COMPLETED");
-
-  /**
-   * Fired when a command is redone. The value will be the redone
-   * {@link com.tinlib.generated.Command}.
-   */
-  public static final Key<Command> COMMAND_REDO_COMPLETED =
-      Keys.createKey(Command.class, "COMMAND_REDO_COMPLETED");
-
-  /**
    * Fired when a game is added to the game list. The value will be the
    * {@link com.tinlib.generated.IndexPath} at which the game was added.
    */
@@ -146,4 +125,7 @@ public final class TinKeys {
    */
   public static final Key<Game> GAME_OVER =
       Keys.createKey(Game.class, "GAME_OVER");
+
+  public static final Key<Void> AI_ACTION_SUBMITTED =
+      Keys.createVoidKey("AI_ACTION_SUBMITTED");
 }

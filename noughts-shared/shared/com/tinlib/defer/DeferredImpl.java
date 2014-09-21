@@ -165,7 +165,7 @@ class DeferredImpl<V> implements Deferred<V> {
     promise.addSuccessHandler(new SuccessHandler<V>() {
       @Override
       public void onSuccess(V value) {
-        resolve(value);
+        resolveOptional(Optional.fromNullable(value));
       }
     });
     promise.addFailureHandler(new FailureHandler() {

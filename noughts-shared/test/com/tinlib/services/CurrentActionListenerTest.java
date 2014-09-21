@@ -4,6 +4,7 @@ import com.firebase.client.Firebase;
 import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.generated.Action;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.test.*;

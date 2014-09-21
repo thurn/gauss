@@ -2,16 +2,19 @@ package com.tinlib.services;
 
 import com.firebase.client.Firebase;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.ImageString;
 import com.tinlib.generated.Profile;
-import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.*;
+import com.tinlib.erroringfirebase.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.util.Procedure;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
@@ -21,6 +24,9 @@ public class ProfileServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
+
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testSetProfileForViewer() {
@@ -37,15 +43,15 @@ public class ProfileServiceTest extends AsyncTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        helper.bus().once(TinKeys.SET_PROFILE_COMPLETED, new Subscriber1<Profile>() {
+        profileService.setProfileForViewer(testProfile).addSuccessHandler(
+            new SuccessHandler<Profile>() {
           @Override
-          public void onMessage(Profile completedViewerProfile) {
-            assertEquals(testProfile, completedViewerProfile);
+          public void onSuccess(Profile completedProfile) {
+            assertEquals(testProfile, completedProfile);
             Game expected = testGame.toBuilder().setProfile(0, testProfile).build();
             helper.assertGameEquals(expected, FINISHED_RUNNABLE);
           }
         });
-        profileService.setProfileForViewer(testProfile);
       }
     });
     endAsyncTestBlock();
@@ -61,8 +67,7 @@ public class ProfileServiceTest extends AsyncTestCase {
     builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.setCurrentGame(testGame);
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
@@ -72,10 +77,12 @@ public class ProfileServiceTest extends AsyncTestCase {
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        profileService.setProfileForViewer(testProfile);
+        profileService.setProfileForViewer(testProfile).addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   @Test
@@ -87,8 +94,7 @@ public class ProfileServiceTest extends AsyncTestCase {
         "runTransaction"));
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.setCurrentGame(testGame);
     builder.setCurrentAction(TestUtils.newEmptyAction(GAME_ID).build());
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
@@ -98,9 +104,11 @@ public class ProfileServiceTest extends AsyncTestCase {
         Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
-        profileService.setProfileForViewer(testProfile);
+        profileService.setProfileForViewer(testProfile).addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 }

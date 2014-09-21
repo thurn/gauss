@@ -94,7 +94,7 @@ public class AIServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         AIService aiService = new AIService(helper.injector());
-        helper.bus().await(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
+        helper.bus().once(TinKeys.AI_ACTION_SUBMITTED, new Subscriber0(){
           @Override
           public void onMessage() {
             Game expectedGame = testGame.toBuilder()

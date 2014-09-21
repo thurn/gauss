@@ -3,6 +3,7 @@ package com.tinlib.jgail.service;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;
@@ -47,9 +48,15 @@ public class AIService {
         ActionScore actionScore = agent.pickActionBlocking(currentGame.getCurrentPlayerNumber(),
             state);
         List<Command> commands = aiActionAdapter.adaptAction(actionScore.getAction());
-        Action.Builder action = Actions.newEmptyAction(currentGame.getId()).toBuilder();
+        final Action.Builder action = Actions.newEmptyAction(currentGame.getId()).toBuilder();
         addCommandService.addCommandsToAction(viewerId, currentGame, action, commands);
-        submitActionService.submitAction(action.build());
+        submitActionService.submitAction(action.build()).addSuccessHandler(
+            new SuccessHandler<Void>() {
+          @Override
+          public void onSuccess(Void value) {
+            bus.post(TinKeys.AI_ACTION_SUBMITTED);
+          }
+        });
       }
     });
   }

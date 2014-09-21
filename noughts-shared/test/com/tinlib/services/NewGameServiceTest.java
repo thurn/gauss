@@ -10,7 +10,7 @@ import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.Profile;
-import com.tinlib.test.ErroringFirebase;
+import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.test.TestConfiguration;
 import com.tinlib.test.TestHelper;
 import com.tinlib.test.TestUtils;

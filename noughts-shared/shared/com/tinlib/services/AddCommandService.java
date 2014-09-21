@@ -22,7 +22,6 @@ import com.tinlib.validator.ActionValidatorService;
 import java.util.List;
 
 public class AddCommandService {
-  private final Bus bus;
   private final ErrorService errorService;
   private final AnalyticsService analyticsService;
   private final GameMutator gameMutator;
@@ -30,7 +29,6 @@ public class AddCommandService {
   private final ActionValidatorService actionValidatorService;
 
   public AddCommandService(Injector injector) {
-    bus = injector.get(Bus.class);
     errorService = injector.get(ErrorService.class);
     analyticsService = injector.get(AnalyticsService.class);
     gameMutator = injector.get(GameMutator.class);

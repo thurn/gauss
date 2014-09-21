@@ -8,6 +8,7 @@ import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.convey.Subscriber0;

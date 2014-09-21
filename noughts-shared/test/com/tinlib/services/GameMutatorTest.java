@@ -1,6 +1,7 @@
 package com.tinlib.services;
 
 import com.tinlib.asynctest.AsyncTestCase;
+import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Command;
 import com.tinlib.generated.Game;

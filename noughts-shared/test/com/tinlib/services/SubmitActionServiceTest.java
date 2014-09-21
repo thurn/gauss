@@ -5,13 +5,15 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
-import com.tinlib.core.TinKeys;
+import com.tinlib.defer.SuccessHandler;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
-import com.tinlib.convey.Subscriber0;
 import com.tinlib.push.PushNotificationHandler;
-import com.tinlib.test.*;
+import com.tinlib.erroringfirebase.ErroringFirebase;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Procedure;
 import org.junit.Test;
@@ -41,6 +43,8 @@ public class SubmitActionServiceTest extends AsyncTestCase {
   private NextPlayerService mockNextPlayerService;
   @Mock
   private TimeService mockTimeService;
+  @Mock
+  private ErrorHandler mockErrorHandler;
 
   @Test
   public void testSubmitCurrentAction() {
@@ -60,13 +64,6 @@ public class SubmitActionServiceTest extends AsyncTestCase {
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
-          @Override
-          public void onMessage() {
-          helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
-          helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
-          }
-        });
 
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
@@ -74,7 +71,13 @@ public class SubmitActionServiceTest extends AsyncTestCase {
         when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(testAction)))
             .thenReturn(1);
 
-        submitService.submitCurrentAction();
+        submitService.submitCurrentAction().addSuccessHandler(new SuccessHandler<Void>() {
+          @Override
+          public void onSuccess(Void value) {
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
+          }
+        });
       }
     });
     endAsyncTestBlock();
@@ -102,19 +105,18 @@ public class SubmitActionServiceTest extends AsyncTestCase {
             .setIsGameOver(true)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
-          @Override
-          public void onMessage() {
-            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
-            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
-          }
-        });
 
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
             .thenReturn(Optional.<List<Integer>>of(ImmutableList.of(0)));
 
-        submitService.submitCurrentAction();
+        submitService.submitCurrentAction().addSuccessHandler(new SuccessHandler<Void>() {
+          @Override
+          public void onSuccess(Void value) {
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
+          }
+        });
       }
     });
     endAsyncTestBlock();
@@ -141,13 +143,6 @@ public class SubmitActionServiceTest extends AsyncTestCase {
             .setCurrentPlayerNumber(1)
             .build();
         final Action expectedAction = TestUtils.newEmptyAction(GAME_ID).build();
-        helper.bus().once(TinKeys.SUBMIT_ACTION_COMPLETED, new Subscriber0() {
-          @Override
-          public void onMessage() {
-            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
-            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
-          }
-        });
 
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(action)))
@@ -155,7 +150,13 @@ public class SubmitActionServiceTest extends AsyncTestCase {
         when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(action)))
             .thenReturn(1);
 
-        submitService.submitAction(action);
+        submitService.submitAction(action).addSuccessHandler(new SuccessHandler<Void>() {
+          @Override
+          public void onSuccess(Void value) {
+            helper.assertGameEquals(expectedGame, FINISHED_RUNNABLE);
+            helper.assertCurrentActionEquals(expectedAction, FINISHED_RUNNABLE);
+          }
+        });
       }
     });
     endAsyncTestBlock();
@@ -171,16 +172,17 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     final Action testAction = TestUtils.newEmptyAction(GAME_ID).build();
     TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
         SubmitActionService submitService = new SubmitActionService(helper.injector());
-        submitService.submitCurrentAction();
+        submitService.submitCurrentAction().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   @Test
@@ -203,8 +205,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestConfiguration.Builder builder = newTestConfig(testGame, testAction);
     builder.setFirebase(firebase);
     builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class,
-        TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -214,10 +215,12 @@ public class SubmitActionServiceTest extends AsyncTestCase {
             .thenReturn(Optional.<List<Integer>>absent());
         when(mockNextPlayerService.nextPlayerNumber(eq(testGame), eq(testAction)))
             .thenReturn(1);
-        submitService.submitCurrentAction();
+        submitService.submitCurrentAction().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
     endAsyncTestBlock();
+
+    TestHelper.verifyErrorHandled(mockErrorHandler);
   }
 
   private TestConfiguration.Builder newTestConfig(Game testGame, Action testAction) {
