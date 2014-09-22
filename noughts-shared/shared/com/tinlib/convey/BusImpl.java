@@ -3,6 +3,7 @@ package com.tinlib.convey;
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
+import com.tinlib.defer.Deferred;
 
 import java.util.Arrays;
 import java.util.List;
@@ -351,45 +352,45 @@ class BusImpl implements Bus {
   }
 
   @Override
-  public <A, B, C, D> void once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
-      Subscriber4<A, B, C, D> subscriber) {
-    once(one, two, three, four, ImmutableList.<Key<?>>of(), subscriber);
+  public <V, A, B, C, D> Deferred<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
+      Callback4<V, A, B, C, D> callback) {
+    return once(one, two, three, four, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, B, C, D> void once(final Key<A> one, final Key<B> two, final Key<C> three,
-      final Key<D> four, ImmutableList<Key<?>> rest, final Subscriber4<A, B, C, D> subscriber) {
-    once(keyList(rest, one, two, three, four), new Subscriber() {
+  public <V, A, B, C, D> Deferred<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
+      final Key<D> four, ImmutableList<Key<?>> rest, final Callback4<V, A, B, C, D> callback) {
+    return once(keyList(rest, one, two, three, four), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four));
+      public Deferred<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four));
       }
     });
   }
 
   @Override
-  public <A, B, C, D, E> void once(Key<A> one, Key<B> two, Key<C> three, Key<D> four, Key<E> five,
-      Subscriber5<A, B, C, D, E> subscriber) {
-    once(one, two, three, four, five, ImmutableList.<Key<?>>of(), subscriber);
+  public <V, A, B, C, D, E> Deferred<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
+      Key<E> five, Callback5<V, A, B, C, D, E> callback) {
+    return once(one, two, three, four, five, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, B, C, D, E> void once(final Key<A> one, final Key<B> two, final Key<C> three,
+  public <V, A, B, C, D, E> Deferred<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
       final Key<D> four, final Key<E> five, ImmutableList<Key<?>> rest,
-      final Subscriber5<A, B, C, D, E> subscriber) {
-    once(keyList(rest, one, two, three, four, five), new Subscriber() {
+      final Callback5<V, A, B, C, D, E> callback) {
+    return once(keyList(rest, one, two, three, four, five), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four),
-            (E)map.get(five));
+      public Deferred<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call((A)map.get(one), (B)map.get(two), (C)map.get(three),
+            (D)map.get(four), (E)map.get(five));
       }
     });
   }
 
   @Override
-  public synchronized void once(ImmutableList<Key<?>> keys, Subscriber subscriber) {
+  public synchronized <V> Deferred<V> once(ImmutableList<Key<?>> keys, Callback<V> subscriber) {
     new MessageHandler(true /* once */,  keys, subscriber);
   }
 
