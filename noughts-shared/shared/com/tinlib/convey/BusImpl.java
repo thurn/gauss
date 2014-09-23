@@ -4,6 +4,8 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.tinlib.defer.Deferred;
+import com.tinlib.defer.Deferreds;
+import com.tinlib.defer.Promise;
 
 import java.util.Arrays;
 import java.util.List;
@@ -42,16 +44,19 @@ class BusImpl implements Bus {
     }
   }
 
-  private class MessageHandler {
+  private class MessageHandler<V> {
     private final ImmutableList<Key<?>> keys;
     private final Map<Key<?>, Optional<?>> requirements = Maps.newHashMap();
     private final boolean once;
-    private final Subscriber subscriber;
+    private final Callback<V> callback;
+    private final Optional<Deferred<V>> deferred;
 
-    public MessageHandler(boolean once, ImmutableList<Key<?>> keys, Subscriber subscriber) {
+    public MessageHandler(boolean once, ImmutableList<Key<?>> keys, Optional<Deferred<V>> deferred,
+        Callback<V> callback) {
       this.once = once;
-      this.subscriber = subscriber;
+      this.callback = callback;
       this.keys = keys;
+      this.deferred = deferred;
 
       for (Key<?> key : keys) {
         if (producedValues.containsKey(key)) {
@@ -60,7 +65,7 @@ class BusImpl implements Bus {
       }
 
       if (allSatisfied()) {
-        subscriber.onMessage(realizeMap());
+        chainDeferred(callback.call(realizeMap()));
       }
 
       if (!(allSatisfied() && once)) {
@@ -73,10 +78,16 @@ class BusImpl implements Bus {
     public <T> Optional<Unsubscriber> handle(Key<T> key, Optional<T> object) {
       requirements.put(key, object);
       if (allSatisfied()) {
-        subscriber.onMessage(realizeMap());
+        chainDeferred(callback.call(realizeMap()));
         return once ? Optional.of(createUnsubscriber()) : Optional.<Unsubscriber>absent();
       }
       return Optional.absent();
+    }
+
+    private void chainDeferred(Promise<V> promise) {
+      if (deferred.isPresent()) {
+        deferred.get().chainFrom(promise);
+      }
     }
 
     public Unsubscriber createUnsubscriber() {
@@ -152,7 +163,7 @@ class BusImpl implements Bus {
 
   private synchronized <T> void fireHandlers(Key<T> key, Optional<T> value) {
     List<Unsubscriber> toRemove = Lists.newArrayList();
-    for (MessageHandler messageHandler : messageHandlers.get(key)) {
+    for (MessageHandler<?> messageHandler : messageHandlers.get(key)) {
       Optional<Unsubscriber> unsubscriber = messageHandler.handle(key, value);
       if (unsubscriber.isPresent()) {
         toRemove.add(unsubscriber.get());
@@ -278,111 +289,118 @@ class BusImpl implements Bus {
   }
 
   @Override
-  public synchronized Unsubscriber await(ImmutableList<Key<?>> keys, Subscriber subscriber) {
-    MessageHandler messageHandler = new MessageHandler(false /* once */, keys, subscriber);
+  public synchronized Unsubscriber await(ImmutableList<Key<?>> keys, final Subscriber subscriber) {
+    MessageHandler<Void> messageHandler = new MessageHandler<>(false /* once */, keys,
+    Optional.<Deferred<Void>>absent(), new Callback<Void>() {
+      @Override
+      public Promise<Void> call(ImmutableMap<Key<?>, Object> map) {
+        subscriber.onMessage(map);
+        return null;
+      }
+    });
     return messageHandler.createUnsubscriber();
   }
 
   @Override
-  public void once(Key<?> key, Subscriber0 subscriber) {
-    once(ImmutableList.<Key<?>>of(key),subscriber);
+  public <V> Promise<V> once(Key<?> key, Callback0<V> callback) {
+    return once(ImmutableList.<Key<?>>of(key), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public void once(ImmutableList<Key<?>> keys, final Subscriber0 subscriber) {
-    once(keyList(keys), new Subscriber() {
+  public <V> Promise<V> once(ImmutableList<Key<?>> keys, final Callback0<V> callback) {
+    return once(keyList(keys), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage();
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call();
       }
     });
   }
 
   @Override
-  public <A> void once(Key<A> one, Subscriber1<A> subscriber) {
-    once(one, ImmutableList.<Key<?>>of(), subscriber);
+  public <V, A> Promise<V> once(Key<A> one, Callback1<V, A> callback) {
+    return once(one, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A> void once(final Key<A> one, ImmutableList<Key<?>> rest,
-      final Subscriber1<A> subscriber) {
-    once(keyList(rest, one), new Subscriber() {
+  public <V, A> Promise<V> once(final Key<A> one, ImmutableList<Key<?>> rest,
+      final Callback1<V, A> callback) {
+    return once(keyList(rest, one), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one));
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call((A)map.get(one));
       }
     });
   }
 
   @Override
-  public <A, B> void once(Key<A> one, Key<B> two, Subscriber2<A, B> subscriber) {
-    once(one, two, ImmutableList.<Key<?>>of(), subscriber);
+  public <V, A, B> Promise<V> once(Key<A> one, Key<B> two, Callback2<V, A, B> callback) {
+    return once(one, two, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, B> void once(final Key<A> one, final Key<B> two, ImmutableList<Key<?>> rest,
-      final Subscriber2<A, B> subscriber) {
-    once(keyList(rest, one, two), new Subscriber() {
+  public <V, A, B> Promise<V> once(final Key<A> one, final Key<B> two, ImmutableList<Key<?>> rest,
+      final Callback2<V, A, B> callback) {
+    return once(keyList(rest, one, two), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two));
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call((A)map.get(one), (B)map.get(two));
       }
     });
   }
 
   @Override
-  public <A, B, C> void once(Key<A> one, Key<B> two, Key<C> three,
-      Subscriber3<A, B, C> subscriber) {
-    once(one, two, three, ImmutableList.<Key<?>>of(), subscriber);
+  public <V, A, B, C> Promise<V> once(Key<A> one, Key<B> two, Key<C> three,
+      Callback3<V, A, B, C> callback) {
+    return once(one, two, three, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A, B, C> void once(final Key<A> one, final Key<B> two, final Key<C> three,
-      ImmutableList<Key<?>> rest, final Subscriber3<A, B, C> subscriber) {
-    once(keyList(rest, one, two, three), new Subscriber() {
+  public <V, A, B, C> Promise<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
+      ImmutableList<Key<?>> rest, final Callback3<V, A, B, C> callback) {
+    return once(keyList(rest, one, two, three), new Callback<V>() {
       @Override
-      public void onMessage(ImmutableMap<Key<?>, Object> map) {
-        subscriber.onMessage((A)map.get(one), (B)map.get(two), (C)map.get(three));
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
+        return callback.call((A)map.get(one), (B)map.get(two), (C)map.get(three));
       }
     });
   }
 
   @Override
-  public <V, A, B, C, D> Deferred<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
+  public <V, A, B, C, D> Promise<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
       Callback4<V, A, B, C, D> callback) {
     return once(one, two, three, four, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V, A, B, C, D> Deferred<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
+  public <V, A, B, C, D> Promise<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
       final Key<D> four, ImmutableList<Key<?>> rest, final Callback4<V, A, B, C, D> callback) {
     return once(keyList(rest, one, two, three, four), new Callback<V>() {
       @Override
-      public Deferred<V> call(ImmutableMap<Key<?>, Object> map) {
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
         return callback.call((A)map.get(one), (B)map.get(two), (C)map.get(three), (D)map.get(four));
       }
     });
   }
 
   @Override
-  public <V, A, B, C, D, E> Deferred<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
+  public <V, A, B, C, D, E> Promise<V> once(Key<A> one, Key<B> two, Key<C> three, Key<D> four,
       Key<E> five, Callback5<V, A, B, C, D, E> callback) {
     return once(one, two, three, four, five, ImmutableList.<Key<?>>of(), callback);
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V, A, B, C, D, E> Deferred<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
+  public <V, A, B, C, D, E> Promise<V> once(final Key<A> one, final Key<B> two, final Key<C> three,
       final Key<D> four, final Key<E> five, ImmutableList<Key<?>> rest,
       final Callback5<V, A, B, C, D, E> callback) {
     return once(keyList(rest, one, two, three, four, five), new Callback<V>() {
       @Override
-      public Deferred<V> call(ImmutableMap<Key<?>, Object> map) {
+      public Promise<V> call(ImmutableMap<Key<?>, Object> map) {
         return callback.call((A)map.get(one), (B)map.get(two), (C)map.get(three),
             (D)map.get(four), (E)map.get(five));
       }
@@ -390,8 +408,10 @@ class BusImpl implements Bus {
   }
 
   @Override
-  public synchronized <V> Deferred<V> once(ImmutableList<Key<?>> keys, Callback<V> subscriber) {
-    new MessageHandler(true /* once */,  keys, subscriber);
+  public synchronized <V> Promise<V> once(ImmutableList<Key<?>> keys, Callback<V> callback) {
+    Deferred<V> result = Deferreds.newDeferred();
+    new MessageHandler<>(true /* once */,  keys, Optional.of(result), callback);
+    return result;
   }
 
   private ImmutableList<Key<?>> keyList(ImmutableList<Key<?>> rest, Key<?>... keys) {

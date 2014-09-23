@@ -5,6 +5,7 @@ import com.firebase.client.FirebaseError;
 import com.google.common.collect.ImmutableMap;
 import com.tinlib.analytics.AnalyticsService;
 import com.tinlib.convey.Bus;
+import com.tinlib.convey.Callback1;
 import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
 import com.tinlib.defer.Deferred;
@@ -26,9 +27,9 @@ public class ArchiveGameService{
 
   public Promise<Void> archiveGame(final String gameId) {
     final Deferred<Void> result = Deferreds.newDeferred();
-    bus.once(TinKeys.FIREBASE_REFERENCES, new Subscriber1<FirebaseReferences>() {
+    return bus.once(TinKeys.FIREBASE_REFERENCES, new Callback1<Void, FirebaseReferences>() {
       @Override
-      public void onMessage(FirebaseReferences references) {
+      public Promise<Void> call(FirebaseReferences references) {
         references.userReferenceForGame(gameId).removeValue(new Firebase.CompletionListener() {
           @Override
           public void onComplete(FirebaseError firebaseError, Firebase firebase) {
