@@ -14,6 +14,8 @@ import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
 import com.tinlib.infuse.*;
+import com.tinlib.jgail.service.AIActionAdapter;
+import com.tinlib.jgail.service.AIProvider;
 import com.tinlib.push.PushNotificationHandler;
 import com.tinlib.services.*;
 import com.tinlib.util.Procedure;
@@ -41,6 +43,10 @@ public class TestHelper implements CleanupFunction {
           Initializers.returnValue(mock(NextPlayerService.class)));
       binder.bindClass(GameOverService.class,
           Initializers.returnValue(mock(GameOverService.class)));
+      binder.bindClass(AIProvider.class,
+          Initializers.returnValue(mock(AIProvider.class)));
+      binder.bindClass(AIActionAdapter.class,
+          Initializers.returnValue(mock(AIActionAdapter.class)));
     }
   }
 

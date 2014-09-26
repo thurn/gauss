@@ -93,7 +93,7 @@ public class AIServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        AIService aiService = new AIService(helper.injector());
+        AIService aiService = helper.injector().get(AIService.class);
         helper.bus().once(TinKeys.AI_ACTION_SUBMITTED, new Subscriber0(){
           @Override
           public void onMessage() {

@@ -150,9 +150,6 @@ public class ErroringFirebase extends Firebase {
   }
 
   private boolean shouldError(String methodName) {
-    System.out.println("shouldError " + errorLocation + " methodName " + methodName + " toString " + super.toString() + " errorMethods " + errorMethods);
-    System.out.println("error location " + super.toString().contains(errorLocation));
-    System.out.println("error method " + errorMethods.contains(methodName));
     return (super.toString().contains(errorLocation)) && errorMethods.contains(methodName);
   }
 }

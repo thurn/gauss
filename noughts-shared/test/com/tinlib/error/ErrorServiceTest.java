@@ -35,7 +35,7 @@ public class ErrorServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ErrorService errorService = new ErrorService(helper.injector());
+        ErrorService errorService = helper.injector().get(ErrorService.class);
         errorService.error("Error %s", "Error arg");
       }
     });

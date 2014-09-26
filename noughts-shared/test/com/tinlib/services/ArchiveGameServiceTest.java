@@ -43,7 +43,7 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, config, new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
+        ArchiveGameService archiveGameService = helper.injector().get(ArchiveGameService.class);
 
         archiveGameService.archiveGame(GAME_ID).addSuccessHandler(new Runnable() {
           @Override
@@ -83,7 +83,7 @@ public class ArchiveGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ArchiveGameService archiveGameService = new ArchiveGameService(helper.injector());
+        ArchiveGameService archiveGameService = helper.injector().get(ArchiveGameService.class);
         archiveGameService.archiveGame(GAME_ID).addFailureHandler(FINISHED_RUNNABLE);
       }
     });

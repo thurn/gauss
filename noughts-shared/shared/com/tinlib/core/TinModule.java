@@ -2,6 +2,7 @@ package com.tinlib.core;
 
 import com.tinlib.convey.Bus;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.jgail.service.AIService;
 import com.tinlib.services.*;
 import com.tinlib.time.DefaultTimeService;
 import com.tinlib.time.TimeService;
@@ -132,5 +133,59 @@ public class TinModule implements Module {
     });
     binder.bindClass(TimeService.class,
         Initializers.<TimeService>returnValue(new DefaultTimeService()));
+    binder.bindClass(AIService.class, new Initializer<AIService>() {
+      @Override
+      public AIService initialize(Injector injector) {
+        return new AIService(injector);
+      }
+    });
+    binder.bindClass(ArchiveGameService.class, new Initializer<ArchiveGameService>() {
+      @Override
+      public ArchiveGameService initialize(Injector injector) {
+        return new ArchiveGameService(injector);
+      }
+    });
+    binder.bindClass(FacebookService.class, new Initializer<FacebookService>() {
+      @Override
+      public FacebookService initialize(Injector injector) {
+        return new FacebookService(injector);
+      }
+    });
+    binder.bindClass(GameListService.class, new Initializer<GameListService>() {
+      @Override
+      public GameListService initialize(Injector injector) {
+        return new GameListService(injector);
+      }
+    });
+    binder.bindClass(GameStatusListener.class, new Initializer<GameStatusListener>() {
+      @Override
+      public GameStatusListener initialize(Injector injector) {
+        return new GameStatusListener(injector);
+      }
+    });
+    binder.bindClass(NewGameService.class, new Initializer<NewGameService>() {
+      @Override
+      public NewGameService initialize(Injector injector) {
+        return new NewGameService(injector);
+      }
+    });
+    binder.bindClass(ProfileService.class, new Initializer<ProfileService>() {
+      @Override
+      public ProfileService initialize(Injector injector) {
+        return new ProfileService(injector);
+      }
+    });
+    binder.bindClass(ResignGameService.class, new Initializer<ResignGameService>() {
+      @Override
+      public ResignGameService initialize(Injector injector) {
+        return new ResignGameService(injector);
+      }
+    });
+    binder.bindClass(UndoService.class, new Initializer<UndoService>() {
+      @Override
+      public UndoService initialize(Injector injector) {
+        return new UndoService(injector);
+      }
+    });
   }
 }

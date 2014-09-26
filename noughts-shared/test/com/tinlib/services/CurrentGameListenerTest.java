@@ -36,7 +36,8 @@ public class CurrentGameListenerTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        final CurrentGameListener currentGameListener = new CurrentGameListener(helper.injector());
+        final CurrentGameListener currentGameListener =
+            helper.injector().get(CurrentGameListener.class);
         helper.bus().once(TinKeys.CURRENT_GAME_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String currentGameId) {
@@ -77,7 +78,7 @@ public class CurrentGameListenerTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        CurrentGameListener currentGameListener = new CurrentGameListener(helper.injector());
+        CurrentGameListener currentGameListener = helper.injector().get(CurrentGameListener.class);
         currentGameListener.loadGame(GAME_ID);
       }
     });

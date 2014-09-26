@@ -36,7 +36,6 @@ public class GameStatusListenerTest extends AsyncTestCase {
             finished();
           }
         });
-        GameStatusListener gameStatusListener = new GameStatusListener(helper.injector());
         helper.bus().produce(TinKeys.CURRENT_GAME, testGame);
       }
     });

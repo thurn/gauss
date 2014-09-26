@@ -32,8 +32,6 @@ public class CurrentActionListenerTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        final CurrentActionListener currentActionListener =
-            new CurrentActionListener(helper.injector());
         helper.bus().once(TinKeys.CURRENT_ACTION, new Subscriber1<Action>() {
           @Override
           public void onMessage(Action currentAction) {
@@ -63,7 +61,6 @@ public class CurrentActionListenerTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        CurrentActionListener currentActionListener = new CurrentActionListener(helper.injector());
         helper.bus().produce(TinKeys.CURRENT_GAME_ID, GAME_ID);
       }
     });

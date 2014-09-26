@@ -52,7 +52,7 @@ public class FacebookServiceTest extends AsyncTestCase {
         helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
-            FacebookService facebookService = new FacebookService(helper.injector());
+            FacebookService facebookService = helper.injector().get(FacebookService.class);
             facebookService.upgradeAccountToFacebook(FACEBOOK_ID).addSuccessHandler(new Runnable() {
               @Override
               public void run() {
@@ -127,7 +127,7 @@ public class FacebookServiceTest extends AsyncTestCase {
         helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber0() {
           @Override
           public void onMessage() {
-            FacebookService facebookService = new FacebookService(helper.injector());
+            FacebookService facebookService = helper.injector().get(FacebookService.class);
             facebookService.upgradeAccountToFacebook(FACEBOOK_ID)
                 .addFailureHandler(FINISHED_RUNNABLE);
           }

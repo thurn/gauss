@@ -35,7 +35,7 @@ public class GameMutatorTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameMutator gameMutator = new GameMutator(helper.injector());
+        GameMutator gameMutator = helper.injector().get(GameMutator.class);
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
           public void mutate(String viewerId, Game.Builder game) {
@@ -78,7 +78,7 @@ public class GameMutatorTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameMutator gameMutator = new GameMutator(helper.injector());
+        GameMutator gameMutator = helper.injector().get(GameMutator.class);
         gameMutator.mutateCurrentGame(new GameMutator.GameMutation() {
           @Override
           public void mutate(String viewerId, Game.Builder game) {
@@ -116,7 +116,7 @@ public class GameMutatorTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameMutator gameMutator = new GameMutator(helper.injector());
+        GameMutator gameMutator = helper.injector().get(GameMutator.class);
         gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
           @Override
           public void mutate(String viewerId, Action.Builder action, Game game) {
@@ -157,7 +157,7 @@ public class GameMutatorTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameMutator gameMutator = new GameMutator(helper.injector());
+        GameMutator gameMutator = helper.injector().get(GameMutator.class);
         gameMutator.mutateCurrentAction(new GameMutator.ActionMutation() {
           @Override
           public void mutate(String viewerId, Action.Builder action, Game game) {

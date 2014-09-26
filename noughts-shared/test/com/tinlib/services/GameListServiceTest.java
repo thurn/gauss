@@ -175,7 +175,7 @@ public class GameListServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameListService gameListService = new GameListService(helper.injector());
+        GameListService gameListService = helper.injector().get(GameListService.class);
       }
     });
     endAsyncTestBlock();
@@ -196,7 +196,7 @@ public class GameListServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        GameListService gameListService = new GameListService(helper.injector());
+        GameListService gameListService = helper.injector().get(GameListService.class);
         helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
@@ -221,7 +221,7 @@ public class GameListServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         testHelper = helper;
-        GameListService gameListService = new GameListService(helper.injector());
+        GameListService gameListService = helper.injector().get(GameListService.class);
         helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {

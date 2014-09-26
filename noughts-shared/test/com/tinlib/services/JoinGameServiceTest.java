@@ -74,7 +74,7 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        JoinGameService joinGameService = helper.injector().get(JoinGameService.class);
         SuccessHandler<Game> successHandler = new SuccessHandler<Game>() {
           @Override
           public void onSuccess(Game game) {
@@ -114,7 +114,7 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        JoinGameService joinGameService = helper.injector().get(JoinGameService.class);
         joinGameService
             .joinGame(1, GAME_ID, Optional.of(testProfile))
             .addFailureHandler(FINISHED_RUNNABLE);
@@ -138,7 +138,7 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        JoinGameService joinGameService = helper.injector().get(JoinGameService.class);
         joinGameService
             .joinGame(1, GAME_ID, Optional.of(testProfile))
             .addFailureHandler(FINISHED_RUNNABLE);
@@ -162,7 +162,7 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        JoinGameService joinGameService = helper.injector().get(JoinGameService.class);
         joinGameService
             .joinGame(1, GAME_ID, Optional.of(testProfile))
             .addFailureHandler(FINISHED_RUNNABLE);
@@ -186,7 +186,7 @@ public class JoinGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        JoinGameService joinGameService = new JoinGameService(helper.injector());
+        JoinGameService joinGameService = helper.injector().get(JoinGameService.class);
         joinGameService
             .joinGameFromRequestId(1, REQUEST_ID, Optional.of(testProfile))
             .addFailureHandler(FINISHED_RUNNABLE);

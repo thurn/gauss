@@ -52,7 +52,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        AddCommandService addCommandService = new AddCommandService(helper.injector());
+        AddCommandService addCommandService = helper.injector().get(AddCommandService.class);
         final Command.Builder testCommand = Command.newBuilder();
 
         addCommandService.addCommand(testCommand.build()).addSuccessHandler(
@@ -90,7 +90,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        new AddCommandService(helper.injector()).addCommand(Command.newBuilder().build())
+        helper.injector().get(AddCommandService.class).addCommand(Command.newBuilder().build())
             .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -111,7 +111,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        new AddCommandService(helper.injector()).addCommand(Command.newBuilder().build())
+        helper.injector().get(AddCommandService.class).addCommand(Command.newBuilder().build())
             .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -133,7 +133,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        AddCommandService addCommandService = new AddCommandService(helper.injector());
+        AddCommandService addCommandService = helper.injector().get(AddCommandService.class);
         final Command.Builder testCommand = Command.newBuilder();
 
         addCommandService.setCommand(0, testCommand.build()).addSuccessHandler(
@@ -168,7 +168,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build())
+        helper.injector().get(AddCommandService.class).setCommand(0, Command.newBuilder().build())
             .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -189,7 +189,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        new AddCommandService(helper.injector()).setCommand(0, Command.newBuilder().build())
+        helper.injector().get(AddCommandService.class).setCommand(0, Command.newBuilder().build())
             .addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -207,7 +207,7 @@ public class AddCommandServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        AddCommandService addCommandService = new AddCommandService(helper.injector());
+        AddCommandService addCommandService = helper.injector().get(AddCommandService.class);
         Action.Builder action = TestUtils.newEmptyAction(GAME_ID);
         List<Command> commands = ImmutableList.of(Command.newBuilder().setPlayerNumber(12).build());
         addCommandService.addCommandsToAction(VIEWER_ID, testGame, action, commands);
