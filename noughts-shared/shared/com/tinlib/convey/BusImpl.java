@@ -399,11 +399,4 @@ class BusImpl implements Bus {
         .addAll(Arrays.asList(keys))
         .build();
   }
-
-  @Override
-  public synchronized <T> void fail(Key<T> key) {
-    for (MessageHandler handler : messageHandlers.get(key)) {
-      handler.createUnsubscriber().unsubscribe();
-    }
-  }
 }

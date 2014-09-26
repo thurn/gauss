@@ -81,14 +81,4 @@ public interface Bus {
       ImmutableList<Key<?>> rest, Subscriber5<A, B, C, D, E> subscriber);
 
   public void once(ImmutableList<Key<?>> keys, Subscriber subscriber);
-
-  /**
-   * Indicates an unrecoverable error has occurred producing a key. All
-   * Subscribers waiting on this key will be removed. This should only
-   * be used if there is no possibility of the key being successfully produced
-   * again in the future.
-   *
-   * @param key The key which has experienced the error.
-   */
-  public <T> void fail(Key<T> key);
 }

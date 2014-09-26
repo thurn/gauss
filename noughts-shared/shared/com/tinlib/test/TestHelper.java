@@ -239,6 +239,7 @@ public class TestHelper implements CleanupFunction {
 
   @Override
   public void cleanUpAsync(final CountDownLatch countDownLatch) {
+    injector.get(KeyedListenerService.class).unregisterAll();
     new Firebase(FIREBASE_URL).removeValue(new Firebase.CompletionListener() {
       @Override
       public void onComplete(FirebaseError firebaseError, Firebase firebase) {

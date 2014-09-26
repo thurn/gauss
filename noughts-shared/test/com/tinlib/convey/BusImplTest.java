@@ -179,16 +179,4 @@ public class BusImplTest {
     bus.produce(intKey, 543, stringKey);
     assertTrue(fired.get());
   }
-
-  @Test
-  public void testFail() {
-    bus.once(intKey, new Subscriber1<Integer>() {
-      @Override
-      public void onMessage(Integer value1) {
-        fail("Expected onMessage to not run after failing key.");
-      }
-    });
-    bus.fail(intKey);
-    bus.produce(intKey, 22);
-  }
 }

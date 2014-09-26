@@ -1,9 +1,6 @@
 package com.tinlib.services;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.ValueEventListener;
+import com.firebase.client.*;
 import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
@@ -38,6 +35,10 @@ public class GameListServiceTest extends AsyncTestCase {
   private TestHelper testHelper;
   private GameList gameList;
 
+  private static interface OnAdd {
+    public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath);
+  }
+
   @Mock
   TimeService mockTimeService;
   @Mock
@@ -51,14 +52,12 @@ public class GameListServiceTest extends AsyncTestCase {
   }
 
   @Test
-  public void test() {}
-
-//  @Test
   public void testGameListAdd() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(IndexPath indexPath) {
+      public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath) {
         IndexPath expected = IndexPath.newBuilder()
             .setSection(GameList.YOUR_GAMES_SECTION)
             .setRow(0)
@@ -207,6 +206,34 @@ public class GameListServiceTest extends AsyncTestCase {
       }
     });
     endAsyncTestBlock();
+  }
+
+  private void runWithGame(final Game game, final OnAdd onAdd) {
+    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
+    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
+    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
+    builder.setFailOnError(false);
+    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
+    builder.bindInstance(TimeService.class, mockTimeService);
+    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
+    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
+      @Override
+      public void run(final TestHelper helper) {
+        helper.bus().once(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
+          @Override
+          public void onMessage(final GameList gameList) {
+            helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
+              @Override
+              public void onMessage(IndexPath indexPath) {
+                onAdd.onAdd(helper, gameList, indexPath);
+              }
+            });
+            helper.references().userReferenceForGame(GAME_ID).setValue(game.serialize());
+            helper.references().gameReference(GAME_ID).setValue(game.serialize());
+          }
+        });
+      }
+    });
   }
 
   private void addGame(final Procedure<IndexPath> onComplete) {
