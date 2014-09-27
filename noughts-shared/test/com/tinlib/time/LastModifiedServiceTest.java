@@ -40,7 +40,7 @@ public class LastModifiedServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
+        LastModifiedService lastModifiedService = helper.injector().get(LastModifiedService.class);
         when(mockTimeService.currentTimeMillis()).thenReturn(789L);
         helper.bus().once(TinKeys.CURRENT_GAME, new Subscriber1<Game>() {
           @Override
@@ -71,7 +71,7 @@ public class LastModifiedServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        LastModifiedService lastModifiedService = new LastModifiedService(helper.injector());
+        LastModifiedService lastModifiedService = helper.injector().get(LastModifiedService.class);
         lastModifiedService.updateLastModified(GAME_ID);
       }
     });

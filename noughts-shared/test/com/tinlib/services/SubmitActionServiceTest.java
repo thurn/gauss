@@ -56,7 +56,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        SubmitActionService submitService = helper.injector().get(SubmitActionService.class);
 
         final Game expectedGame = testGame.toBuilder()
             .addSubmittedAction(testAction.toBuilder().setIsSubmitted(true))
@@ -95,7 +95,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        SubmitActionService submitService = helper.injector().get(SubmitActionService.class);
 
         final Game expectedGame = testGame.toBuilder()
             .addSubmittedAction(testAction.toBuilder().setIsSubmitted(true))
@@ -134,7 +134,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        SubmitActionService submitService = helper.injector().get(SubmitActionService.class);
         Action action = TestUtils.newUnsubmittedActionWithCommand(GAME_ID).build();
 
         final Game expectedGame = testGame.toBuilder()
@@ -176,7 +176,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        SubmitActionService submitService = helper.injector().get(SubmitActionService.class);
         submitService.submitCurrentAction().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -209,7 +209,7 @@ public class SubmitActionServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        SubmitActionService submitService = new SubmitActionService(helper.injector());
+        SubmitActionService submitService = helper.injector().get(SubmitActionService.class);
         when(mockTimeService.currentTimeMillis()).thenReturn(456L);
         when(mockGameOverService.computeVictors(eq(testGame), eq(testAction)))
             .thenReturn(Optional.<List<Integer>>absent());

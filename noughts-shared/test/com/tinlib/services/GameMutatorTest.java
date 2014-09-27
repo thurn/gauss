@@ -42,8 +42,8 @@ public class GameMutatorTest extends AsyncTestCase {
             assertEquals(VIEWER_ID, viewerId);
             assertEquals(testGame, game.build());
             game.setIsGameOver(true);
-            game.setCurrentPlayerNumber(507);
-            game.addVictor(11);
+            game.setCurrentPlayerNumber(0);
+            game.addVictor(0);
           }
 
           @Override
@@ -51,8 +51,8 @@ public class GameMutatorTest extends AsyncTestCase {
               Game game) {
             assertEquals(VIEWER_ID, viewerId);
             assertTrue(game.getIsGameOver());
-            assertEquals(507, game.getCurrentPlayerNumber());
-            assertEquals(11, game.getVictor(0));
+            assertEquals(0, game.getCurrentPlayerNumber());
+            assertEquals(0, game.getVictor(0));
             finished();
           }
 

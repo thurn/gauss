@@ -45,7 +45,7 @@ public class ResignGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ResignGameService resignGameService = new ResignGameService(helper.injector());
+        ResignGameService resignGameService = helper.injector().get(ResignGameService.class);
 
         when(mockTimeService.currentTimeMillis()).thenReturn(777L);
 
@@ -100,7 +100,7 @@ public class ResignGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ResignGameService resignGameService = new ResignGameService(helper.injector());
+        ResignGameService resignGameService = helper.injector().get(ResignGameService.class);
         resignGameService.resignGame(GAME_ID).addFailureHandler(new FailureHandler() {
           @Override
           public void onError(RuntimeException exception) {

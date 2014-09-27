@@ -22,7 +22,7 @@ public class ViewerServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ViewerService viewerService = new ViewerService(helper.injector());
+        ViewerService viewerService = helper.injector().get(ViewerService.class);
 
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
@@ -64,7 +64,7 @@ public class ViewerServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ViewerService viewerService = new ViewerService(helper.injector());
+        ViewerService viewerService = helper.injector().get(ViewerService.class);
         helper.bus().once(TinKeys.VIEWER_ID, new Subscriber1<String>() {
           @Override
           public void onMessage(String viewerId) {

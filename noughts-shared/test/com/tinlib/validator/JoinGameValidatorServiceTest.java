@@ -24,7 +24,7 @@ public class JoinGameValidatorServiceTest extends AsyncTestCase {
       @Override
       public void run(final TestHelper helper) {
         JoinGameValidatorService joinGameValidatorService =
-            new JoinGameValidatorService(helper.injector());
+            helper.injector().get(JoinGameValidatorService.class);
         assertTrue(joinGameValidatorService.canJoinGame(VIEWER_ID,
             TestUtils.newGameWithOnePlayer("gameid").build()));
 

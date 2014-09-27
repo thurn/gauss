@@ -46,7 +46,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.undo().addSuccessHandler(new SuccessHandler<Command>() {
           @Override
           public void onSuccess(Command command) {
@@ -78,7 +78,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.undo().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -99,7 +99,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.undo().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -120,7 +120,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.redo().addSuccessHandler(new SuccessHandler<Command>() {
           @Override
           public void onSuccess(Command command) {
@@ -152,7 +152,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.redo().addFailureHandler(FINISHED_RUNNABLE);
       }
     });
@@ -175,7 +175,7 @@ public class UndoServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        UndoService undoService = new UndoService(helper.injector());
+        UndoService undoService = helper.injector().get(UndoService.class);
         undoService.redo().addFailureHandler(FINISHED_RUNNABLE);
       }
     });

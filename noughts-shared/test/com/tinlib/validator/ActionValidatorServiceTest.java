@@ -30,7 +30,7 @@ public class ActionValidatorServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ActionValidatorService validator = new ActionValidatorService(helper.injector());
+        ActionValidatorService validator = helper.injector().get(ActionValidatorService.class);
         Command command = Command.newBuilder().build();
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
         assertTrue(validator.canAddCommand(VIEWER_ID, game.build(),
@@ -63,7 +63,7 @@ public class ActionValidatorServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ActionValidatorService validator = new ActionValidatorService(helper.injector());
+        ActionValidatorService validator = helper.injector().get(ActionValidatorService.class);
         Command command = Command.newBuilder().build();
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
         assertFalse(validator.canSetCommand(VIEWER_ID, game.build(),
@@ -108,7 +108,7 @@ public class ActionValidatorServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ActionValidatorService validator = new ActionValidatorService(helper.injector());
+        ActionValidatorService validator = helper.injector().get(ActionValidatorService.class);
         Game.Builder game = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID);
         assertFalse(validator.canSubmitAction(VIEWER_ID, game.build(),
             TestUtils.newEmptyAction(GAME_ID).build()));

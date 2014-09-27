@@ -73,7 +73,7 @@ public class ProfileServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ProfileService profileService = new ProfileService(helper.injector());
+        ProfileService profileService = helper.injector().get(ProfileService.class);
         final Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();
@@ -100,7 +100,7 @@ public class ProfileServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        ProfileService profileService = new ProfileService(helper.injector());
+        ProfileService profileService = helper.injector().get(ProfileService.class);
         Profile testProfile = TestUtils.newTestProfile()
             .setImageString(ImageString.newBuilder().setString("foo"))
             .build();

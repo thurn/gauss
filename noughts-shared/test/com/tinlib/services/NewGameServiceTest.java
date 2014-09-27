@@ -70,7 +70,7 @@ public class NewGameServiceTest extends AsyncTestCase {
             .setIsGameOver(false)
             .build();
 
-        NewGameService newGameService = new NewGameService(helper.injector());
+        NewGameService newGameService = helper.injector().get(NewGameService.class);
         SuccessHandler<Game> successHandler = new SuccessHandler<Game>() {
           @Override
           public void onSuccess(Game game) {
@@ -132,7 +132,7 @@ public class NewGameServiceTest extends AsyncTestCase {
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
-        NewGameService newGameService = new NewGameService(helper.injector());
+        NewGameService newGameService = helper.injector().get(NewGameService.class);
         when(mockTimeService.currentTimeMillis()).thenReturn(444L);
         newGameService.newGameBuilder(GAME_ID)
             .addPlayers(ImmutableList.of(VIEWER_ID))
