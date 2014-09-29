@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -60,9 +59,7 @@ class DeferredImpl<V> implements Deferred<V> {
         successHandlers.add(handler);
         break;
       case RESOLVED:
-        if (value.isPresent()) {
-          handler.onSuccess(value.orNull());
-        }
+        handler.onSuccess(value.orNull());
         break;
       case FAILED:
         // Do nothing
@@ -125,7 +122,7 @@ class DeferredImpl<V> implements Deferred<V> {
     addSuccessHandler(new SuccessHandler<V>() {
       @Override
       public void onSuccess(V value) {
-        if (value == null) throw new NullPointerException();
+        Preconditions.checkNotNull(value);
         result.chainFrom(function.apply(value));
       }
     });
@@ -161,22 +158,6 @@ class DeferredImpl<V> implements Deferred<V> {
   }
 
   @Override
-  public void chainFrom(Promise<V> promise) {
-    promise.addSuccessHandler(new SuccessHandler<V>() {
-      @Override
-      public void onSuccess(V value) {
-        resolveOptional(Optional.fromNullable(value));
-      }
-    });
-    promise.addFailureHandler(new FailureHandler() {
-      @Override
-      public void onError(RuntimeException exception) {
-        fail(exception);
-      }
-    });
-  }
-
-  @Override
   public Promise<Void> then(final Runnable runnable) {
     final DeferredImpl<Void> result = new DeferredImpl<>();
     addSuccessHandler(new Runnable() {
@@ -194,4 +175,21 @@ class DeferredImpl<V> implements Deferred<V> {
     });
     return result;
   }
+
+  @Override
+  public void chainFrom(Promise<V> promise) {
+    promise.addSuccessHandler(new SuccessHandler<V>() {
+      @Override
+      public void onSuccess(V value) {
+        resolveOptional(Optional.fromNullable(value));
+      }
+    });
+    promise.addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        fail(exception);
+      }
+    });
+  }
+
 }

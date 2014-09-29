@@ -1,6 +1,3 @@
-TestHelper
-  - Get instances from injector instead of making them directly.
-
 EntityGenerator
   - Integrate it with the build process
   - Add support for extensions
@@ -11,12 +8,11 @@ EntityGenerator
 Defer
   - Tests
 
-GameList
-  - Fix the tests
-  - Rewrite the tests to rely less on storing junk in class fields
-
 General
   - Run tests from command line
   - Run coverage from command line
   - Build javadoc from command line
   - Run findbugs & check style from command line
+  - github continuous integration banners
+  - Add javadoc everywhere
+  - maven central releases
