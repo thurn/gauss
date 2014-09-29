@@ -1,25 +1,29 @@
 package com.tinlib.services;
 
-import com.firebase.client.*;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
 import com.tinlib.asynctest.AsyncTestCase;
+import com.tinlib.convey.Subscriber1;
 import com.tinlib.core.TinKeys;
 import com.tinlib.error.ErrorHandler;
+import com.tinlib.error.TinException;
 import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.generated.Game;
 import com.tinlib.generated.GameListEntry;
 import com.tinlib.generated.GameListUpdate;
 import com.tinlib.generated.IndexPath;
-import com.tinlib.convey.Subscriber1;
-import com.tinlib.test.*;
+import com.tinlib.test.TestConfiguration;
+import com.tinlib.test.TestHelper;
+import com.tinlib.test.TestUtils;
 import com.tinlib.time.TimeService;
 import com.tinlib.util.Procedure;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,13 +31,6 @@ public class GameListServiceTest extends AsyncTestCase {
   private static final String VIEWER_ID = TestUtils.newViewerId();
   private static final String VIEWER_KEY = TestUtils.newViewerKey();
   private static final String GAME_ID = TestUtils.newGameId();
-
-  private final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
-  private TestKeyedListenerService keyedListenerService;
-  private ChildEventListener childListener;
-  private ValueEventListener valueListener;
-  private TestHelper testHelper;
-  private GameList gameList;
 
   private static interface OnAdd {
     public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath);
@@ -45,11 +42,6 @@ public class GameListServiceTest extends AsyncTestCase {
   ErrorHandler mockErrorHandler;
   @Mock
   DataSnapshot mockDataSnapshot;
-
-  @Before
-  public void setup() {
-    keyedListenerService = new TestKeyedListenerService();
-  }
 
   @Test
   public void testGameListAdd() {
@@ -69,15 +61,14 @@ public class GameListServiceTest extends AsyncTestCase {
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGameListMove() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(IndexPath indexPath) {
-        valueListener.onDataChange(new FakeDataSnapshot(
-            testGame.toBuilder().setIsGameOver(true).build().serialize(), GAME_ID));
-        testHelper.bus().once(TinKeys.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
+      public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath) {
+        helper.bus().once(TinKeys.GAME_LIST_MOVE, new Subscriber1<GameListUpdate>() {
           @Override
           public void onMessage(GameListUpdate update) {
             IndexPath expectedFrom = IndexPath.newBuilder()
@@ -93,36 +84,40 @@ public class GameListServiceTest extends AsyncTestCase {
             finished();
           }
         });
+        helper.references().gameReference(GAME_ID).setValue(
+            testGame.toBuilder().setIsGameOver(true).build().serialize());
       }
     });
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGameListRemove() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(final IndexPath indexPath) {
-        childListener.onChildRemoved(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-        testHelper.bus().once(TinKeys.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
+      public void onAdd(TestHelper helper, GameList gameList, final IndexPath indexPath) {
+        helper.bus().once(TinKeys.GAME_LIST_REMOVE, new Subscriber1<IndexPath>() {
           @Override
           public void onMessage(IndexPath removePath) {
             assertEquals(indexPath, removePath);
             finished();
           }
         });
+        helper.references().userReferenceForGame(GAME_ID).removeValue();
       }
     });
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGetGameListEntry() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(IndexPath indexPath) {
+      public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath) {
         when(mockTimeService.currentTimeMillis()).thenReturn(333L);
         GameListEntry entry = gameList.getGameListEntry(indexPath.getSection(), indexPath.getRow());
         assertEquals("vs. Opponent", entry.getVsString());
@@ -132,12 +127,13 @@ public class GameListServiceTest extends AsyncTestCase {
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGetGameCountForSection() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(IndexPath indexPath) {
+      public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath) {
         assertEquals(1, gameList.gameCountForSection(GameList.YOUR_GAMES_SECTION));
         assertEquals(0, gameList.gameCountForSection(GameList.THEIR_GAMES_SECTION));
         assertEquals(0, gameList.gameCountForSection(GameList.GAME_OVER_SECTION));
@@ -147,20 +143,25 @@ public class GameListServiceTest extends AsyncTestCase {
     endAsyncTestBlock();
   }
 
-//  @Test(expected=TinException.class)
+  @Test
   public void testInvalidSectionError() {
     beginAsyncTestBlock();
-    addGame(new Procedure<IndexPath>() {
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
+    runWithGame(testGame, new OnAdd() {
       @Override
-      public void run(IndexPath indexPath) {
-        gameList.getGameListEntry(117, 0);
-        finished();
+      public void onAdd(TestHelper helper, GameList gameList, IndexPath indexPath) {
+        try {
+          gameList.getGameListEntry(117, 0);
+          fail("Expected exception");
+        } catch (TinException exception) {
+          finished();
+        }
       }
     });
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGameListChildListenerError() {
     beginAsyncTestBlock();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
@@ -180,9 +181,10 @@ public class GameListServiceTest extends AsyncTestCase {
     endAsyncTestBlock();
   }
 
-//  @Test
+  @Test
   public void testGameListValueListenerError() {
     beginAsyncTestBlock();
+    final Game testGame = TestUtils.newGameWithTwoPlayers(VIEWER_ID, GAME_ID).build();
     TestConfiguration.Builder builder = TestConfiguration.newBuilder();
     builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
     builder.bindInstance(TimeService.class, mockTimeService);
@@ -191,7 +193,6 @@ public class GameListServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class,
         TestHelper.finishedErrorHandler(FINISHED_RUNNABLE));
-    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -199,8 +200,7 @@ public class GameListServiceTest extends AsyncTestCase {
         helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
           @Override
           public void onMessage(GameList list) {
-            childListener = keyedListenerService.getChildEventListenerForKey(GameList.LISTENER_KEY);
-            childListener.onChildAdded(new FakeDataSnapshot(testGame.serialize(), GAME_ID), "");
+            helper.references().userReferenceForGame(GAME_ID).setValue(testGame.serialize());
           }
         });
       }
@@ -215,7 +215,6 @@ public class GameListServiceTest extends AsyncTestCase {
     builder.setFailOnError(false);
     builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
     builder.bindInstance(TimeService.class, mockTimeService);
-    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
     TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
       @Override
       public void run(final TestHelper helper) {
@@ -230,40 +229,6 @@ public class GameListServiceTest extends AsyncTestCase {
             });
             helper.references().userReferenceForGame(GAME_ID).setValue(game.serialize());
             helper.references().gameReference(GAME_ID).setValue(game.serialize());
-          }
-        });
-      }
-    });
-  }
-
-  private void addGame(final Procedure<IndexPath> onComplete) {
-    TestConfiguration.Builder builder = TestConfiguration.newBuilder();
-    builder.setAnonymousViewer(VIEWER_ID, VIEWER_KEY);
-    builder.setFirebase(new Firebase(TestHelper.FIREBASE_URL));
-    builder.setFailOnError(false);
-    builder.multibindInstance(ErrorHandler.class, mockErrorHandler);
-    builder.bindInstance(TimeService.class, mockTimeService);
-    builder.bindInstance(KeyedListenerService.class, keyedListenerService);
-    TestHelper.runTest(this, builder.build(), new Procedure<TestHelper>() {
-      @Override
-      public void run(final TestHelper helper) {
-        testHelper = helper;
-        GameListService gameListService = helper.injector().get(GameListService.class);
-        helper.bus().await(TinKeys.GAME_LIST, new Subscriber1<GameList>() {
-          @Override
-          public void onMessage(GameList list) {
-            gameList = list;
-            childListener = keyedListenerService.getChildEventListenerForKey(GameList.LISTENER_KEY);
-            childListener.onChildAdded(new FakeDataSnapshot(testGame.serialize(), GAME_ID), "");
-            valueListener =
-                keyedListenerService.getValueEventListenerForKey(GameList.LISTENER_KEY + GAME_ID);
-            valueListener.onDataChange(new FakeDataSnapshot(testGame.serialize(), GAME_ID));
-            helper.bus().once(TinKeys.GAME_LIST_ADD, new Subscriber1<IndexPath>() {
-              @Override
-              public void onMessage(IndexPath indexPath) {
-                onComplete.run(indexPath);
-              }
-            });
           }
         });
       }

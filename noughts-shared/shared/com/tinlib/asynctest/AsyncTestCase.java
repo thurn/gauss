@@ -64,7 +64,7 @@ public abstract class AsyncTestCase {
     try {
       boolean result = countDownLatch.await(timeoutSeconds, TimeUnit.SECONDS);
       if (throwableToPropagate.isPresent()) {
-        throw new RuntimeException(throwableToPropagate.get());
+        propagate(throwableToPropagate.get());
       }
       throwableToPropagate = Optional.absent();
       if (!result) {
@@ -95,7 +95,7 @@ public abstract class AsyncTestCase {
     try {
       boolean result = latch.get().await(timeoutSeconds, TimeUnit.SECONDS);
       if (throwableToPropagate.isPresent()) {
-        throw new RuntimeException(throwableToPropagate.get());
+        propagate(throwableToPropagate.get());
       }
       throwableToPropagate = Optional.absent();
       if (!result) {
@@ -107,6 +107,14 @@ public abstract class AsyncTestCase {
       throw new RuntimeException(exception);
     } finally {
       latch = Optional.absent();
+    }
+  }
+
+  private void propagate(Throwable throwable) {
+    if (throwable instanceof RuntimeException) {
+      throw (RuntimeException)throwable;
+    } else {
+      throw new RuntimeException(throwable);
     }
   }
 
