@@ -1,14 +1,14 @@
 package com.tinlib.defer;
 
+import com.google.common.base.Function;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DeferredImplTest {
@@ -94,18 +94,119 @@ public class DeferredImplTest {
     assertTrue(completeRan.get());
   }
 
+  @Test
+  public void testAddAfterFail() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> deferred = Deferreds.newDeferred();
+    deferred.fail(new RuntimeException());
+    deferred.addFailureHandler(new Runnable() {
+      @Override
+      public void run() {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testGetState() {
+    Deferred<Void> deferred = Deferreds.newDeferred();
+    assertEquals(Promise.State.PENDING, deferred.getState());
+    deferred.resolve();
+    assertEquals(Promise.State.RESOLVED, deferred.getState());
+    Deferred<Void> deferred2 = Deferreds.newDeferred();
+    deferred2.fail(new RuntimeException());
+    assertEquals(Promise.State.FAILED, deferred2.getState());
+  }
+
+  @Test
+  public void testThenFunction() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<String> deferred = Deferreds.newDeferred();
+    final Deferred<String> two = Deferreds.newDeferred();
+    Promise<String> result = deferred.then(new Function<String, Promise<String>>() {
+      @Override
+      public Promise<String> apply(String s) {
+        assertEquals("one", s);
+        return two;
+      }
+    });
+    result.addSuccessHandler(new SuccessHandler<String>() {
+      @Override
+      public void onSuccess(String value) {
+        assertEquals("two", value);
+        ran.set(true);
+      }
+    });
+    deferred.resolve("one");
+    two.resolve("two");
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testThenCallableFail() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> deferred = Deferreds.newDeferred();
+    final Deferred<String> two = Deferreds.newDeferred();
+    Promise<String> result = deferred.then(new Callable<Promise<String>>() {
+      @Override
+      public Promise<String> call() throws Exception {
+        return two;
+      }
+    });
+    result.addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        ran.set(true);
+      }
+    });
+    deferred.fail(new RuntimeException());
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testThenRunnable() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> deferred = Deferreds.newDeferred();
+    Promise<Void> result = deferred.then(new Runnable() {
+      @Override
+      public void run() {
+        ran.set(true);
+      }
+    });
+    result.addSuccessHandler(new Runnable() {
+      @Override
+      public void run() {
+        ran.set(true);
+      }
+    });
+    deferred.resolve();
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testChainFrom() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> parent = Deferreds.newDeferred();
+    Deferred<Void> child = Deferreds.newDeferred();
+    child.chainFrom(parent);
+    child.addSuccessHandler(new Runnable() {
+      @Override
+      public void run() {
+        ran.set(true);
+      }
+    });
+    parent.resolve();
+    assertTrue(ran.get());
+  }
+
 /*
-- resolve()
-- completion handlers
-- add success handler after success
-- runnable success handler
-- add failure handler after failure
-- runnable failure handler
-- getState()
-- then(Function)
-- then(Callable)
-- then(Runnable)
-- chainFrom(Promise)
+completion handler on failed
+then callable success
+then callable exception
+then runnable failure
+add failure handler to resolved - no exceptions
+add success handler to failed - no exceptions
 */
 
 }
