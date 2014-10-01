@@ -50,22 +50,14 @@ public abstract class Entity<T extends Entity<T>> {
 
     @Override
     public int hashCode() {
-      return getInternalEntity().serialize().hashCode();
+      return getInternalEntity().hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-      if (this == object) {
-        return true;
-      }
-      if (object == null) {
-        return false;
-      }
-      if (getClass() != object.getClass()) {
-        return false;
-      }
-      EntityBuilder<?> other = (EntityBuilder<?>)object;
-      return getInternalEntity().serialize().equals(other.getInternalEntity().serialize());
+      if (this == object) return true;
+      if (object == null || !(object instanceof EntityBuilder)) return false;
+      return getInternalEntity().equals(((EntityBuilder<?>)object).getInternalEntity());
     }
   }
 

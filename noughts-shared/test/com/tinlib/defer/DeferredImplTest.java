@@ -200,13 +200,61 @@ public class DeferredImplTest {
     assertTrue(ran.get());
   }
 
-/*
-completion handler on failed
-then callable success
-then callable exception
-then runnable failure
-add failure handler to resolved - no exceptions
-add success handler to failed - no exceptions
-*/
+  @Test
+  public void testFailedCompletionHandler() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> deferred = Deferreds.newDeferred();
+    deferred.addCompletionHandler(new Runnable() {
+      @Override
+      public void run() {
+        ran.set(true);
+      }
+    });
+    deferred.fail(new RuntimeException());
+    assertTrue(ran.get());
+  }
 
+  @Test
+  public void testThenCallableSuccess() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    Deferred<Void> one = Deferreds.newDeferred();
+    final Deferred<String> two = Deferreds.newDeferred();
+    Promise<String> result = one.then(new Callable<Promise<String>>() {
+      @Override
+      public Promise<String> call() throws Exception {
+        return two;
+      }
+    });
+    result.addSuccessHandler(new SuccessHandler<String>() {
+      @Override
+      public void onSuccess(String value) {
+        assertEquals("foo", value);
+        ran.set(true);
+      }
+    });
+    two.resolve("foo");
+    one.resolve();
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testNoExceptionsAddHandlers() {
+    Deferred<Void> one = Deferreds.newDeferred();
+    one.resolve();
+    one.addFailureHandler(new FailureHandler() {
+      @Override
+      public void onError(RuntimeException exception) {
+        fail("Failure handler should not be invoked.");
+      }
+    });
+
+    Deferred<Void> two = Deferreds.newDeferred();
+    two.fail(new RuntimeException());
+    two.addSuccessHandler(new Runnable() {
+      @Override
+      public void run() {
+        fail("Success handler should not be invoked");
+      }
+    });
+  }
 }
