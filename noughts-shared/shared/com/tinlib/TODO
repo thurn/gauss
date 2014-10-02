@@ -1,7 +1,8 @@
-EntityGenerator
+Beget
   - Integrate it with the build process
   - Add support for extensions
   - Add support for packages
+  - Add support for subclassing
   - Generally clean up the code
   - tests
 
@@ -16,3 +17,4 @@ General
   - github continuous integration banners
   - Add javadoc everywhere
   - maven central releases
+  - import utility tests (GamesTest & co)

@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 public class ErroringFirebase extends Firebase {
-  private final FirebaseError error = new FirebaseError(0, "");
+  private final FirebaseError error = new FirebaseError(FirebaseError.USER_CODE_EXCEPTION,
+      "ErroringFirebase Error");
   private final String errorLocation;
   private final Set<String> errorMethods;
 
