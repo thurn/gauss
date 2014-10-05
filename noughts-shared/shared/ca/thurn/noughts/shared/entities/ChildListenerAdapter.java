@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared.entities;
 
 import com.tinlib.beget.Entity;
+import com.tinlib.entities.FirebaseDeserializer;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -29,21 +30,24 @@ public final class ChildListenerAdapter<T extends Entity<T>>
 
   @Override
   public final void onChildAdded(DataSnapshot snapshot, String previousChildName) {
-    listener.onChildAdded(deserializer.fromDataSnapshot(snapshot), previousChildName);
+    listener.onChildAdded(FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot),
+        previousChildName);
   }
 
   @Override
   public final void onChildChanged(DataSnapshot snapshot, String previousChildName) {
-    listener.onChildChanged(deserializer.fromDataSnapshot(snapshot), previousChildName);
+    listener.onChildChanged(FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot),
+        previousChildName);
   }
 
   @Override
   public final void onChildMoved(DataSnapshot snapshot, String previousChildName) {
-    listener.onChildMoved(deserializer.fromDataSnapshot(snapshot), previousChildName);
+    listener.onChildMoved(FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot),
+        previousChildName);
   }
 
   @Override
   public final void onChildRemoved(DataSnapshot snapshot) {
-    listener.onChildRemoved(deserializer.fromDataSnapshot(snapshot));
+    listener.onChildRemoved(FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot));
   }
 }

@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared.entities;
 
 import com.tinlib.beget.Entity;
+import com.tinlib.entities.FirebaseDeserializer;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -28,6 +29,6 @@ public final class ValueListenerAdapter<T extends Entity<T>> implements ValueEve
 
   @Override
   public void onDataChange(DataSnapshot snapshot) {
-    listener.onUpdate(deserializer.fromDataSnapshot(snapshot));
+    listener.onUpdate(FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot));
   }
 }

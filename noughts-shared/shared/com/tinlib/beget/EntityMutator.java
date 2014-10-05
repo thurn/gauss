@@ -1,6 +1,7 @@
 package com.tinlib.beget;
 
 import com.firebase.client.*;
+import com.tinlib.entities.FirebaseDeserializer;
 
 public class EntityMutator {
   public static interface Mutation<E extends Entity<E>, B extends Entity.EntityBuilder<E>> {
@@ -24,7 +25,7 @@ public class EntityMutator {
         // This is safe for the default implementations -- toBuilder always
         // returns the associated builder type.
         @SuppressWarnings("unchecked")
-        B builder = (B)deserializer.fromMutableData(mutableData).toBuilder();
+        B builder = (B)FirebaseDeserializer.fromMutableData(deserializer, mutableData).toBuilder();
         mutation.mutate(builder);
         mutableData.setValue(builder.build().serialize());
         return Transaction.success(mutableData);
@@ -37,7 +38,7 @@ public class EntityMutator {
             System.err.println("+++++ null data snapshot +++++++");
             return;
           }
-          mutation.onComplete(deserializer.fromDataSnapshot(dataSnapshot));
+          mutation.onComplete(FirebaseDeserializer.fromDataSnapshot(deserializer, dataSnapshot));
         } else {
           mutation.onError(error, committed);
         }

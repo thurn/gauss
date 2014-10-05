@@ -1,6 +1,7 @@
 package ca.thurn.noughts.shared.entities;
 
 import com.tinlib.beget.Entity;
+import com.tinlib.entities.FirebaseDeserializer;
 import org.timepedia.exporter.client.Export;
 import org.timepedia.exporter.client.ExportPackage;
 import org.timepedia.exporter.client.Exportable;
@@ -31,7 +32,7 @@ public final class PreviousValueListenerAdapter<T extends Entity<T>>
 
   @Override
   public final void onDataChange(DataSnapshot snapshot) {
-    T entity = deserializer.fromDataSnapshot(snapshot);
+    T entity = FirebaseDeserializer.fromDataSnapshot(deserializer, snapshot);
     if (previousValue == null) {
       listener.onInitialValue(entity);
     } else {

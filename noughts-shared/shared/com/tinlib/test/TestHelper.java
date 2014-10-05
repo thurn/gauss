@@ -10,6 +10,7 @@ import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.asynctest.CleanupFunction;
 import com.tinlib.convey.Bus;
 import com.tinlib.core.TinModule;
+import com.tinlib.entities.FirebaseDeserializer;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.generated.Action;
 import com.tinlib.generated.Game;
@@ -162,7 +163,8 @@ public class TestHelper implements CleanupFunction {
         new ValueEventListener() {
           @Override
           public void onDataChange(DataSnapshot dataSnapshot) {
-            assertEquals(game, Game.newDeserializer().fromDataSnapshot(dataSnapshot));
+            assertEquals(game,
+                FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), dataSnapshot));
             runnable.run();
           }
 
@@ -178,7 +180,8 @@ public class TestHelper implements CleanupFunction {
         new ValueEventListener() {
           @Override
           public void onDataChange(DataSnapshot dataSnapshot) {
-            assertEquals(action, Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+            assertEquals(action,
+                FirebaseDeserializer.fromDataSnapshot(Action.newDeserializer(), dataSnapshot));
             runnable.run();
           }
 

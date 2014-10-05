@@ -6,9 +6,6 @@ Beget
   - Generally clean up the code
   - tests
 
-Defer
-  - Tests
-
 General
   - Run tests from command line
   - Run coverage from command line

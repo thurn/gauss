@@ -6,6 +6,7 @@ import com.firebase.client.ValueEventListener;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
+import com.tinlib.entities.FirebaseDeserializer;
 import com.tinlib.error.ErrorService;
 import com.tinlib.generated.Action;
 import com.tinlib.infuse.Injector;
@@ -55,7 +56,8 @@ public class CurrentActionListener implements Subscriber2<FirebaseReferences, St
       @Override
       public void onDataChange(DataSnapshot dataSnapshot) {
         if (dataSnapshot.getValue() != null) {
-          Action currentAction = Action.newDeserializer().fromDataSnapshot(dataSnapshot);
+          Action currentAction = FirebaseDeserializer.fromDataSnapshot(Action.newDeserializer(),
+              dataSnapshot);
           bus.produce(TinKeys.CURRENT_ACTION, currentAction, TinKeys.CURRENT_GAME_ID);
         }
       }

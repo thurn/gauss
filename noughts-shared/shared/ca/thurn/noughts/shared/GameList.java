@@ -1,19 +1,19 @@
 package ca.thurn.noughts.shared;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import ca.thurn.noughts.shared.entities.AbstractValueEventListener;
 import ca.thurn.noughts.shared.entities.ChildListener;
-import com.tinlib.generated.Game;
-
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.tinlib.entities.FirebaseDeserializer;
+import com.tinlib.generated.Game;
 import com.tinlib.services.FirebaseReferences;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class GameList implements ChildEventListener {
   private final FirebaseReferences firebaseReferences;
@@ -64,7 +64,7 @@ public class GameList implements ChildEventListener {
     addGameValueListener(snapshot, new AbstractValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
-        Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+        Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), snapshot);
         games.put(game.getId(), game);
         for (ChildListener<Game> childListener : listeners) {
           childListener.onChildAdded(game, previous);
@@ -78,7 +78,7 @@ public class GameList implements ChildEventListener {
     addGameValueListener(snapshot, new AbstractValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
-        Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+        Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), snapshot);
         games.put(game.getId(), game);
         for (ChildListener<Game> childListener : listeners) {
           childListener.onChildChanged(game, previous);
@@ -92,7 +92,7 @@ public class GameList implements ChildEventListener {
     addGameValueListener(snapshot, new AbstractValueEventListener() {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
-        Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+        Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), snapshot);
         games.put(game.getId(), game);
         for (ChildListener<Game> childListener : listeners) {
           childListener.onChildMoved(game, previous);

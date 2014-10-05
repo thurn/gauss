@@ -22,19 +22,19 @@ public abstract class Entity<T extends Entity<T>> {
      */
     public abstract T deserialize(Map<String, Object> map);
 
-    @SuppressWarnings("unchecked")
-    public T fromDataSnapshot(DataSnapshot snapshot) {
-      Preconditions.checkNotNull(snapshot.getValue());
-      Map<String, Object> map = (Map<String, Object>)snapshot.getValue();
-      return deserialize(map);
-    }
-
-    @SuppressWarnings("unchecked")
-    public T fromMutableData(MutableData data) {
-      Preconditions.checkNotNull(data.getValue());
-      Map<String, Object> map = (Map<String, Object>)data.getValue();
-      return deserialize(map);
-    }
+//    @SuppressWarnings("unchecked")
+//    public T fromDataSnapshot(DataSnapshot snapshot) {
+//      Preconditions.checkNotNull(snapshot.getValue());
+//      Map<String, Object> map = (Map<String, Object>)snapshot.getValue();
+//      return deserialize(map);
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    public T fromMutableData(MutableData data) {
+//      Preconditions.checkNotNull(data.getValue());
+//      Map<String, Object> map = (Map<String, Object>)data.getValue();
+//      return deserialize(map);
+//    }
   }
 
   public static abstract class EntityBuilder<T extends Entity<T>> {

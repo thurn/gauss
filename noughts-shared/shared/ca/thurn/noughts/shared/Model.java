@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import javax.annotation.Nullable;
 
 import ca.thurn.noughts.shared.entities.AbstractChildEventListener;
+import com.tinlib.entities.FirebaseDeserializer;
 import com.tinlib.util.Games;
 import com.tinlib.infuse.Injector;
 import com.tinlib.analytics.AnalyticsService;
@@ -233,7 +234,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
       @Override
       public void onDataChange(DataSnapshot snapshot) {
         if (snapshot.getValue() != null) {
-          Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+          Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), snapshot);
           Game oldGame = games.get(game.getId());
           games.put(game.getId(), game);
           fireListeners(game, oldGame);
@@ -889,7 +890,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
 
       @Override
       public void onDataChange(DataSnapshot snapshot) {
-        Game game = Game.newDeserializer().fromDataSnapshot(snapshot);
+        Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), snapshot);
         if (game.getPlayerList().contains(userId)) {
           // Viewer has already joined
           callbacks.onJoinedGame(game);
@@ -1171,7 +1172,7 @@ public class Model extends AbstractChildEventListener implements Exportable {
         if (data.getValue() == null) {
           return Transaction.success(data);
         }
-        Game game = Game.newDeserializer().fromMutableData(data);
+        Game game = FirebaseDeserializer.fromMutableData(Game.newDeserializer(), data);
         if (original != null && !original.equals(game) && abortOnConflict) {
           System.out.println("\naborting on conflict");
           System.out.println("\noriginal " + original);
@@ -1187,7 +1188,8 @@ public class Model extends AbstractChildEventListener implements Exportable {
       @Override
       public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
         if (snapshot != null && snapshot.getValue() != null) {
-          mutation.onComplete(Game.newDeserializer().fromDataSnapshot(snapshot));
+          mutation.onComplete(FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(),
+              snapshot));
         }
       }
     });
@@ -1200,7 +1202,8 @@ public class Model extends AbstractChildEventListener implements Exportable {
         if (data.getValue() == null) {
           return Transaction.success(data);
         }
-        Action.Builder action = Action.newDeserializer().fromMutableData(data).toBuilder();
+        Action.Builder action = FirebaseDeserializer.fromMutableData(Action.newDeserializer(), data)
+            .toBuilder();
         mutation.mutate(action);
         data.setValue(action.build().serialize());
         return Transaction.success(data);
@@ -1209,7 +1212,8 @@ public class Model extends AbstractChildEventListener implements Exportable {
       @Override
       public void onComplete(FirebaseError error, boolean done, DataSnapshot snapshot) {
         if (snapshot.getValue() != null) {
-          mutation.onComplete(Action.newDeserializer().fromDataSnapshot(snapshot));
+          mutation.onComplete(FirebaseDeserializer.fromDataSnapshot(Action.newDeserializer(),
+              snapshot));
         }
       }
     });

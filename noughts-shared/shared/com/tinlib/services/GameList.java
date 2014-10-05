@@ -7,6 +7,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.tinlib.convey.Bus;
 import com.tinlib.core.TinKeys;
+import com.tinlib.entities.FirebaseDeserializer;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;
@@ -48,7 +49,7 @@ public class GameList {
         public void onDataChange(DataSnapshot dataSnapshot) {
           listLock.lock();
           try {
-            Game game = Game.newDeserializer().fromDataSnapshot(dataSnapshot);
+            Game game = FirebaseDeserializer.fromDataSnapshot(Game.newDeserializer(), dataSnapshot);
             Optional<IndexPath> location = findGame(game.getId());
             IndexPath destination = destinationForGame(game);
             if (location.isPresent()) {

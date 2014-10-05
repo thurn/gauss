@@ -7,6 +7,7 @@ import com.firebase.client.ValueEventListener;
 import com.tinlib.analytics.AnalyticsHandler;
 import com.tinlib.asynctest.AsyncTestCase;
 import com.tinlib.core.TinKeys;
+import com.tinlib.entities.FirebaseDeserializer;
 import com.tinlib.error.ErrorHandler;
 import com.tinlib.erroringfirebase.ErroringFirebase;
 import com.tinlib.generated.Action;
@@ -65,8 +66,8 @@ public class FacebookServiceTest extends AsyncTestCase {
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                       @Override
                       public void onDataChange(DataSnapshot dataSnapshot) {
-                        assertEquals(testAction,
-                            Action.newDeserializer().fromDataSnapshot(dataSnapshot));
+                        assertEquals(testAction, FirebaseDeserializer.fromDataSnapshot(
+                            Action.newDeserializer(), dataSnapshot));
                         finished();
                       }
 
