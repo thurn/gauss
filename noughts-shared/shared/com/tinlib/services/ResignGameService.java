@@ -9,7 +9,7 @@ import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber2;
 import com.tinlib.core.TinKeys;
 import com.tinlib.defer.*;
-import com.tinlib.beget.EntityMutator;
+import com.tinlib.entities.EntityMutator;
 import com.tinlib.error.ErrorService;
 import com.tinlib.error.TinException;
 import com.tinlib.generated.Game;

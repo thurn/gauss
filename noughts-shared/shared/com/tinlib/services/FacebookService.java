@@ -7,7 +7,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import com.tinlib.analytics.AnalyticsService;
-import com.tinlib.beget.EntityMutator;
+import com.tinlib.entities.EntityMutator;
 import com.tinlib.convey.Bus;
 import com.tinlib.convey.Subscriber3;
 import com.tinlib.core.TinKeys;

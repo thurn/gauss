@@ -1,6 +1,7 @@
-package com.tinlib.beget;
+package com.tinlib.entities;
 
 import com.firebase.client.*;
+import com.tinlib.beget.Entity;
 import com.tinlib.entities.FirebaseDeserializer;
 
 public class EntityMutator {
