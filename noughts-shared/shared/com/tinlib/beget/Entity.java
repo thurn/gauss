@@ -1,11 +1,9 @@
 package com.tinlib.beget;
 
+import com.google.common.collect.Lists;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 public abstract class Entity<T extends Entity<T>> {
   public static abstract class EntityDeserializer<T extends Entity<T>> {
@@ -176,6 +174,20 @@ public abstract class Entity<T extends Entity<T>> {
     putSerializedObject(map, key, object);
   }
 
+  public static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
+      Entity<T> entity) {
+    if (entity != null) {
+      map.put(key, entity.serialize());
+    }
+  }
+
+  public static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key,
+      Enum<T> enumObject) {
+    if (enumObject != null) {
+      map.put(key, enumObject.name());
+    }
+  }
+
   public static void putSerialized(Map<String, Object> map, String key, List<?> list) {
     List<Map<String, Object>> maps = Lists.newArrayList();
     List<Object> objects = Lists.newArrayList();
@@ -188,37 +200,10 @@ public abstract class Entity<T extends Entity<T>> {
     }
     if (maps.size() > 0 && objects.size() > 0) {
       throw new IllegalArgumentException("Cannot mix entities & non-entities in serialized list");
-    }
-    if (maps.size() > 0) {
+    } else if (maps.size() > 0) {
       map.put(key, maps);
-    }
-    if (objects.size() > 0) {
+    } else if (objects.size() > 0) {
       map.put(key, objects);
-    }
-  }
-
-  public static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
-      Map<String, T> entities) {
-    Map<String, Object> result = Maps.newHashMap();
-    for (Entry<String, T> entry : entities.entrySet()) {
-      result.put(entry.getKey(), entry.getValue().serialize());
-    }
-    if (result.size() > 0) {
-      map.put(key, result);
-    }
-  }
-
-  public static <T extends Entity<T>> void putSerialized(Map<String, Object> map, String key,
-      Entity<T> entity) {
-    if (entity != null) {
-      map.put(key, entity.serialize());
-    }
-  }
-
-  public static <T extends Enum<T>> void putSerialized(Map<String, Object> map, String key,
-      Enum<T> enumObject) {
-    if (enumObject != null) {
-      map.put(key, enumObject.name());
     }
   }
 

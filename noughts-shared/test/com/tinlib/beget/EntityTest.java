@@ -17,6 +17,10 @@ import static org.junit.Assert.fail;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EntityTest {
+  private static enum TestEnum {
+    VALUE
+  }
+
   private static class TestEntityBuilder extends Entity.EntityBuilder<TestEntity> {
     private TestEntity testEntity;
 
@@ -121,13 +125,123 @@ public class EntityTest {
 
   @Test
   public void testGetEntityMissing() {
-    TestEntity testEntity = new TestEntity(map("foo", 1));
     assertNull(Entity.get(map("other", 12), "key", new TestEntityDeserializer()));
+  }
+
+  @Test
+  public void testGetRepeated() {
+    assertEquals(list(12), Entity.getRepeated(map("key", list(12)), "key", Integer.class));
+  }
+
+  @Test
+  public void testGetRepeatedEntity() {
+    TestEntity testEntity = new TestEntity(map("foo", 1));
+    assertEquals(list(testEntity), Entity.getRepeated(map("key", list(testEntity.serialize())),
+        "key", new TestEntityDeserializer()));
+  }
+
+  @Test
+  public void testGetEnum() {
+    assertEquals(TestEnum.VALUE, Entity.getEnum(map("key", "VALUE"), "key", TestEnum.class));
+  }
+
+  @Test
+  public void testGetEnumNull() {
+    assertNull(Entity.getEnum(map("key", null), "key", TestEnum.class));
+  }
+
+  @Test
+  public void testPutSerializedNumber() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", 12);
+    assertEquals(map("key", 12), testMap);
+  }
+
+  @Test
+  public void testPutSerializedNull() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", (Number)null);
+    assertEquals(map(), testMap);
+  }
+
+  @Test
+  public void testPutSerializedString() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", "twelve");
+    assertEquals(map("key", "twelve"), testMap);
+  }
+
+  @Test
+  public void testPutSerializedBoolean() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", true);
+    assertEquals(map("key", true), testMap);
+  }
+
+  @Test
+  public void testPutSerializedEntity() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", new TestEntity(map("foo", "bar")));
+    assertEquals(map("key", map("foo", "bar")), testMap);
+  }
+
+  @Test
+  public void testPutSerializedEntityNull() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", (Entity<?>)null);
+    assertEquals(map(), testMap);
+  }
+
+  @Test
+  public void testPutSerializedEnum() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", TestEnum.VALUE);
+    assertEquals(map("key", "VALUE"), testMap);
+  }
+
+  @Test
+  public void testPutSerializedEnumNull() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", (Enum<?>)null);
+    assertEquals(map(), testMap);
+  }
+
+  @Test
+  public void testPutSerializedStringList() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", list("foo"));
+    assertEquals(map("key", list("foo")), testMap);
+  }
+
+  @Test
+  public void testPutSerializedEntityList() {
+    Map<String, Object> testMap = map();
+    Entity.putSerialized(testMap, "key", list(new TestEntity(map("foo", "bar"))));
+    assertEquals(map("key", list(map("foo", "bar"))), testMap);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testPutSerializedMixedListExeption() {
+    Map<String, Object> testMap = map();
+    List<Object> testList = Lists.newArrayList();
+    testList.add("foo");
+    testList.add(new TestEntity(map("bar", 12)));
+    Entity.putSerialized(testMap, "key", testList);
+  }
+
+  private Map<String, Object> map() {
+    return Maps.newHashMap();
   }
 
   private Map<String, Object> map(String key, Object value) {
     Map<String, Object> result = Maps.newHashMap();
     result.put(key, value);
+    return result;
+  }
+
+  private <T> List<T> list(T object) {
+    List<T> result = Lists.newArrayList();
+    result.add(object);
     return result;
   }
 }
