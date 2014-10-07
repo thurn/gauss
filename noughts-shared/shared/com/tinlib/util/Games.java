@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class Games {
+  private Games() {}
+
   static final ImageString GAME_OVER_IMAGE_STRING = ImageString.newBuilder()
       .setString("game_over")
       .setType(ImageType.LOCAL)
