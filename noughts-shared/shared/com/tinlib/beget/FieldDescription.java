@@ -3,9 +3,6 @@ package com.tinlib.beget;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
-* Created by dthurn on 8/16/14.
-*/
 class FieldDescription {
   private final String name;
   private final String type;
@@ -18,7 +15,7 @@ class FieldDescription {
     type = object.getString("type");
     repeated = object.optBoolean("repeated");
     description = object.optString("desc");
-    if (EntityGenerator.isPrimitive(name)) {
+    if (EntityWriter.isPrimitive(name)) {
       this.packageString = "";
     } else {
       this.packageString = packageString;

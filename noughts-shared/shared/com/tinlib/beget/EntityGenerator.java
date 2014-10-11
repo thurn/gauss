@@ -41,7 +41,7 @@ public class EntityGenerator {
       }
     }
 
-    EntityWriter writer = new EntityWriter();
+    EntityWriter writer = new EntityWriter(entityTypes);
     for (String key : descriptions.keySet()) {
       EntityDescription canonical = getCanonicalEntity(descriptions.get(key));
       File output = new File(canonical.getParent(), key + ".java");
