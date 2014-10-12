@@ -1,8 +1,6 @@
 package com.tinlib.erroringfirebase;
 
-import com.firebase.client.ChildEventListener;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.FirebaseError;
+import com.firebase.client.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -28,6 +26,92 @@ public class ErroringFirebaseTest {
       public void onChildRemoved(DataSnapshot dataSnapshot) {}
       @Override
       public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testFailSingleValueEventListener() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "",
+        "addListenerForSingleValueEvent");
+    erroringFirebase.addListenerForSingleValueEvent(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testFailValueEventListener() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "addValueEventListener");
+    erroringFirebase.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {
+      }
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testFailAuth() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "auth");
+    erroringFirebase.auth("credential", new Firebase.AuthListener() {
+      @Override
+      public void onAuthError(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+      @Override
+      public void onAuthSuccess(Object o) {}
+      @Override
+      public void onAuthRevoked(FirebaseError firebaseError) {}
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testChild() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "child", "addValueEventListener");
+    Firebase child = erroringFirebase.child("child");
+    child.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {}
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testGetParent() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "addValueEventListener");
+    Firebase parent = erroringFirebase.child("child").getParent();
+    parent.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {}
+
       @Override
       public void onCancelled(FirebaseError firebaseError) {
         ran.set(true);
