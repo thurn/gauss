@@ -1,12 +1,14 @@
 package com.tinlib.erroringfirebase;
 
 import com.firebase.client.*;
+import com.google.common.collect.Maps;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -93,7 +95,8 @@ public class ErroringFirebaseTest {
     Firebase child = erroringFirebase.child("child");
     child.addValueEventListener(new ValueEventListener() {
       @Override
-      public void onDataChange(DataSnapshot dataSnapshot) {}
+      public void onDataChange(DataSnapshot dataSnapshot) {
+      }
 
       @Override
       public void onCancelled(FirebaseError firebaseError) {
@@ -114,6 +117,116 @@ public class ErroringFirebaseTest {
 
       @Override
       public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testGetRoot() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "addValueEventListener");
+    Firebase parent = erroringFirebase.child("child").getRoot();
+    parent.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {}
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testPush() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "addValueEventListener");
+    Firebase pushed = erroringFirebase.push();
+    pushed.addValueEventListener(new ValueEventListener() {
+      @Override
+      public void onDataChange(DataSnapshot dataSnapshot) {}
+
+      @Override
+      public void onCancelled(FirebaseError firebaseError) {
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testRemoveValue() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "removeValue");
+    erroringFirebase.removeValue(new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        assertNotNull(firebaseError);
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testRunTransaction() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "runTransaction");
+    erroringFirebase.runTransaction(new Transaction.Handler() {
+      @Override
+      public Transaction.Result doTransaction(MutableData mutableData) {
+        return Transaction.success(mutableData);
+      }
+
+      @Override
+      public void onComplete(FirebaseError firebaseError, boolean b, DataSnapshot dataSnapshot) {
+        assertNotNull(firebaseError);
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testSetPriority() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "setPriority");
+    erroringFirebase.setPriority(12, new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        assertNotNull(firebaseError);
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testSetValue() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "setValue");
+    erroringFirebase.setValue(12, new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        assertNotNull(firebaseError);
+        ran.set(true);
+      }
+    });
+    assertTrue(ran.get());
+  }
+
+  @Test
+  public void testUpdateChildren() {
+    final AtomicBoolean ran = new AtomicBoolean(false);
+    ErroringFirebase erroringFirebase = new ErroringFirebase(URL, "", "updateChildren");
+    erroringFirebase.updateChildren(Maps.<String, Object>newHashMap(),
+        new Firebase.CompletionListener() {
+      @Override
+      public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+        assertNotNull(firebaseError);
         ran.set(true);
       }
     });
