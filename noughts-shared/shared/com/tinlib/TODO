@@ -14,4 +14,3 @@ General
   - github continuous integration banners
   - Add javadoc everywhere
   - maven central releases
-  - import utility tests (GamesTest & co)

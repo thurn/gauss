@@ -23,18 +23,17 @@ public class EntityWriter {
     return descriptions.iterator().next();
   }
 
-  public void writeEntityDescriptions(JavaWriter writer,
-      Collection<EntityDescription> descriptions) throws IOException {
-    EntityDescription canonical = getCanonicalEntity(descriptions);
-    switch (canonical.getType()) {
+  public void writeEntityDescription(JavaWriter writer, EntityDescription description)
+      throws IOException {
+    switch (description.getType()) {
       case ENTITY:
-        writeEntity(writer, canonical);
+        writeEntity(writer, description);
         break;
       case ENUM:
-        writeEnum(writer, canonical);
+        writeEnum(writer, description);
         break;
       default:
-        throw new RuntimeException("Unknown entity type: " + canonical.getType());
+        throw new RuntimeException("Unknown entity type: " + description.getType());
     }
   }
 

@@ -16,6 +16,15 @@ class EntityDescription {
   private final List<EnumValueDescription> values = Lists.newArrayList();
   private final File parent;
 
+  public EntityDescription(EntityType type, String name, String packageString, String description,
+      File parentFile) {
+    this.type = type;
+    this.name = name;
+    this.packageString = packageString;
+    this.description = description;
+    this.parent = parentFile;
+  }
+
   public EntityDescription(JSONObject object, File parent) throws JSONException {
     type = object.getString("type").equals("entity") ? EntityType.ENTITY : EntityType.ENUM;
     name = object.getString("name");
@@ -37,6 +46,14 @@ class EntityDescription {
         throw new RuntimeException("Unknown entity type " + type);
     }
     this.parent = parent;
+  }
+
+  public void addField(FieldDescription fieldDescription) {
+    fields.add(fieldDescription);
+  }
+
+  public void addEnumValue(EnumValueDescription enumValueDescription) {
+    values.add(enumValueDescription);
   }
 
   public String fullyQualifiedName() {

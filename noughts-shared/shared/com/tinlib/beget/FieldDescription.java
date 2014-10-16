@@ -10,6 +10,15 @@ class FieldDescription {
   private final String description;
   private final String packageString;
 
+  public FieldDescription(String name, String type, boolean repeated, String description,
+      String packageString) {
+    this.name = name;
+    this.type = type;
+    this.repeated = repeated;
+    this.description = description;
+    this.packageString = packageString;
+  }
+
   public FieldDescription(String packageString, JSONObject object) throws JSONException {
     name = object.getString("name");
     type = object.getString("type");
