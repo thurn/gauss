@@ -7,8 +7,6 @@ Beget
   - tests
 
 General
-  - Run tests from command line
-  - Run coverage from command line
   - Build javadoc from command line
   - Run findbugs & check style from command line
   - github continuous integration banners

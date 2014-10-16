@@ -87,4 +87,8 @@ class EntityDescription {
   public File getParent() {
     return parent;
   }
+
+  public boolean hasParent() {
+    return parent != null;
+  }
 }
