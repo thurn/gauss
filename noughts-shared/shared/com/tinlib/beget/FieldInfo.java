@@ -3,14 +3,14 @@ package com.tinlib.beget;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class FieldDescription {
+class FieldInfo {
   private final String name;
   private final String type;
   private final boolean repeated;
   private final String description;
   private final String packageString;
 
-  public FieldDescription(String name, String type, boolean repeated, String description,
+  public FieldInfo(String name, String type, boolean repeated, String description,
       String packageString) {
     this.name = name;
     this.type = type;
@@ -19,7 +19,7 @@ class FieldDescription {
     this.packageString = packageString;
   }
 
-  public FieldDescription(String packageString, JSONObject object) throws JSONException {
+  public FieldInfo(String packageString, JSONObject object) throws JSONException {
     name = object.getString("name");
     type = object.getString("type");
     repeated = object.optBoolean("repeated");

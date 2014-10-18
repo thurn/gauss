@@ -17,9 +17,9 @@ public class EntityGenerator {
 
     EntityReader.ReadResult readResult = new EntityReader().read(Arrays.asList(args));
     EntityWriter writer = new EntityWriter(readResult.getEntityTypes());
-    for (EntityDescription entityDescription : readResult.getEntityDescriptions()) {
-      File output = new File(entityDescription.getParent(), entityDescription.getName() + ".java");
-      writer.writeEntityDescription(new JavaWriter(new FileWriter(output)), entityDescription);
+    for (EntityInfo entityInfo : readResult.getEntityInfos()) {
+      File output = new File(entityInfo.getParent(), entityInfo.getName() + ".java");
+      writer.writeEntityDescription(new JavaWriter(new FileWriter(output)), entityInfo);
     }
   }
 }

@@ -18,12 +18,12 @@ public class EntityWriter {
     this.entityTypes = entityTypes;
   }
 
-  private EntityDescription getCanonicalEntity(Collection<EntityDescription> descriptions) {
+  private EntityInfo getCanonicalEntity(Collection<EntityInfo> descriptions) {
     // TODO this
     return descriptions.iterator().next();
   }
 
-  public void writeEntityDescription(JavaWriter writer, EntityDescription description)
+  public void writeEntityDescription(JavaWriter writer, EntityInfo description)
       throws IOException {
     switch (description.getType()) {
       case ENTITY:
@@ -37,7 +37,7 @@ public class EntityWriter {
     }
   }
 
-  private void writeEntity(JavaWriter writer, EntityDescription description)
+  private void writeEntity(JavaWriter writer, EntityInfo description)
       throws IOException {
     writePreface(writer, description);
     writer.emitImports(ImmutableList.of("java.util.*"));
@@ -58,7 +58,7 @@ public class EntityWriter {
     writer.close();
   }
 
-  private void writePreface(JavaWriter writer, EntityDescription description) throws IOException {
+  private void writePreface(JavaWriter writer, EntityInfo description) throws IOException {
     writer.emitSingleLineComment("================================");
     writer.emitSingleLineComment("GENERATED CODE -- DO NOT MODIFY!");
     writer.emitSingleLineComment("================================");
@@ -86,7 +86,7 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeBuilder(JavaWriter writer, EntityDescription description)
+  private void writeBuilder(JavaWriter writer, EntityInfo description)
       throws IOException {
     String name = description.getName();
     String paramName = decapitalize(name);
@@ -116,7 +116,7 @@ public class EntityWriter {
     writer.emitStatement("return %s", paramName);
     writer.endMethod();
     writer.emitEmptyLine();
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       writeAccessors(writer, field, paramName + ".", true /* inBuilder */);
       writeMutators(writer, field, paramName);
     }
@@ -124,7 +124,7 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeCommonStaticMethods(JavaWriter writer, EntityDescription description)
+  private void writeCommonStaticMethods(JavaWriter writer, EntityInfo description)
       throws IOException {
     writer.emitJavadoc("Returns a new Builder class to help you create %s instances.",
         description.getName());
@@ -142,9 +142,9 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeFields(JavaWriter writer, EntityDescription description)
+  private void writeFields(JavaWriter writer, EntityInfo description)
       throws IOException {
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       if (field.isRepeated()) {
         writer.emitField("List<" + field.getType() + ">", field.getName() + "List",
             EnumSet.of(Modifier.PRIVATE, Modifier.FINAL));
@@ -155,13 +155,13 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeConstructors(JavaWriter writer, EntityDescription description)
+  private void writeConstructors(JavaWriter writer, EntityInfo description)
       throws IOException {
     String name = description.getName();
     String paramName = decapitalize(name);
 
     writer.beginConstructor(PRIVATE);
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       if (field.isRepeated()) {
         writer.emitStatement("%sList = new ArrayList<>()", field.getName());
       }
@@ -170,7 +170,7 @@ public class EntityWriter {
     writer.emitEmptyLine();
 
     writer.beginConstructor(PRIVATE, name, paramName);
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       if (field.isRepeated()) {
         writer.emitStatement("%sList = new ArrayList<>(%s.%sList)", field.getName(), paramName,
             field.getName());
@@ -182,7 +182,7 @@ public class EntityWriter {
     writer.emitEmptyLine();
 
     writer.beginConstructor(PRIVATE, "Map<String, Object>", "map");
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       if (field.isRepeated()) {
         if (isPrimitive(field.getType()) || field.getType().equals("String")) {
           writer.emitStatement("%sList = getRepeated(map, \"%s\", %s.class)", field.getName(),
@@ -211,7 +211,7 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeCommonMethods(JavaWriter writer, EntityDescription description)
+  private void writeCommonMethods(JavaWriter writer, EntityInfo description)
       throws IOException {
     writer.emitJavadoc("Returns the name of this entity for use in toString().");
     writer.emitAnnotation("Override");
@@ -224,7 +224,7 @@ public class EntityWriter {
     writer.emitAnnotation("Override");
     writer.beginMethod("Map<String, Object>", "serialize", PUBLIC);
     writer.emitStatement("Map<String, Object> result = new HashMap<>()");
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       if (field.isRepeated()) {
         writer.emitStatement("putSerialized(result, \"%s\", %sList)", field.getName(),
             field.getName());
@@ -245,14 +245,14 @@ public class EntityWriter {
     writer.emitEmptyLine();
   }
 
-  private void writeFieldMethods(JavaWriter writer, EntityDescription description)
+  private void writeFieldMethods(JavaWriter writer, EntityInfo description)
       throws IOException {
-    for (FieldDescription field : description.getFields()) {
+    for (FieldInfo field : description.getFields()) {
       writeAccessors(writer, field, "", false /* inBuilder */);
     }
   }
 
-  private void writeAccessors(JavaWriter writer, FieldDescription field, String accessor,
+  private void writeAccessors(JavaWriter writer, FieldInfo field, String accessor,
                               boolean inBuilder) throws IOException {
     String name = accessor + field.getName();
     String capitalName = capitalize(field.getName());
@@ -300,7 +300,7 @@ public class EntityWriter {
     }
   }
 
-  private void writeMutators(JavaWriter writer, FieldDescription field, String accessor)
+  private void writeMutators(JavaWriter writer, FieldInfo field, String accessor)
       throws IOException {
     String name = field.getName();
     String capitalName = capitalize(field.getName());
@@ -391,11 +391,11 @@ public class EntityWriter {
     }
   }
 
-  private void writeEnum(JavaWriter writer, EntityDescription description)
+  private void writeEnum(JavaWriter writer, EntityInfo description)
       throws IOException {
     writePreface(writer, description);
     writer.beginType(description.getName(), "enum", PUBLIC);
-    for (EnumValueDescription enumDescription : description.getValues()) {
+    for (EnumValueInfo enumDescription : description.getEnumValues()) {
       writer.emitEnumValue(enumDescription.getName());
     }
     writer.endType();
@@ -418,7 +418,7 @@ public class EntityWriter {
     }
   }
 
-  private static String maybePrimitive(FieldDescription field) {
+  private static String maybePrimitive(FieldInfo field) {
     switch (field.getType()) {
       case "Byte":
         return "byte";

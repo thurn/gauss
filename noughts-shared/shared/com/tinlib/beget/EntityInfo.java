@@ -7,16 +7,16 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.List;
 
-class EntityDescription {
+class EntityInfo {
   private final EntityType type;
   private final String name;
   private final String packageString;
   private final String description;
-  private final List<FieldDescription> fields = Lists.newArrayList();
-  private final List<EnumValueDescription> values = Lists.newArrayList();
+  private final List<FieldInfo> fields = Lists.newArrayList();
+  private final List<EnumValueInfo> values = Lists.newArrayList();
   private final File parent;
 
-  public EntityDescription(EntityType type, String name, String packageString, String description,
+  public EntityInfo(EntityType type, String name, String packageString, String description,
       File parentFile) {
     this.type = type;
     this.name = name;
@@ -25,7 +25,7 @@ class EntityDescription {
     this.parent = parentFile;
   }
 
-  public EntityDescription(JSONObject object, File parent) throws JSONException {
+  public EntityInfo(JSONObject object, File parent) throws JSONException {
     type = object.getString("type").equals("entity") ? EntityType.ENTITY : EntityType.ENUM;
     name = object.getString("name");
     packageString = object.getString("package");
@@ -33,13 +33,13 @@ class EntityDescription {
     switch (type) {
       case ENTITY:
         for (int i = 0; i < object.getJSONArray("fields").length(); ++i) {
-          fields.add(new FieldDescription(packageString,
+          fields.add(new FieldInfo(packageString,
               object.getJSONArray("fields").getJSONObject(i)));
         }
         break;
       case ENUM:
         for (int i = 0; i < object.getJSONArray("values").length(); ++i) {
-          values.add(new EnumValueDescription(object.getJSONArray("values").getJSONObject(i)));
+          values.add(new EnumValueInfo(object.getJSONArray("values").getJSONObject(i)));
         }
         break;
       default:
@@ -48,12 +48,12 @@ class EntityDescription {
     this.parent = parent;
   }
 
-  public void addField(FieldDescription fieldDescription) {
-    fields.add(fieldDescription);
+  public void addField(FieldInfo fieldInfo) {
+    fields.add(fieldInfo);
   }
 
-  public void addEnumValue(EnumValueDescription enumValueDescription) {
-    values.add(enumValueDescription);
+  public void addEnumValue(EnumValueInfo enumValueInfo) {
+    values.add(enumValueInfo);
   }
 
   public String fullyQualifiedName() {
@@ -76,19 +76,29 @@ class EntityDescription {
     return description;
   }
 
-  public List<FieldDescription> getFields() {
+  public List<FieldInfo> getFields() {
     return fields;
   }
 
-  public List<EnumValueDescription> getValues() {
+  public boolean hasFieldNamed(String name) {
+    for (FieldInfo fieldInfo : fields) {
+      if (fieldInfo.getName().equals(name)) return true;
+    }
+    return false;
+  }
+
+  public List<EnumValueInfo> getEnumValues() {
     return values;
+  }
+
+  public boolean hasEnumValueNamed(String name) {
+    for (EnumValueInfo enumValueInfo : values) {
+      if (enumValueInfo.getName().equals(name)) return true;
+    }
+    return false;
   }
 
   public File getParent() {
     return parent;
-  }
-
-  public boolean hasParent() {
-    return parent != null;
   }
 }

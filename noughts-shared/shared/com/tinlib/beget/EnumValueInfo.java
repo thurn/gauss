@@ -3,11 +3,16 @@ package com.tinlib.beget;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class EnumValueDescription {
+class EnumValueInfo {
   private final String name;
   private final String description;
 
-  public EnumValueDescription(JSONObject object) throws JSONException {
+  public EnumValueInfo(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
+
+  public EnumValueInfo(JSONObject object) throws JSONException {
     name = object.getString("name");
     description = object.optString("desc");
   }
