@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -34,76 +33,100 @@ public class EntityReader {
     }
   }
 
+  private static class ObjectWithFile {
+    private final JSONObject object;
+    private final File file;
+
+    private ObjectWithFile(JSONObject object, File file) {
+      this.object = object;
+      this.file = file;
+    }
+  }
+
+  private final List<ObjectWithFile> jsonObjects = Lists.newArrayList();
+  private final List<JSONObject> jsonExtensions = Lists.newArrayList();
   private final Map<String, EntityType> entityTypes = Maps.newHashMap();
   private final Map<String, EntityDescription> descriptions = Maps.newHashMap();
 
-  public ReadResult read(List<String> files) throws JSONException, IOException {
+  public ReadResult read(List<String> inputFiles) throws JSONException, IOException {
     Map<String, EntityType> entityTypes = Maps.newHashMap();
     List<EntityDescription> descriptions = Lists.newArrayList();
-    for (String arg : files) {
+
+    for (String arg : inputFiles) {
       File file = new File(arg);
       String json = Files.toString(file, Charsets.UTF_8);
       JSONArray array = new JSONArray(json);
       for (int i = 0; i < array.length(); ++i) {
-        EntityDescription description =
-            new EntityDescription(array.getJSONObject(i), file.getParentFile());
-        descriptions.add(description);
-        entityTypes.put(description.fullyQualifiedName(), description.getType());
+        readObject(file, array.getJSONObject(i));
       }
     }
+
+    loadJsonObjects();
+    loadJsonExtensions();
+
     return new ReadResult(entityTypes, descriptions);
   }
 
-  private void readJsonObject(JSONObject entity, File parentFile) throws JSONException {
-    String type = entity.getString("type");
-    String name = entity.getString("name");
-    String packageString = entity.getString("package");
-    String fullyQualifiedName = packageString + "." + name;
-    String description = entity.optString("desc");
-    switch (type) {
+  private void readObject(File file, JSONObject object) throws JSONException {
+    switch (object.getString("type")) {
       case "entity":
-        mergeEntityDescription(new EntityDescription(EntityType.ENTITY, name, packageString,
-            description, parentFile), true /* isCanonical */);
-        break;
       case "enum":
+        jsonObjects.add(new ObjectWithFile(object, file.getParentFile()));
         break;
       case "entity_extension":
-        mergeEntityDescription(new EntityDescription(EntityType.ENTITY, name, packageString,
-            null, null), false /* isCanonical */);
-        break;
       case "enum_extension":
+        jsonExtensions.add(object);
         break;
       default:
-        throw new IllegalArgumentException("Unknown entity type " + type);
+        throw new IllegalArgumentException("Unknown input type " + object.getString("type"));
     }
   }
 
-  private void mergeEntityDescription(EntityDescription toAdd, boolean isCanonical) {
-    if (descriptions.containsKey(toAdd.fullyQualifiedName())) {
-      EntityDescription current = descriptions.get(toAdd.fullyQualifiedName());
-      EntityDescription merged = new EntityDescription(toAdd.getType(),
-          toAdd.getName(),
-          toAdd.getPackageString(),
-          isCanonical ? toAdd.getDescription() : null,
-          isCanonical ? toAdd.getParent() : null);
-      for (FieldDescription fieldDescription : toAdd.getFields()) {
-        merged.addField(fieldDescription);
+  private void loadJsonObjects() throws JSONException {
+    for (ObjectWithFile objectWithFile : jsonObjects) {
+      JSONObject object = objectWithFile.object;
+      EntityType type = object.getString("type").equals("entity") ?
+          EntityType.ENTITY : EntityType.ENUM;
+      String name = object.getString("name");
+      String packageString = object.getString("package");
+      String description = object.optString("desc");
+      String fullyQualifiedName = packageString + "." + name;
+      EntityDescription entityDescription = new EntityDescription(type, name, packageString,
+          description, objectWithFile.file);
+      if (type == EntityType.ENTITY) {
+        addFields(entityDescription, object);
       }
-      for (FieldDescription fieldDescription : current.getFields()) {
-        merged.addField(fieldDescription);
+      if (type == EntityType.ENUM) {
+        addEnumValues(entityDescription, object);
       }
-      descriptions.put(toAdd.fullyQualifiedName(), merged);
-    } else {
-      descriptions.put(toAdd.fullyQualifiedName(), toAdd);
+      descriptions.put(fullyQualifiedName, entityDescription);
     }
   }
 
-  private List<FieldDescription> readFields(JSONObject entity) {
-    return null;
+  private void loadJsonExtensions() throws JSONException {
+    for (JSONObject object : jsonExtensions) {
+      String name = object.getString("name");
+      String packageString = object.getString("package");
+      String type = object.getString("type");
+      String fullyQualifiedName = packageString + "." + name;
+      if (!descriptions.containsKey(fullyQualifiedName)) {
+        throw new IllegalArgumentException("Unable to find base implementation for extension " +
+            fullyQualifiedName);
+      }
+      EntityDescription entityDescription = descriptions.get(fullyQualifiedName);
+      if (type.equals("entity_extension")) {
+        addFields(entityDescription, object);
+      }
+      if (type.equals("enum_extension")) {
+        addEnumValues(entityDescription, object);
+      }
+    }
   }
 
-  private EntityDescription getCanonicalEntity(Collection<EntityDescription> descriptions) {
-    // TODO this
-    return descriptions.iterator().next();
+  private void addFields(EntityDescription description, JSONObject entity) throws JSONException {
+  }
+
+  private void addEnumValues(EntityDescription description, JSONObject entity)
+      throws JSONException {
   }
 }
