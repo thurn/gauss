@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
 
-public class EntityWriter {
+class EntityWriter {
   private static final EnumSet<Modifier> PUBLIC = EnumSet.of(Modifier.PUBLIC);
   private static final EnumSet<Modifier> PRIVATE = EnumSet.of(Modifier.PRIVATE);
   private final Map<String, EntityType> entityTypes;

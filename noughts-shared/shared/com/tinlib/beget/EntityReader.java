@@ -1,35 +1,31 @@
 package com.tinlib.beget;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.io.Files;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-public class EntityReader {
+class EntityReader {
   public static class ReadResult {
     private final Map<String, EntityType> entityTypes;
-    private final List<EntityInfo> entityInfos;
+    private final Iterable<EntityInfo> entityInformation;
 
-    public ReadResult(Map<String, EntityType> entityTypes,
-        List<EntityInfo> entityInfos) {
+    public ReadResult(Map<String, EntityType> entityTypes, Iterable<EntityInfo> entityInformation) {
       this.entityTypes = entityTypes;
-      this.entityInfos = entityInfos;
+      this.entityInformation = entityInformation;
     }
 
     public Map<String, EntityType> getEntityTypes() {
       return entityTypes;
     }
 
-    public List<EntityInfo> getEntityInfos() {
-      return entityInfos;
+    public Iterable<EntityInfo> getEntityInformation() {
+      return entityInformation;
     }
   }
 
@@ -48,30 +44,26 @@ public class EntityReader {
   private final Map<String, EntityType> entityTypes = Maps.newHashMap();
   private final Map<String, EntityInfo> entityInformation = Maps.newHashMap();
 
-  public ReadResult read(List<String> inputFiles) throws JSONException, IOException {
-    Map<String, EntityType> entityTypes = Maps.newHashMap();
-    List<EntityInfo> descriptions = Lists.newArrayList();
-
-    for (String arg : inputFiles) {
-      File file = new File(arg);
-      String json = Files.toString(file, Charsets.UTF_8);
-      JSONArray array = new JSONArray(json);
-      for (int i = 0; i < array.length(); ++i) {
-        readObject(file, array.getJSONObject(i));
+  public ReadResult read(List<String> jsonStrings, List<File> parentDirectories)
+      throws JSONException {
+    for (int i = 0; i < jsonStrings.size(); ++i) {
+      JSONArray array = new JSONArray(jsonStrings.get(i));
+      for (int j = 0; j < array.length(); ++j) {
+        readObject(parentDirectories.get(i), array.getJSONObject(j));
       }
     }
 
     loadJsonObjects();
     loadJsonExtensions();
 
-    return new ReadResult(entityTypes, descriptions);
+    return new ReadResult(entityTypes, entityInformation.values());
   }
 
-  private void readObject(File file, JSONObject object) throws JSONException {
+  private void readObject(File parent, JSONObject object) throws JSONException {
     switch (object.getString("type")) {
       case "entity":
       case "enum":
-        jsonObjects.add(new ObjectWithFile(object, file.getParentFile()));
+        jsonObjects.add(new ObjectWithFile(object, parent));
         break;
       case "entity_extension":
       case "enum_extension":
@@ -100,6 +92,7 @@ public class EntityReader {
         addEnumValues(entityInfo, object);
       }
       entityInformation.put(fullyQualifiedName, entityInfo);
+      entityTypes.put(fullyQualifiedName, type);
     }
   }
 
