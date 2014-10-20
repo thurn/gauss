@@ -69,6 +69,78 @@ public class EntityReaderTest {
     assertEquals("com.foo", field2.getPackageString());
   }
 
+  @Test
+  public void testReadEnum() {
+    EntityReader.ReadResult readResult = readString(
+        "[{" +
+            "'type':'enum'," +
+            "'name':'TestEnum'," +
+            "'package':'com.example'," +
+            "'values': [" +
+                "{'name':'VALUE1', 'desc':'field description'}," +
+            "]" +
+        "}]"
+    );
+    assertEquals(EntityType.ENUM, readResult.getEntityTypes().get("com.example.TestEnum"));
+    EntityInfo entityInfo = readResult.getEntityInformation().iterator().next();
+    assertEquals("TestEnum", entityInfo.getName());
+    assertEquals("com.example", entityInfo.getPackageString());
+    EnumValueInfo enumValueInfo = entityInfo.getEnumValues().get(0);
+    assertEquals("VALUE1", enumValueInfo.getName());
+    assertEquals("field description", enumValueInfo.getDescription());
+  }
+
+  @Test
+  public void testExtendEntity() {
+    EntityReader.ReadResult readResult = readString(
+        "[{" +
+            "'type':'entity_extension'," +
+            "'name':'TestEntity'," +
+            "'package':'com.example'," +
+            "'fields': [" +
+                "{'name':'extensionField', 'type':'ExtensionFieldType'}," +
+            "]" +
+        "},{" +
+            "'type':'entity'," +
+            "'name':'TestEntity'," +
+            "'package':'com.example'," +
+            "'desc':'test entity description'," +
+            "'fields': []" +
+        "}]"
+    );
+    EntityInfo entityInfo = readResult.getEntityInformation().iterator().next();
+    assertEquals("TestEntity", entityInfo.getName());
+    assertEquals("com.example", entityInfo.getPackageString());
+    FieldInfo fieldInfo = entityInfo.getFields().get(0);
+    assertEquals("extensionField", fieldInfo.getName());
+    assertEquals("ExtensionFieldType", fieldInfo.getType());
+  }
+
+  @Test
+  public void testExtendEnum() {
+    EntityReader.ReadResult readResult = readString(
+        "[{" +
+            "'type':'enum_extension'," +
+            "'name':'TestEnum'," +
+            "'package':'com.example'," +
+            "'values': [" +
+                "{'name':'EXTENSION_VALUE'}," +
+            "]" +
+        "},{" +
+            "'type':'enum'," +
+            "'name':'TestEnum'," +
+            "'package':'com.example'," +
+            "'desc':'test entity description'," +
+            "'values': []" +
+        "}]"
+    );
+    EntityInfo entityInfo = readResult.getEntityInformation().iterator().next();
+    assertEquals("TestEnum", entityInfo.getName());
+    assertEquals("com.example", entityInfo.getPackageString());
+    EnumValueInfo enumValueInfo = entityInfo.getEnumValues().get(0);
+    assertEquals("EXTENSION_VALUE", enumValueInfo.getName());
+  }
+
   private EntityReader.ReadResult readString(String json) {
     EntityReader entityReader = new EntityReader();
     try {

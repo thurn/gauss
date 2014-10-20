@@ -5,7 +5,6 @@ import com.squareup.javawriter.JavaWriter;
 
 import javax.lang.model.element.Modifier;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -18,22 +17,17 @@ class EntityWriter {
     this.entityTypes = entityTypes;
   }
 
-  private EntityInfo getCanonicalEntity(Collection<EntityInfo> descriptions) {
-    // TODO this
-    return descriptions.iterator().next();
-  }
-
-  public void writeEntityDescription(JavaWriter writer, EntityInfo description)
+  public void writeEntityDescription(JavaWriter writer, EntityInfo entityInfo)
       throws IOException {
-    switch (description.getType()) {
+    switch (entityInfo.getType()) {
       case ENTITY:
-        writeEntity(writer, description);
+        writeEntity(writer, entityInfo);
         break;
       case ENUM:
-        writeEnum(writer, description);
+        writeEnum(writer, entityInfo);
         break;
       default:
-        throw new RuntimeException("Unknown entity type: " + description.getType());
+        throw new RuntimeException("Unknown entity type: " + entityInfo.getType());
     }
   }
 
