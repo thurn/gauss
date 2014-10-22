@@ -18,18 +18,22 @@ public class DropswitchState implements State {
   private final int EMPTY = 0;
   private final int PLAYER_ONE = 1;
   private final int PLAYER_TWO = 2;
+  private final int MAX_MOVES = 50;
   private final int[][] board;
 
   private List<Long> possibleActions;
   private int currentPlayer;
   private int winner;
+  private int moveCount;
   private Random random = new Random();
 
-  private DropswitchState(int[][] board, List<Long> actions, int currentPlayer, int winner) {
+  private DropswitchState(int[][] board, List<Long> actions, int currentPlayer, int winner,
+      int moveCount) {
     this.board = board;
     this.possibleActions = actions;
     this.currentPlayer = currentPlayer;
     this.winner = winner;
+    this.moveCount = moveCount;
   }
 
   @Override
@@ -60,13 +64,14 @@ public class DropswitchState implements State {
     }
     winner = EMPTY;
     possibleActions = currentlyPossibleActions();
+    moveCount = 0;
     return this;
   }
 
   @Override
-  public State copy() {
+  public DropswitchState copy() {
     return new DropswitchState(copyBoard(), new ArrayList<>(possibleActions), currentPlayer,
-        winner);
+        winner, moveCount);
   }
 
   private int[][] copyBoard() {
@@ -78,18 +83,26 @@ public class DropswitchState implements State {
   }
 
   @Override
-  public State initializeFrom(Object state) {
-    return null;
+  public State initializeFrom(Object otherState) {
+    DropswitchState state = ((DropswitchState)otherState).copy();
+    this.currentPlayer = state.currentPlayer;
+    this.winner = state.winner;
+    this.possibleActions = state.possibleActions;
+    this.moveCount = state.moveCount;
+    for (int i = 0; i < 4; ++i) {
+      System.arraycopy(state.board[i], 0, board[i], 0, 4);
+    }
+    return this;
   }
 
   @Override
   public boolean isTerminal() {
-    return false;
+    return winner != EMPTY || moveCount == MAX_MOVES;
   }
 
   @Override
   public int getWinner() {
-    return 0;
+    return winner;
   }
 
   @Override
@@ -105,6 +118,11 @@ public class DropswitchState implements State {
   @Override
   public int playerBefore(int player) {
     return player == PLAYER_ONE ? PLAYER_TWO : PLAYER_ONE;
+  }
+
+  @Override
+  public String toString() {
+    return "";
   }
 
   @Override
