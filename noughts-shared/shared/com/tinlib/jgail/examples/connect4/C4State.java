@@ -270,8 +270,7 @@ public class C4State implements State {
    *     direction.
    */
   private int countGroupSize(int col, int row, Direction dir, int player) {
-    if (row < 6 && row >= 0 && col < 7 && col >= 0
-        && board[col][row] == player) {
+    if (row < 6 && row >= 0 && col < 7 && col >= 0 && board[col][row] == player) {
       switch (dir) {
         case N:
           return 1 + countGroupSize(col, row + 1, dir, player);

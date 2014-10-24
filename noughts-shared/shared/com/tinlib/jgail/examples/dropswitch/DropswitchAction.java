@@ -21,27 +21,27 @@ public class DropswitchAction {
     return ((1 << 12) & action) != 0;
   }
 
-  public static long getDropColumn(long action) {
-    return (action >> 2) & 0b11;
+  public static int getDropColumn(long action) {
+    return (int) (action >> 2) & 0b11;
   }
 
-  public static long getDropRow(long action) {
-    return action & 0b11;
+  public static int getDropRow(long action) {
+    return (int) action & 0b11;
   }
 
-  public static long getSwitchColumn1(long action) {
-    return (action >> 10) & 0b11;
+  public static int getSwitchColumn1(long action) {
+    return (int) (action >> 10) & 0b11;
   }
 
-  public static long getSwitchRow1(long action) {
-    return (action >> 8) & 0b11;
+  public static int getSwitchRow1(long action) {
+    return (int) (action >> 8) & 0b11;
   }
 
-  public static long getSwitchColumn2(long action) {
-    return (action >> 6) & 0b11;
+  public static int getSwitchColumn2(long action) {
+    return (int) (action >> 6) & 0b11;
   }
 
-  public static long getSwitchRow2(long action) {
-    return (action >> 4) & 0b11;
+  public static int getSwitchRow2(long action) {
+    return (int) (action >> 4) & 0b11;
   }
 }
