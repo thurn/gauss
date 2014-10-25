@@ -3,7 +3,6 @@ package com.tinlib.jgail.core;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -12,21 +11,22 @@ import java.util.Random;
  * A helper class for running games & sets of games between multiple Agents.
  */
 public class TwoPlayerRunner {
-  private final List<Agent> agents;
+  private final Map<Integer, Agent> agents;
   private final State initialState;
   private final Random random = new Random();
 
   /**
    * Constructs a new Main instance.
    *
-   * @param agents A list of agents who will participate in the game(s).
+   * @param agents A map from player numbers to agents who will play in this
+   *     game.
    * @param canonicalState The state to use as the canonical game state. It is
    *     responsible for keeping track of actual actions in the game and is not
    *     directly given to any agent to make their action determination. It is
    *     the responsibility of the caller to ensure that this state is in the
    *     appropriate initial state for this game.
    */
-  public TwoPlayerRunner(List<Agent> agents, State canonicalState) {
+  public TwoPlayerRunner(Map<Integer, Agent> agents, State canonicalState) {
     this.agents = agents;
     this.initialState = canonicalState;
   }
@@ -85,7 +85,8 @@ public class TwoPlayerRunner {
     
     long duration = System.currentTimeMillis() - startTime;
     String elapsed = new SimpleDateFormat("mm:ss").format(new Date(duration));
-    String perTournament = new SimpleDateFormat("mm:ss").format(new Date(duration / tournamentSize));
+    String perTournament = new SimpleDateFormat("mm:ss").format(
+        new Date(duration / tournamentSize));
     System.out.println("Tournament finished in " + elapsed + " (" + perTournament + 
         " per tournament)");    
   }
@@ -99,12 +100,9 @@ public class TwoPlayerRunner {
    * @throws InterruptedException 
    */
   public void runMatch(long perMoveTimeBudget) throws InterruptedException {
-    final Map<Integer, Agent> agentMap = new HashMap<>();
-    agentMap.put(0, agents.get(0));
-    agentMap.put(1, agents.get(1));
-    int winner = playGame(agentMap, true /* isInteractive */, perMoveTimeBudget);
+    int winner = playGame(agents, true /* isInteractive */, perMoveTimeBudget);
     if (winner != State.NO_WINNER) {
-      System.out.println(agentMap.get(winner) + " wins!");
+      System.out.println(agents.get(winner) + " wins!");
     } else {
       System.out.println("Game drawn.");
     }
@@ -113,7 +111,7 @@ public class TwoPlayerRunner {
   /**
    * Play a match between the supplied agents.
    *
-   * @param agentMap A mapping from players in the game to the agents who will
+   * @param agentMap A mapping from player numbers in the game to the agents who will
    *     represent them.
    * @param isInteractive If true, print out intermediate game state
    *     information.

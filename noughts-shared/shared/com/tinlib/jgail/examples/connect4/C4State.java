@@ -47,7 +47,7 @@ public class C4State implements State {
   
   /**
    * Null-initializes this state. The state will not be usable until one of
-   * initialize() or setToStartingConditions() is called on the result; 
+   * initializeFrom() or setToStartingConditions() is called on the result;
    */
   public C4State() {
   }

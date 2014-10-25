@@ -15,9 +15,10 @@ public class DropswitchState implements State {
     N, NE, E, SE, S, SW, W, NW
   }
 
+  public static final int PLAYER_ONE = 1;
+  public static final int PLAYER_TWO = 2;
+
   private static final int EMPTY = 0;
-  private static final int PLAYER_ONE = 1;
-  private static final int PLAYER_TWO = 2;
   private final int[][] board;
 
   private List<Long> possibleActions;
@@ -26,12 +27,20 @@ public class DropswitchState implements State {
   private boolean gameOver;
   private Random random = new Random();
 
+  /**
+   * Null-initializes this state. The state will not be usable until one of
+   * initializeFrom() or setToStartingConditions() is called on the result;
+   */
+  public DropswitchState() {
+    this.board = new int[4][4];
+  }
+
   private DropswitchState(int[][] board, List<Long> actions, int currentPlayer, int winner,
       boolean gameOver) {
     this.board = board;
     this.possibleActions = actions;
     this.currentPlayer = currentPlayer;
-    this.winner = State.NO_WINNER;
+    this.winner = winner;
     this.gameOver = gameOver;
   }
 
@@ -171,9 +180,9 @@ public class DropswitchState implements State {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
-        int p = board[i][j];
+    for (int row = 0; row < 4; ++row) {
+      for (int column = 0; column < 4; ++column) {
+        int p = board[column][row];
         if (p == EMPTY) {
           result.append("-");
         } else {
