@@ -27,7 +27,10 @@ public class NegamaxSearch implements AsynchronousAgent {
     public Builder(State stateRepresentation) {
       this.stateRepresentation = stateRepresentation;
       this.evaluator = new AgentEvaluator(
-          MonteCarloSearch.builder(stateRepresentation).setNumSimulations(500).setDiscountRate(0.9).build(), 0L);
+          MonteCarloSearch.builder(stateRepresentation)
+              .setNumSimulations(500)
+              .setDiscountRate(0.9)
+              .build(), 0L);
     }
 
     /**
@@ -46,7 +49,7 @@ public class NegamaxSearch implements AsynchronousAgent {
       this.searchDepth = searchDepth;
       return this;
     }
-    
+
     /**
      * @param evaluator Function to use to evaluate the quality of nodes in
      *     the search tree once the depth limit is hit. Default value is an
@@ -58,7 +61,7 @@ public class NegamaxSearch implements AsynchronousAgent {
       return this;
     }    
   }
-  
+
   /**
    * @param stateRepresentation State representation to employ.
    * @return A new builder for NegamaxSearch agents.
@@ -66,13 +69,13 @@ public class NegamaxSearch implements AsynchronousAgent {
   public static Builder builder(State stateRepresentation) {
     return new Builder(stateRepresentation);
   }
-  
+
   private final State stateRepresentation;
   private final int searchDepth;
   private final Evaluator evaluator;
   private volatile ActionScore asyncResult;
   private Thread workerThread;  
-  
+
   private NegamaxSearch(State stateRepresentation, int searchDepth, Evaluator evaluator) {
     this.stateRepresentation = stateRepresentation;
     this.searchDepth = searchDepth;
@@ -101,9 +104,9 @@ public class NegamaxSearch implements AsynchronousAgent {
     workerThread = (new Thread() {
       @Override
       public void run() {
-        int searchDepth = 1;
-        while (!isInterrupted()) {
-          asyncResult = search(player, root.copy(), searchDepth++, Double.NEGATIVE_INFINITY,
+        int currentSearchDepth = 1;
+        while (!isInterrupted() && currentSearchDepth < searchDepth) {
+          asyncResult = search(player, root.copy(), currentSearchDepth++, Double.NEGATIVE_INFINITY,
               Double.POSITIVE_INFINITY);
         }
       }

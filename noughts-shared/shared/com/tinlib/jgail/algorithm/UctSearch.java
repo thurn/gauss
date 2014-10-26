@@ -141,6 +141,7 @@ public class UctSearch implements AsynchronousAgent {
   private final Random random = new Random();
   private volatile ActionScore asyncResult;
   private Thread workerThread;
+  private ActionTree actionTree;
   
   private UctSearch(State stateRepresentation, int numSimulations, double explorationBias,
       double discountRate, int maxDepth, int numInitialVisits, Evaluator evaluator) {
@@ -158,7 +159,7 @@ public class UctSearch implements AsynchronousAgent {
    */
   @Override
   public ActionScore pickActionBlocking(int player, State root) {
-    ActionTree actionTree = new ActionTree();
+    actionTree = new ActionTree();
     return runSimulations(player, root, actionTree, numSimulations);
   }
 
@@ -169,7 +170,7 @@ public class UctSearch implements AsynchronousAgent {
   public State getStateRepresentation() {
     return stateRepresentation.copy();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -178,15 +179,17 @@ public class UctSearch implements AsynchronousAgent {
     workerThread = (new Thread() {
       @Override
       public void run() {
-        ActionTree actionTree = new ActionTree();
-        while (!isInterrupted()) {
-          asyncResult = runSimulations(player, root, actionTree, 1000);         
+        actionTree = new ActionTree();
+        int simulationCount = 0;
+        while (!isInterrupted() && simulationCount < numSimulations) {
+          asyncResult = runSimulations(player, root, actionTree, 1000);
+          simulationCount += 1000;
         }
       }
     });
-    workerThread.start();    
+    workerThread.start();
   }
-  
+
   /**
    * {@inheritDoc}
    */
@@ -196,7 +199,7 @@ public class UctSearch implements AsynchronousAgent {
     workerThread = null;
     return asyncResult;
   }
-  
+
   /**
    * Runs a number of simulations to determine the best action to take from the
    * provided root state.
@@ -277,7 +280,7 @@ public class UctSearch implements AsynchronousAgent {
     state.perform(action);
     return playRandomGame(player, state, depth + 1);   
   }
-  
+
   /**
    * Updates the tree at the given position, adding the given reward and
    * marking this node as visited

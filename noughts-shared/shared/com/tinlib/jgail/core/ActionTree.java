@@ -65,4 +65,19 @@ public class ActionTree {
   public double getTotalReward() {
     return totalReward;
   }
+
+  /**
+   * Prints out the scores associated with each child of this ActionTree.
+   * Intended for use in debugging.
+   *
+   * @param state A state object for producing String versions of the actions.
+   */
+  public void printTopLevel(State state) {
+    for (Map.Entry<Long, ActionTree> entry : children.entrySet()) {
+      System.out.println(state.actionToString(entry.getKey()) + "----->" +
+          entry.getValue().getTotalReward() / entry.getValue().getNumVisits());
+    }
+    System.out.println("NUM VISITS: " + numVisits);
+    System.out.println("AVERAGE REWARD: -----> " + totalReward / numVisits);
+  }
 }

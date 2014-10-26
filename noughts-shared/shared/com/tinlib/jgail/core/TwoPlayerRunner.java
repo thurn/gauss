@@ -1,78 +1,61 @@
 package com.tinlib.jgail.core;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
 
 /**
  * A helper class for running games & sets of games between multiple Agents.
  */
 public class TwoPlayerRunner {
-  private final Map<Integer, Agent> agents;
   private final State initialState;
   private final Random random = new Random();
 
   /**
-   * Constructs a new Main instance.
+   * Constructs a new Two Player Runner.
    *
-   * @param agents A map from player numbers to agents who will play in this
-   *     game.
    * @param canonicalState The state to use as the canonical game state. It is
    *     responsible for keeping track of actual actions in the game and is not
    *     directly given to any agent to make their action determination. It is
    *     the responsibility of the caller to ensure that this state is in the
    *     appropriate initial state for this game.
    */
-  public TwoPlayerRunner(Map<Integer, Agent> agents, State canonicalState) {
-    this.agents = agents;
+  public TwoPlayerRunner(State canonicalState) {
     this.initialState = canonicalState;
   }
   
   /**
-   * Run a series of matches between the agents, selected at random, and then
-   * report the results.
+   * Run a series of matches between the agents and then report the results.
    *
    * @param tournamentSize The number of matches to run.
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
    * @throws InterruptedException 
    */
-  public void runTournament(int tournamentSize, long perMoveTimeBudget)
+  public void runTournament(Map<Integer, Agent> agentMap, int tournamentSize, long perMoveTimeBudget)
       throws InterruptedException {
     long startTime = System.currentTimeMillis();
     Map<Agent, Integer> wins = new HashMap<>();
     int draws = 0;
+    List<Map.Entry<Integer, Agent>> list = new ArrayList<>(agentMap.entrySet());
 
     for (int i = 0; i < tournamentSize; ++i) {
-      Map<Integer, Agent> agentMap = new HashMap<>();
-      int black = random.nextInt(agents.size());
-      int red = random.nextInt(agents.size());
-      while (red == black) {
-        red = random.nextInt(agents.size());
+      Collections.shuffle(list);
+      Map<Integer, Agent> agents = new HashMap<>();
+      for (Map.Entry<Integer, Agent> entry : list) {
+        agents.put(entry.getKey(), entry.getValue());
       }
-      Agent agent1 = agents.get(black);
-      Agent agent2 = agents.get(red);
-      agentMap.put(0, agent1);
-      agentMap.put(1, agent2);
-      int winner = playGame(agentMap, false /* isInteractive */, perMoveTimeBudget);
+      int winner = playGame(agents, false /* isInteractive */, perMoveTimeBudget);
       System.out.print(".");
-      if (winner == 0) {
-        if (wins.containsKey(agent1)) {
-          wins.put(agent1, wins.get(agent1) + 1);
-        } else {
-          wins.put(agent1, 1);
-        }
-      } else if (winner == 1) {
-        if (wins.containsKey(agent2)) {
-          wins.put(agent2, wins.get(agent2) + 1);
-        } else {
-          wins.put(agent2, 1);
-        }
-      } else if (winner == State.NO_WINNER) {
+      if (winner == State.NO_WINNER) {
         draws++;
+      } else {
+        Agent winningAgent = agents.get(winner);
+        if (wins.containsKey(winningAgent)) {
+          wins.put(winningAgent, wins.get(winningAgent) + 1);
+        } else {
+          wins.put(winningAgent, 1);
+        }
       }
 
       if (i >= 10 && i % (tournamentSize / 10) == 0) {
@@ -90,22 +73,33 @@ public class TwoPlayerRunner {
     System.out.println("Tournament finished in " + elapsed + " (" + perTournament + 
         " per tournament)");    
   }
-  
+
+  public int runMatch(Map<Integer, Agent> agents, long perMoveTimeBudget)
+      throws InterruptedException {
+    return runMatch(agents, perMoveTimeBudget, true /* interactive */);
+  }
+
   /**
    * Run a single match between the first two provided agents, printing out the
    * current game state between each move.
    * 
    * @param perMoveTimeBudget Amount of time to allow for each agent to pick a
    *     move, if they are AsynchronousAgents.
-   * @throws InterruptedException 
+   * @throws InterruptedException
+   * @return The player number of the winner of this match, or State.NO_WINNER if
+   *     there was no winner.
    */
-  public void runMatch(long perMoveTimeBudget) throws InterruptedException {
-    int winner = playGame(agents, true /* isInteractive */, perMoveTimeBudget);
-    if (winner != State.NO_WINNER) {
-      System.out.println(agents.get(winner) + " wins!");
-    } else {
-      System.out.println("Game drawn.");
+  public int runMatch(Map<Integer, Agent> agents, long perMoveTimeBudget, boolean interactive)
+      throws InterruptedException {
+    int winner = playGame(agents, interactive, perMoveTimeBudget);
+    if (interactive) {
+      if (winner != State.NO_WINNER) {
+        System.out.println("Player " + winner + ", " + agents.get(winner) + " wins!");
+      } else {
+        System.out.println("Game drawn.");
+      }
     }
+    return winner;
   }
   
   /**

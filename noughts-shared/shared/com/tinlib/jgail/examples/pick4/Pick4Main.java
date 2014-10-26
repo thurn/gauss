@@ -19,7 +19,7 @@ public class Pick4Main {
     agents.put(1, NegamaxSearch.builder(new Pick4State())
         .setEvaluator(new WinLossEvaluator())
         .build());
-    TwoPlayerRunner runner = new TwoPlayerRunner(agents, new Pick4State().setToStartingConditions());
-    runner.runMatch(500L);
+    TwoPlayerRunner runner = new TwoPlayerRunner(new Pick4State().setToStartingConditions());
+    runner.runMatch(agents, 500L);
   }
 }

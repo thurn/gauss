@@ -16,8 +16,8 @@ public class TicTacToeMain {
         .setEvaluator(new WinLossEvaluator())
         .build());
     agents.put(1, MonteCarloSearch.builder(new TicTacToeState()).setNumSimulations(10).build());
-    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(agents,
+    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(
         new TicTacToeState().setToStartingConditions());
-    twoPlayerRunner.runTournament(100, 25L);
+    twoPlayerRunner.runTournament(agents, 100, 25L);
   }
 }

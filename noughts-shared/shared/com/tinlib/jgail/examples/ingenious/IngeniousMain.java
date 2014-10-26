@@ -19,8 +19,8 @@ public class IngeniousMain {
         .setEvaluator(new IngeniousState.LowestScoreEvaluator())
         .setSearchDepth(2)
         .build());    
-    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(agents,
+    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(
         new IngeniousState().setToStartingConditions());
-    twoPlayerRunner.runMatch(1000L);
+    twoPlayerRunner.runMatch(agents, 1000L);
   }
 }

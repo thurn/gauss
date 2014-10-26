@@ -26,6 +26,7 @@ public class DropswitchState implements State {
   private int winner;
   private boolean gameOver;
   private Random random = new Random();
+  private long lastAction;
 
   /**
    * Null-initializes this state. The state will not be usable until one of
@@ -36,12 +37,13 @@ public class DropswitchState implements State {
   }
 
   private DropswitchState(int[][] board, List<Long> actions, int currentPlayer, int winner,
-      boolean gameOver) {
+      boolean gameOver, long lastAction) {
     this.board = board;
     this.possibleActions = actions;
     this.currentPlayer = currentPlayer;
     this.winner = winner;
     this.gameOver = gameOver;
+    this.lastAction = lastAction;
   }
 
   @Override
@@ -67,7 +69,7 @@ public class DropswitchState implements State {
       int winner2 = computeWinnerFromLocation(board[column2][row2], column2, row2);
 
       if (winner1 != State.NO_WINNER && winner2 != State.NO_WINNER) {
-        // Simultaneous win
+        // Simultaneous win -> draw
         gameOver = true;
         winner = State.NO_WINNER;
       } else if (winner1 != State.NO_WINNER) {
@@ -87,9 +89,10 @@ public class DropswitchState implements State {
       }
     }
     currentPlayer = playerAfter(currentPlayer);
+    long undoToken = lastAction;
+    lastAction = action;
     possibleActions = currentlyPossibleActions();
-
-    return 0;
+    return undoToken;
   }
 
   @Override
@@ -102,8 +105,10 @@ public class DropswitchState implements State {
     } else {
       board[DropswitchAction.getDropColumn(action)][DropswitchAction.getDropRow(action)] = EMPTY;
     }
+    gameOver = false;
     winner = State.NO_WINNER;
     currentPlayer = playerBefore(currentPlayer);
+    lastAction = undoToken;
     possibleActions = currentlyPossibleActions();
   }
 
@@ -122,13 +127,18 @@ public class DropswitchState implements State {
     winner = State.NO_WINNER;
     possibleActions = currentlyPossibleActions();
     gameOver = false;
+    lastAction = -1;
     return this;
   }
 
   @Override
   public DropswitchState copy() {
-    return new DropswitchState(copyBoard(), new ArrayList<>(possibleActions), currentPlayer,
-        winner, gameOver);
+    if (possibleActions == null) {
+      return new DropswitchState();
+    } else {
+      return new DropswitchState(copyBoard(), new ArrayList<>(possibleActions), currentPlayer,
+          winner, gameOver, lastAction);
+    }
   }
 
   private int[][] copyBoard() {
@@ -146,6 +156,7 @@ public class DropswitchState implements State {
     this.winner = state.winner;
     this.possibleActions = state.possibleActions;
     this.gameOver = state.gameOver;
+    this.lastAction = state.lastAction;
     for (int i = 0; i < 4; ++i) {
       System.arraycopy(state.board[i], 0, board[i], 0, 4);
     }
@@ -197,12 +208,12 @@ public class DropswitchState implements State {
   @Override
   public String actionToString(long action) {
     if (DropswitchAction.isSwitchAction(action)) {
-      return "[s (" + DropswitchAction.getSwitchColumn1(action) + "," +
+      return "[switch (" + DropswitchAction.getSwitchColumn1(action) + "," +
           DropswitchAction.getSwitchRow1(action) + ") (" +
           DropswitchAction.getSwitchColumn2(action) + "," +
           DropswitchAction.getSwitchRow2(action) + ")]";
     } else {
-      return "[d (" + DropswitchAction.getDropColumn(action) + "," +
+      return "[drop (" + DropswitchAction.getDropColumn(action) + "," +
           DropswitchAction.getDropRow(action) + ")]";
     }
   }
@@ -219,7 +230,8 @@ public class DropswitchState implements State {
    */
   private int computeWinnerFromLocation(int player, int moveColumn, int moveRow) {
     // Vertical win?
-    if (countGroupSize(moveColumn, moveRow - 1, Direction.S, player) >= 3) {
+    if (countGroupSize(moveColumn, moveRow - 1, Direction.S, player) +
+        countGroupSize(moveColumn, moveRow + 1, Direction.N, player) >= 3) {
       return player;
     }
 
@@ -287,7 +299,10 @@ public class DropswitchState implements State {
     for (int i = 0; i < 4; ++i) {
       for (int j = 0; j < 4; ++j) {
         if (board[i][j] == EMPTY) {
-          result.add(DropswitchAction.dropAction(i, j));
+          long action = DropswitchAction.dropAction(i, j);
+          if (action != lastAction) {
+            result.add(action);
+          }
         }
       }
     }
@@ -296,12 +311,18 @@ public class DropswitchState implements State {
     for (int i = 0; i < 3; ++i) {
       for (int j = 0; j < 3; ++j) {
         // Switch with right neighbor
-        if (board[i][j] != EMPTY && board[i + 1][j] != board[i][j]) {
-          result.add(DropswitchAction.switchAction(i, j, i + 1, j));
+        if (board[i][j] != EMPTY && board[i + 1][j] != EMPTY && board[i + 1][j] != board[i][j]) {
+          long action = DropswitchAction.switchAction(i, j, i + 1, j);
+          if (action != lastAction) {
+            result.add(action);
+          }
         }
         // Switch with bottom neighbor
-        if (board[i][j] != EMPTY && board[i][j + 1] != board[i][j]) {
-          result.add(DropswitchAction.switchAction(i, j, i, j + 1));
+        if (board[i][j] != EMPTY && board[i][j + 1] != EMPTY && board[i][j + 1] != board[i][j]) {
+          long action = DropswitchAction.switchAction(i, j, i, j + 1);
+          if (action != lastAction) {
+            result.add(action);
+          }
         }
       }
     }

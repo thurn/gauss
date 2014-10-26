@@ -13,8 +13,8 @@ public class C4Main {
     Map<Integer, Agent> agents = new HashMap<>();
     agents.put(0, NegamaxSearch.builder(new C4State()).build());
     agents.put(1, MonteCarloSearch.builder(new C4State()).build());
-    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(agents,
+    TwoPlayerRunner twoPlayerRunner = new TwoPlayerRunner(
         new C4State().setToStartingConditions());
-    twoPlayerRunner.runTournament(10, 1000L);
+    twoPlayerRunner.runTournament(agents, 10, 1000L);
   }
 }
