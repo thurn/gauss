@@ -19,6 +19,8 @@ public class DropswitchState implements State {
   public static final int PLAYER_TWO = 2;
 
   private static final int EMPTY = 0;
+  private static final int BOARD_SIZE = 4;
+  private static final int WINNING_LINE_SIZE = 4;
   private final int[][] board;
 
   private List<Long> possibleActions;
@@ -33,7 +35,7 @@ public class DropswitchState implements State {
    * initializeFrom() or setToStartingConditions() is called on the result;
    */
   public DropswitchState() {
-    this.board = new int[4][4];
+    this.board = new int[BOARD_SIZE][BOARD_SIZE];
   }
 
   private DropswitchState(int[][] board, List<Long> actions, int currentPlayer, int winner,
@@ -124,6 +126,7 @@ public class DropswitchState implements State {
     for (int[] array : board) {
       Arrays.fill(array, EMPTY);
     }
+
     winner = State.NO_WINNER;
     possibleActions = currentlyPossibleActions();
     gameOver = false;
@@ -142,9 +145,9 @@ public class DropswitchState implements State {
   }
 
   private int[][] copyBoard() {
-    int[][] result = new int[4][4];
-    for (int i = 0; i < 4; ++i) {
-      result[i] = Arrays.copyOf(board[i], 4);
+    int[][] result = new int[BOARD_SIZE][BOARD_SIZE];
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+      result[i] = Arrays.copyOf(board[i], BOARD_SIZE);
     }
     return result;
   }
@@ -157,8 +160,8 @@ public class DropswitchState implements State {
     this.possibleActions = state.possibleActions;
     this.gameOver = state.gameOver;
     this.lastAction = state.lastAction;
-    for (int i = 0; i < 4; ++i) {
-      System.arraycopy(state.board[i], 0, board[i], 0, 4);
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+      System.arraycopy(state.board[i], 0, board[i], 0, BOARD_SIZE);
     }
     return this;
   }
@@ -191,8 +194,8 @@ public class DropswitchState implements State {
   @Override
   public String toString() {
     StringBuilder result = new StringBuilder();
-    for (int row = 0; row < 4; ++row) {
-      for (int column = 0; column < 4; ++column) {
+    for (int row = 0; row < BOARD_SIZE; ++row) {
+      for (int column = 0; column < BOARD_SIZE; ++column) {
         int p = board[column][row];
         if (p == EMPTY) {
           result.append("-");
@@ -231,23 +234,27 @@ public class DropswitchState implements State {
   private int computeWinnerFromLocation(int player, int moveColumn, int moveRow) {
     // Vertical win?
     if (countGroupSize(moveColumn, moveRow - 1, Direction.S, player) +
-        countGroupSize(moveColumn, moveRow + 1, Direction.N, player) >= 3) {
+        countGroupSize(moveColumn, moveRow + 1, Direction.N, player) >=
+        WINNING_LINE_SIZE - 1) {
       return player;
     }
 
     // Horizontal win?
     if (countGroupSize(moveColumn + 1, moveRow, Direction.E, player) +
-        countGroupSize(moveColumn - 1, moveRow, Direction.W, player) >= 3) {
+        countGroupSize(moveColumn - 1, moveRow, Direction.W, player) >=
+        WINNING_LINE_SIZE - 1) {
       return player;
     }
 
     // Diagonal win?
     if (countGroupSize(moveColumn + 1, moveRow + 1, Direction.NE, player) +
-        countGroupSize(moveColumn - 1, moveRow - 1, Direction.SW, player) >= 3) {
+        countGroupSize(moveColumn - 1, moveRow - 1, Direction.SW, player) >=
+        WINNING_LINE_SIZE - 1) {
       return player;
     }
     if (countGroupSize(moveColumn - 1, moveRow + 1, Direction.NW, player) +
-        countGroupSize(moveColumn + 1, moveRow - 1, Direction.SE, player) >=3) {
+        countGroupSize(moveColumn + 1, moveRow - 1, Direction.SE, player) >=
+        WINNING_LINE_SIZE - 1) {
       return player;
     }
 
@@ -266,7 +273,7 @@ public class DropswitchState implements State {
    *     direction.
    */
   private int countGroupSize(int col, int row, Direction dir, int player) {
-    if (row < 4 && row >= 0 && col < 4 && col >= 0 && board[col][row] == player) {
+    if (row < BOARD_SIZE && row >= 0 && col < BOARD_SIZE && col >= 0 && board[col][row] == player) {
       switch (dir) {
         case N:
           return 1 + countGroupSize(col, row + 1, dir, player);
@@ -296,8 +303,8 @@ public class DropswitchState implements State {
     List<Long> result = new ArrayList<>();
 
     // Add drop actions
-    for (int i = 0; i < 4; ++i) {
-      for (int j = 0; j < 4; ++j) {
+    for (int i = 0; i < BOARD_SIZE; ++i) {
+      for (int j = 0; j < BOARD_SIZE; ++j) {
         if (board[i][j] == EMPTY) {
           long action = DropswitchAction.dropAction(i, j);
           if (action != lastAction) {
@@ -308,8 +315,8 @@ public class DropswitchState implements State {
     }
 
     // Add switch actions
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 3; ++j) {
+    for (int i = 0; i < BOARD_SIZE - 1; ++i) {
+      for (int j = 0; j < BOARD_SIZE - 1; ++j) {
         // Switch with right neighbor
         if (board[i][j] != EMPTY && board[i + 1][j] != EMPTY && board[i + 1][j] != board[i][j]) {
           long action = DropswitchAction.switchAction(i, j, i + 1, j);
