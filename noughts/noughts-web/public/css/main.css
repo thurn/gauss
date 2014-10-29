@@ -1,0 +1,45 @@
+body {
+  margin: 0;
+}
+
+.header {
+  background-color: #f0f0f0;
+  height: 4rem;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-align-items: center;
+}
+
+.logo {
+  margin-left: 2rem;
+}
+
+.body {
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  -webkit-justify-content: center;
+  align-items: center;
+  -webkit-align-items: center;
+  margin: 0 1rem 0 1rem;
+}
+
+.message {
+  width: 20rem;
+  height: 30rem;
+  margin-top: 3rem;
+}
+
+.tall-message {
+  width: 20rem;
+}
+
+.centered-flexbox {
+  display: flex;
+  display: -webkit-flex;
+  display: flex;
+  justify-content: center;
+  -webkit-justify-content: center;
+  align-items: center;
+  -webkit-align-items: center;
+}

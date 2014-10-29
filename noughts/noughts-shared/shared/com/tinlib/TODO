@@ -1,0 +1,14 @@
+Beget
+  - Integrate it with the build process
+  - Add support for extensions
+  - Add support for packages
+  - Add support for subclassing
+  - Generally clean up the code
+  - tests
+
+General
+  - Build javadoc from command line
+  - Run findbugs & check style from command line
+  - github continuous integration banners
+  - Add javadoc everywhere
+  - maven central releases

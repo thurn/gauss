@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "games": {
+      "$gameId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "requests": {
+      "$requestId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "users": {
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    "facebookUsers": {
+      "$facebookId": {
+        ".read": "$facebookId == auth.id",
+        ".write": "$facebookId == auth.id"
+      }
+    }
+  }
+}

@@ -1,7 +1,0 @@
-.DS_Store
-.gradle/
-build/
-*.iml
-*.iws
-*.pyc
-out/

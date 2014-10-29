@@ -1,0 +1,164 @@
+apply plugin: 'java'
+
+defaultTasks 'closureCompile'
+
+def gwtDir = "${project.buildDir}/gwt"
+def gwtOptimizedDir = "${project.buildDir}/gwtOptimized"
+def toolsDir = "noughts-web/tools"
+def externsDir = "noughts-web/externs"
+def jsDir = "noughts-web/public/js"
+def closureDir = "noughts-web/public/closure"
+def gwtOutputFile = "${jsDir}/shared.nocache.js"
+def depsFile = "${jsDir}/deps.js"
+def jsOutputFile = "${jsDir}/compiled.js"
+
+def commonGwtArgs = [
+  'ca.thurn.noughts.Shared',
+  '-strict',
+  '-logLevel', 'INFO',
+  '-localWorkers', '2'
+]
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+  compile 'com.google.gwt:gwt-user:2.6.1'
+  compile 'com.google.gwt:gwt-servlet:2.6.1'
+  compile 'com.google.gwt:gwt-dev:2.6.1'
+  compile 'com.google.guava:guava:17.0'
+  compile 'com.google.guava:guava-gwt:17.0'
+  compile fileTree('noughts-shared/lib')
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir 'noughts-shared/shared'
+      exclude 'ca/thurn/gwtcompat/super/**'
+    }
+  }
+}
+
+task setup << {
+  file(gwtDir).mkdirs()
+  file(gwtOptimizedDir).mkdirs()
+}
+
+task gwtc(dependsOn: [setup, classes], type: JavaExec) {
+  inputs.source sourceSets.main.java.srcDirs
+  outputs.dir gwtDir
+
+  main = 'com.google.gwt.dev.Compiler'
+
+  classpath {[
+    sourceSets.main.java.srcDirs,
+    sourceSets.main.output.classesDir,
+    sourceSets.main.compileClasspath
+  ]}
+
+  maxHeapSize = '256M'
+  args = commonGwtArgs + [
+    '-war', gwtDir,
+    '-style', 'PRETTY',
+    '-draftCompile',
+    '-optimize', '0',
+  ]
+}
+
+task gwtOptimized(dependsOn: [setup, classes], type: JavaExec) {
+  inputs.source sourceSets.main.java.srcDirs
+  outputs.dir gwtOptimizedDir
+
+  main = 'com.google.gwt.dev.Compiler'
+
+  classpath {[
+    sourceSets.main.java.srcDirs,
+    sourceSets.main.output.classesDir,
+    sourceSets.main.compileClasspath
+  ]}
+
+  maxHeapSize = '256M'
+  args = commonGwtArgs + [
+    '-war', gwtOptimizedDir,
+    '-XenableClosureCompiler',
+    '-XnoclassMetadata',
+  ]
+}
+
+task copyGwtOutput(dependsOn: gwtc, type: Copy) {
+  from "${gwtDir}/shared/shared.nocache.js"
+  into jsDir
+}
+
+task copyGwtOptimizedOutput(dependsOn: gwtOptimized, type: Copy) {
+  from "${gwtOptimizedDir}/shared/shared.nocache.js"
+  into jsDir
+}
+
+def gwtTask(project) {
+  if (project.hasProperty("debug")) {
+    copyGwtOutput
+  } else {
+    copyGwtOptimizedOutput
+  }
+}
+
+task fixGwtOutput(dependsOn: gwtTask(project)) << {
+  def gwtFile = file(gwtOutputFile)
+  def text = gwtFile.text
+  def suppress = "@suppress {uselessCode|checkTypes|const|suspiciousCode" +
+      "|duplicate|checkVars|es5Strict}"
+
+  // Calm the typechecker down a bit
+  text = "goog.require('org.timepedia.exporter.Exportable');\n" + text
+
+  // Fixes a bug where GWT creates a global variable 'shared' which
+  // already exists
+  gwtFile.write(text
+      .replaceAll(/function shared/, 'shared = function')
+      .replaceAll(/\@suppress \{.*?\}/, suppress)
+      .replaceAll(/\.\<T\>/, ''))
+}
+
+task generateDepsFile(dependsOn: fixGwtOutput, type: Exec) {
+  executable = "python"
+  args = [
+    "${toolsDir}/depswriter.py",
+    "--root_with_prefix", "${jsDir} ../js"
+  ]
+  standardOutput = file(depsFile).newOutputStream()
+}
+
+task closureCompile(dependsOn: generateDepsFile, type: Exec) {
+  executable = "python"
+  def compilationLevel = "ADVANCED_OPTIMIZATIONS"
+  if (project.hasProperty("debug")) {
+    compilationLevel = "WHITESPACE_ONLY"
+  }
+  args = [
+    "${toolsDir}/closurebuilder.py",
+    "--root=${closureDir}",
+    "--root=${jsDir}",
+    "--namespace=other",
+    "--output_mode=compiled",
+    "--compiler_jar=${toolsDir}/compiler.jar",
+    "--compiler_flags=--externs=${externsDir}/firebase.js",
+    "--compiler_flags=--process_closure_primitives",
+    "--compiler_flags=--warning_level=VERBOSE",
+    "--compiler_flags=--jscomp_warning=accessControls",
+    "--compiler_flags=--jscomp_warning=checkRegExp",
+    "--compiler_flags=--jscomp_warning=const",
+    "--compiler_flags=--jscomp_warning=constantProperty",
+    "--compiler_flags=--jscomp_warning=strictModuleDepCheck",
+    "--compiler_flags=--jscomp_warning=visibility",
+    "--compiler_flags=--compilation_level=${compilationLevel}",
+    "--output_file=${jsOutputFile}"
+  ]
+}
+
+clean << {
+  file(gwtOutputFile).delete()
+  file(depsFile).delete()
+}
