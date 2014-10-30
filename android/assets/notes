@@ -1,0 +1,67 @@
+All game programming uses a standard coordinate system. The primary gameplay
+activity happens inside the 600x960 "gameplay" box. A larger "viewport" box is
+available which is 685x1150. The gameplay box is centered inside the viewport box,
+and due to varying aspect ratios, the top and bottom 42 pixels and the left and
+right 95 pixels of the viewport may not be visible on some devices.
+
+# Asset Classes
+
+Assets should be produced in the following classes:
+
+* 1.000000x (600p) (example device: iPhone 5 in landscape)
+* 1.066666x (640p) (example device: iPhone 5)
+* 1.558333x (935p) (example device: iPad with game sideways)
+* 1.675000x (1005p) (example device: Nexus 5 in landscape)
+* 1.800000x (1080p) (example device: Galaxy S5)
+* 2.091666x (1255p) (example device: iPad)
+* 3.600000x (2160p) (example device: 4K TV)
+
+# Phone Info
+
+Here is a list of the estimated resolutions of various phones, along with details about
+their secondary UI space.
+
+## iPhone 4
+- Game runs in landscape only!
+- Resolution: 600x960
+- Secondary UI: None
+
+## iPhone 5
+- Resolution: 640x1024
+- Secondary UI: 640x72 (Top)
+
+## iPhone 5 (in-call)
+- Resolution: 550x880
+- Secondary UI: 32x550 (Top)
+
+## iPhone 5 (landscape)
+- Resolution: 600x960
+- Secondary UI: None
+
+## Nexus 5/HTC One
+- Resolution: 1062x1700
+- Secondary UI: 17.5x1700 (Side)
+
+## HTC One (Landscape)
+- Resolution: 1005x1608
+- Secondary UI: 187x1005 (Top)
+
+## Nexus 5 (landscape)
+- Resolution: 1005 * 1608
+- Secondary UI: 167x1005 (Top)
+
+## Nexus 4
+- Resolution: 708x1133
+- Secondary UI: 60x1133 (Side)
+
+## Moto X
+- Resolution: 708x1133
+- Secondary UI: 12x1133 (Side)
+
+## Galaxy S5
+- Resolution: 1080x1728
+- Secondary UI: 117*1080 (Top)
+
+## Galaxy S5 (landscape)
+- Resolution: 1005 * 1608
+- Secondary UI: 312*1005 (Top)
