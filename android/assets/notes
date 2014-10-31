@@ -11,6 +11,11 @@ Converted to 2160p, the gameplay box is 2160x3456 and the viewport box is
 
 Assets should be produced in the following classes:
 
+* 0.800000x
+  - 480p
+  - Example device: Samsung Galaxy
+  - Background Size: 548x920
+
 * 1.000000x
   - 600p
   - Example device: iPhone 5 in landscape
@@ -31,9 +36,14 @@ Assets should be produced in the following classes:
   - Example device: Nexus 5 in landscape
   - Background Size: 1147x1926
 
+* 1.771666x
+  - 1063p
+  - Example device: Nexus 5 in portrait
+  - Background Size: 1214x2037
+
 * 1.800000x
   - 1080p
-  - Example device: Galaxy S5
+  - Example device: Samsung Galaxy S5
   - Background Size: 1233x2070
 
 * 2.091666x

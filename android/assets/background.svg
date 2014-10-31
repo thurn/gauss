@@ -16,7 +16,7 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.2 r9819"
-   sodipodi:docname="abstract art.svg"
+   sodipodi:docname="background.svg"
    inkscape:export-filename="/Users/dthurn/Dropbox/dropswitch/android/assets/600p/background.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -27,9 +27,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.5"
-     inkscape:cx="357.42055"
-     inkscape:cy="639.60921"
+     inkscape:zoom="0.70710678"
+     inkscape:cx="342.5192"
+     inkscape:cy="647.33889"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -838,7 +838,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -1680,7 +1680,7 @@
     </g>
     <g
        id="g6031"
-       transform="translate(-9.5367432e-6,-55.499992)">
+       transform="matrix(0.9,0,0,0.9,34.249991,-2.2137745)">
       <rect
          ry="18.880211"
          rx="18.880207"
