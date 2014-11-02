@@ -1,11 +1,6 @@
 All game programming uses a standard coordinate system. The primary gameplay
 activity happens inside the 600x960 "gameplay" box. A larger "viewport" box is
-available which is 685x1150. The gameplay box is centered inside the viewport box,
-and due to varying aspect ratios, the top and bottom 95 pixels and the left and
-right 42 pixels of the viewport may not be visible on some devices.
-
-Converted to 2160p, the gameplay box is 2160x3456 and the viewport box is
-2466x4140.
+available which is 750x1150. The gameplay box is centered inside the viewport box.
 
 # Asset Classes
 
@@ -14,47 +9,38 @@ Assets should be produced in the following classes:
 * 0.800000x
   - 480p
   - Example device: Samsung Galaxy
-  - Background Size: 548x920
 
 * 1.000000x
   - 600p
   - Example device: iPhone 5 in landscape
-  - Background Size: 685x1150
 
 * 1.066666x
   - 640p
   - Example device: iPhone 5
-  - Background Size: 731x1227
 
 * 1.558333x
   - 935p
   - Example device: iPad with game sideways
-  - Background Size: 1067x1792
 
 * 1.675000x
   - 1005p
   - Example device: Nexus 5 in landscape
-  - Background Size: 1147x1926
 
 * 1.771666x
   - 1063p
   - Example device: Nexus 5 in portrait
-  - Background Size: 1214x2037
 
 * 1.800000x
   - 1080p
   - Example device: Samsung Galaxy S5
-  - Background Size: 1233x2070
 
 * 2.091666x
   - 1255p
   - Example device: iPad
-  - Background Size: 1433x2405
 
 * 3.600000x
   - 2160p
   - Example device: 4K TV
-  - Background Size: 2466x4140
 
 # Phone Info
 
