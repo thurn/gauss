@@ -15,6 +15,7 @@ public class DropswitchMain extends ApplicationAdapter {
 
 	private SpriteBatch batch;
   private TextureRegion background;
+  private OrthographicCamera camera;
 
 	@Override
 	public void create () {
@@ -23,23 +24,32 @@ public class DropswitchMain extends ApplicationAdapter {
 
   @Override
   public void resize(int width, int height) {
+    camera = new OrthographicCamera();
+    camera.setToOrtho(false /* yDown */, width, height);
+
     int shortEdge = width;
     int longEdge = height;
     if (width > height) {
       shortEdge = height;
       longEdge = width;
+      rotateToLandscape(true /* clockwise */);
     }
 
-    CurrentLauncher.get().log("Resize to " + width + "x" + height);
-    int scaledWidth = Math.min(width, MathUtils.roundPositive(longEdge / ASPECT_RATIO));
+    int scaledShortEdge = Math.min(width, MathUtils.roundPositive(longEdge / ASPECT_RATIO));
 
-    Texture texture = loadTexture("background.png", scaledWidth);
+    Texture texture = loadTexture("background.png", scaledShortEdge);
     texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Nearest);
 
     int xOffset = MathUtils.roundPositive((texture.getWidth() - shortEdge) / 2.0f);
     int yOffset = MathUtils.roundPositive((texture.getHeight() - longEdge) / 2.0f);
 
     background = new TextureRegion(texture, xOffset, yOffset, shortEdge, longEdge);
+  }
+
+  private void rotateToLandscape(boolean clockwise) {
+    camera.translate(-Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2);
+    camera.rotate(clockwise ? 90 : -90);
+    camera.translate(Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth() / 2);
   }
 
   private Texture loadTexture(String name, int screenWidth) {
@@ -75,8 +85,13 @@ public class DropswitchMain extends ApplicationAdapter {
     Gdx.gl.glClearColor(0.13f, 0.37f, 0.41f, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+    camera.update();
+    batch.setProjectionMatrix(camera.combined);
+
 		batch.begin();
-		batch.draw(background, 0, 0);
+    batch.draw(background, 0, 0);
+//		batch.draw(background, 140, -140);
+//    background.draw(batch);
 		batch.end();
 	}
 }
