@@ -14,17 +14,18 @@ public class DropswitchMain extends ApplicationAdapter {
   private static final float ASPECT_RATIO = 1.7f;
 
 	private SpriteBatch batch;
-  private TextureRegion background;
+  private Sprite background;
   private OrthographicCamera camera;
+
+  private Sprite red;
 
 	@Override
 	public void create () {
 		batch = new SpriteBatch();
-	}
 
-  @Override
-  public void resize(int width, int height) {
     camera = new OrthographicCamera();
+    int width = Gdx.graphics.getWidth();
+    int height = Gdx.graphics.getHeight();
     camera.setToOrtho(false /* yDown */, width, height);
 
     int shortEdge = width;
@@ -32,7 +33,7 @@ public class DropswitchMain extends ApplicationAdapter {
     if (width > height) {
       shortEdge = height;
       longEdge = width;
-      rotateToLandscape(true /* clockwise */);
+//      rotateToLandscape(true /* clockwise */);
     }
 
     int scaledShortEdge = Math.min(width, MathUtils.roundPositive(longEdge / ASPECT_RATIO));
@@ -43,12 +44,50 @@ public class DropswitchMain extends ApplicationAdapter {
     int xOffset = MathUtils.roundPositive((texture.getWidth() - shortEdge) / 2.0f);
     int yOffset = MathUtils.roundPositive((texture.getHeight() - longEdge) / 2.0f);
 
-    background = new TextureRegion(texture, xOffset, yOffset, shortEdge, longEdge);
+    background = new Sprite(new TextureRegion(texture, xOffset, yOffset, shortEdge, longEdge));
+    red = new Sprite(new Texture("bucket.png"));
+    red.setPosition(200, 200);
+	}
+
+  @Override
+  public void resize(int width, int height) {
+    if (width > height) {
+      Gdx.app.log(";;;", "width>height");
+//      background.rotate(-90);
+      red.setOrigin(0, 0);
+//      red.rotate(-90);
+      red.setPosition(625, 200);
+//      camera.rotate(-90);
+    } else {
+      Gdx.app.log(";;;", "height>width");
+    }
+//    Gdx.app.log(";;;", "resize " + width + "x" + height);
+//
+//    camera = new OrthographicCamera();
+//    camera.setToOrtho(false /* yDown */, width, height);
+//
+//    int shortEdge = width;
+//    int longEdge = height;
+//    if (width > height) {
+//      shortEdge = height;
+//      longEdge = width;
+////      rotateToLandscape(true /* clockwise */);
+//    }
+//
+//    int scaledShortEdge = Math.min(width, MathUtils.roundPositive(longEdge / ASPECT_RATIO));
+//
+//    Texture texture = loadTexture("background.png", scaledShortEdge);
+//    texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Nearest);
+//
+//    int xOffset = MathUtils.roundPositive((texture.getWidth() - shortEdge) / 2.0f);
+//    int yOffset = MathUtils.roundPositive((texture.getHeight() - longEdge) / 2.0f);
+//
+//    background = new TextureRegion(texture, xOffset, yOffset, shortEdge, longEdge);
   }
 
   private void rotateToLandscape(boolean clockwise) {
     camera.translate(-Gdx.graphics.getWidth() / 2, -Gdx.graphics.getHeight() / 2);
-    camera.rotate(clockwise ? 90 : -90);
+    camera.rotate(clockwise ? -90 : 90);
     camera.translate(Gdx.graphics.getHeight() / 2, Gdx.graphics.getWidth() / 2);
   }
 
@@ -85,11 +124,14 @@ public class DropswitchMain extends ApplicationAdapter {
     Gdx.gl.glClearColor(0.13f, 0.37f, 0.41f, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    camera.update();
-    batch.setProjectionMatrix(camera.combined);
+//    camera.update();
+//    batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();
-    batch.draw(background, 0, 0);
+//    background.draw(batch);
+    red.draw(batch);
+//    batch.draw(red, 0, 0);
+//    batch.draw(background, 0, 0);
 //		batch.draw(background, 140, -140);
 //    background.draw(batch);
 		batch.end();
