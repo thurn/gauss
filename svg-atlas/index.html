@@ -1,0 +1,27 @@
+<!doctype html>
+<html>
+  <head>
+  <meta charset="utf-8">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/pixi.js/1.6.1/pixi.js"></script>
+    <script src="svgatlas.js"></script>
+    <script>
+      function init() {
+        var loader = new svgatlas.SvgAtlasLoader(["atlas.svgatlas"]);
+        loader.on('loaded', onSvgLoaded);
+        loader.load();
+       	var stage = new PIXI.Stage(0xFFFFFF);
+        var renderer = PIXI.autoDetectRenderer(800, 600);
+        document.body.appendChild(renderer.view);
+
+        function onSvgLoaded() {
+          var red = PIXI.Sprite.fromFrame("red");
+          red.position.x = 100;
+          red.position.y = 100;
+          stage.addChild(red);
+        }
+      }
+    </script>
+  </head>
+  <body onload="init();">
+  </body>
+</html>

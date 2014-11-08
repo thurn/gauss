@@ -1,0 +1,26 @@
+{
+  "file":"atlas.svg",
+  "assets":[
+    {
+      "name":"background",
+      "x":0,
+      "y":0,
+      "width":800,
+      "height":1220
+    },
+    {
+      "name":"blue",
+      "x":801.530,
+      "y":2.416,
+      "width":147.141,
+      "height":146.376
+    },
+    {
+      "name":"red",
+      "x":803.444,
+      "y":150.478,
+      "width":140.136,
+      "height":142.161
+    }
+  ]
+}
