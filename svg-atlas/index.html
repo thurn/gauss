@@ -6,18 +6,34 @@
     <script src="svgatlas.js"></script>
     <script>
       function init() {
-        var loader = new svgatlas.SvgAtlasLoader(["atlas.svgatlas"]);
+        var loader = new svgatlas.SvgAtlasLoader(['atlas.svgatlas']);
         loader.on('loaded', onSvgLoaded);
         loader.load();
-       	var stage = new PIXI.Stage(0xFFFFFF);
+       	var stage = new PIXI.Stage(0x66FF99);
         var renderer = PIXI.autoDetectRenderer(800, 600);
         document.body.appendChild(renderer.view);
+        requestAnimFrame(animate);
 
         function onSvgLoaded() {
-          var red = PIXI.Sprite.fromFrame("red");
+          var red = PIXI.Sprite.fromFrame('red');
           red.position.x = 100;
           red.position.y = 100;
           stage.addChild(red);
+
+          var red2 = PIXI.Sprite.fromFrame('red');
+          red2.position.x = 300;
+          red2.position.y = 300;
+          stage.addChild(red2);
+
+          var blue = PIXI.Sprite.fromFrame('blue');
+          blue.position.x = 300;
+          blue.position.y = 100;
+          stage.addChild(blue);
+        }
+
+        function animate() {
+          requestAnimFrame(animate);
+          renderer.render(stage);
         }
       }
     </script>

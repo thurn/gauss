@@ -54,7 +54,6 @@ svgatlas.SvgAtlasLoader.prototype.onImageLoaded = function(image) {
   var canvas = document.createElement('canvas');
   canvas.height = image.height;
   canvas.width = image.width;
-  document.body.appendChild(canvas);
   var context = canvas.getContext('2d');
   context.drawImage(image, 0, 0, image.width, image.height);
 
@@ -63,14 +62,9 @@ svgatlas.SvgAtlasLoader.prototype.onImageLoaded = function(image) {
     var asset = this.assets[i];
     var name = asset['name'];
     var yCoordinate = image.height - asset['height'] - asset['y'];
-    PIXI.TextureCache[name] = new PIXI.Texture(texture, {
-      x: asset['x'],
-      y: yCoordinate,
-      width: asset['width'],
-      height: asset['height']
-    });
-    PIXI.TextureCache[name].crop = new PIXI.Rectangle(asset['x'], yCoordinate,
-        asset['width'], asset['height']);
+    PIXI.TextureCache[name] = new PIXI.Texture(texture);
+    PIXI.TextureCache[name].setFrame(new PIXI.Rectangle(asset['x'], yCoordinate,
+        asset['width'], asset['height']));
   };
 
   this.dispatchEvent({
