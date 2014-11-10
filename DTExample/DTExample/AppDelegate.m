@@ -7,6 +7,7 @@
 
 @interface AppDelegate ()
 @property(nonatomic) GCDWebServer* webServer;
+@property(nonatomic) WKWebView *webView;
 @end
 
 @implementation AppDelegate
@@ -27,21 +28,31 @@
   [self.webServer addGETHandlerForBasePath:@"/"
                              directoryPath:[bundlePath stringByAppendingString:@"/Test"]
                              indexFilename:@"index.html"
-                                  cacheAge:3600
+                                  cacheAge:0
                         allowRangeRequests:YES];
   [self.webServer startWithPort:8080 bonjourName:nil];
 
   WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
-  WKWebView *webView = [[WKWebView alloc] initWithFrame:rootController.view.frame
+  self.webView = [[WKWebView alloc] initWithFrame:rootController.view.frame
                                           configuration:configuration];
-  [rootController.view addSubview:webView];
+  [rootController.view addSubview:self.webView];
 
-  NSURL *url = [[NSURL alloc] initWithString:@"http://0.0.0.0:8080/"];
+  NSURL *url = [[NSURL alloc] initWithString:@"http://0.0.0.0:8080/ipc.html"];
   NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
   
-  [webView loadRequest:request];
+  [self.webView loadRequest:request];
 
   return YES;
+}
+
+- (void)callJs {
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+                   [self.webView evaluateJavaScript:@"tin.alert([1,2,3])"
+                                  completionHandler:^(id result, NSError *error) {
+                                    NSLog(@"%@", result);
+                                  }];
+                 });
 }
 
 @end

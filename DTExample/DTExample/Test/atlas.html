@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+  <head>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+		}
+  </style>
+  <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/1.6.1/pixi.js"></script>
+    <script src="svgatlas.js"></script>
+    <script>
+      function init() {
+       	var stage = new PIXI.Stage(0x66FF99);
+        var renderer = PIXI.autoDetectRenderer(800, 800);
+        document.body.appendChild(renderer.view);
+        requestAnimFrame(animate);
+
+        function animate() {
+          requestAnimFrame(animate);
+          renderer.render(stage);
+        }
+
+        var loader = new svgatlas.SvgAtlasLoader(['atlas.svgatlas'], 0.5 /* scale factor */,
+            true /* crossorigin */);
+        loader.on('loaded', onSvgLoaded);
+        loader.load();
+
+        function onSvgLoaded() {
+          var tiger = PIXI.Sprite.fromFrame('tiger');
+          tiger.position.x = 50;
+          tiger.position.y = 50;
+          stage.addChild(tiger);
+
+          var koala = PIXI.Sprite.fromFrame('koala');
+          koala.position.x = 50;
+          koala.position.y = 400;
+          stage.addChild(koala);
+
+          var dog = PIXI.Sprite.fromFrame('dog');
+          dog.position.x = 400;
+          dog.position.y = 50;
+          stage.addChild(dog);
+
+          var tiger2 = PIXI.Sprite.fromFrame('tiger');
+          tiger2.anchor.x = 0.5;
+          tiger2.anchor.y = 0.5;
+          tiger2.position.x = 1300;
+          tiger2.position.y = 1300;
+          tiger2.scale.x = 8.0;
+          tiger2.scale.y = 8.0;
+          tiger2.rotation = Math.PI + Math.PI/2;
+          stage.addChild(tiger2);
+        }
+
+        (function animate() {
+          requestAnimFrame(animate);
+          renderer.render(stage);
+        })();
+      }
+    </script>
+  </head>
+  <body onload="init();">
+    <img src="atlas.svg" style="display:none;" id="atlas" />
+  </body>
+</html>
