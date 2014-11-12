@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      window.loadDb = function() {
+        var openRequest = window.indexedDB.open("myDatabase", 2);
+        openRequest.onsuccess = function() {
+          window.database = openRequest.result;
+        };
+        openRequest.onupgradeneeded = function(event) {
+          var db = event.target.result;
+          db.createObjectStore("customers", { keyPath: "ssn" });
+        };
+      };
+
+      window.initialize = function() {
+        var transaction = window.database.transaction(["customers"], "readwrite");
+        var objectStore = transaction.objectStore("customers");
+        objectStore.add({"name": "fred", "ssn": "123"});
+        objectStore.add({"name": "george", "ssn": "345"});
+        objectStore.add({"name": "bob", "ssn": "567"});
+      };
+
+      window.readData = function() {
+        window.database.transaction("customers").
+            objectStore("customers").
+            get("123").onsuccess = function(event) {
+          document.body.appendChild(new Text("Customer name " + event.target.result.name));
+        }
+      };
+    </script>
+  </head>
+  <body onload="loadDb();">
+    <br /><br /><br /><h1>body</h1>
+    <button type="button" onclick="initialize();">Initialize</button>
+    <br /><br />
+    <button type="button" onclick="readData();">Read Data</button>
+    <br /><br />
+  </body>
+</html>

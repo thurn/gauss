@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <script>
+      function run() {
+        var worker = new Worker("worker.js");
+        worker.onmessage = function(event) {
+          document.body.appendChild(document.createTextNode("Worker said: " + event.data + " "));
+        };
+        worker.postMessage("Main thread");
+      }
+    </script>
+  </head>
+  <body>
+    <br /><br /><br /><h1>body</h1>
+    <button type="button" onclick="run();">Run</button>
+    <br /><br />
+  </body>
+</html>

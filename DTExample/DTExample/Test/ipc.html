@@ -8,9 +8,20 @@
         var f = function() {};
         return f;
       };
+
+      tin.postMessage = function(msg) {
+        if (window.webkit && window.webkit.messageHandlers) {
+          window.webkit.messageHandlers['my_handler'].postMessage(msg);
+        }
+      }
+
+      tin.click = function() {
+        tin.postMessage({text: "Button Clicked!"});
+      };
     </script>
   </head>
   <body>
     <br /><br /><br /><h1>body</h1>
+    <button type="button" onclick="tin.click();">Click me</button>
   </body>
 </html>

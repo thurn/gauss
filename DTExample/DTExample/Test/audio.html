@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/1.1.17/howler.min.js"></script>
+    <script>
+      buttonClick = function() {
+        var sound = new Howl({urls: ['sound.mp3']});
+        sound.play();
+      }
+      setTimeout(function() {
+        buttonClick();
+      }, 200);
+    </script>
+  </head>
+  <body>
+    <br /><br /><br /><h1>body</h1>
+    <button type="button" onclick="buttonClick();">Click me</button>
+  </body>
+</html>

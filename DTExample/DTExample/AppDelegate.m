@@ -5,7 +5,7 @@
 #import "GCDWebServer.h"
 #import "GCDWebServerDataResponse.h"
 
-@interface AppDelegate ()
+@interface AppDelegate () <WKScriptMessageHandler>
 @property(nonatomic) GCDWebServer* webServer;
 @property(nonatomic) WKWebView *webView;
 @end
@@ -33,16 +33,26 @@
   [self.webServer startWithPort:8080 bonjourName:nil];
 
   WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
+  WKUserContentController *userContentController = [[WKUserContentController alloc] init];
+  [userContentController addScriptMessageHandler:self name:@"my_handler"];
+  configuration.userContentController = userContentController;
   self.webView = [[WKWebView alloc] initWithFrame:rootController.view.frame
                                           configuration:configuration];
   [rootController.view addSubview:self.webView];
 
-  NSURL *url = [[NSURL alloc] initWithString:@"http://0.0.0.0:8080/ipc.html"];
+  NSURL *url = [[NSURL alloc] initWithString:@"http://0.0.0.0:8080/firebase.html"];
   NSURLRequest *request = [[NSURLRequest alloc] initWithURL:url];
-  
+
   [self.webView loadRequest:request];
 
   return YES;
+}
+
+- (void)userContentController:(WKUserContentController *)userContentController
+      didReceiveScriptMessage:(WKScriptMessage *)message {
+  NSString *text = message.body[@"text"];
+  [self.webView evaluateJavaScript:[NSString stringWithFormat:@"tin.alert('%@');", text]
+                 completionHandler:nil];
 }
 
 - (void)callJs {
